@@ -1,1 +1,5 @@
-히나 서바이벌 v2.7: 후두부 헤어 보강, 야간 조도 감소, 허기 시 물고기/토끼 포획 우선, 포획 먹거리 허기 회복량 차등(모닥불 조리 보너스).
+HINA SURVIVAL v3.7
+- Terrain step collision with body footprint, prevents entering raised cliff sides.
+- Camera soft occlusion uses projected screen overlap instead of center ray alone; includes grass terrain caps.
+- Walk gait animation 200% speed, simulation time unaffected.
+- Safety spot validation strengthened.

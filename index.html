@@ -8,7 +8,8 @@
  #badge #status,#badge #exploration{display:none}
  #controls{z-index:10;left:50%;bottom:calc(7px + env(safe-area-inset-bottom));transform:translateX(-50%);padding:6px 8px;gap:6px;max-width:calc(100vw - 20px);white-space:nowrap}
  #controls button{font-size:12px;padding:9px 10px;min-height:36px}
- #controls #elapsed{font-size:11px}
+ #controls #elapsed{display:none}
+ #controls #cameraMode{font-size:11px;padding:8px 7px}
  #extraControls{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#101d24f4;border-radius:12px;padding:10px;max-width:calc(100vw - 25px);flex-wrap:wrap;justify-content:center;width:285px;white-space:normal}
  body.menu-open #extraControls{display:flex}
  #bubble{max-width:190px;font-size:12px}
@@ -16,39 +17,52 @@
 
 #bubble.sleep-bubble{font-size:18px;font-weight:850;letter-spacing:2px;padding:8px 15px;min-width:80px;max-width:105px;background:#eef4ff;color:#35476c;border-color:#6e85ac;animation:sleepFloat 2.6s ease-in-out infinite}
 #bubble.sleep-bubble:after{background:#eef4ff;border-color:#6e85ac}
+#ambientBubble{position:fixed;pointer-events:none;z-index:3;opacity:0;transition:opacity .5s;transform:translate(-50%,-100%);padding:6px 11px;border-radius:15px;background:#172a30e8;color:#d3e7db;border:1px solid #668078;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 3px 12px #0007}
+#ambientBubble.show{opacity:1}
 @keyframes sleepFloat{0%,100%{margin-top:0}50%{margin-top:-6px}}
-</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ui"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div><div style="margin-top:12px"><b>AI 행동 기록</b><div id="log"></div></div></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">탐험 반경 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><div id="extraControls"><button id="reset">다시 시작</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><button id="qualityToggle">화질: 자동</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대 · F: 히나 찾기 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
+</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ambientBubble" aria-hidden="true"></div><div id="ui"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div><details id="mindPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🧠 히나의 마음 · 기억 일기</summary><div id="mindContent" style="font-size:12px;line-height:1.55;padding:8px 2px;white-space:pre-line"></div></details><div style="margin-top:12px"><b>AI 행동 기록</b><div id="log"></div></div></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">탐험 반경 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><button id="cameraMode" aria-pressed="false">카메라: 자유</button><div id="extraControls"><button id="reset">다시 시작</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><button id="qualityToggle">화질: 자동</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대(팔로우에서도 가능) · F: 히나 찾기 · C: 카메라 모드 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia('(max-width:700px)').matches;
 let highQuality=!isMobile;
+const mobileTargetFPS=30;let lastRenderAt=0;
+let followCamera=false;let followDistance=21.4;const followOffset=new THREE.Vector3(12,13,12);const followFocus=new THREE.Vector3();const followDesired=new THREE.Vector3();
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ad4e7);scene.fog=new THREE.Fog(0x9ad4e7,165,380);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,380);camera.position.set(32,35,49);const renderer=new THREE.WebGLRenderer({antialias:!isMobile,powerPreference:isMobile?"low-power":"high-performance"});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.15:2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('view').appendChild(renderer.domElement);const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(-4,1,-3);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI/2.08;orbit.minDistance=5;orbit.maxDistance=255;const ambient=new THREE.HemisphereLight(0xffffff,0x516d4b,2.2);scene.add(ambient);const sun=new THREE.DirectionalLight(0xffe4aa,2.4);sun.position.set(-12,25,14);sun.castShadow=true;sun.shadow.mapSize.set(isMobile?512:2048,isMobile?512:2048);sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.025;sun.shadow.camera.left=isMobile?-38:-155;sun.shadow.camera.right=isMobile?38:155;sun.shadow.camera.top=isMobile?38:155;sun.shadow.camera.bottom=isMobile?-38:-155;scene.add(sun);const fill=new THREE.DirectionalLight(0xa4d9ff,.65);fill.position.set(14,10,-18);scene.add(fill);
-const solidObstacles=[];const detailMeshes=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x3eabc2),riverMat=mat(0x66c6d5),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);
+const groundPlatforms=[];const solidObstacles=[];const detailMeshes=[];const cameraOccluders=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x3eabc2),riverMat=mat(0x66c6d5),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);
+ if((m===grass||m===dirt||m===dirt2)&&w>=2.8&&d>=2.8&&h<=8.0){
+  groundPlatforms.push({x,z,rx:w*.5,rz:d*.5,top:y+h*.5});
+ }
+ if(h>.12&&Math.max(w,d)<45&&Math.max(w,d)>.5){o.geometry.computeBoundingSphere();cameraOccluders.push(o);}
  // Solid objects whose lower portion intersects Hina's chest-height walking space.
  // Exclude the broad floor/shore and horizontal platforms.
  if(h>=1.15 && w<65 && d<65 && y-h/2<1.3 && y+h/2>.65
+    && !(m===dirt||m===dirt2||m===grass)
     && !(h>1.4 && w<=2.1 && d<=2.1))
   solidObstacles.push({x,z,rx:w*.5+.34,rz:d*.5+.34});
- if(Math.max(w,h,d)<4&&Math.hypot(x,z)>23)detailMeshes.push(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
+ if(Math.max(w,h,d)<4&&Math.hypot(x,z)>23)detailMeshes.push(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=true;scene.add(o);if(h>.65)cameraOccluders.push(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
 grass.polygonOffset=true;grass.polygonOffsetFactor=-1;grass.polygonOffsetUnits=-1;
 const dirt=mat(0x9a7656),dirt2=mat(0x82654f),rockDark=mat(0x4d5356),rock=mat(0x777979),moss=mat(0x64885a),palmLeaf=mat(0x4d9664),foam=mat(0xa7e9dc);
 box(460,.25,460,sea,0,-.85,0);
-const waterSurface=new THREE.Mesh(new THREE.PlaneGeometry(455,455),new THREE.MeshPhysicalMaterial({color:0x38b9c8,transparent:true,opacity:.68,roughness:.22,metalness:0,side:THREE.DoubleSide,depthWrite:false}));
+const waterSurface=new THREE.Mesh(new THREE.PlaneGeometry(455,455),new THREE.MeshPhongMaterial({color:0x38b9c8,transparent:true,opacity:.84,shininess:85,specular:0x77bdc9,side:THREE.DoubleSide,depthWrite:false}));
 waterSurface.rotation.x=-Math.PI/2;waterSurface.position.y=-.52;scene.add(waterSurface);
 // Organic voxel coastline: a scalloped island footprint with no rectangular base.
 function coastRadius(a){
  return 1+.095*Math.sin(a*5+.4)+.065*Math.sin(a*9-1.2)+.042*Math.cos(a*13+1.3);
 }
 function islandValue(x,z){
- const a=Math.atan2(z/76.0,x/92.0),r=Math.hypot(x/92,z/76);
+ // West-facing landmass is broader, with a rugged mountainous inland shore.
+ const west=Math.max(0,Math.min(1,(-x-8)/65));
+ const rx=x<0?92+west*44:92;
+ const rz=76+west*13;
+ const a=Math.atan2(z/rz,x/rx),r=Math.hypot(x/rx,z/rz);
  return coastRadius(a)-r;
 }
 function landAt(x,z){return islandValue(x,z)>0;}
 const shoreGeo=new THREE.BoxGeometry(1,1,1);
-const shoreMesh=new THREE.InstancedMesh(shoreGeo,sand,58000);
+const shoreMesh=new THREE.InstancedMesh(shoreGeo,sand,85000);
 shoreMesh.castShadow=!isMobile;shoreMesh.receiveShadow=true;
 const transform=new THREE.Object3D();let shoreCount=0;
-for(let x=-104;x<=104;x+=1.04)for(let z=-90;z<=90;z+=1.04){
+for(let x=-155;x<=104;x+=1.04)for(let z=-90;z<=90;z+=1.04){
  const v=islandValue(x,z);
  if(v<-.005||Math.pow((x+9)/4.15,2)+Math.pow((z-4)/3.2,2)<1.0)continue;
  const edge=v<.085;
@@ -71,9 +85,32 @@ for(const [x,z,w,d,h] of [[-17,-5,5,5,1.5],[-12,-4,6,5,1.0],
 }
 // Low stepping-stone terraces form a plausible route between beach and the forest.
 for(const [x,z,h] of [[5,2,.18],[2,2,.36],[-1,2,.48],[-4,2,.52]]){box(3.1,h,3.1,dirt,x,h/2,z);box(3.1,.12,3.1,grass,x,h+.06,z)}
+// Mountain shoulder behind and on either side of the cave. Its face meets the cave roof.
+// No raised ground is placed in the cave entrance corridor.
+for(const [x,z,w,d,h] of [
+ [-5,-19,23,10,5.2],[-13,-15,10,9,4.5],[5,-16,9,9,4.35],
+ [-8,-24,23,10,6.5],[-19,-20,12,11,5.5],[-4,-29,18,9,7.3],
+ [-22,-27,16,12,4.3],[-31,-22,14,15,3.2]]){
+ box(w,h,d,rock,x,h/2,z);
+ box(w,.18,d,grass,x,h+.09,z);
+}
+// The front-facing cliff lip is visibly fused with the mountain above the cave.
 // The natural cave is cut into a cliff at (-4,-10), opening toward +Z.
 // Back, side walls and ceiling are separate voxel rock pieces: a real hollow space.
 const caveX=-4,caveZ=-10;
+function groundHeightAt(x,z,currentY=0){
+ // The cave has a flat stone floor, not the roof above it.
+ if(x>caveX-3.85&&x<caveX+3.85&&z>caveZ-4.25&&z<caveZ+2.4)return .26;
+ let top=.30;
+ for(const p of groundPlatforms){
+  if(Math.abs(x-p.x)<=p.rx-.12&&Math.abs(z-p.z)<=p.rz-.12){
+   // Only step onto ledges within a reasonable height of the current feet.
+   if(p.top<=currentY+1.9)top=Math.max(top,p.top);
+  }
+ }
+ return top;
+}
+
 box(12,3.8,2.1,rock,caveX,1.9,caveZ-3.9); // back wall
 box(2.3,3.9,8.1,rock,caveX-5.0,1.95,caveZ-1.0);
 box(2.3,3.9,8.1,rock,caveX+5.0,1.95,caveZ-1.0);
@@ -89,7 +126,7 @@ for(const [x,y,z,w,d] of [[-9.2,5.6,-10,3,3],[-4,5.6,-12,4,3],[.6,5.6,-9.5,3,4],
 // The pond is a genuine opening in the sand voxel field, not a coplanar blue box.
 // Deep basin, translucent water, terraced sandy banks and stones.
 const pondBottom=box(8.5,.2,6.6,dirt,-9,-.40,4);
-const pondWaterMat=new THREE.MeshBasicMaterial({color:0x38d2d7,transparent:true,opacity:.88,depthWrite:false,side:THREE.DoubleSide});
+const pondWaterMat=new THREE.MeshPhongMaterial({color:0x38d2d7,transparent:true,opacity:.94,shininess:115,specular:0x8bd4dd,depthWrite:false,side:THREE.DoubleSide});
 const pondWater=new THREE.Mesh(new THREE.CircleGeometry(1,48),pondWaterMat);
 pondWater.rotation.x=-Math.PI/2;pondWater.scale.set(4.65,3.45,1);
 pondWater.position.set(-9,.49,4);pondWater.renderOrder=7;scene.add(pondWater);
@@ -100,7 +137,7 @@ for(let j=0;j<44;j++){
  peb.rotation.y=a;
 }
 function randSafe(n){return (Math.sin(n*127.1+15.7)*43758.5453)%1<0?1+((Math.sin(n*127.1+15.7)*43758.5453)%1):((Math.sin(n*127.1+15.7)*43758.5453)%1)}
-const pondRippleMat=new THREE.MeshBasicMaterial({color:0xe5fff6,transparent:true,opacity:.6,depthWrite:false,side:THREE.DoubleSide});
+const pondRippleMat=new THREE.MeshLambertMaterial({color:0xe5fff6,transparent:true,opacity:.38,depthWrite:false,side:THREE.DoubleSide});
 const pondRipples=[];
 for(let i=0;i<4;i++){
  const ring=new THREE.Mesh(new THREE.RingGeometry(.35+i*.46,.39+i*.46,36),pondRippleMat);
@@ -160,6 +197,41 @@ for(let i=0;i<6;i++){let x=-2.5+(i%3)*.65,z=9.4+Math.floor(i/3)*.65;box(.75,.8,.
 // Small, nonflammable wood pieces by the cave; no campfire is granted.
 for(let i=0;i<5;i++){let b=box(.15,.14,1.2,wood,-1.7+i*.3,.32,-5.4+i*.12);b.rotation.y=i*.34}
 
+// Visible, collectible fallen branches: scattered near cave and nearby forest.
+const branchPiles=[];
+const branchMat=new THREE.MeshLambertMaterial({color:0x79522f});
+const branchTipMat=new THREE.MeshLambertMaterial({color:0xa27c4b});
+const branchGeo=new THREE.CylinderGeometry(.055,.085,1,5);
+function createBranchPile(x,z){
+ const group=new THREE.Group();
+ for(let k=0;k<3;k++){
+  const twig=new THREE.Mesh(branchGeo,k===1?branchTipMat:branchMat);
+  twig.rotation.z=Math.PI/2;twig.rotation.y=k*1.04;
+  twig.position.set((k-1)*.09,.12+k*.025,(k-1)*.06);
+  group.add(twig);
+ }
+ group.position.set(x,.62,z);
+ scene.add(group);
+ branchPiles.push({group,x,z,available:true,respawnAt:0});
+}
+for(const [x,z] of [[-1,-4],[1,-7],[-7,-4],[-10,-2],[2,-2],[-13,-7],
+ [5,-11],[8,-6],[-12,1],[-17,-2],[4,6],[10,4],[-3,13],[-16,12]]){
+ if(landAt(x,z))createBranchPile(x,z);
+}
+function nearestBranchPile(){
+ let best=null,dist=Infinity;
+ for(const p of branchPiles){
+  if(!p.available)continue;
+  const d=Math.hypot(hana.position.x-p.x,hana.position.z-p.z);
+  if(d<dist){best=p;dist=d;}
+ }
+ return best;
+}
+function refreshBranches(){
+ for(const p of branchPiles){
+  if(!p.available&&elapsed>=p.respawnAt){p.available=true;p.group.visible=true;}
+ }
+}
 // === PROCEDURAL ART PASS: layered coast, cliff details, foliage, cave ===
 const clay=mat(0xb58a67), paleStone=mat(0xa7a59a), warmRock=mat(0x9b8c7a),
     grassBright=mat(0x83b65c),grassDeep=mat(0x4d854c),sandLight=mat(0xf4dc9e),
@@ -169,7 +241,9 @@ const clay=mat(0xb58a67), paleStone=mat(0xa7a59a), warmRock=mat(0x9b8c7a),
 function cube(x,y,z,s,m){return box(s,s,s,m,x,y,z)}
 function groupCube(g,w,h,d,m,x,y,z){
  const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
- o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);return o;
+ o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);
+ if(Math.max(w,h,d)>.4){o.geometry.computeBoundingSphere();cameraOccluders.push(o);}
+ return o;
 }
 // Sand coastline built from uneven, overlapping small ledges instead of a clean rectangle.
 for(let i=0;i<175;i++){
@@ -190,6 +264,35 @@ for(let i=0;i<215;i++){
  const s=.16+rand()*.42;
  if(rand()<.68)box(s,.10,s,rand()>.5?grassBright:grassDeep,x,h+.2,z);
  else box(s,.18,s,rand()>.5?warmRock:paleStone,x,h+.22,z);
+}
+// Low-poly grass tufts: one geometry, a few chunked InstancedMeshes instead of hundreds of draws.
+const grassTuftGeometry=new THREE.ConeGeometry(.105,.42,3);
+grassTuftGeometry.translate(0,.21,0);
+const grassTuftMaterial=new THREE.MeshLambertMaterial({color:0x72a956,side:THREE.DoubleSide});
+const grassTuftChunks=[],tuftMatrix=new THREE.Object3D();
+for(let cx=-2;cx<=1;cx++)for(let cz=-2;cz<=1;cz++){
+ const transforms=[];
+ for(let j=0;j<100;j++){
+  const x=cx*12+rand()*12,z=cz*12+rand()*12;
+  if(!landAt(x,z)||Math.hypot(x+9,z-4)<8||Math.hypot(x+4,z+9)<8)continue;
+  let h=0;
+  for(const [tx,tz,w,d,th] of terraces){
+   if(Math.abs(x-tx)<w*.45&&Math.abs(z-tz)<d*.45)h=Math.max(h,th);
+  }
+  if(h<.15)continue;
+  transforms.push({x,z,h,rot:rand()*6.28,scale:.65+rand()*.9});
+ }
+ if(!transforms.length)continue;
+ const inst=new THREE.InstancedMesh(grassTuftGeometry,grassTuftMaterial,transforms.length);
+ inst.castShadow=false;inst.receiveShadow=false;
+ transforms.forEach((v,i)=>{
+  tuftMatrix.position.set(v.x,v.h+.19,v.z);
+  tuftMatrix.rotation.set(0,v.rot,0);
+  tuftMatrix.scale.set(v.scale,v.scale,v.scale);
+  tuftMatrix.updateMatrix();inst.setMatrixAt(i,tuftMatrix.matrix);
+ });
+ inst.instanceMatrix.needsUpdate=true;inst.computeBoundingSphere();
+ scene.add(inst);grassTuftChunks.push({mesh:inst,cx:cx*12+6,cz:cz*12+6});
 }
 // Strata and protruding boulders around cave, keep front entrance open.
 for(let i=0;i<105;i++){
@@ -534,7 +637,10 @@ function updateCharacterPose(){
  const sleep=((state==='rest'||state==='night')&&night&&atShelter&&!target)||state==='fieldRest';
  sleepingPose=sleep;
  hana.rotation.z=sleep?-Math.PI/2:0;
- hana.position.y=sleep?1.13:.4;
+ const floor=terrainTopAt(hana.position.x,hana.position.z);
+ const desiredY=floor+(sleep?.82:.10);
+ // Never descend below terrain. Smoothing is used only for ascending to avoid popping.
+ hana.position.y=desiredY; // snap to the walkable surface; never leave the body inside a cliff
  head.rotation.x=sleep?-.10:0;
  eyeMeshes.forEach(m=>m.visible=!sleep);
  closedEyes.forEach(m=>m.visible=sleep);
@@ -580,6 +686,17 @@ function moraleUpdate(step){
 
 // Personality + distance-aware needs. Each successful meal/drink redraws the threshold.
 let thirstTrigger=38,hungerTrigger=40,thirstRate=.105,hungerRate=.085;
+let carriedBerries=0,caveBerries=0,lastBerryStorageAt=-999;
+const MAX_CARRY_BERRIES=6,MAX_CAVE_BERRIES=18;
+function eatStoredBerries(){
+ const atCave=distanceTo('shelter')<3.3;
+ if(!atCave||caveBerries<=0)return false;
+ const amount=Math.min(caveBerries,Math.max(1,Math.ceil((70-stats.hunger)/9)),4);
+ caveBerries-=amount;stats.hunger=Math.min(100,stats.hunger+amount*9);
+ food=true;hungerTrigger=randomBetween(23,65);hungerDelayUntil=elapsed+18;
+ log(`동굴 보관 열매 ${amount}개 먹음 · 남은 보관량 ${caveBerries}개`);
+ return true;
+}
 let thirstDelayUntil=0,hungerDelayUntil=0,randomHesitationDuration=8;
 const randomBetween=(a,b)=>a+Math.random()*(b-a);
 function redrawNeeds(){thirstTrigger=randomBetween(24,64);hungerTrigger=randomBetween(23,65);thirstRate=randomBetween(.078,.137);hungerRate=randomBetween(.064,.118);thirstDelayUntil=0;hungerDelayUntil=0;}
@@ -649,9 +766,80 @@ farWest:new THREE.Vector3(-58,.5,-21),farNorth:new THREE.Vector3(6,.5,51),farSou
 // A* computes a detour once per destination (not every animation frame).
 const NAV_CELL=1.25,NAV_LIMIT=9500;
 let navPath=[],navGoal=null,navReplanAt=0,navStuck=0,navNoPathSince=0,navLastProgressAt=0,navLastPosition=null;
+let lastBlockedSpeechAt=-999,routeFailures=0,blockedGoalUntil=new Map();
+let climbBlockedSince=0,climbUntil=0,climbCooldownUntil=0;
 const navDirs=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+function continueMovementBlocked(){navStuck+=.4;}
+// Anti-entrapment watchdog: remember a verified walkable location and rescue
+// only after sustained failure. No terrain-clipping / noclip fallback.
+let lastSafeSpot={x:9,z:5,y:.4},lastSafeSpotAt=0;
+let rescueCooldownUntil=0,terrainMismatchSince=0;
+function terrainTopAt(x,z){
+ if(x>caveX-3.85&&x<caveX+3.85&&z>caveZ-4.25&&z<caveZ+2.4)return .26;
+ let top=.30;
+ for(const p of groundPlatforms){
+  if(Math.abs(x-p.x)<=p.rx-.12&&Math.abs(z-p.z)<=p.rz-.12)top=Math.max(top,p.top);
+ }
+ return top;
+}
+function terrainPassable(fromX,fromZ,toX,toZ){
+ const base=terrainTopAt(fromX,fromZ);
+ // Check the full body footprint, not just the character pivot.
+ const r=.34;
+ for(const [ox,oz] of [[0,0],[r,0],[-r,0],[0,r],[0,-r],[r*.7,r*.7],[-r*.7,-r*.7]]){
+  const next=terrainTopAt(toX+ox,toZ+oz);
+  if(next>base+.78 || next<base-1.18)return false;
+ }
+ return true;
+}
+function safeWalkingSpot(x,z){
+ if(!Number.isFinite(x)||!Number.isFinite(z)||!landAt(x,z))return false;
+ const y=terrainTopAt(x,z);
+ for(const [ox,oz] of [[.34,0],[-.34,0],[0,.34],[0,-.34]])if(Math.abs(terrainTopAt(x+ox,z+oz)-y)>.78)return false;
+ for(const o of solidObstacles){if(Math.abs(x-o.x)<o.rx&&Math.abs(z-o.z)<o.rz)return false;}
+ return true;
+}
+function rescueHina(reason){
+ if(elapsed<rescueCooldownUntil)return;
+ let candidate=null;
+ const anchor=lastSafeSpot;
+ if(safeWalkingSpot(anchor.x,anchor.z))candidate={x:anchor.x,z:anchor.z};
+ if(!candidate){
+  const centers=[{x:hana.position.x,z:hana.position.z},sites.shelter,sites.beach];
+  outer:for(const c of centers)for(let r=0;r<=22;r+=1.25)for(let j=0;j<24;j++){
+   const a=j*Math.PI/12,x=c.x+Math.cos(a)*r,z=c.z+Math.sin(a)*r;
+   if(safeWalkingSpot(x,z)){candidate={x,z};break outer;}
+  }
+ }
+ if(!candidate)return;
+ hana.position.set(candidate.x,terrainTopAt(candidate.x,candidate.z)+.10,candidate.z);
+ lastSafeSpot={x:hana.position.x,z:hana.position.z,y:hana.position.y};
+ lastSafeSpotAt=elapsed;terrainMismatchSince=0;
+ target=null;navReset();rescueCooldownUntil=elapsed+12;
+ log('안전 복귀 · '+reason);
+}
+function terrainSafetyWatch(){
+ const x=hana.position.x,z=hana.position.z;
+ const safe=safeWalkingSpot(x,z);
+ const terrain=terrainTopAt(x,z);
+ const feet=hana.position.y-.10;
+ const embedded=!safe||feet<terrain-.38||!Number.isFinite(hana.position.y);
+ if(embedded){
+  if(!terrainMismatchSince)terrainMismatchSince=elapsed;
+  if(elapsed-terrainMismatchSince>1.5)rescueHina('지형 끼임 감지');
+ }else{
+  terrainMismatchSince=0;
+  if(elapsed-lastSafeSpotAt>1.2 && safe){
+   lastSafeSpot={x,z,y:hana.position.y};lastSafeSpotAt=elapsed;
+  }
+ }
+}
+
 function navBlocked(x,z){
  if(!landAt(x,z))return true;
+ // When a local obstacle cannot be passed for five seconds, climb over it briefly.
+ // Never disable physical collision, even during stuck recovery.
+ // A bypass previously allowed Hina to enter solid cliffs.
  // Pond shore is deliberately open to approach, even when a nearby bank overlaps.
  if(Math.pow((x+9)/6.4,2)+Math.pow((z-4)/5.3,2)<1)return false;
  for(const o of solidObstacles){
@@ -689,10 +877,12 @@ function navBuild(from,to){
  const heuristic=(i,j)=>Math.hypot(dst.i-i,dst.j-j);
  const start={i:src.i,j:src.j,g:0,f:heuristic(src.i,src.j),parent:null};
  nodes.set(startKey,start);pushHeap(start);
- let found=null,iterations=0;
+ let found=null,best=start,bestScore=heuristic(start.i,start.j),iterations=0;
  while(open.length&&iterations++<NAV_LIMIT){
   const cur=popHeap();
   if(cur.closed)continue;cur.closed=true;
+  const score=heuristic(cur.i,cur.j)+cur.g*.035;
+  if(score<bestScore){best=cur;bestScore=score;}
   if(key(cur.i,cur.j)===goalKey){found=cur;break;}
   for(const [di,dj] of navDirs){
    const i=cur.i+di,j=cur.j+dj;if(i<0||j<0||i>=nx||j>=nz)continue;
@@ -706,7 +896,12 @@ function navBuild(from,to){
    next.f=g+heuristic(i,j);pushHeap(next);
   }
  }
- if(!found)return [];
+ if(!found){
+  // The destination may be inside a cliff. Walk to the closest reachable frontier
+  // instead of standing still while repeatedly requesting an impossible route.
+  if(best===start||bestScore>=heuristic(src.i,src.j)-.6)return [];
+  found=best;
+ }
  const raw=[];for(let p=found;p&&p.parent;p=p.parent)raw.push({x:originX+p.i*NAV_CELL,z:originZ+p.j*NAV_CELL});
  raw.reverse();
  // Line-of-sight smoothing avoids robotic right-angle motion.
@@ -718,19 +913,23 @@ function navBuild(from,to){
  }
  return smoothed;
 }
-function navReset(){navPath=[];navGoal=null;navReplanAt=0;navStuck=0;navNoPathSince=0;navLastProgressAt=elapsed;navLastPosition=null;}
+function navReset(){navPath=[];navGoal=null;navReplanAt=0;navStuck=0;navNoPathSince=0;navLastProgressAt=elapsed;navLastPosition=null;climbBlockedSince=0;}
 function turnTowards(angle,step){
  const delta=Math.atan2(Math.sin(angle-hana.rotation.y),Math.cos(angle-hana.rotation.y));
  hana.rotation.y+=Math.max(-step*5,Math.min(step*5,delta));
 }
+let walkAnimationTime=0;
 function walkPose(step,moving){
- const weight=Math.min(1,step*4.2),stride=moving?Math.sin(elapsed*4.2)*.34:0;
+ // Keep identical real-time gait at 1x, 2x, 4x even though simulation accelerates.
+ const realStep=step/Math.max(1,speed);
+ if(moving)walkAnimationTime+=realStep;
+ const weight=Math.min(1,realStep*7.2),stride=moving?Math.sin(walkAnimationTime*8.4)*.34:0;
  legs[0].rotation.x+=(stride-legs[0].rotation.x)*weight;
  legs[1].rotation.x+=(-stride-legs[1].rotation.x)*weight;
  arms[0].rotation.x+=(-stride*.72-arms[0].rotation.x)*weight;
  arms[1].rotation.x+=(stride*.72-arms[1].rotation.x)*weight;
- body.rotation.z=moving?Math.sin(elapsed*2.1)*.016:0;
- head.rotation.z=moving?Math.sin(elapsed*2.1)*.020:0;
+ body.rotation.z=moving?Math.sin(walkAnimationTime*4.2)*.016:0;
+ head.rotation.z=moving?Math.sin(walkAnimationTime*4.2)*.020:0;
 }
 // Fog of war: unknown terrain is dark, explored tiles stay revealed forever.
 // Dark semi-transparent (not solid black) so the coastline is still legible.
@@ -777,11 +976,15 @@ function updateExploration(force=false){
 function updateDetailVisibility(force=false){
  if(!force&&elapsed<detailNextUpdate)return;
  detailNextUpdate=elapsed+1.25;
+ for(const chunk of grassTuftChunks){
+  const d=Math.hypot(chunk.cx-camera.position.x,chunk.cz-camera.position.z);
+  chunk.mesh.visible=d<(highQuality?72:35);
+ }
  // Preserve nearby gameplay landmarks. Cull distant decoration, including undiscovered land.
  for(const mesh of detailMeshes){
-  const d=Math.hypot(mesh.position.x-hana.position.x,mesh.position.z-hana.position.z);
+  const d=Math.min(Math.hypot(mesh.position.x-hana.position.x,mesh.position.z-hana.position.z),Math.hypot(mesh.position.x-camera.position.x,mesh.position.z-camera.position.z));
   if(!isMobile&&highQuality){mesh.visible=true;continue;}
-  if(d>68){mesh.visible=false;continue;}
+  if(d>(followCamera?44:68)){mesh.visible=false;continue;}
   if(d<19){mesh.visible=true;continue;}
   let known=false;
   for(const tile of fogTiles){
@@ -795,6 +998,38 @@ function updateDetailVisibility(force=false){
 }
 const $=id=>document.getElementById(id);
 let bubbleEnabled=true,bubbleUntil=0;const bubbleAnchor=new THREE.Vector3();
+let nextNightSoundAt=0,nightSoundUntil=0,nightSoundText='',nightSoundPosition=new THREE.Vector3();
+const nightSoundPool=[['찌르르... 🦗',7],['사각... 🍃',8],['졸졸... 💧',10]];
+function updateNightSoundBubble(){
+ const el=$('ambientBubble'),t=clockParts(),isNight=t.h>=19||t.h<6;
+ if(!bubbleEnabled||!isNight){el.classList.remove('show');return;}
+ if(elapsed>=nextNightSoundAt){
+  nextNightSoundAt=elapsed+5+Math.random()*7;
+  const rabbit=critters.filter(r=>!r.caught&&r.g.visible&&r.g.position.distanceTo(hana.position)<9);
+  const pondDist=Math.hypot(hana.position.x+9,hana.position.z-4);
+  let chosen=null;
+  if(rabbit.length&&Math.random()<.75){
+   const r=rabbit[Math.floor(Math.random()*rabbit.length)];
+   chosen={text:'바스락... 🐇',position:r.g.position.clone().add(new THREE.Vector3(0,1.4,0))};
+  }else if(pondDist<9&&Math.random()<.65){
+   chosen={text:'졸졸... 💧',position:new THREE.Vector3(-9,1.1,4)};
+  }else if(Math.random()<.38){
+   // A nearby bush/insect, never a sound from across the island.
+   const a=Math.random()*Math.PI*2,r=2+Math.random()*4;
+   chosen={text:Math.random()<.5?'찌르르... 🦗':'사각... 🍃',
+    position:hana.position.clone().add(new THREE.Vector3(Math.cos(a)*r,1.3,Math.sin(a)*r))};
+  }
+  if(chosen&&chosen.position.distanceTo(hana.position)<10){
+   nightSoundText=chosen.text;nightSoundPosition.copy(chosen.position);nightSoundUntil=elapsed+2.8;
+  }else nightSoundUntil=0;
+ }
+ if(elapsed>nightSoundUntil||nightSoundPosition.distanceTo(hana.position)>11){el.classList.remove('show');return;}
+ const screen=nightSoundPosition.clone().project(camera);
+ if(screen.z< -1||screen.z>1){el.classList.remove('show');return;}
+ const x=(screen.x*.5+.5)*innerWidth,y=(-screen.y*.5+.5)*innerHeight;
+ if(x<40||x>innerWidth-40||y<45||y>innerHeight-45){el.classList.remove('show');return;}
+ el.textContent=nightSoundText;el.style.left=x+'px';el.style.top=y+'px';el.classList.add('show');
+}
 function updateBubble(){
  const el=$('bubble');
  // Sleep has its own persistent bubble; it does not overwrite the AI's thoughts.
@@ -817,10 +1052,92 @@ function clockParts(){
  const safeElapsed=Math.max(0,elapsed),dayTime=safeElapsed%DAY_SECONDS,hr=6+dayTime/DAY_SECONDS*24;
  return {day:Math.floor(safeElapsed/DAY_SECONDS)+1,h:Math.floor(hr)%24,m:Math.floor((hr%1)*60),dayTime};
 }
+// Persistent-in-run personality, episodic memory and daily intentions.
+// This is a rule-based autonomous agent, not a conscious being or remote LLM.
+const BASE_TRAITS={curiosity:76,courage:43,perseverance:74,sociability:66,confidence:31};
+let mind={traits:{...BASE_TRAITS},memories:[],likes:{pond:0,cave:0,beach:0,forest:0},
+ plan:[],planDay:0,planDone:[],lastReflectionDay:0,lastLeisureDay:0,
+ lastChoiceAt:0,lastMindUI:0,rememberedRoutes:new Map(),lastRecallAt:0,
+ discoveries:0,mistakes:0,regrets:0,keepsakes:0,identity:'처음에는 겁이 많지만 호기심 많은 졸업생'};
+function clampMind(v){return Math.max(0,Math.min(100,v));}
+function remember(kind,detail,importance=1){
+ if(!mind||clockParts().day<1)return;
+ const entry={day:clockParts().day,kind,detail,importance};
+ const old=mind.memories.findLast?.(m=>m.kind===kind&&m.detail===detail&&m.day===entry.day);
+ if(old)return;
+ mind.memories.push(entry);
+ if(mind.memories.length>80)mind.memories.splice(0,mind.memories.length-80);
+ if(kind==='failure'){mind.mistakes++;mind.traits.confidence=clampMind(mind.traits.confidence-1.3);mind.traits.perseverance=clampMind(mind.traits.perseverance+.35);}
+ if(kind==='success'){mind.traits.confidence=clampMind(mind.traits.confidence+1.7);mind.traits.courage=clampMind(mind.traits.courage+.35);}
+ if(kind==='discovery'){mind.discoveries++;mind.traits.curiosity=clampMind(mind.traits.curiosity+.3);}
+ if(kind==='regret'){mind.regrets++;mind.traits.perseverance=clampMind(mind.traits.perseverance+.7);}
+}
+function dailyMindPlan(){
+ const today=clockParts().day;
+ if(today<2||mind.planDay===today)return;
+ mind.planDay=today;mind.planDone=[];
+ const hungry=stats.hunger<62, thirsty=stats.thirst<62;
+ mind.plan=[thirsty?'물 마시기':'물가 확인하기',hungry?'식량 구하기':'열매 비축하기',fireEverLit?'모닥불 살피기':'불 피우기 연습하기'];
+ if(mind.traits.curiosity>55)mind.plan.push('새로운 장소 탐험하기');
+ remember('plan',mind.plan.join(' · '));
+ if(today>2&&mind.memories.length>5){
+  const recent=mind.memories.filter(m=>m.day<today&&m.importance>=2).slice(-8);
+  if(recent.length){const m=recent[Math.floor(Math.random()*recent.length)];
+   if(elapsed-mind.lastRecallAt>65){say(`지난번 ${m.detail.slice(0,23)}... 오늘은 조금 다르게 해봐야지.`);mind.lastRecallAt=elapsed;}}
+ }
+}
+function mindObserveEvent(t){
+ if(!mind||!t)return;
+ if(/실패|놓침|막힘|꺼짐|실수/.test(t))remember('failure',t.slice(0,75),2);
+ else if(/성공|발견|포획|채집|보관 완료|첫 모닥불/.test(t))remember('success',t.slice(0,75),2);
+ else if(/탐험|관찰/.test(t)&&Math.random()<.18)remember('discovery',t.slice(0,75));
+ for(const [word,task] of [['물 마시','물 마시기'],['열매','식량 구하기'],['모닥불','모닥불 살피기'],['탐험','새로운 장소 탐험하기']]){
+  if(t.includes(word)&&mind.plan.includes(task)&&!mind.planDone.includes(task))mind.planDone.push(task);
+ }
+}
+function mindLeisure(){
+ const d=clockParts(),safe=stats.energy>57&&stats.hunger>52&&stats.thirst>52;
+ if(!safe||d.h<9||d.h>=17||d.day===mind.lastLeisureDay)return false;
+ if(elapsed-mind.lastChoiceAt<70||Math.random()>.22)return false;
+ mind.lastLeisureDay=d.day;mind.lastChoiceAt=elapsed;
+ const chance= mind.traits.curiosity+mind.traits.sociability*.25;
+ if(chance>65&&Math.random()<.62){
+  mind.keepsakes++;
+  mind.likes.beach=Math.min(100,mind.likes.beach+8);
+  remember('keepsake','해변에서 친구에게 줄 조개껍데기를 주웠다',3);
+  setState('personalTravel','친구를 위한 조개껍데기 찾기','beach','이 조개껍데기는 지유가 좋아할 것 같아... 만나면 선물해야지.');
+ }else{
+  const place= mind.likes.pond>mind.likes.beach?'water':'beach';
+  mind.likes[place==='water'?'pond':'beach']+=5;
+  remember('joy',place==='water'?'연못에서 잠깐 쉬었다':'해변에서 바다를 바라봤다',2);
+  setState('personalTravel','혼자만의 여유 · 풍경 감상',place,'오늘은 잠깐 풍경을 보고 싶어... 살아 있다는 느낌이 들어.');
+ }
+ return true;
+}
+function mindReflect(){
+ const d=clockParts();if(d.day<2||mind.lastReflectionDay===d.day||d.h<19)return;
+ mind.lastReflectionDay=d.day;
+ if(d.day%5===0&&mind.memories.length>12){remember('identity',`처음보다 더 익숙해졌어. 생존 ${d.day}일째, 성공을 ${mind.memories.filter(m=>m.kind==='success').length}번 기억해`,3);}
+ const done=mind.planDone.length,total=mind.plan.length;
+ const success=mind.memories.filter(m=>m.day===d.day&&m.kind==='success').length;
+ const failed=mind.memories.filter(m=>m.day===d.day&&m.kind==='failure').length;
+ const text=failed>success?'오늘은 실수도 많았어. 내일은 조금 더 신중하게 해보자.':
+ done>=Math.ceil(total/2)?'오늘은 계획했던 일을 제법 해냈어. 조금씩 익숙해지고 있어.':
+ '계획대로 되진 않았지만... 그래도 내일 다시 해보면 돼.';
+ remember('reflection',`계획 ${done}/${total}개 · 성공 ${success}회 · 실패 ${failed}회`,3);
+ if(state==='rest'||state==='night'||state==='recover')say(text);
+}
+function renderMind(){
+ const t=mind.traits,rec=mind.memories.slice(-5).reverse();
+ $('mindContent').textContent=`성격 · 호기심 ${Math.round(t.curiosity)} / 용기 ${Math.round(t.courage)} / 끈기 ${Math.round(t.perseverance)} / 자신감 ${Math.round(t.confidence)} / 외로움 ${Math.round(loneliness)}\n`+
+ `오늘 목표 · ${mind.plan.map(p=>(mind.planDone.includes(p)?'✓ ':'○ ')+p).join(' · ')||'섬에 적응하기'}\n`+
+ `추억 · 조개 ${mind.keepsakes}개 / 발견 ${mind.discoveries}회 / 실수 ${mind.mistakes}회\n`+
+ `최근 기억\n${rec.map(m=>`D${m.day} ${m.detail}`).join('\n')||'아직 기억이 많지 않아.'}`;
+}
 function log(t){
  const key=clockParts();let e=document.createElement('div');
  e.textContent=`D${key.day} ${String(key.h).padStart(2,'0')}:${String(key.m).padStart(2,'0')}  ${t}`;
- $('log').prepend(e);
+ $('log').prepend(e);mindObserveEvent(t);
  if($('log').children.length>90)$('log').lastChild.remove();
 }
 function say(t){
@@ -833,6 +1150,20 @@ function setState(s,g,p,words){
  if(target&&navBlocked(target.x,target.z)){
   const safe=navFindOpen(target.x,target.z);target.set(safe.x,.5,safe.z);
  }
+ if(target){
+  const key=s+':'+Math.round(target.x/4)+':'+Math.round(target.z/4);
+  if((blockedGoalUntil.get(key)||0)>elapsed){
+   // Temporary detour away from a repeatedly blocked destination.
+   const a=elapsed*.31+routeFailures*2.4;
+   const near=navFindOpen(hana.position.x+Math.cos(a)*8,hana.position.z+Math.sin(a)*8);
+   if(!navBlocked(near.x,near.z))target.set(near.x,.5,near.z);
+  }
+ }
+ if(s==='branchTravel'){
+  const pile=nearestBranchPile();
+  if(pile){target=new THREE.Vector3(pile.x,.5,pile.z);goal+=' · 실제 나뭇가지 위치';}
+  else{target=sites.shelter.clone();}
+ }
  navReset();
  if(s==='rest'){sleepRestored=false;sleepStartEnergy=stats.energy;sleepQuality=Math.random();}
  if(s==='rest')restCooldownUntil=elapsed+50;
@@ -844,11 +1175,14 @@ function setState(s,g,p,words){
   fieldRestRecovery=randomBetween(21,39);
  }
  if(s==='returnHesitate')randomHesitationDuration=randomBetween(5,13);
- $('phase').textContent=g;say(words);log(g);actions++;
+ $('phase').textContent=g;if(words)say(words);log(g);actions++;
 }
 function init(){
+ for(const [mesh,original] of fadedMeshes){mesh.material.dispose();mesh.material=original;}fadedMeshes.clear();
  // Restore both simulation data and visuals. A reset must match a fresh page load.
- paused=false;speed=1;prev=0;elapsed=0;day=1;navReset();
+ paused=false;speed=1;prev=0;elapsed=0;day=1;walkAnimationTime=0;
+ branchPiles.forEach(p=>{p.available=true;p.respawnAt=0;p.group.visible=true;});
+ carriedBerries=0;caveBerries=0;lastBerryStorageAt=-999;climbUntil=0;climbCooldownUntil=0;climbBlockedSince=0;navReset();routeFailures=0;blockedGoalUntil.clear();lastBlockedSpeechAt=-999;
  state='confused';phaseAt=0;target=null;goal='';lastLog='';actions=0;
  water=food=shelter=failedFire=rested=false;
  knownWater=knownBerries=knownCave=seenRabbit=seenFish=false;
@@ -865,12 +1199,14 @@ function init(){
  explorationExperience=0;previousExplorationCount=0;discoveryBoostAt=0;
  explorationNextUpdate=0;detailNextUpdate=0;uiNextUpdate=0;
  bubbleUntil=0;ambientTimer=0;
- $('log').innerHTML='';$('thought').textContent='';$('bubble').textContent='';$('bubble').classList.remove('show','sleep-bubble');
+ mind={traits:{...BASE_TRAITS},memories:[],likes:{pond:0,cave:0,beach:0,forest:0},plan:[],planDay:0,planDone:[],lastReflectionDay:0,lastLeisureDay:0,lastChoiceAt:0,lastMindUI:0,rememberedRoutes:new Map(),lastRecallAt:0,discoveries:0,mistakes:0,regrets:0,keepsakes:0,identity:'처음에는 겁이 많지만 호기심 많은 졸업생'};renderMind();
+ $('log').innerHTML='';$('thought').textContent='';$('bubble').textContent='';$('bubble').classList.remove('show','sleep-bubble');$('ambientBubble').classList.remove('show');nextNightSoundAt=0;nightSoundUntil=0;
  $('pause').textContent='일시정지';$('speed').textContent='속도 ×1';
  $('dayLabel').textContent='· DAY 01';$('clock').textContent='06:00';
  $('elapsed').textContent='D1 00:00';
  $('phase').textContent='워프 직후 · 혼란';
  hana.position.set(9,.4,5);hana.rotation.set(0,0,0);
+ lastSafeSpot={x:9,z:5,y:.4};lastSafeSpotAt=0;rescueCooldownUntil=0;terrainMismatchSince=0;
  head.rotation.set(0,0,0);
  legs.forEach(l=>l.rotation.set(0,0,0));arms.forEach(a=>a.rotation.set(0,0,0));
  eyeMeshes.forEach(m=>m.visible=true);closedEyes.forEach(m=>m.visible=false);
@@ -936,6 +1272,7 @@ function dayOneDecide(){
  finishDayOne();
 }
 function chooseNextDayAction(){
+ dailyMindPlan();
  if(stats.energy<=20){
   if(distanceTo('shelter')<12&&stats.energy>=15&&Math.random()<.75){
    setState('sleepTravel','체력 부족 · 동굴로 이동','shelter','동굴이 가까워... 안전한 곳에서 쉬는 게 좋겠어.');return;
@@ -953,13 +1290,13 @@ function chooseNextDayAction(){
  // Collect branches whenever the fire is getting low; wet days are harder.
  if(fireEverLit&&fireSuccess&&fireKnowledge<63&&stats.energy>27&&stats.thirst>18&&
     stats.hunger>18&&elapsed>=nextFireAttempt){
-  setState('branchTravel','모닥불 연료 · 나뭇가지 줍기','shelter',
+  setState('branchTravel','모닥불 연료 · 나뭇가지 줍기',null,
    '불이 약해졌어. 근처에 떨어진 나뭇가지를 주워 와야겠어.');return;
  }
  // Extinguished fires need new tinder and a learned relighting attempt.
  if(fireEverLit&&!fireSuccess&&stats.energy>35&&stats.thirst>23&&stats.hunger>23&&
     elapsed>=nextFireAttempt){
-  setState('branchTravel','꺼진 불 다시 살리기','shelter',
+  setState('branchTravel','꺼진 불 다시 살리기',null,
    '아차, 불이 완전히 꺼졌어... 마른 나뭇가지를 모아서 다시 해보자.');return;
  }
  // Need thresholds vary by day, temperament, distance and urgency.
@@ -967,6 +1304,10 @@ function chooseNextDayAction(){
   setState('drinkTravel','갈증 해소 · 물가로 이동','water',stats.thirst<20?'너무 멀리 왔나 봐... 목이 바짝 말라! 물가로 돌아가야겠어.':'슬슬 물을 마셔야겠어. 물가로 돌아가자.');return;
  }
  if(shouldAddressNeed('hunger')){
+  if(caveBerries>0&&stats.hunger<68){
+   setState('storedBerryTravel','허기 해소 · 동굴 보관 열매 먹기','shelter',
+    '동굴에 보관한 열매가 있었지. 가져다 둔 걸 먹자.');return;
+  }
   const now=clockParts();
   // Hungry Hina actively uses learned hunting/fishing rather than relying solely on fruit.
   if(now.h>=7&&now.h<18&&stats.energy>27&&stats.thirst>18){
@@ -1037,6 +1378,7 @@ function chooseNextDayAction(){
        '토끼가 도망가는 방향을 잘 봐두자. 아직 잡기에는 너무 빨라.');return;
   }
  }
+ if(mindLeisure())return;
  // Idle roaming creates small variations and gives wildlife time to pass by.
  const choices=[
   ['outerNorth','북쪽 숲 탐험','저 멀리도 숲이 있네... 조금 가볼까?'],
@@ -1050,9 +1392,9 @@ function chooseNextDayAction(){
   ['wildlife','토끼 관찰','토끼다! 아직 잡을 능력은 없으니까 보기만 하자.'],
   ['water','물고기 관찰','물고기가 헤엄치네. 아직 잡을 방법을 모르겠어.']
  ];
- const c=choices[(actions+Math.floor(elapsed/77))%choices.length];
+ const c=choices[(actions+Math.floor(elapsed/77)+Math.floor(mind.traits.curiosity/18))%choices.length];
  // Low will makes Hina hesitate to venture into distant, unfamiliar terrain.
- if((c[0].startsWith('outer')||c[0].startsWith('far'))&&stats.will<48){
+ if((c[0].startsWith('outer')||c[0].startsWith('far'))&&(stats.will<48||mind.traits.courage<30)){
   setState('hesitate','낯선 지역 앞에서 망설임',null,'너무 멀리 가는 건 아직 무서워... 주변부터 익히자.');
  }else setState('wander','주변 탐색 · '+c[1],c[0],c[2]);
 }
@@ -1083,6 +1425,10 @@ function attemptFire(){
 }
 function dayTwoPlusDecide(){
  if(clockParts().day<2)return;
+ if(state==='personalTravel'&&!target){
+  setState('personalMoment','잠깐 혼자만의 시간',null,goal.includes('조개')?'언젠가 다시 만나면 꼭 이걸 보여줘야지.':'파도 소리가 좋다... 잠깐만 더 있다 가자.');return;
+ }
+ if(state==='personalMoment'&&elapsed-phaseAt>13){setState('recover','작은 즐거움으로 마음 회복',null,'이런 시간도 가끔 필요하겠지.');changeWill(5,'작은 행복');return;}
  if(state==='fieldRest'){
   if(elapsed>=fieldRestEnd){
    log(`현장 휴식 완료 · 체력 ${Math.round(stats.energy)}`);
@@ -1092,6 +1438,10 @@ function dayTwoPlusDecide(){
   return;
  }
  if(state==='branchTravel'&&!target){
+  const pile=nearestBranchPile();
+  if(pile&&Math.hypot(hana.position.x-pile.x,hana.position.z-pile.z)<2.6){
+   pile.available=false;pile.group.visible=false;pile.respawnAt=elapsed+randomBetween(150,270);
+  }
   setState('branchGather','주변의 떨어진 나뭇가지 수집',null,
    raining()?'나뭇가지가 젖었네... 그래도 쓸 만한 걸 찾아보자.':'마른 나뭇가지부터 모으자.');return;
  }
@@ -1200,6 +1550,23 @@ function dayTwoPlusDecide(){
   log('물을 마셔 갈증이 회복됨 (위생 위험은 아직 모름)');
   setState('recover','갈증 해소',null,'살 것 같아... 물은 여기 있다는 걸 기억하자.');return;
  }
+ if(carriedBerries>0&&distanceTo('shelter')<3.3&&state!=='berryStoreTravel'){
+  const moved=Math.min(carriedBerries,MAX_CAVE_BERRIES-caveBerries);
+  if(moved>0){carriedBerries-=moved;caveBerries+=moved;log(`동굴에 열매 ${moved}개 보관 · 총 ${caveBerries}개`);}
+ }
+ if(state==='storedBerryTravel'&&!target){
+  const ate=eatStoredBerries();
+  setState('recover',ate?'동굴 보관 열매로 허기 회복':'보관한 열매가 없음',null,
+   ate?'미리 가져다 둬서 다행이야.':'남은 열매가 없네... 다시 채집해야겠어.');return;
+ }
+ if(state==='berryStoreTravel'&&!target){
+  const room=MAX_CAVE_BERRIES-caveBerries;
+  const stored=Math.min(carriedBerries,Math.max(0,room));
+  carriedBerries-=stored;caveBerries+=stored;lastBerryStorageAt=elapsed;
+  log(`동굴에 열매 ${stored}개 보관 · 보관량 ${caveBerries}/${MAX_CAVE_BERRIES}`);
+  setState('recover','열매 동굴 보관 완료',null,
+   stored?`열매 ${stored}개를 동굴에 가져다 놨어. 나중에 먹자.`:'동굴에 열매가 충분히 있네.');return;
+ }
  if(state==='berrySearch'&&!target){
   const tree=closestFruitTree();
   if(tree){sites.berries.set(tree.group.position.x,.5,tree.group.position.z);setState('eatTravel','열매 발견 · 채집하러 이동','berries','앗! 열매가 열렸어. 이번엔 조금 따보자.');}
@@ -1212,11 +1579,20 @@ function dayTwoPlusDecide(){
  if(state==='eating'&&elapsed-phaseAt>9){
   const picked=pickBerries();
   if(picked>0){
-   stats.hunger=Math.min(100,stats.hunger+picked*randomBetween(7,11));
+   // Eat a modest portion now, carry the rest to cave, with separate storage limits.
+   const urgent=stats.hunger<30;
+   const immediate=Math.min(picked,urgent?Math.ceil(picked*.65):Math.max(1,Math.floor(picked*.35)));
+   const carryRoom=Math.max(0,MAX_CARRY_BERRIES-carriedBerries);
+   const saved=Math.min(picked-immediate,carryRoom,Math.max(0,MAX_CAVE_BERRIES-caveBerries));
+   carriedBerries+=saved;
+   stats.hunger=Math.min(100,stats.hunger+immediate*randomBetween(7,11));
    food=true;hungerTrigger=randomBetween(23,65);hungerRate=randomBetween(.064,.118);
    changeWill(2,'채집 성공');
-   log(`열매 ${picked}개 채집 · 나무에서 실제로 사라짐`);
-   setState('recover','열매 채집 완료',null,`열매를 ${picked}개 땄어! 남은 건 다음에 먹어야지.`);
+   log(`열매 ${picked}개 채집 · ${immediate}개 먹음 / ${saved}개 휴대 · 동굴 ${caveBerries}/${MAX_CAVE_BERRIES}`);
+   if(carriedBerries>=2&&caveBerries<MAX_CAVE_BERRIES&&stats.energy>23){
+    setState('berryStoreTravel','남은 열매를 동굴로 운반','shelter',
+     `열매 ${carriedBerries}개는 동굴에 가져다 놓자. 나중에 먹을 수 있어.`);
+   }else setState('recover','열매 채집 완료',null,`열매 ${immediate}개를 먹었어. 남은 건 챙겨 뒀어.`);
   }else setState('recover','열매 채집 실패',null,'어? 열매가 하나도 없네... 다른 곳을 찾아봐야겠어.');
   return;
  }
@@ -1316,7 +1692,7 @@ function updateIntroMovement(step){
   turnTowards(Math.atan2(dx,dz),step);
   const k=Math.min(1,step*2.8);
   const nx=hana.position.x+dx*k,nz=hana.position.z+dz*k;
-  if(!navBlocked(nx,nz)){hana.position.x=nx;hana.position.z=nz;}
+  if(!navBlocked(nx,nz)&&terrainPassable(hana.position.x,hana.position.z,nx,nz)){hana.position.x=nx;hana.position.z=nz;}
   walkPose(step,true);
  }
  head.rotation.y=Math.sin(t*.7)*.16;
@@ -1324,6 +1700,9 @@ function updateIntroMovement(step){
 function update(dt){
  if(paused)return;
  const step=Math.max(0,dt)*speed;elapsed=Math.max(0,elapsed+step);
+ if(clockParts().day>=2){dailyMindPlan();mindReflect();}
+ if(elapsed>mind.lastMindUI+3){mind.lastMindUI=elapsed;renderMind();}
+ refreshBranches();
  // Physical fatigue: long walks, rain, poor nutrition and stress all have costs.
  const walking=Boolean(target)&&navPath.length>0;
  const away=distanceTo('shelter');
@@ -1342,17 +1721,24 @@ function update(dt){
   else if(hana.position.distanceToSquared(navLastPosition)>.55*.55){
    navLastPosition.copy(hana.position);navLastProgressAt=elapsed;navNoPathSince=0;
   }
-  if(elapsed-navLastProgressAt>17){
+  if(elapsed-navLastProgressAt>9&&elapsed>=rescueCooldownUntil){
+   rescueHina('이동 정체 9초 · 마지막 안전 지점으로 이동');
+  }
+  if(elapsed-navLastProgressAt>21){
    const oldGoal=goal;
+   const failedKey=state+':'+Math.round(target.x/4)+':'+Math.round(target.z/4);
+   blockedGoalUntil.set(failedKey,elapsed+65+mind.mistakes*1.5);
+   mind.rememberedRoutes.set(failedKey,elapsed+100);
+   routeFailures++;
    target=null;navReset();
    if(stats.energy<40){
     setState('fieldRest','이동 중단 · 현장에서 휴식',null,
-     '길이 막혀서 한참 헤맸어... 일단 쉬고 다른 길을 찾아보자.');
+     elapsed-lastBlockedSpeechAt>85?'이쪽은 힘드네... 조금 쉬어야겠어.':null);
    }else{
     setState('recover','목적지 접근 실패',null,
-     '여기는 길이 막혔네. 무리하지 말고 다른 곳으로 가보자.');
+     elapsed-lastBlockedSpeechAt>85?'다른 길로 돌아가 봐야겠어.':null);
    }
-   log(`이동 정체 감지 · ${oldGoal} 포기`);
+   if(elapsed-lastBlockedSpeechAt>85){lastBlockedSpeechAt=elapsed;log(`이동 정체 · ${oldGoal} 경로 재선택`);}
   }
  }else {navLastPosition=null;navLastProgressAt=elapsed;}
  if(!target&&state!=='fieldRest'&&state!=='rest'&&state!=='night'&&stats.energy<55){
@@ -1435,8 +1821,7 @@ function update(dt){
     walkPose(step,false);
     if(elapsed>navReplanAt){
      navReplanAt=elapsed+9;
-     log('높은 지형에 길이 막혀 다른 경로를 찾는 중');
-     say('여기는 못 지나가겠어... 돌아가는 길을 찾아보자.');
+     if(elapsed-lastBlockedSpeechAt>85){lastBlockedSpeechAt=elapsed;log('우회 경로 탐색 중');}
     }
    }else{
     const waypoint=navPath[0],dx=waypoint.x-hana.position.x,dz=waypoint.z-hana.position.z;
@@ -1446,9 +1831,11 @@ function update(dt){
      const movement=Math.min(dist,step*1.8*(stats.energy<25?.52:stats.energy<45?.76:1));
      const nx=hana.position.x+dx/dist*movement,nz=hana.position.z+dz/dist*movement;
      if(!navBlocked(nx,nz)){
-      hana.position.x=nx;hana.position.z=nz;
+      const nextFloor=terrainTopAt(nx,nz),currentFloor=terrainTopAt(hana.position.x,hana.position.z);
+      if(!terrainPassable(hana.position.x,hana.position.z,nx,nz)){navPath=[];navGoal=null;navReplanAt=elapsed+1;continueMovementBlocked();}
+      else{hana.position.x=nx;hana.position.z=nz;
       turnTowards(Math.atan2(dx,dz),step);
-      walkPose(step,true);navStuck=0;
+      walkPose(step,true);navStuck=0;}
      }else{
       navStuck+=step;walkPose(step,false);
       if(navStuck>.7){navPath=[];navGoal=null;navReplanAt=elapsed+1;navStuck=0;}
@@ -1462,6 +1849,7 @@ function update(dt){
  }
  decide();
  updateCharacterPose();
+ terrainSafetyWatch();
  updateExploration();
  updateDetailVisibility();
  updateBerryTrees();
@@ -1478,15 +1866,21 @@ function update(dt){
  pondWater.position.y=.49+Math.sin(elapsed*1.1)*.006;
  pondRipples.forEach((r,i)=>{const pulse=(elapsed*.16+i*.24)%1;r.scale.setScalar(.6+pulse*.55);r.material.opacity=.6;});
  waveMat.opacity=.15+Math.sin(elapsed*1.7)*.09;
- const rawDayLight=Math.sin(t.dayTime/DAY_SECONDS*Math.PI*2+.38)*.48+.52;
- const dayLight=Math.pow(Math.max(0,rawDayLight),1.65);
- const darkNight=(t.h>=19||t.h<6);
- renderer.toneMappingExposure=darkNight?.91:1.25;
+ // Continuous dawn/dusk: no discrete exposure or light intensity jump at 06/19.
+ const hour=6+t.dayTime/DAY_SECONDS*24;
+ const smoothstep=(a,b,x)=>{const q=THREE.MathUtils.clamp((x-a)/(b-a),0,1);return q*q*(3-2*q)};
+ const daylight=smoothstep(5,8,hour)*(1-smoothstep(17,20,hour));
+ const dayLight=.065+.935*daylight;
+ // A dark pond at night, with only moon/ambient and fire illumination.
+ pondWaterMat.color.setRGB(.075+.15*daylight,.23+.49*daylight,.27+.49*daylight);
+ pondRippleMat.opacity=.11+.42*daylight;
+ waterSurface.material.opacity=.77;
+ renderer.toneMappingExposure=.80+.45*daylight;
  for(const mote of motes)mote.visible=dayLight<.4;
  scene.background.setRGB(.07+dayLight*.53,.12+dayLight*.71,.22+dayLight*.69);
- scene.fog.color.copy(scene.background);sun.intensity=(darkNight?.025:.12)+dayLight*2.3;
- ambient.intensity=(darkNight?.12:.24)+dayLight*1.85;
- fill.intensity=darkNight?.10:.65;
+ scene.fog.color.copy(scene.background);sun.intensity=.025+daylight*2.4;
+ ambient.intensity=.13+daylight*1.96;
+ fill.intensity=.08+daylight*.57;
  weatherUpdate(step);updateSound(dt,dayLight<.25);updateCampfire(elapsed);
  // Cool, blue rainy light without changing individual material colors permanently.
  const cool=raining()?0.72:groundWet()?0.91:1;
@@ -1544,22 +1938,134 @@ $('mobileMenu').onclick=()=>{
  $('mobileMenu').textContent=open?'✕ 닫기':'☰ 메뉴';
 };
 function applyQuality(){
- renderer.setPixelRatio(Math.min(devicePixelRatio,highQuality?Math.min(isMobile?1.6:2,devicePixelRatio):1.05));
- sun.shadow.mapSize.set(highQuality?(isMobile?1024:2048):512,highQuality?(isMobile?1024:2048):512);
+ renderer.setPixelRatio(Math.min(devicePixelRatio,highQuality?Math.min(isMobile?1.25:2,devicePixelRatio):(isMobile?.85:1.05)));
+ sun.shadow.mapSize.set(highQuality?(isMobile?768:2048):(isMobile?384:512),highQuality?(isMobile?768:2048):(isMobile?384:512));
  sun.shadow.map?.dispose();sun.shadow.map=null;
  sun.shadow.camera.left=highQuality?-155:-38;
  sun.shadow.camera.right=highQuality?155:38;
  sun.shadow.camera.top=highQuality?155:38;
  sun.shadow.camera.bottom=highQuality?-155:-38;
  sun.shadow.camera.updateProjectionMatrix();
+ renderer.shadowMap.enabled=!isMobile||highQuality;
  shoreMesh.castShadow=highQuality&&!isMobile;
  $('qualityToggle').textContent=highQuality?'화질: 높음':'화질: 절약';
  updateDetailVisibility(true);
 }
 $('qualityToggle').onclick=()=>{highQuality=!highQuality;applyQuality();};
 applyQuality();
+// Cinematic circular soft occlusion: keep normal material lighting/texture outside Hina.
+// Only a small screen-space area around the character becomes transparent.
+const occlusionRay=new THREE.Raycaster(),occlusionAim=new THREE.Vector3();
+const occlusionDirection=new THREE.Vector3(),fadedMeshes=new Map();
+const occlusionFocusPx=new THREE.Vector2(),occlusionBufferSize=new THREE.Vector2();
+let nextOcclusionCheck=0;
+function makeSoftOcclusionMaterial(original){
+ const material=original.clone();
+ material.transparent=true;material.depthWrite=false;
+ material.userData.softOcclusion={focus:occlusionFocusPx,radius:Math.max(320,Math.min(innerWidth,innerHeight)*.68)*renderer.getPixelRatio()};
+ const previous=material.onBeforeCompile;
+ material.onBeforeCompile=(shader,renderer)=>{
+  if(previous)previous(shader,renderer);
+  shader.uniforms.uHinaFocus={value:occlusionFocusPx};
+  shader.uniforms.uHinaRadius={value:material.userData.softOcclusion.radius};
+  shader.fragmentShader='uniform vec2 uHinaFocus;\nuniform float uHinaRadius;\n'+shader.fragmentShader;
+  shader.fragmentShader=shader.fragmentShader.replace('#include <opaque_fragment>',
+   '#include <opaque_fragment>\n float hinaDistance = distance(gl_FragCoord.xy, uHinaFocus);\n float hinaMask = smoothstep(uHinaRadius * 0.38, uHinaRadius, hinaDistance);\n gl_FragColor.a *= mix(0.0, 1.0, hinaMask);');
+  material.userData.shader=shader;
+ };
+ material.customProgramCacheKey=()=> 'hina-soft-circle-v3';
+ return material;
+}
+function updateCameraOcclusion(now){
+ const dpr=renderer.getPixelRatio();
+ renderer.getDrawingBufferSize(occlusionBufferSize);
+ occlusionAim.copy(hana.position).add(new THREE.Vector3(0,1.2,0));
+ const projected=occlusionAim.clone().project(camera);
+ occlusionFocusPx.set((projected.x*.5+.5)*occlusionBufferSize.x,(projected.y*.5+.5)*occlusionBufferSize.y);
+ const radius=Math.max(320,Math.min(innerWidth,innerHeight)*.68)*dpr;
+ for(const [mesh,original] of fadedMeshes){
+  const data=mesh.material.userData.softOcclusion;
+  if(data){data.radius=radius;if(mesh.material.userData.shader)mesh.material.userData.shader.uniforms.uHinaRadius.value=radius;}
+ }
+ if(now<nextOcclusionCheck)return;
+ nextOcclusionCheck=now+175;
+ occlusionDirection.copy(occlusionAim).sub(camera.position);
+ const length=occlusionDirection.length();
+ if(length<.01)return;
+ occlusionDirection.normalize();
+ occlusionRay.set(camera.position,occlusionDirection);occlusionRay.far=Math.max(0,length-.6);
+ // Screen-space occlusion: a center-only ray misses the broad terrain blocks
+ // that visually cover Hina. Project each candidate's bounding sphere and
+ // fade every foreground mesh whose projected footprint overlaps Hina.
+ scene.updateMatrixWorld(true);
+ const hitMeshes=new Set();
+ const screenHeight=occlusionBufferSize.y;
+ const characterDepth=occlusionAim.distanceTo(camera.position);
+ const focusRadius=radius*.62;
+ const v=new THREE.Vector3();
+ for(const m of cameraOccluders){
+  if(!m.visible||!m.geometry.boundingSphere)continue;
+  m.getWorldPosition(v);
+  const depth=v.distanceTo(camera.position);
+  const sphere=m.geometry.boundingSphere.radius*Math.max(m.scale.x,m.scale.y,m.scale.z);
+  if(depth-sphere>characterDepth+.35||depth+sphere<.2)continue;
+  const projected=v.clone().project(camera);
+  if(projected.z>1||projected.z< -1)continue;
+  const px=(projected.x*.5+.5)*occlusionBufferSize.x;
+  const py=(projected.y*.5+.5)*screenHeight;
+  const apparentRadius=sphere*screenHeight/(2*Math.max(1,depth)*Math.tan(THREE.MathUtils.degToRad(camera.fov)*.5));
+  if(Math.hypot(px-occlusionFocusPx.x,py-occlusionFocusPx.y)<focusRadius+apparentRadius){
+   hitMeshes.add(m);
+  }
+ }
+ for(const mesh of hitMeshes){
+  if(!fadedMeshes.has(mesh)){
+   const original=mesh.material;
+   mesh.material=makeSoftOcclusionMaterial(original);
+   fadedMeshes.set(mesh,original);
+  }
+ }
+ for(const [mesh,original] of fadedMeshes){
+  if(hitMeshes.has(mesh))continue;
+  mesh.material.dispose();mesh.material=original;fadedMeshes.delete(mesh);
+ }
+}
+function setCameraMode(on){
+ followCamera=on;orbit.enabled=!on;
+ $('cameraMode').textContent=on?'카메라: 팔로우':'카메라: 자유';
+ $('cameraMode').setAttribute('aria-pressed',String(on));
+ if(on){followOffset.set(12,13,12).normalize().multiplyScalar(followDistance);followFocus.copy(hana.position).add(new THREE.Vector3(0,1.25,0));
+   orbit.target.copy(followFocus);camera.position.copy(followFocus).add(followOffset);camera.lookAt(followFocus);}
+ else{orbit.target.copy(hana.position).add(new THREE.Vector3(0,1.25,0));orbit.update();}
+}
+$('cameraMode').onclick=()=>setCameraMode(!followCamera);
+// OrbitControls is disabled in follow mode, so handle its wheel separately.
+renderer.domElement.addEventListener('wheel',e=>{
+ if(!followCamera)return;
+ e.preventDefault();
+ const scale=Math.exp(Math.sign(e.deltaY)*Math.min(Math.abs(e.deltaY),160)*.0017);
+ followDistance=THREE.MathUtils.clamp(followDistance*scale,5.8,52);
+ followOffset.set(12,13,12).normalize().multiplyScalar(followDistance);
+},{passive:false});
+// On tablets a two-finger pinch zooms the following camera as well.
+let followPinchDistance=0;
+renderer.domElement.addEventListener('touchstart',e=>{
+ if(!followCamera||e.touches.length!==2)return;
+ followPinchDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+},{passive:true});
+renderer.domElement.addEventListener('touchmove',e=>{
+ if(!followCamera||e.touches.length!==2)return;
+ const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+ if(followPinchDistance>0&&dist>0){
+  e.preventDefault();followDistance=THREE.MathUtils.clamp(followDistance*followPinchDistance/dist,5.8,52);
+  followOffset.set(12,13,12).normalize().multiplyScalar(followDistance);
+ }
+ followPinchDistance=dist;
+},{passive:false});
+renderer.domElement.addEventListener('touchend',e=>{if(e.touches.length<2)followPinchDistance=0;},{passive:true});
 // F: snap camera to Hina while preserving the current orbit viewing angle.
 function focusHina(){
+ if(followCamera){setCameraMode(true);return;}
  const offset=camera.position.clone().sub(orbit.target);
  // Keep the viewing direction, but always move to a close character shot.
  if(offset.lengthSq()<.001)offset.set(0,4,8);
@@ -1571,11 +2077,22 @@ function focusHina(){
  orbit.update();
 }
 window.addEventListener('keydown',e=>{
- if(e.code!=='KeyF'||e.repeat||e.ctrlKey||e.altKey||e.metaKey)return;
+ if(!['KeyF','KeyC'].includes(e.code)||e.repeat||e.ctrlKey||e.altKey||e.metaKey)return;
  if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;
- e.preventDefault();focusHina();
+ e.preventDefault();if(e.code==='KeyC')setCameraMode(!followCamera);else focusHina();
 });
-$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 암막 ON':'미탐험 암막 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration(true);updateDetailVisibility(true)};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};$('speed').onclick=()=>{speed=speed===1?2:speed===2?4:1;$('speed').textContent='속도 ×'+speed};$('reset').onclick=()=>{init()};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();function animate(t){requestAnimationFrame(animate);let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused&&(!isMobile||Math.floor(t/65)!==Math.floor((t-dt*1000)/65)))animateWildlife(t*.001,dt*speed);orbit.update();updateBubble();
+$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 암막 ON':'미탐험 암막 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration(true);updateDetailVisibility(true)};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};$('speed').onclick=()=>{speed=speed===1?2:speed===2?4:1;$('speed').textContent='속도 ×'+speed};$('reset').onclick=()=>{init();if(followCamera)setCameraMode(true)};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();function animate(t){requestAnimationFrame(animate);
+ if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
+ lastRenderAt=t;
+ let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused&&(!isMobile||Math.floor(t/65)!==Math.floor((t-dt*1000)/65)))animateWildlife(t*.001,dt*speed);if(followCamera){
+  followFocus.copy(hana.position).add(new THREE.Vector3(0,1.25,0));
+  followDesired.copy(followFocus).add(followOffset);
+  const lerp=1-Math.exp(-Math.min(dt,.08)*5);
+  orbit.target.lerp(followFocus,lerp);
+  camera.position.lerp(followDesired,lerp);
+  camera.lookAt(orbit.target);
+ }else orbit.update();
+ updateCameraOcclusion(t);updateBubble();updateNightSoundBubble();
  const clockNow=clockParts();
  const nightNow=clockNow.h>=19||clockNow.h<6;
  const dn=$('dayNight');
