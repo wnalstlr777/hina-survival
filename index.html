@@ -1,8 +1,25 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} </style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ui"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div><div style="margin-top:12px"><b>AI 행동 기록</b><div id="log"></div></div></div><div id="badge"><b id="clock">06:00</b><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">탐험 반경 계산 중</div></div><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><button id="reset">다시 시작</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대 · 우클릭: 이동 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
+@media(max-width:700px){
+ #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
+ #ui{display:none;position:fixed;z-index:11;top:61px;left:auto;right:8px;width:min(285px,calc(100vw - 38px));max-height:calc(100dvh - 160px);overflow:auto;padding:12px;background:#101d24f2}
+ body.menu-open #ui{display:block}
+ #badge{top:8px;left:8px;right:auto;text-align:left;max-width:calc(100vw - 135px);padding:7px 9px;font-size:11px;pointer-events:none}
+ #badge #status,#badge #exploration{display:none}
+ #controls{z-index:10;left:50%;bottom:calc(7px + env(safe-area-inset-bottom));transform:translateX(-50%);padding:6px 8px;gap:6px;max-width:calc(100vw - 20px);white-space:nowrap}
+ #controls button{font-size:12px;padding:9px 10px;min-height:36px}
+ #controls #elapsed{font-size:11px}
+ #extraControls{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#101d24f4;border-radius:12px;padding:10px;max-width:calc(100vw - 25px);flex-wrap:wrap;justify-content:center;width:285px;white-space:normal}
+ body.menu-open #extraControls{display:flex}
+ #bubble{max-width:190px;font-size:12px}
+}
+</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ui"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div><div style="margin-top:12px"><b>AI 행동 기록</b><div id="log"></div></div></div><div id="badge"><b id="clock">06:00</b><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">탐험 반경 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><div id="extraControls"><button id="reset">다시 시작</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><button id="qualityToggle">화질: 자동</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대 · 우클릭: 이동 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ad4e7);scene.fog=new THREE.Fog(0x9ad4e7,165,380);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,380);camera.position.set(32,35,49);const renderer=new THREE.WebGLRenderer({antialias:true});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('view').appendChild(renderer.domElement);const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(-4,1,-3);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI/2.08;orbit.minDistance=5;orbit.maxDistance=255;const ambient=new THREE.HemisphereLight(0xffffff,0x516d4b,2.2);scene.add(ambient);const sun=new THREE.DirectionalLight(0xffe4aa,2.4);sun.position.set(-12,25,14);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.025;sun.shadow.camera.left=-155;sun.shadow.camera.right=155;sun.shadow.camera.top=155;sun.shadow.camera.bottom=-155;scene.add(sun);const fill=new THREE.DirectionalLight(0xa4d9ff,.65);fill.position.set(14,10,-18);scene.add(fill);
-const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x3eabc2),riverMat=mat(0x66c6d5),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
+const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia('(max-width:700px)').matches;
+let highQuality=!isMobile;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ad4e7);scene.fog=new THREE.Fog(0x9ad4e7,165,380);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,380);camera.position.set(32,35,49);const renderer=new THREE.WebGLRenderer({antialias:!isMobile,powerPreference:isMobile?"low-power":"high-performance"});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.15:2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('view').appendChild(renderer.domElement);const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(-4,1,-3);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI/2.08;orbit.minDistance=5;orbit.maxDistance=255;const ambient=new THREE.HemisphereLight(0xffffff,0x516d4b,2.2);scene.add(ambient);const sun=new THREE.DirectionalLight(0xffe4aa,2.4);sun.position.set(-12,25,14);sun.castShadow=true;sun.shadow.mapSize.set(isMobile?512:2048,isMobile?512:2048);sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.025;sun.shadow.camera.left=isMobile?-38:-155;sun.shadow.camera.right=isMobile?38:155;sun.shadow.camera.top=isMobile?38:155;sun.shadow.camera.bottom=isMobile?-38:-155;scene.add(sun);const fill=new THREE.DirectionalLight(0xa4d9ff,.65);fill.position.set(14,10,-18);scene.add(fill);
+const detailMeshes=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x3eabc2),riverMat=mat(0x66c6d5),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);if(Math.max(w,h,d)<4&&Math.hypot(x,z)>23)detailMeshes.push(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
 grass.polygonOffset=true;grass.polygonOffsetFactor=-1;grass.polygonOffsetUnits=-1;
 const dirt=mat(0x9a7656),dirt2=mat(0x82654f),rockDark=mat(0x4d5356),rock=mat(0x777979),moss=mat(0x64885a),palmLeaf=mat(0x4d9664),foam=mat(0xa7e9dc);
 box(460,.25,460,sea,0,-.85,0);
@@ -19,7 +36,7 @@ function islandValue(x,z){
 function landAt(x,z){return islandValue(x,z)>0;}
 const shoreGeo=new THREE.BoxGeometry(1,1,1);
 const shoreMesh=new THREE.InstancedMesh(shoreGeo,sand,58000);
-shoreMesh.castShadow=true;shoreMesh.receiveShadow=true;
+shoreMesh.castShadow=!isMobile;shoreMesh.receiveShadow=true;
 const transform=new THREE.Object3D();let shoreCount=0;
 for(let x=-104;x<=104;x+=1.04)for(let z=-90;z<=90;z+=1.04){
  const v=islandValue(x,z);
@@ -557,29 +574,64 @@ outerNorth:new THREE.Vector3(-38,.5,39),outerEast:new THREE.Vector3(58,.5,6),out
 farWest:new THREE.Vector3(-58,.5,-21),farNorth:new THREE.Vector3(6,.5,51),farSouth:new THREE.Vector3(-16,.5,-48)};
 // Fog of war: unknown terrain is dark, explored tiles stay revealed forever.
 // Dark semi-transparent (not solid black) so the coastline is still legible.
-const FOG_STEP=5.4, fogTiles=[],explored=new Set();
+const FOG_STEP=5.4,fogTiles=[],explored=new Set();
 const fogGeo=new THREE.PlaneGeometry(FOG_STEP+.12,FOG_STEP+.12);
 const fogMat=new THREE.MeshBasicMaterial({color:0x050b12,transparent:true,opacity:.88,
  side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2});
 for(let x=-103;x<=103;x+=FOG_STEP)for(let z=-88;z<=88;z+=FOG_STEP){
  if(!landAt(x,z))continue;
- const fogTile=new THREE.Mesh(fogGeo,fogMat);
- fogTile.rotation.x=-Math.PI/2;fogTile.position.set(x,7.9,z);
- fogTile.renderOrder=20;scene.add(fogTile);
- fogTiles.push({mesh:fogTile,x,z,key:`${Math.round(x*10)}:${Math.round(z*10)}`});
+ fogTiles.push({x,z,key:`${Math.round(x*10)}:${Math.round(z*10)}`});
 }
+const fogMesh=new THREE.InstancedMesh(fogGeo,fogMat,fogTiles.length);
+fogMesh.rotation.x=-Math.PI/2;fogMesh.renderOrder=20;fogMesh.frustumCulled=false;
+const fogDummy=new THREE.Object3D();
+for(let i=0;i<fogTiles.length;i++){
+ const tile=fogTiles[i];fogDummy.position.set(tile.x,-tile.z,7.9);
+ fogDummy.scale.set(1,1,1);fogDummy.updateMatrix();fogMesh.setMatrixAt(i,fogDummy.matrix);
+}
+fogMesh.instanceMatrix.needsUpdate=true;scene.add(fogMesh);
 let fogEnabled=true,explorationExperience=0,lastRevealPosition=new THREE.Vector3(9,0,5);
+let explorationNextUpdate=0,detailNextUpdate=0,uiNextUpdate=0,displayedStats='';
 function exploreRadius(){return 5.5+stats.will*.13+Math.min(6,explorationExperience*.09);}
-function updateExploration(){
- const r=exploreRadius();let newTiles=0;
- for(const tile of fogTiles){
+function updateExploration(force=false){
+ if(!force&&elapsed<explorationNextUpdate)return;
+ explorationNextUpdate=elapsed+.75;
+ const r=exploreRadius();let newTiles=0,changed=false;
+ for(let i=0;i<fogTiles.length;i++){
+  const tile=fogTiles[i];
   if(!explored.has(tile.key)&&Math.hypot(tile.x-hana.position.x,tile.z-hana.position.z)<=r){
    explored.add(tile.key);newTiles++;
   }
-  tile.mesh.visible=fogEnabled&&!explored.has(tile.key);
+  const hidden=fogEnabled&&!explored.has(tile.key);
+  if(tile.hidden!==hidden||force){
+   fogDummy.position.set(tile.x,-tile.z,7.9);
+   fogDummy.scale.set(hidden?1:0,hidden?1:0,hidden?1:0);
+   fogDummy.updateMatrix();fogMesh.setMatrixAt(i,fogDummy.matrix);
+   tile.hidden=hidden;changed=true;
+  }
  }
- if(newTiles){explorationExperience=Math.min(100,explorationExperience+newTiles*.055);}
+ if(changed)fogMesh.instanceMatrix.needsUpdate=true;
+ if(newTiles)explorationExperience=Math.min(100,explorationExperience+newTiles*.055);
  document.getElementById('exploration').textContent=`탐험 반경 ${r.toFixed(0)}m · 발견 ${Math.round(explored.size/Math.max(1,fogTiles.length)*100)}%`;
+}
+function updateDetailVisibility(force=false){
+ if(!force&&elapsed<detailNextUpdate)return;
+ detailNextUpdate=elapsed+1.25;
+ // Preserve nearby gameplay landmarks. Cull distant decoration, including undiscovered land.
+ for(const mesh of detailMeshes){
+  const d=Math.hypot(mesh.position.x-hana.position.x,mesh.position.z-hana.position.z);
+  if(!isMobile&&highQuality){mesh.visible=true;continue;}
+  if(d>68){mesh.visible=false;continue;}
+  if(d<19){mesh.visible=true;continue;}
+  let known=false;
+  for(const tile of fogTiles){
+   if(Math.abs(tile.x-mesh.position.x)<FOG_STEP*1.6&&
+      Math.abs(tile.z-mesh.position.z)<FOG_STEP*1.6&&explored.has(tile.key)){
+    known=true;break;
+   }
+  }
+  mesh.visible=known;
+ }
 }
 const $=id=>document.getElementById(id);
 let bubbleEnabled=true,bubbleUntil=0;const bubbleAnchor=new THREE.Vector3();
@@ -616,7 +668,7 @@ function init(){
  knownWater=knownBerries=knownCave=seenRabbit=seenFish=false;actions=0;
  stats={energy:92,thirst:85,hunger:83,will:72};redrawNeeds();loneliness=0;lastMoraleMessage=0;exhaustionCooldown=0;previousEnergyBand=100;resetBerryTrees();
  fireAttempts=0;fireSuccess=false;fireKnowledge=0;fireDryStock=0;fireLearnedWet=false;nextFireAttempt=0;lastWeatherDay=0;
- hana.position.set(9,.4,5);hana.rotation.set(0,0,0);explored.clear();explorationExperience=0;previousExplorationCount=0;discoveryBoostAt=0;updateExploration();
+ hana.position.set(9,.4,5);hana.rotation.set(0,0,0);explored.clear();explorationExperience=0;previousExplorationCount=0;discoveryBoostAt=0;updateExploration(true);updateDetailVisibility(true);
  $('log').innerHTML='';lastLog='';
  setState('confused','워프 직후 · 혼란',null,'여긴... 어디지? 애들은 어디 간 거야?');
 }
@@ -867,6 +919,7 @@ function update(dt){
  decide();
  updateCharacterPose();
  updateExploration();
+ updateDetailVisibility();
  updateBerryTrees();
  const visited=explored.size;
  if(visited>previousExplorationCount+28&&elapsed>discoveryBoostAt+45){
@@ -894,8 +947,10 @@ function update(dt){
  sun.color.setRGB(cool,.94,1);
  ambient.color.setRGB(.82*cool,.91,1);
  if(raining())ambient.intensity*=.82;
+ if(elapsed>=uiNextUpdate){uiNextUpdate=elapsed+.3;
  $('stats').innerHTML=Object.entries({체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불경험:Math.min(100,fireKnowledge*3)})
  .map(([k,v])=>`<div class="stat"><label>${k}</label><div class="bar"><div class="fill" style="width:${v}%;background:${v<30?'#db826f':v<55?'#d8b65b':'#68d3b1'}"></div></div><span class="val">${Math.round(v)}</span></div>`).join('');
+ }
 }
 
 // Lightweight procedural ambience, unlocked only by a user click (browser autoplay policy).
@@ -935,5 +990,25 @@ $('soundToggle').onclick=async()=>{
  $('soundToggle').textContent=soundEnabled?'환경음 ON':'환경음 OFF';$('soundToggle').setAttribute('aria-pressed',String(soundEnabled));
 };
 
-$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 암막 ON':'미탐험 암막 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration()};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};$('speed').onclick=()=>{speed=speed===1?2:speed===2?4:1;$('speed').textContent='속도 ×'+speed};$('reset').onclick=()=>{init();paused=false;$('pause').textContent='일시정지'};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();function animate(t){requestAnimationFrame(animate);let dt=Math.min(.05,(t-prev)/1000);prev=t;update(dt);if(!paused)animateWildlife(t*.001,dt*speed);orbit.update();updateBubble();renderer.render(scene,camera)}requestAnimationFrame(animate);
+$('mobileMenu').onclick=()=>{
+ const open=document.body.classList.toggle('menu-open');
+ $('mobileMenu').setAttribute('aria-expanded',String(open));
+ $('mobileMenu').textContent=open?'✕ 닫기':'☰ 메뉴';
+};
+function applyQuality(){
+ renderer.setPixelRatio(Math.min(devicePixelRatio,highQuality?Math.min(isMobile?1.6:2,devicePixelRatio):1.05));
+ sun.shadow.mapSize.set(highQuality?(isMobile?1024:2048):512,highQuality?(isMobile?1024:2048):512);
+ sun.shadow.map?.dispose();sun.shadow.map=null;
+ sun.shadow.camera.left=highQuality?-155:-38;
+ sun.shadow.camera.right=highQuality?155:38;
+ sun.shadow.camera.top=highQuality?155:38;
+ sun.shadow.camera.bottom=highQuality?-155:-38;
+ sun.shadow.camera.updateProjectionMatrix();
+ shoreMesh.castShadow=highQuality&&!isMobile;
+ $('qualityToggle').textContent=highQuality?'화질: 높음':'화질: 절약';
+ updateDetailVisibility(true);
+}
+$('qualityToggle').onclick=()=>{highQuality=!highQuality;applyQuality();};
+applyQuality();
+$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 암막 ON':'미탐험 암막 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration(true);updateDetailVisibility(true)};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};$('speed').onclick=()=>{speed=speed===1?2:speed===2?4:1;$('speed').textContent='속도 ×'+speed};$('reset').onclick=()=>{init();paused=false;$('pause').textContent='일시정지'};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();function animate(t){requestAnimationFrame(animate);let dt=Math.min(.05,(t-prev)/1000);prev=t;update(dt);if(!paused&&(!isMobile||Math.floor(t/65)!==Math.floor((t-dt*1000)/65)))animateWildlife(t*.001,dt*speed);orbit.update();updateBubble();renderer.render(scene,camera)}requestAnimationFrame(animate);
 </script></body></html>
