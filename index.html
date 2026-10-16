@@ -845,30 +845,50 @@ let fireDay10Planned=false;
 let fireEverLit=false,fireSkill=0,lastFireOutDay=0,lastBranchDay=0;
 let fishObservations=0,fishAttempts=0,fishCaught=0,lastFishDay=0;
 // v5.2: learned survival systems. Timers use simulation seconds.
-let fishSkill=0,fishSpear=false,storedFish=[],rainWater=0,waterVessel=false,lastFoodCheckAt=0;
+let fishSkill=0,fishSpear=false,storedFish=[],carriedFish=[],rainWater=0,waterVessel=false,lastFoodCheckAt=0;
+const MAX_CAVE_FISH=8,MAX_CARRY_FISH=2;
 let leafBed=false,leafStock=0,plantKnowledge=0,petBond=0,friendClue=0;
 let lastBuildDay=0,lastPlantDay=0,lastPetCareDay=0,lastClueDay=0,lastRainCollectionDay=0;
 function storeFish(){
- if(storedFish.length>=4)return false;
- storedFish.push({at:elapsed,life:DAY_SECONDS*(fireSuccess?3:1.5),cooked:fireSuccess});
- log(`🐟 물고기 저장 · 보유 ${storedFish.length}/4`);return true;
+ if(carriedFish.length>=MAX_CARRY_FISH)return false;
+ const cooked=fireSuccess&&distanceTo('shelter')<4;
+ carriedFish.push({at:elapsed,life:DAY_SECONDS*(cooked?3:1.4),cooked});
+ log(`🐟 물고기 휴대 · ${carriedFish.length}/${MAX_CARRY_FISH}마리 · 동굴로 가져가 보관 예정`);return true;
 }
-function edibleFish(){return storedFish.findIndex(f=>elapsed-f.at<f.life);}
-function eatFish(){
- const i=edibleFish();if(i<0)return false;
- const f=storedFish.splice(i,1)[0],cooked=f.cooked;
+function edibleFish(){return carriedFish.findIndex(f=>elapsed-f.at<f.life);}
+function eatFish(fromCave=false){
+ if(fromCave&&distanceTo('shelter')>=3.3)return false;
+ const list=fromCave?storedFish:carriedFish;
+ const i=list.findIndex(f=>elapsed-f.at<f.life);if(i<0)return false;
+ const f=list.splice(i,1)[0],cooked=fromCave&&fireSuccess?true:f.cooked;
  const h=stats.hunger,e=stats.energy;
  stats.hunger=Math.min(100,stats.hunger+randomBetween(cooked?28:15,cooked?38:23));
  stats.energy=Math.min(100,stats.energy+randomBetween(cooked?8:0,cooked?12:3));
- hungerDelayUntil=elapsed+27;
+ hungerDelayUntil=elapsed+27;food=true;
  if(!cooked&&Math.random()<.17){stats.energy=Math.max(5,stats.energy-7);changeWill(-3,'익히지 않은 생선 섭취');log('날생선 섭취 후 속이 불편함');}
- log(`🐟 ${cooked?'구운':'생'}생선 섭취 · 허기 +${Math.round(stats.hunger-h)} · 체력 +${Math.round(stats.energy-e)}`);
+ log(`🐟 ${cooked?'구운':'생'}생선 섭취 · 허기 +${Math.round(stats.hunger-h)} · 체력 +${Math.round(stats.energy-e)} · ${fromCave?'동굴 비축':'휴대'}`);
  return true;
 }
+function depositCaveFood(){
+ if(distanceTo('shelter')>=3.3||!carriedFish.length)return 0;
+ const room=Math.max(0,MAX_CAVE_FISH-storedFish.length);
+ const amount=Math.min(room,carriedFish.length);
+ for(let i=0;i<amount;i++){
+  const f=carriedFish.shift();
+  // Cave fire permits smoking/cooking fish on arrival, extending its usable life.
+  if(fireSuccess){f.cooked=true;f.life=Math.max(f.life,elapsed-f.at+DAY_SECONDS*3);}
+  storedFish.push(f);
+ }
+ if(amount)log(`🏕 동굴에 생선 ${amount}마리 보관 · 비축 ${storedFish.length}/${MAX_CAVE_FISH}`);
+ return amount;
+}
 function spoilFood(){
- const before=storedFish.length;
- storedFish=storedFish.filter(f=>elapsed-f.at<f.life);
- if(before>storedFish.length)log(`저장한 물고기 ${before-storedFish.length}마리 부패 · 폐기`);
+ for(const [list,name] of [[storedFish,'동굴 보관'],[carriedFish,'휴대']]){
+  const before=list.length;
+  const good=list.filter(f=>elapsed-f.at<f.life);
+  list.splice(0,list.length,...good);
+  if(before>list.length)log(`🐟 ${name} 생선 ${before-list.length}마리 부패 · 폐기`);
+ }
 }
 
 let rabbitPattern=0;
@@ -1292,7 +1312,7 @@ function init(){
  fireAttempts=0;fireSuccess=false;fireKnowledge=0;fireSkill=0;fireEverLit=false;lastFireOutDay=0;lastBranchDay=0;fireDryStock=0;
  torchOuting=false;torchNightDay=0;torchOutingsToday=0;torchDecisionAt=-Infinity;torchGroup.visible=false;torchLight.intensity=0;
  fishObservations=0;fishAttempts=0;fishCaught=0;lastFishDay=0;
- fishSkill=0;fishSpear=false;storedFish=[];rainWater=0;waterVessel=false;lastFoodCheckAt=0;
+ fishSkill=0;fishSpear=false;storedFish=[];carriedFish=[];rainWater=0;waterVessel=false;lastFoodCheckAt=0;
  leafBed=false;leafStock=0;plantKnowledge=0;petBond=0;friendClue=0;
  lastBuildDay=lastPlantDay=lastPetCareDay=lastClueDay=lastRainCollectionDay=0;
  rabbitPattern=0;petRabbit=null;campfire.visible=false;fireLight.intensity=0;
@@ -1406,6 +1426,10 @@ function chooseNextDayAction(){
   }
   setState('fieldRest','체력 부족 · 현장에서 휴식',null,'너무 지쳤어... 여기서 잠깐 누워 쉬어야겠어.');return;
  }
+ // Carry freshly caught fish to the cave while it is still edible.
+ if(carriedFish.length>0&&stats.energy>22&&stats.thirst>18&&stats.hunger>26&&distanceTo('shelter')>3.3){
+  setState('fishStoreTravel','잡은 물고기 · 동굴로 운반','shelter','물고기가 상하기 전에 동굴에 가져다 두자.');return;
+ }
  // Day 10: prioritize the prepared campfire once immediate survival is not critical.
  const today=clockParts().day, hour=clockParts().h;
  if(!fireEverLit&&today>=10&&today%7!==0&&hour>=7&&hour<20&&
@@ -1415,8 +1439,8 @@ function chooseNextDayAction(){
    '열흘 동안 실패했지만... 이제는 마른 나무를 어떻게 써야 하는지 알 것 같아.');return;
  }
  // Collect branches whenever the fire is getting low; wet days are harder.
- if(fireEverLit&&fireSuccess&&fireKnowledge<78&&stats.energy>24&&stats.thirst>16&&
-    stats.hunger>16&&elapsed>=nextFireAttempt){
+ if(fireEverLit&&fireSuccess&&fireKnowledge<(raining()?92:86)&&stats.energy>20&&stats.thirst>14&&
+    stats.hunger>14&&elapsed>=nextFireAttempt){
   setState('branchTravel','모닥불 연료 · 나뭇가지 줍기',null,
    '불이 약해졌어. 근처에 떨어진 나뭇가지를 주워 와야겠어.');return;
  }
@@ -1435,6 +1459,9 @@ function chooseNextDayAction(){
  if(shouldAddressNeed('thirst')){
   setState('drinkTravel','갈증 해소 · 물가로 이동','water',stats.thirst<20?'너무 멀리 왔나 봐... 목이 바짝 말라! 물가로 돌아가야겠어.':'슬슬 물을 마셔야겠어. 물가로 돌아가자.');return;
  }
+ if(shouldAddressNeed('hunger')&&storedFish.length>0&&distanceTo('shelter')<3.3){
+  if(eatFish(true)){setState('recover','동굴 비축 생선으로 허기 회복',null,'동굴에 모아둔 생선을 먹으니까 든든해.');return;}
+ }
  if(shouldAddressNeed('hunger')&&edibleFish()>=0){
   if(eatFish()){
    setState('recover','저장한 생선으로 허기 해소',null,'미리 잡아둔 물고기를 먹자.');return;
@@ -1449,8 +1476,8 @@ function chooseNextDayAction(){
    log(`휴대 열매 ${eaten}개 먹음 · 남은 휴대 ${carriedBerries}개 · 허기 ${Math.round(stats.hunger)}`);
    setState('recover','휴대한 열매로 허기 회복',null,'가져온 열매부터 먹고 움직이자.');return;
   }
-  if(caveBerries>0&&stats.hunger<68){
-   setState('storedBerryTravel','허기 해소 · 동굴 보관 열매 먹기','shelter',
+  if((caveBerries>0||storedFish.length>0)&&stats.hunger<72){
+   setState('storedBerryTravel','허기 해소 · 동굴 비축 식량 먹기','shelter',
     '동굴에 보관한 열매가 있었지. 가져다 둔 걸 먹자.');return;
   }
   const now=clockParts();
@@ -1640,12 +1667,12 @@ function dayTwoPlusDecide(){
  }
  if(state==='branchGather'){
   if(elapsed-phaseAt<9)return;
-  const gained=raining()?randomBetween(7,13):randomBetween(24,39);
+  const gained=raining()?randomBetween(13,23):randomBetween(34,48);
   fireDryStock=Math.min(8,fireDryStock+1);
   if(fireSuccess){
    fireKnowledge=Math.min(100,fireKnowledge+gained);
    log(`나뭇가지 보충 · 불 유지력 +${Math.round(gained)} (${Math.round(fireKnowledge)})`);
-   nextFireAttempt=elapsed+18;
+   nextFireAttempt=elapsed+(raining()?10:16);
    setState('recover','모닥불 연료 보충',null,'이제 불이 조금 더 오래 가겠어.');return;
   }
   const chance=raining()?.22:Math.min(.94,.50+fireSkill*.004);
@@ -1718,13 +1745,13 @@ function dayTwoPlusDecide(){
   const chance=Math.min(.88,.09+fishSkill*.005+(fishSpear?.26:0));
   if(Math.random()<chance){
    fishCaught++;
-   if(stats.hunger<65||storedFish.length>=4){
+   if(stats.hunger<52||carriedFish.length>=MAX_CARRY_FISH){
     const cooked=fireSuccess,h=stats.hunger,e=stats.energy;
     stats.hunger=Math.min(100,stats.hunger+randomBetween(cooked?28:15,cooked?38:23));
     stats.energy=Math.min(100,stats.energy+randomBetween(cooked?8:0,cooked?12:3));
     hungerDelayUntil=elapsed+25;
     log(`🐟 포획 후 ${cooked?'구워':'날로'} 먹음 · 허기 +${Math.round(stats.hunger-h)} · 체력 +${Math.round(stats.energy-e)}`);
-   }else storeFish();
+   }else if(!storeFish()){eatFish();}
    setState('fishResult','물고기 포획 성공',null,'잡았다! 오늘은 먹을까, 보관할까?');return;
   }
   fishObservations++;
@@ -1789,18 +1816,22 @@ function dayTwoPlusDecide(){
   log('물을 마셔 갈증이 회복됨 (위생 위험은 아직 모름)');
   setState('recover','갈증 해소',null,'살 것 같아... 물은 여기 있다는 걸 기억하자.');return;
  }
+ depositCaveFood();
  if(carriedBerries>0&&distanceTo('shelter')<3.3&&state!=='berryStoreTravel'&&stats.hunger>=42){
   const moved=Math.min(carriedBerries,MAX_CAVE_BERRIES-caveBerries);
   if(moved>0){carriedBerries-=moved;caveBerries+=moved;log(`동굴에 열매 ${moved}개 보관 · 총 ${caveBerries}개`);}
  }
  // Storage actions must confirm arrival; a navigation detour is not a cave visit.
+ if(state==='fishStoreTravel'&&!target){
+  depositCaveFood();setState('recover','동굴 생선 보관 완료',null,'이제 동굴에서 쉴 때 먹을 수 있겠어.');return;
+ }
  if(state==='storedBerryTravel'&&!target){
   if(distanceTo('shelter')>=3.3){
    if(elapsed-phaseAt<65){setState('storedBerryTravel','동굴 보관 열매를 찾으러 다시 이동','shelter');return;}
    setState('recover','동굴 접근 실패 · 다른 식량 찾기',null,'동굴로 가는 길이 막혔어. 다른 먹을거리를 찾자.');
    hungerDelayUntil=elapsed+8;return;
   }
-  const ate=eatStoredBerries();
+  const ate=(storedFish.length>0&&eatFish(true))||eatStoredBerries();
   setState('recover',ate?'동굴 보관 열매로 허기 회복':'보관한 열매가 없음',null,
    ate?'미리 가져다 둬서 다행이야.':'동굴 열매가 다 떨어졌네. 다른 식량을 찾아야겠어.');return;
  }
@@ -1863,6 +1894,11 @@ function dayTwoPlusDecide(){
     need==='thirst'?'그래, 물부터 마시고 다시 탐험하자.':'아쉽지만 열매를 먹고 다시 오자.');return;
  }
  if(state==='rest'){
+  // Resting at the cave includes a meal from the actual cave pantry when hungry.
+  if(distanceTo('shelter')<3.3&&stats.hunger<67&&elapsed>=hungerDelayUntil){
+   const ate=(storedFish.length>0&&eatFish(true))||eatStoredBerries();
+   if(ate){log('🏕 동굴에서 휴식하며 비축 식량 섭취');}
+  }
   const hours=clockParts().h;
   if(hours>=0&&hours<4&&sleepRestored&&fireEverLit&&stats.energy>63&&
      stats.thirst>60&&stats.hunger>60&&stats.will>55&&!raining()&&
@@ -1911,7 +1947,7 @@ function completeDayTenFire(){
  fireDryStock=Math.max(fireDryStock,1);
  fireSuccess=true;
  fireDay10Planned=false;
- nextFireAttempt=Infinity;
+ nextFireAttempt=elapsed+15;
  navReset();
  target=null;
  hana.position.set(sites.shelter.x+.85,.4,sites.shelter.z+.6);
@@ -2036,7 +2072,7 @@ function update(dt){
  if(waterVessel&&raining()&&rainWater<4&&elapsed-lastRainCollectionDay>65){
   lastRainCollectionDay=elapsed;rainWater++;log(`💧 빗물 받이에 식수 1회분 저장 · ${rainWater}/4`);
  }
- if(storedFish.length&&Math.floor(elapsed)%5===0&&elapsed>lastFoodCheckAt+4){lastFoodCheckAt=elapsed;spoilFood();}
+ if((storedFish.length||carriedFish.length)&&Math.floor(elapsed)%5===0&&elapsed>lastFoodCheckAt+4){lastFoodCheckAt=elapsed;spoilFood();}
  if(raining()){
   // Rain provides an ambient hydration bonus, overriding normal thirst decay.
   stats.thirst=Math.min(100,stats.thirst+step*.085);
@@ -2047,9 +2083,10 @@ function update(dt){
  moraleUpdate(step);
  updateSnakes(step);
  if(fireSuccess){
-  fireKnowledge=Math.max(0,fireKnowledge-step*(raining()?.20:.067));
+  // Rain accelerates consumption and raises the risk of embers dying, even with fuel.
+  fireKnowledge=Math.max(0,fireKnowledge-step*(raining()?.25:.052));
   // Rare accident: rain or a missed branch delivery can suddenly extinguish the embers.
-  if(fireKnowledge<24&&Math.random()<step*(raining()?.003:.0008)){
+  if(fireKnowledge<(raining()?40:19)&&Math.random()<step*(raining()?.005:.00045)){
    fireKnowledge=0;log('실수로 모닥불 불씨를 놓침 · 불이 꺼짐');
   }
   if(fireKnowledge<=0){
@@ -2193,7 +2230,7 @@ function update(dt){
  // WeatherUpdate modifies sunlight for rain and wet ground; keep its existing behavior.
  if(elapsed>=uiNextUpdate){uiNextUpdate=elapsed+.3;
  $('stats').innerHTML=Object.entries({체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불유지:Math.min(100,fireKnowledge),불기술:Math.min(100,fireSkill),토끼패턴:Math.min(100,rabbitPattern),물고기숙련:Math.round(fishSkill),식물연구:Math.round(plantKnowledge),친구단서:Math.round(friendClue)})
- .map(([k,v])=>`<div class="stat"><label>${k}</label><div class="bar"><div class="fill" style="width:${v}%;background:${v<30?'#db826f':v<55?'#d8b65b':'#68d3b1'}"></div></div><span class="val">${Math.round(v)}</span></div>`).join('')+`<div style="font-size:12px;color:#e8d8b8;margin-top:7px">🐟 저장 생선 ${storedFish.length}/4 · ${fishSpear?'작살 완성':'맨손 포획'} · 💧 빗물 ${rainWater}/4 · ${leafBed?'🛏️ 침상 완성':'침상 미제작'}${petRabbit?' · 🐇 펫 친밀도 '+Math.round(petBond):''}</div>`;
+ .map(([k,v])=>`<div class="stat"><label>${k}</label><div class="bar"><div class="fill" style="width:${v}%;background:${v<30?'#db826f':v<55?'#d8b65b':'#68d3b1'}"></div></div><span class="val">${Math.round(v)}</span></div>`).join('')+`<div style="font-size:12px;color:#e8d8b8;margin-top:7px">🏕 동굴 생선 ${storedFish.length}/${MAX_CAVE_FISH} · 휴대 ${carriedFish.length}/${MAX_CARRY_FISH} · 동굴 열매 ${caveBerries}/${MAX_CAVE_BERRIES} · ${fishSpear?'작살 완성':'맨손 포획'} · 💧 빗물 ${rainWater}/4 · ${leafBed?'🛏️ 침상 완성':'침상 미제작'}${petRabbit?' · 🐇 펫 친밀도 '+Math.round(petBond):''}</div>`;
  }
 }
 
@@ -2397,7 +2434,7 @@ function devJumpToDay10(){
  lastSafeSpot={x:hana.position.x,z:hana.position.z,y:hana.position.y};
  rabbitPattern=100;rabbitObservations=5;rabbitAttempts=0;lastRabbitAttemptDay=0;
  fishObservations=3;fishAttempts=2;fishSkill=49;fishSpear=false;lastFishDay=0;
- storedFish=[];rainWater=1;waterVessel=true;
+ storedFish=[{at:elapsed,life:DAY_SECONDS*2.5,cooked:true}];carriedFish=[];rainWater=1;waterVessel=true;
  leafBed=false;leafStock=2;plantKnowledge=22;petBond=0;friendClue=12;
  resilienceXP=18;explorationExperience=20;
  // Pre-reveal a coherent region near the known camp rather than scattered fog tiles.
