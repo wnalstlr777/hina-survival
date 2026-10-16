@@ -32,14 +32,14 @@ const groundPlatforms=[];const solidObstacles=[];const detailMeshes=[];const cam
  if((m===grass||m===dirt||m===dirt2)&&w>=2.8&&d>=2.8&&h<=8.0){
   groundPlatforms.push({x,z,rx:w*.5,rz:d*.5,top:y+h*.5});
  }
- if(h>.12&&Math.max(w,d)<45&&Math.max(w,d)>.5){o.geometry.computeBoundingSphere();cameraOccluders.push(o);}
+ // v6.1: terrain/ground boxes do not participate in character occlusion fade.
  // Solid objects whose lower portion intersects Hina's chest-height walking space.
  // Exclude the broad floor/shore and horizontal platforms.
  if(h>=1.15 && w<65 && d<65 && y-h/2<1.3 && y+h/2>.65
     && !(m===dirt||m===dirt2||m===grass)
     && !(h>1.4 && w<=2.1 && d<=2.1))
   /* v4.3: scenery never creates navigation blockers */
- if(Math.max(w,h,d)<4&&Math.hypot(x,z)>23)detailMeshes.push(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=true;scene.add(o);if(h>.65)cameraOccluders.push(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
+ if(Math.max(w,h,d)<4&&Math.hypot(x,z)>23)detailMeshes.push(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
 grass.polygonOffset=true;grass.polygonOffsetFactor=-1;grass.polygonOffsetUnits=-1;
 const dirt=mat(0x9a7656),dirt2=mat(0x82654f),rockDark=mat(0x4d5356),rock=mat(0x777979),moss=mat(0x64885a),palmLeaf=mat(0x4d9664),foam=mat(0xa7e9dc);
 box(460,.25,460,sea,0,-.85,0);
@@ -242,7 +242,8 @@ function cube(x,y,z,s,m){return box(s,s,s,m,x,y,z)}
 function groupCube(g,w,h,d,m,x,y,z){
  const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
  o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);
- if(Math.max(w,h,d)>.4){o.geometry.computeBoundingSphere();cameraOccluders.push(o);}
+ // v6.1: register EVERY piece, including tiny tree crown/trunk caps.
+ o.geometry.computeBoundingSphere();cameraOccluders.push(o);
  return o;
 }
 // Sand coastline built from uneven, overlapping small ledges instead of a clean rectangle.
@@ -2303,69 +2304,81 @@ let perfVisible=false,perfFrames=0,perfCpu=0,perfLast=performance.now(),perfNext
 const perfHud=document.createElement('div');perfHud.id='perfHud';perfHud.style.cssText='display:none;position:fixed;right:10px;bottom:68px;z-index:15;background:#091e24e8;color:#d8fff0;padding:10px 12px;border-radius:10px;font:12px/1.6 monospace;pointer-events:none;white-space:pre';document.body.appendChild(perfHud);
 function refreshPerfHud(){if(perfVisible)perfHud.textContent=`FPS ${perfFps} / target ${isMobile?mobileTargetFPS:'display'}\nDraw ${perfDraw} | Tri ${perfTris.toLocaleString()}\nRender CPU ${perfRenderMs}ms\nPixel ratio ${renderer.getPixelRatio().toFixed(2)}`;}
 $('perfToggle').onclick=()=>{perfVisible=!perfVisible;perfHud.style.display=perfVisible?'block':'none';$('perfToggle').textContent=perfVisible?'성능 정보 ON':'성능 정보 OFF';$('perfToggle').setAttribute('aria-pressed',String(perfVisible));refreshPerfHud();};
-// v4.6: One consistent, screen-space fade for all occluding opaque scenery.
-// A shared focus/radius and identical alpha curve prevent per-mesh opacity differences.
+// v6.1: SINGLE occlusion system. No independent whole-object opacity fade.
+// Trees/bushes fade as one group, including small cap pieces; terrain is excluded.
 const occlusionAim=new THREE.Vector3(),occlusionFocusPx=new THREE.Vector2();
 const occlusionBufferSize=new THREE.Vector2(),occlusionWorldPos=new THREE.Vector3();
 const fadedMeshes=new Map(),occlusionCandidates=new Set();
 const occlusionUniforms={focus:{value:occlusionFocusPx},radius:{value:1}};
+const occlusionGroupMembers=new Map(),occlusionBounds=new Map();
 let nextOcclusionCheck=0;
 function makeSoftOcclusionMaterial(original){
  const material=original.clone();
- material.transparent=true;
- material.depthWrite=false;
- // Keep the original surface color, but use a single common fade curve for every mesh.
+ material.transparent=true;material.depthWrite=false;
  const previous=material.onBeforeCompile;
- material.onBeforeCompile=(shader,webglRenderer)=>{
-  if(previous)previous(shader,webglRenderer);
+ material.onBeforeCompile=(shader,renderer)=>{
+  if(previous)previous(shader,renderer);
   shader.uniforms.uHinaFocus=occlusionUniforms.focus;
   shader.uniforms.uHinaRadius=occlusionUniforms.radius;
   shader.fragmentShader='uniform vec2 uHinaFocus;\nuniform float uHinaRadius;\n'+shader.fragmentShader;
   shader.fragmentShader=shader.fragmentShader.replace('#include <opaque_fragment>',
-   '#include <opaque_fragment>\n float hinaFade = smoothstep(uHinaRadius * 0.30, uHinaRadius, distance(gl_FragCoord.xy, uHinaFocus));\n gl_FragColor.a = hinaFade;');
+   '#include <opaque_fragment>\n float hinaFade = smoothstep(uHinaRadius * 0.28, uHinaRadius, distance(gl_FragCoord.xy, uHinaFocus));\n gl_FragColor.a *= hinaFade;');
  };
- material.customProgramCacheKey=()=> 'hina-unified-soft-occlusion-v46';
+ material.customProgramCacheKey=()=> 'hina-group-occlusion-v61';
  return material;
 }
+// Static scenery groups are built once. Avoid allocating geometry and per-part shader state every frame.
+function initializeOcclusionGroups(){
+ occlusionGroupMembers.clear();occlusionBounds.clear();
+ for(const mesh of cameraOccluders){
+  if(!mesh.parent||mesh.parent===scene)continue;
+  const group=mesh.parent;
+  if(!occlusionGroupMembers.has(group))occlusionGroupMembers.set(group,[]);
+  occlusionGroupMembers.get(group).push(mesh);
+ }
+ scene.updateMatrixWorld(true);
+ for(const [group,members] of occlusionGroupMembers){
+  const bounds=new THREE.Box3();
+  for(const mesh of members){mesh.updateWorldMatrix(true,false);bounds.expandByObject(mesh);}
+  const sphere=new THREE.Sphere();bounds.getBoundingSphere(sphere);
+  occlusionBounds.set(group,sphere);
+ }
+}
+initializeOcclusionGroups();
 function updateCameraOcclusion(now){
  renderer.getDrawingBufferSize(occlusionBufferSize);
  occlusionAim.copy(hana.position);occlusionAim.y+=1.2;
  const projectedFocus=occlusionAim.clone().project(camera);
  occlusionFocusPx.set((projectedFocus.x*.5+.5)*occlusionBufferSize.x,(projectedFocus.y*.5+.5)*occlusionBufferSize.y);
- // Radius in drawing-buffer pixels, independent of individual actor size or material.
- const radius=Math.min(occlusionBufferSize.x,occlusionBufferSize.y)*0.34;
+ const radius=Math.min(occlusionBufferSize.x,occlusionBufferSize.y)*.31;
  occlusionUniforms.radius.value=Math.max(1,radius);
  if(now<nextOcclusionCheck)return;
  nextOcclusionCheck=now+(ultraLowPower?500:isMobile?300:175);
  const focusDepth=occlusionAim.distanceTo(camera.position);
- const viewHeight=occlusionBufferSize.y;
- const perspectiveFactor=viewHeight/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov)*.5));
+ const perspectiveFactor=occlusionBufferSize.y/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov)*.5));
  occlusionCandidates.clear();
- scene.updateMatrixWorld(false);
- for(const mesh of cameraOccluders){
-  if(!mesh.visible||!mesh.geometry||!mesh.geometry.boundingSphere)continue;
-  mesh.getWorldPosition(occlusionWorldPos);
-  const depth=occlusionWorldPos.distanceTo(camera.position);
-  const scale=mesh.getWorldScale(new THREE.Vector3());
-  const sphere=mesh.geometry.boundingSphere.radius*Math.max(scale.x,scale.y,scale.z);
-  if(depth-sphere>focusDepth+.5||depth+sphere<.2)continue;
-  const p=occlusionWorldPos.clone().project(camera);
+ for(const [group,members] of occlusionGroupMembers){
+  if(!group.visible)continue;
+  const sphere=occlusionBounds.get(group);
+  if(!sphere)continue;
+  const depth=sphere.center.distanceTo(camera.position);
+  if(depth-sphere.radius>focusDepth+.5||depth+sphere.radius<.2)continue;
+  const p=occlusionWorldPos.copy(sphere.center).project(camera);
   if(p.z>1||p.z< -1)continue;
   const px=(p.x*.5+.5)*occlusionBufferSize.x;
-  const py=(p.y*.5+.5)*viewHeight;
-  const projectedRadius=sphere*perspectiveFactor/Math.max(1,depth);
-  // Generous overlap buffer avoids visible hard-edged parts at the circular fade boundary.
-  if(Math.hypot(px-occlusionFocusPx.x,py-occlusionFocusPx.y)<radius+projectedRadius+24){
-   occlusionCandidates.add(mesh);
-  }
+  const py=(p.y*.5+.5)*occlusionBufferSize.y;
+  const projectedRadius=sphere.radius*perspectiveFactor/Math.max(1,depth);
+  if(Math.hypot(px-occlusionFocusPx.x,py-occlusionFocusPx.y)>radius+projectedRadius+12)continue;
+  // Every mesh in the same tree fades with exactly the same screen-space gradient.
+  for(const mesh of members)if(mesh.visible&&mesh.material&&!Array.isArray(mesh.material)&&!mesh.material.transparent)occlusionCandidates.add(mesh);
+  // Previously faded meshes must remain candidates even though their temporary material is transparent.
+  for(const mesh of members)if(mesh.visible&&fadedMeshes.has(mesh))occlusionCandidates.add(mesh);
  }
  for(const mesh of occlusionCandidates){
   if(fadedMeshes.has(mesh))continue;
-  // Do not replace translucent water, particles, or special-purpose shaders.
   const original=mesh.material;
   if(!original||Array.isArray(original)||original.transparent)continue;
-  mesh.material=makeSoftOcclusionMaterial(original);
-  fadedMeshes.set(mesh,original);
+  mesh.material=makeSoftOcclusionMaterial(original);fadedMeshes.set(mesh,original);
  }
  for(const [mesh,original] of fadedMeshes){
   if(occlusionCandidates.has(mesh))continue;
