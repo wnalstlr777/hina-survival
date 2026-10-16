@@ -1,0 +1,939 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} </style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ui"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div><div style="margin-top:12px"><b>AI 행동 기록</b><div id="log"></div></div></div><div id="badge"><b id="clock">06:00</b><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">탐험 반경 계산 중</div></div><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><button id="reset">다시 시작</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대 · 우클릭: 이동 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ad4e7);scene.fog=new THREE.Fog(0x9ad4e7,165,380);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,380);camera.position.set(32,35,49);const renderer=new THREE.WebGLRenderer({antialias:true});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('view').appendChild(renderer.domElement);const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(-4,1,-3);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI/2.08;orbit.minDistance=5;orbit.maxDistance=255;const ambient=new THREE.HemisphereLight(0xffffff,0x516d4b,2.2);scene.add(ambient);const sun=new THREE.DirectionalLight(0xffe4aa,2.4);sun.position.set(-12,25,14);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.025;sun.shadow.camera.left=-155;sun.shadow.camera.right=155;sun.shadow.camera.top=155;sun.shadow.camera.bottom=-155;scene.add(sun);const fill=new THREE.DirectionalLight(0xa4d9ff,.65);fill.position.set(14,10,-18);scene.add(fill);
+const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x3eabc2),riverMat=mat(0x66c6d5),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
+grass.polygonOffset=true;grass.polygonOffsetFactor=-1;grass.polygonOffsetUnits=-1;
+const dirt=mat(0x9a7656),dirt2=mat(0x82654f),rockDark=mat(0x4d5356),rock=mat(0x777979),moss=mat(0x64885a),palmLeaf=mat(0x4d9664),foam=mat(0xa7e9dc);
+box(460,.25,460,sea,0,-.85,0);
+const waterSurface=new THREE.Mesh(new THREE.PlaneGeometry(455,455),new THREE.MeshPhysicalMaterial({color:0x38b9c8,transparent:true,opacity:.68,roughness:.22,metalness:0,side:THREE.DoubleSide,depthWrite:false}));
+waterSurface.rotation.x=-Math.PI/2;waterSurface.position.y=-.52;scene.add(waterSurface);
+// Organic voxel coastline: a scalloped island footprint with no rectangular base.
+function coastRadius(a){
+ return 1+.095*Math.sin(a*5+.4)+.065*Math.sin(a*9-1.2)+.042*Math.cos(a*13+1.3);
+}
+function islandValue(x,z){
+ const a=Math.atan2(z/76.0,x/92.0),r=Math.hypot(x/92,z/76);
+ return coastRadius(a)-r;
+}
+function landAt(x,z){return islandValue(x,z)>0;}
+const shoreGeo=new THREE.BoxGeometry(1,1,1);
+const shoreMesh=new THREE.InstancedMesh(shoreGeo,sand,58000);
+shoreMesh.castShadow=true;shoreMesh.receiveShadow=true;
+const transform=new THREE.Object3D();let shoreCount=0;
+for(let x=-104;x<=104;x+=1.04)for(let z=-90;z<=90;z+=1.04){
+ const v=islandValue(x,z);
+ if(v<-.005||Math.pow((x+9)/4.15,2)+Math.pow((z-4)/3.2,2)<1.0)continue;
+ const edge=v<.085;
+ const h=edge?.42:.68;
+ transform.position.set(x,-.38+h/2,z);
+ transform.scale.set(1.07,h,1.07);
+ transform.updateMatrix();shoreMesh.setMatrixAt(shoreCount++,transform.matrix);
+}
+shoreMesh.count=shoreCount;shoreMesh.instanceMatrix.needsUpdate=true;scene.add(shoreMesh);
+
+// Ocean shallows, beach ledges, terraced forest: walkable ground heights are defined below.
+const terraces=[[-16,-11,13,11,1.0],[-14,-12,10,8,1.7],[-13,-13,7,6,2.4],[-9,-12,7,7,1.0],[-17,7,11,9,.9],[-15,8,7,7,1.55],[-9,8,8,7,.95],[-3,-13,8,7,.75],[-2,12,9,7,.7],[8,-13,9,7,.6]];
+for(const [x,z,w,d,h] of terraces){box(w,h,d,dirt,x,h/2,z);box(w,.16,d,grass,x,h+.08,z)}
+// Additional raised natural headland; irregular stepped silhouette.
+for(const [x,z,w,d,h] of [[-17,-5,5,5,1.5],[-12,-4,6,5,1.0],
+ [-15,-8,5,5,2.0],[-11,-9,5,5,2.65],[-7,-15,5,4,2.1],
+ [-6,-17,3,3,1.25],[-16,1,6,5,.65],[5,-11,6,5,.75],
+ [9,-7,6,5,.65],[13,-5,4,5,.45]]){
+ box(w,h,d,dirt,x,h/2,z);box(w,.15,d,grass,x,h+.07,z);
+}
+// Low stepping-stone terraces form a plausible route between beach and the forest.
+for(const [x,z,h] of [[5,2,.18],[2,2,.36],[-1,2,.48],[-4,2,.52],[-7,2,.7]]){box(3.1,h,3.1,dirt,x,h/2,z);box(3.1,.12,3.1,grass,x,h+.06,z)}
+// The natural cave is cut into a cliff at (-4,-10), opening toward +Z.
+// Back, side walls and ceiling are separate voxel rock pieces: a real hollow space.
+const caveX=-4,caveZ=-10;
+box(12,3.8,2.1,rock,caveX,1.9,caveZ-3.9); // back wall
+box(2.3,3.9,8.1,rock,caveX-5.0,1.95,caveZ-1.0);
+box(2.3,3.9,8.1,rock,caveX+5.0,1.95,caveZ-1.0);
+box(12,1.35,8.4,rock,caveX,4.65,caveZ-1.0); // natural overhang
+box(12,.25,8.4,grass,caveX,5.43,caveZ-1.0);
+box(10,.22,7.5,stone,caveX,.13,caveZ-1.1); // dry cave floor
+// Irregular rocks frame the cave entrance, leaving a clear opening.
+for(const [x,y,z,w,h,d] of [[-9.3,1.2,-6.1,2.1,2.4,2.4],[1.3,1.25,-6.1,2.1,2.5,2.4],[-8,3.55,-6.4,2.3,1.3,2.5],[0,3.5,-6.4,2.3,1.4,2.5],[-4,4.1,-6.3,4.4,.75,2.5],[-9.4,2.4,-12,2.2,4.8,3],[1.4,2.3,-12,2.2,4.6,3]])box(w,h,d,rock,x,y,z);
+// A darker interior, entrance pebbles, cliff ledges and moss.
+box(9,.05,6,rockDark,caveX,.285,caveZ-1.0);
+for(const [x,y,z,w,d] of [[-9.2,5.6,-10,3,3],[-4,5.6,-12,4,3],[.6,5.6,-9.5,3,4],[-12,2.4,-14,4,4],[4,1.4,-12,3,4]]){box(w,.7,d,dirt,x,y,z);box(w,.15,d,grass,x,y+.44,z)}
+// Freshwater pond near the lower forest; the character does not automatically know it is safe.
+// The pond is a genuine opening in the sand voxel field, not a coplanar blue box.
+// Deep basin, translucent water, terraced sandy banks and stones.
+const pondBottom=box(8.5,.2,6.6,dirt,-9,-.40,4);
+const pondWaterMat=new THREE.MeshPhysicalMaterial({color:0x3bbfcb,roughness:.16,metalness:0,
+ transparent:true,opacity:.78,depthWrite:false,side:THREE.DoubleSide});
+const pondWater=new THREE.Mesh(new THREE.CircleGeometry(1,48),pondWaterMat);
+pondWater.rotation.x=-Math.PI/2;pondWater.scale.set(4.1,3.15,1);
+pondWater.position.set(-9,.19,4);pondWater.renderOrder=3;scene.add(pondWater);
+const pondRim=mat(0xc5b18b),pondRock=mat(0x929b91);
+for(let j=0;j<44;j++){
+ const a=j*Math.PI*2/44,r=1+.06*Math.sin(j*2.7),x=-9+Math.cos(a)*4.2*r,z=4+Math.sin(a)*3.27*r;
+ const peb=box(.48+randSafe(j)*.38,.24,.45+randSafe(j+13)*.3,j%3?pondRim:pondRock,x,.32,z);
+ peb.rotation.y=a;
+}
+function randSafe(n){return (Math.sin(n*127.1+15.7)*43758.5453)%1<0?1+((Math.sin(n*127.1+15.7)*43758.5453)%1):((Math.sin(n*127.1+15.7)*43758.5453)%1)}
+const pondRippleMat=new THREE.MeshBasicMaterial({color:0xe5fff6,transparent:true,opacity:.6,depthWrite:false,side:THREE.DoubleSide});
+const pondRipples=[];
+for(let i=0;i<4;i++){
+ const ring=new THREE.Mesh(new THREE.RingGeometry(.35+i*.46,.39+i*.46,36),pondRippleMat);
+ ring.rotation.x=-Math.PI/2;ring.position.set(-9,.235,4);ring.renderOrder=4;scene.add(ring);pondRipples.push(ring);
+}
+
+// Seeded decorative placement to keep the scene stable across reloads.
+let seed=2143;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+function palm(x,z,h=0){const ht=2.6+rand()*1.7;box(.43,ht,.43,wood,x,h+ht/2,z);for(let i=0;i<5;i++){let angle=i*Math.PI*2/5;let f=box(2.8,.22,.78,palmLeaf,x+Math.cos(angle)*1.15,h+ht+.12,z+Math.sin(angle)*1.15);f.rotation.y=-angle;f.rotation.z=(i%2?-.15:.15)}}
+// Expanded island: distant ridges, plateaus, groves and boulders. Keep the original
+// cave, pond and first-day landmarks unchanged so the existing AI still works.
+const farRidges=[
+ [-56,-22,17,13,1.8],[-54,-20,11,9,3.2],[-53,-20,7,7,4.5],
+ [-35,40,19,13,1.4],[-37,40,12,9,2.8],[-37,40,7,6,4.1],
+ [29,36,17,14,1.7],[30,36,10,10,3.0],[32,36,6,6,4.4],
+ [57,5,17,13,1.6],[57,5,10,9,3.0],
+ [42,-43,20,14,1.7],[42,-43,12,10,3.0],[43,-44,7,7,4.1],
+ [-16,-48,17,13,1.8],[-16,-48,10,9,3.2],
+ [-68,8,13,13,1.0],[-65,8,8,8,2.1],
+ [5,52,16,12,1.5],[6,52,10,8,2.8]
+];
+for(const [x,z,w,d,h] of farRidges){
+ if(!landAt(x,z))continue;
+ box(w,h,d,dirt,x,h/2,z);
+ box(w,.18,d,grass,x,h+.095,z);
+}
+for(let i=0;i<220;i++){
+ const x=-86+rand()*172,z=-71+rand()*142;
+ if(!landAt(x,z)||Math.hypot(x,z)<26)continue;
+ const h=.2+rand()*.9;
+ if(rand()<.43)palm(x,z,h);
+ else {
+  const size=.35+rand()*1.4;
+  box(size,size*.7,size,rand()<.5?stone:rock,x,size*.35,z);
+ }
+}
+for(let i=0;i<32;i++){let x=-20+rand()*39,z=-18+rand()*35;if(!landAt(x,z)||(x>-12&&x<-5&&z>1&&z<8)||(x>-10&&x<3&&z>-16&&z<-5)||(x>3&&x<13&&z>0&&z<9))continue;let h=x<-11&&z<0?1.8:x<-10&&z>4?1.1:0;palm(x,z,h)}
+for(let i=0;i<62;i++){let x=-21+rand()*43,z=-18+rand()*36;if(!landAt(x,z)||(x>-10&&x<2&&z>-15&&z<-5))continue;let size=.24+rand()*.6;box(size,size*.65,size,rand()>.45?stone:rock,x,size*.33,z)}
+// Berry bush to inspect, not automatically eat.
+for(let i=0;i<6;i++){let x=-2.5+(i%3)*.65,z=9.4+Math.floor(i/3)*.65;box(.75,.8,.75,leaf,x,.45,z);}
+// Small, nonflammable wood pieces by the cave; no campfire is granted.
+for(let i=0;i<5;i++){let b=box(.15,.14,1.2,wood,-1.7+i*.3,.32,-5.4+i*.12);b.rotation.y=i*.34}
+
+// === PROCEDURAL ART PASS: layered coast, cliff details, foliage, cave ===
+const clay=mat(0xb58a67), paleStone=mat(0xa7a59a), warmRock=mat(0x9b8c7a),
+    grassBright=mat(0x83b65c),grassDeep=mat(0x4d854c),sandLight=mat(0xf4dc9e),
+    sandShadow=mat(0xcab788), fernGreen=mat(0x43845a),fernLight=mat(0x6ea96a),
+    barkDark=mat(0x6e5037), trunkLight=mat(0xaa8255), vine=mat(0x4b8751),
+    flowerYellow=mat(0xf8d681), flowerPink=mat(0xe6a3a7), caveShade=mat(0x34393b);
+function cube(x,y,z,s,m){return box(s,s,s,m,x,y,z)}
+function groupCube(g,w,h,d,m,x,y,z){
+ const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+ o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);return o;
+}
+// Sand coastline built from uneven, overlapping small ledges instead of a clean rectangle.
+for(let i=0;i<175;i++){
+ const a=rand()*Math.PI*2,rad=16+rand()*7.5;
+ const x=Math.cos(a)*rad,z=Math.sin(a)*rad*.82;
+ if(!landAt(x,z))continue;
+ const s=.55+rand()*1.55;
+ box(s,.18+rand()*.35,s,rand()>.3?sandLight:sandShadow,x,-.05,z);
+}
+// Scattered grass top patches and exposed strata on slopes.
+for(let i=0;i<215;i++){
+ const x=-21+rand()*40,z=-18+rand()*35;
+ let h=null;
+ for(const [tx,tz,w,d,th] of terraces){
+  if(Math.abs(x-tx)<w*.46&&Math.abs(z-tz)<d*.46)h=Math.max(h??0,th);
+ }
+ if(h===null||!landAt(x,z)||(x>-10&&x<2&&z>-16&&z<-5))continue;
+ const s=.16+rand()*.42;
+ if(rand()<.68)box(s,.10,s,rand()>.5?grassBright:grassDeep,x,h+.2,z);
+ else box(s,.18,s,rand()>.5?warmRock:paleStone,x,h+.22,z);
+}
+// Strata and protruding boulders around cave, keep front entrance open.
+for(let i=0;i<105;i++){
+ let x=-11+rand()*15,z=-16+rand()*12;
+ if(x>-8.3&&x<.5&&z>-7.5&&z<-4.7)continue;
+ const s=.25+rand()*1.15;
+ const y=rand()*3.6+.2;
+ if(z>-8.3&&y>2.3)continue;
+ box(s,s*.55,s,rand()>.45?warmRock:rock,x,y,z);
+}
+for(let i=0;i<40;i++){
+ const x=-9.5+rand()*11,z=-13.8+rand()*6;
+ if(x>-8&&x<0&&z>-7.5)continue;
+ const s=.16+rand()*.36;
+ box(s,.1,s,rand()>.5?rock:paleStone,x,.3,z);
+}
+// Ceiling recess is a dark unlit back plane; overhang shades the interior.
+box(9.1,2.8,.14,caveShade,caveX,1.75,caveZ-2.73);
+for(let i=0;i<16;i++){
+ const x=-8.4+rand()*8.6,z=-13.4+rand()*4.2;
+ if(z>-7.7&&x>-7.7&&x<-.3)continue;
+ const s=.17+rand()*.45;
+ box(s,.12,s,rock,x,.35,z);
+}
+// Voxel palm trees with curved trunks and tiered fronds.
+function lushPalm(x,z,h=0,scale=1){
+ const g=new THREE.Group();g.position.set(x,h,z);scene.add(g);
+ const height=(3.8+rand()*2.0)*scale;
+ for(let k=0;k<7;k++){
+  const y=(k+.5)*height/7;
+  const lean=Math.sin(k/7*1.5)*.48*scale;
+  groupCube(g,.43*scale,height/7+.06,.43*scale,k%2?wood:trunkLight,lean,y,0);
+ }
+ for(let ring=0;ring<2;ring++){
+  const top=height-ring*.4*scale;
+  for(let j=0;j<7;j++){
+   const a=j*Math.PI*2/7+ring*.3;
+   for(let k=0;k<4;k++){
+    const r=(.6+k*.55)*scale;
+    const y=top-(k*k*.10+ring*.10)*scale;
+    groupCube(g,(.78-k*.10)*scale,.18*scale,(.82-k*.1)*scale,
+       (k+ring)%2?fernLight:fernGreen,
+       Math.cos(a)*r+.45*scale,y,Math.sin(a)*r);
+   }
+  }
+ }
+ for(let j=0;j<3;j++)groupCube(g,.24*scale,.28*scale,.24*scale,wood,
+    .35*scale+Math.cos(j*2.1)*.3*scale,height-.5*scale,Math.sin(j*2.1)*.3*scale);
+}
+for(let i=0;i<19;i++){
+ const x=-20+rand()*37,z=-17+rand()*33;
+ if(!landAt(x,z)||(x>-11&&x<3&&z>-16&&z<-4)||(x>-11&&x<-5&&z>1&&z<8))continue;
+ let h=0;
+ for(const [tx,tz,w,d,th] of terraces)if(Math.abs(x-tx)<w*.42&&Math.abs(z-tz)<d*.42)h=Math.max(h,th+.15);
+ lushPalm(x,z,h,.72+rand()*.38);
+}
+// Dense cube bushes, ferns, flowering plants and cliff vines.
+function bush(x,y,z,s){
+ const g=new THREE.Group();g.position.set(x,y,z);scene.add(g);
+ for(let j=0;j<7;j++){
+  const a=rand()*Math.PI*2,r=rand()*s*.7;
+  groupCube(g,s*(.42+rand()*.32),s*(.35+rand()*.25),s*(.42+rand()*.32),
+     rand()>.5?fernGreen:fernLight,Math.cos(a)*r,s*.25+rand()*s*.32,Math.sin(a)*r);
+ }
+ if(rand()>.65)for(let j=0;j<3;j++)groupCube(g,.12,.12,.12,rand()>.5?flowerPink:flowerYellow,
+     (rand()-.5)*s,s*.65,(rand()-.5)*s);
+}
+for(let i=0;i<95;i++){
+ const x=-21+rand()*42,z=-17+rand()*34;
+ if(!landAt(x,z)||(x>-10&&x<2&&z>-16&&z<-4)||(x>-11&&x<-5&&z>1&&z<8))continue;
+ let h=0;
+ for(const [tx,tz,w,d,th] of terraces)if(Math.abs(x-tx)<w*.45&&Math.abs(z-tz)<d*.45)h=Math.max(h,th+.16);
+ bush(x,h,z,.38+rand()*.85);
+}
+for(let i=0;i<32;i++){
+ const x=rand()>.5?-9.6+rand()*2:-.2+rand()*2;
+ const z=-15+rand()*9;
+ const y=1.2+rand()*4.1;
+ box(.12,.4+rand()*.8,.16,vine,x,y,z);
+}
+// Warm sky clouds, stylized distant rock spires and sea foam streaks.
+const cloudMat=new THREE.MeshBasicMaterial({color:0xfff3de,transparent:true,opacity:.72,depthWrite:false});
+const clouds=[];
+for(let i=0;i<13;i++){
+ const g=new THREE.Group();scene.add(g);g.position.set(-50+rand()*100,24+rand()*15,-40+rand()*75);
+ for(let j=0;j<4;j++)groupCube(g,3+rand()*4,.55+rand()*.7,1.3+rand()*2,cloudMat,(j-1.5)*2,rand()*.6,0);
+ clouds.push(g);
+}
+for(let i=0;i<22;i++){
+ const x=-22+rand()*44,z=-18+rand()*36;
+ if(!landAt(x,z)||(x>-11&&x<3&&z>-16&&z<-5))continue;
+ const s=.25+rand()*.7;
+ box(s,.12,s,rand()>.5?paleStone:rock,x,.15,z);
+}
+const waveLines=[];
+const waveMat=new THREE.MeshBasicMaterial({color:0xd6fff1,transparent:true,opacity:.28,depthWrite:false});
+for(let i=0;i<70;i++){
+ const a=rand()*Math.PI*2, r=47+rand()*25;
+ const x=Math.cos(a)*r,z=Math.sin(a)*r;
+ const w=.3+rand()*1.6;
+ const o=new THREE.Mesh(new THREE.PlaneGeometry(w,.055+rand()*.09),waveMat);
+ o.rotation.x=-Math.PI/2;o.rotation.z=rand()*Math.PI;
+ o.position.set(x,-.40,z);scene.add(o);waveLines.push(o);
+}
+// Decorative camera-facing fireflies near foliage at sunset.
+const glowMat=new THREE.MeshBasicMaterial({color:0xffd68b,transparent:true,opacity:.65});
+const motes=[];
+for(let i=0;i<28;i++){
+ const o=new THREE.Mesh(new THREE.BoxGeometry(.07,.07,.07),glowMat);
+ o.position.set(-17+rand()*25,.8+rand()*3,-16+rand()*27);
+ scene.add(o);motes.push(o);
+}
+
+
+// v0.5: procedural wildlife and fruit trees. No external 3D assets.
+const berryRed=mat(0xd94848),berryDark=mat(0x9e3039),twigMat=mat(0x665039);
+const berryTrees=[];
+function berryTree(x,z,ground=0){
+ const g=new THREE.Group();g.position.set(x,ground,z);scene.add(g);
+ groupCube(g,.42,2.8,.42,trunkLight,0,1.4,0);
+ for(const [dx,dy,dz,size] of [[0,3.1,0,1.6],[-.85,2.7,0,1.2],[.85,2.75,.25,1.25],[0,2.65,-.9,1.1]])
+  groupCube(g,size,size*.82,size,fernGreen,dx,dy,dz);
+ const fruits=[];
+ for(let j=0;j<16;j++){
+  const a=rand()*Math.PI*2,r=.45+rand()*1.05,y=2.4+rand()*1.25;
+  const f=groupCube(g,.17,.17,.17,j%3===0?berryDark:berryRed,Math.cos(a)*r,y,Math.sin(a)*r);
+  fruits.push(f);
+ }
+ berryTrees.push({group:g,fruits,stock:0,regrowAt:0});return g;
+}
+// The first berry tree is deliberately close to Hina's existing berry-search destination.
+berryTree(-3.6,10.7,0);berryTree(-1.6,12.4,.15);berryTree(13.7,-1.2,0);
+// Fruits are finite physical objects: harvest hides individual fruit meshes.
+// Regrowth is stochastic and slow; no guaranteed fruit on a given day.
+function resetBerryTrees(){
+ for(const tree of berryTrees){
+  tree.stock=0;tree.regrowAt=0;
+  for(const fruit of tree.fruits)fruit.visible=false;
+ }
+ berryTrees[0].regrowAt=DAY_SECONDS*1.12;
+ berryTrees[1].regrowAt=DAY_SECONDS*1.4;
+ berryTrees[2].regrowAt=DAY_SECONDS*1.7;
+}
+function updateBerryTrees(){
+ for(const tree of berryTrees){
+  if(elapsed<tree.regrowAt)continue;
+  tree.regrowAt=elapsed+randomBetween(110,320);
+  if(tree.stock===0&&Math.random()<.78){
+   tree.stock=Math.floor(randomBetween(3,11));
+   for(let i=0;i<tree.fruits.length;i++)tree.fruits[i].visible=i<tree.stock;
+   log('열매나무에 새로운 열매가 열림');
+  }else if(tree.stock>0&&tree.stock<tree.fruits.length&&Math.random()<.4){
+   tree.fruits[tree.stock++].visible=true;
+  }
+ }
+}
+function closestFruitTree(){
+ const trees=berryTrees.filter(t=>t.stock>0);
+ trees.sort((a,b)=>Math.hypot(hana.position.x-a.group.position.x,hana.position.z-a.group.position.z)-Math.hypot(hana.position.x-b.group.position.x,hana.position.z-b.group.position.z));
+ return trees[0]||null;
+}
+function pickBerries(){
+ const tree=berryTrees.find(t=>t.stock>0&&Math.hypot(hana.position.x-t.group.position.x,hana.position.z-t.group.position.z)<4);
+ if(!tree)return 0;
+ const n=Math.min(tree.stock,Math.floor(randomBetween(2,6)));
+ for(let i=tree.stock-n;i<tree.stock;i++)tree.fruits[i].visible=false;
+ tree.stock-=n;
+ if(tree.stock===0)tree.regrowAt=elapsed+randomBetween(240,610);
+ return n;
+}
+
+// New outer island (roughly twice the old width and length): independent hills and foliage.
+const outerTerraces=[];
+for(let i=0;i<56;i++){
+ const a=rand()*Math.PI*2,r=.50+rand()*.40;
+ const x=Math.cos(a)*43*r,z=Math.sin(a)*35*r;
+ if(!landAt(x,z)||Math.hypot(x+9,z-4)<9)continue;
+ const w=3.3+rand()*5.8,d=3+rand()*5.2,h=.45+rand()*2.1;
+ box(w,h,d,i%4===0?rock:dirt,x,h/2,z);
+ box(w-.04,.13,d-.04,i%4===0?moss:grass,x,h+.085,z);
+ outerTerraces.push([x,z,h,w,d]);
+}
+for(let i=0;i<155;i++){
+ const x=-46+rand()*92,z=-39+rand()*78;
+ if(!landAt(x,z)||Math.abs(x)<20&&Math.abs(z)<18||Math.hypot(x+9,z-4)<9)continue;
+ let h=0;for(const [tx,tz,th,w,d] of outerTerraces)
+  if(Math.abs(x-tx)<w*.44&&Math.abs(z-tz)<d*.44)h=Math.max(h,th+.17);
+ if(i%3===0)lushPalm(x,z,h,.68+rand()*.5);
+ else bush(x,h,z,.4+rand()*.9);
+}
+for(let i=0;i<65;i++){
+ const x=-45+rand()*90,z=-38+rand()*76;
+ if(!landAt(x,z)||Math.abs(x)<20&&Math.abs(z)<18)continue;
+ const size=.2+rand()*.8;box(size,size*.7,size,i%2?stone:rock,x,size*.35,z);
+}
+const critters=[],critSkin=mat(0xbba88e),critWhite=mat(0xe5d9c5),critEar=mat(0xd89d9c),critEye=mat(0x24262a);
+function rabbit(x,z,seedPhase){
+ const g=new THREE.Group();scene.add(g);
+ const body=groupCube(g,.56,.39,.82,critSkin,0,.36,0);
+ groupCube(g,.44,.43,.42,critSkin,0,.59,.45);
+ groupCube(g,.13,.49,.17,critSkin,-.14,.98,.48);
+ groupCube(g,.13,.49,.17,critSkin,.14,.98,.48);
+ groupCube(g,.075,.26,.19,critEar,-.14,1.04,.575);
+ groupCube(g,.075,.26,.19,critEar,.14,1.04,.575);
+ groupCube(g,.22,.22,.22,critWhite,0,.42,-.47);
+ for(const side of [-1,1]){
+  groupCube(g,.07,.075,.06,critEye,side*.23,.65,.65);
+  groupCube(g,.19,.18,.26,critSkin,side*.22,.14,.30);
+  groupCube(g,.21,.18,.28,critSkin,side*.22,.14,-.3);
+ }
+ g.position.set(x,0,z);
+ critters.push({g,homeX:x,homeZ:z,phase:seedPhase,heading:seedPhase,panic:0});
+}
+rabbit(11.7,8.3,.5);rabbit(27,17,2.2);rabbit(-30,21,4.5);
+const fishes=[],fishOrange=mat(0xffb85e),fishBlue=mat(0x3b819a),fishSilver=mat(0xb8d2ce),fishDark=mat(0x466f86);
+function fish(x,z,phase,color){
+ const g=new THREE.Group();scene.add(g);
+ groupCube(g,.5,.19,.23,color,0,0,0);
+ const tail=groupCube(g,.23,.28,.06,color,-.35,0,0);
+ tail.rotation.z=.25;
+ groupCube(g,.09,.12,.08,fishDark,.22,.04,.12);
+ const fin=groupCube(g,.15,.14,.09,color,-.05,.17,0);fin.rotation.z=.3;
+ g.position.set(x,-.26,z);fishes.push({g,x,z,phase,tail});
+}
+for(let i=0;i<23;i++){
+ const a=rand()*Math.PI*2,r=49+rand()*17;
+ fish(Math.cos(a)*r,Math.sin(a)*r*.9,i*.84,[fishOrange,fishBlue,fishSilver][i%3]);
+}
+// A few fish in the freshwater pond make the first water discovery more legible.
+for(let i=0;i<6;i++)fish(-10.6+rand()*3.4,3+rand()*1.8,i*1.1,fishSilver);
+function animateWildlife(t,dt){
+ for(const r of critters){
+  const dx=r.g.position.x-hana.position.x,dz=r.g.position.z-hana.position.z;
+  const near=Math.hypot(dx,dz)<4.1;
+  r.panic=near?Math.min(1,r.panic+dt*2):Math.max(0,r.panic-dt*.65);
+  let angle=near?Math.atan2(dx,dz):r.phase+Math.sin(t*.28+r.phase)*1.5;
+  const sp=near?2.1:.28;
+  r.g.position.x+=Math.sin(angle)*sp*dt;
+  r.g.position.z+=Math.cos(angle)*sp*dt;
+  // Keep roaming near its habitat and away from the water's edge.
+  const fromHome=Math.hypot(r.g.position.x-r.homeX,r.g.position.z-r.homeZ);
+  if(fromHome>4.6){r.g.position.x+=(r.homeX-r.g.position.x)*dt*.7;r.g.position.z+=(r.homeZ-r.g.position.z)*dt*.7}
+  r.g.rotation.y=angle;
+  r.g.position.y=Math.max(0,Math.sin(t*(near?12:5)+r.phase)*.095);
+ }
+ for(const f of fishes){
+  const a=t*.52+f.phase;
+  f.g.position.x=f.x+Math.cos(a)*(.5+Math.sin(f.phase)*.24);
+  f.g.position.z=f.z+Math.sin(a)*(.4+Math.cos(f.phase)*.15);
+  f.g.position.y=-.30+Math.sin(t*2.4+f.phase)*.035;
+  f.g.rotation.y=-a;
+  f.tail.rotation.y=Math.sin(t*12+f.phase)*.5;
+ }
+}
+
+// Higher-detail procedural chibi character: hair layers, expressive face, tailored uniform.
+const hana=new THREE.Group();scene.add(hana);
+const skin=mat(0xf6c9ac),hair=mat(0x292633),hairLight=mat(0x40313d),shirt=mat(0xf9f4e9),skirt=mat(0xd98ca0),dark=mat(0x34313d),shoe=mat(0x493a3a),sock=mat(0xfff7e9),eye=mat(0x211c2b),eyeShine=mat(0xffffff),blush=mat(0xe8a09b),ribbon=mat(0x9f516d),seam=mat(0xb7758b);
+function part(w,h,d,m,x,y,z){const p=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);p.position.set(x,y,z);p.castShadow=true;p.receiveShadow=true;hana.add(p);return p}
+const body=part(.69,.83,.40,shirt,0,1.46,0);
+part(.78,.13,.45,shirt,0,1.81,0);part(.52,.12,.09,dark,0,1.75,.255);
+part(.28,.10,.11,ribbon,0,1.61,.265);part(.08,.20,.09,ribbon,0,1.48,.27);
+part(.77,.15,.48,skirt,0,1.06,0);part(.85,.39,.54,skirt,0,.85,0);
+for(let x of [-.28,-.09,.10,.29])part(.028,.30,.045,seam,x,.84,.281);
+part(.49,.11,.37,skin,0,1.95,0);
+const head=new THREE.Group();hana.add(head);head.position.y=2.28;
+function facepart(w,h,d,m,x,y,z){const p=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);p.position.set(x,y,z);p.castShadow=true;head.add(p);return p}
+facepart(.67,.65,.59,skin,0,0,0);
+facepart(.76,.24,.66,hair,0,.38,-.02);facepart(.76,.15,.65,hair,0,.27,-.04);
+facepart(.19,.34,.64,hair,-.33,.17,-.02);facepart(.19,.34,.64,hair,.33,.17,-.02);
+facepart(.19,.19,.12,hair,-.24,.22,.31);facepart(.18,.26,.12,hair,-.08,.20,.31);facepart(.18,.17,.12,hair,.11,.23,.31);
+facepart(.14,.23,.11,hair,.27,.16,.30);
+for(let side of [-1,1]){
+ facepart(.18,.48,.29,hair,side*.39,-.21,-.08);
+ facepart(.17,.28,.23,hairLight,side*.41,-.52,-.08);
+ facepart(.135,.19,.038,eye,side*.17,-.045,.312);
+ facepart(.045,.05,.045,eyeShine,side*.14,-.015,.34);
+ facepart(.14,.05,.028,blush,side*.265,-.18,.313);
+}
+facepart(.10,.025,.032,ribbon,0,-.23,.319);
+facepart(.28,.26,.19,hair,0,-.31,-.30);facepart(.33,.27,.19,hair,0,-.54,-.30);
+const arms=[part(.19,.62,.24,shirt,-.46,1.48,0),part(.19,.62,.24,shirt,.46,1.48,0)];
+part(.16,.19,.19,skin,-.46,1.11,0);part(.16,.19,.19,skin,.46,1.11,0);
+const legs=[part(.23,.56,.24,skin,-.20,.42,0),part(.23,.56,.24,skin,.20,.42,0)];
+part(.24,.19,.25,sock,-.20,.19,0);part(.24,.19,.25,sock,.20,.19,0);
+part(.29,.16,.43,shoe,-.20,.075,.10);part(.29,.16,.43,shoe,.20,.075,.10);
+const satchel=part(.23,.33,.15,dark,.44,1.02,-.12);
+part(.07,.60,.08,shoe,.25,1.53,-.20);
+hana.position.set(9,.4,5);
+const closedEyes=[];
+for(const side of [-1,1]){
+ const lid=facepart(.16,.035,.042,hair,side*.17,-.065,.35);
+ lid.visible=false;closedEyes.push(lid);
+}
+const eyeMeshes=head.children.filter(m=>m.material===eye||m.material===eyeShine);
+let sleepingPose=false;
+function updateCharacterPose(){
+ const t=clockParts();
+ const night=t.h>=19||t.h<6;
+ const atShelter=Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<2.5;
+ const sleep=(state==='rest'||state==='night')&&night&&atShelter&&!target;
+ sleepingPose=sleep;
+ hana.rotation.z=sleep?-Math.PI/2:0;
+ hana.position.y=sleep?1.13:.4;
+ head.rotation.x=sleep?-.10:0;
+ eyeMeshes.forEach(m=>m.visible=!sleep);
+ closedEyes.forEach(m=>m.visible=sleep);
+ if(sleep){legs.forEach(l=>l.rotation.x=0);arms.forEach(a=>a.rotation.x=0);head.rotation.z=0;}
+}
+let elapsed=0,speed=1,paused=false,prev=performance.now(),state='confused',
+target=null,goal='',lastLog='',phaseAt=0,water=false,food=false,shelter=false,
+failedFire=false,rested=false,seenRabbit=false,seenFish=false,
+knownWater=false,knownBerries=false,knownCave=false,
+stats={energy:92,thirst:85,hunger:83,will:72},actions=0,day=1;
+const DAY_SECONDS=300;
+let loneliness=0,moraleCooldown=0,discoveryBoostAt=0,previousExplorationCount=0;
+let exhaustionCooldown=0,previousEnergyBand=100;
+let lastMoraleMessage=0;
+function changeWill(amount,reason){
+ const before=stats.will;
+ stats.will=Math.max(4,Math.min(100,stats.will+amount));
+ if(Math.abs(stats.will-before)>1.2&&reason)log(`${reason} · 의지력 ${amount>0?'+':''}${Math.round(amount)}`);
+}
+function moraleUpdate(step){
+ const h=clockParts().h,night=h>=19||h<6;
+ const away=distanceTo('shelter');
+ const exploring=state==='wander'||state==='hesitate'||state==='returnHesitate';
+ const exposed=away>6&&state!=='rest'&&state!=='night';
+ let drain=0;
+ if(exploring&&away>13)drain+=.035+(away>28?.045:0);
+ if(night&&exposed)drain+=.105;
+ if(raining()&&exposed)drain+=.07;
+ if(stats.thirst<25)drain+=.045;
+ if(stats.hunger<25)drain+=.045;
+ // Isolation grows over days but is buffered by confidence from small successes.
+ loneliness=Math.min(100,loneliness+step*.012);
+ drain+=loneliness*.00018;
+ if(state==='rest'&&night){
+  stats.will=Math.min(95,stats.will+step*.085);
+  loneliness=Math.max(0,loneliness-step*.014);
+ }else stats.will=Math.max(4,stats.will-step*drain);
+ if(elapsed>lastMoraleMessage+32&&stats.will<34&&state==='wander'){
+  lastMoraleMessage=elapsed;
+  say(loneliness>28?'누군가랑 이야기하고 싶어... 혼자 있으니까 더 무서워.':'너무 멀리 가는 건 무서워... 동굴로 돌아갈까?');
+ }
+}
+
+// Personality + distance-aware needs. Each successful meal/drink redraws the threshold.
+let thirstTrigger=38,hungerTrigger=40,thirstRate=.105,hungerRate=.085;
+let thirstDelayUntil=0,hungerDelayUntil=0,randomHesitationDuration=8;
+const randomBetween=(a,b)=>a+Math.random()*(b-a);
+function redrawNeeds(){thirstTrigger=randomBetween(24,64);hungerTrigger=randomBetween(23,65);thirstRate=randomBetween(.078,.137);hungerRate=randomBetween(.064,.118);thirstDelayUntil=0;hungerDelayUntil=0;}
+function distanceTo(site){return Math.hypot(hana.position.x-sites[site].x,hana.position.z-sites[site].z)}
+function shouldAddressNeed(which){
+ const v=stats[which],isThirst=which==='thirst',limit=isThirst?thirstTrigger:hungerTrigger;
+ const dist=distanceTo(isThirst?'water':'berries');
+ // At critically low levels, stop procrastinating even on distant excursions.
+ if(v<=12)return true;
+ const busyExploring=state==='wander'&&!!target&&dist>22;
+ if(busyExploring&&v>19)return false;
+ if(v>limit)return false;
+ const until=isThirst?thirstDelayUntil:hungerDelayUntil;
+ if(elapsed<until&&v>20)return false;
+ return true;
+}
+
+// A rainy day every seventh day; ground stays damp until the following morning.
+let lastWeatherDay=0, fireAttempts=0, fireSuccess=false, fireKnowledge=0;
+let fireDryStock=0, fireLearnedWet=false, nextFireAttempt=0;
+const rainDrops=[];
+const rainMaterial=new THREE.MeshBasicMaterial({color:0xb7dcf5,transparent:true,opacity:.55,depthWrite:false});
+const rainGeometry=new THREE.BoxGeometry(.035,.8,.035);
+for(let i=0;i<190;i++){
+ const drop=new THREE.Mesh(rainGeometry,rainMaterial);
+ drop.position.set(-23+rand()*46,4+rand()*15,-20+rand()*40);
+ scene.add(drop);rainDrops.push(drop);
+}
+function raining(d=clockParts().day){return d%7===0;}
+function groundWet(d=clockParts().day){return raining(d)||d>1&&(d-1)%7===0;}
+function fireChance(){
+ const wet=groundWet(), rain=raining();
+ return Math.max(.01,Math.min(.83,.025+fireKnowledge*.013+fireAttempts*.017+fireDryStock*.07-(rain?.36:wet?.18:0)));
+}
+function weatherUpdate(step){
+ const t=clockParts(),rain=raining(t.day),wet=groundWet(t.day);
+ for(let i=0;i<rainDrops.length;i++){
+  const d=rainDrops[i];d.visible=rain;
+  if(rain){d.position.y-=step*(12+i%6);if(d.position.y<.4)d.position.y=12+rand()*7;}
+ }
+ rainMaterial.opacity=.35+Math.sin(elapsed*2)*.12;
+ if(lastWeatherDay!==t.day){
+  lastWeatherDay=t.day;
+  if(rain){log('비가 내리기 시작함 · 야외 나뭇가지가 젖음');fireDryStock=0;
+   say('비가 온다... 나무도 다 젖겠는데?');}
+  else if(wet){log('비가 그쳤지만 땅과 나뭇가지가 아직 축축함');}
+  else if(t.day>1){log('맑은 날 · 나뭇가지가 마르기 시작함');}
+ }
+ $('weather').textContent=rain?'🌧 비 · 나무가 젖음':wet?'☁ 비 갠 뒤 · 축축한 땅':'☀ 맑음 · 미지의 섬';
+ sun.intensity*=rain?.47:wet?.78:1;
+ scene.fog.far=rain?280:wet?330:380;
+}
+
+const sites={water:new THREE.Vector3(-8,.5,2),berries:new THREE.Vector3(-3,.5,10),
+shelter:new THREE.Vector3(-4,.5,-10),beach:new THREE.Vector3(9,.5,5),
+trees:new THREE.Vector3(-1,.5,-5),wildlife:new THREE.Vector3(11,.5,7),
+outerNorth:new THREE.Vector3(-38,.5,39),outerEast:new THREE.Vector3(58,.5,6),outerSouth:new THREE.Vector3(40,.5,-43),
+farWest:new THREE.Vector3(-58,.5,-21),farNorth:new THREE.Vector3(6,.5,51),farSouth:new THREE.Vector3(-16,.5,-48)};
+// Fog of war: unknown terrain is dark, explored tiles stay revealed forever.
+// Dark semi-transparent (not solid black) so the coastline is still legible.
+const FOG_STEP=5.4, fogTiles=[],explored=new Set();
+const fogGeo=new THREE.PlaneGeometry(FOG_STEP+.12,FOG_STEP+.12);
+const fogMat=new THREE.MeshBasicMaterial({color:0x050b12,transparent:true,opacity:.88,
+ side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2});
+for(let x=-103;x<=103;x+=FOG_STEP)for(let z=-88;z<=88;z+=FOG_STEP){
+ if(!landAt(x,z))continue;
+ const fogTile=new THREE.Mesh(fogGeo,fogMat);
+ fogTile.rotation.x=-Math.PI/2;fogTile.position.set(x,7.9,z);
+ fogTile.renderOrder=20;scene.add(fogTile);
+ fogTiles.push({mesh:fogTile,x,z,key:`${Math.round(x*10)}:${Math.round(z*10)}`});
+}
+let fogEnabled=true,explorationExperience=0,lastRevealPosition=new THREE.Vector3(9,0,5);
+function exploreRadius(){return 5.5+stats.will*.13+Math.min(6,explorationExperience*.09);}
+function updateExploration(){
+ const r=exploreRadius();let newTiles=0;
+ for(const tile of fogTiles){
+  if(!explored.has(tile.key)&&Math.hypot(tile.x-hana.position.x,tile.z-hana.position.z)<=r){
+   explored.add(tile.key);newTiles++;
+  }
+  tile.mesh.visible=fogEnabled&&!explored.has(tile.key);
+ }
+ if(newTiles){explorationExperience=Math.min(100,explorationExperience+newTiles*.055);}
+ document.getElementById('exploration').textContent=`탐험 반경 ${r.toFixed(0)}m · 발견 ${Math.round(explored.size/Math.max(1,fogTiles.length)*100)}%`;
+}
+const $=id=>document.getElementById(id);
+let bubbleEnabled=true,bubbleUntil=0;const bubbleAnchor=new THREE.Vector3();
+function updateBubble(){
+ const el=$('bubble');if(!bubbleEnabled||elapsed>bubbleUntil){el.classList.remove('show');return}
+ bubbleAnchor.set(0,3.35,0);hana.localToWorld(bubbleAnchor);bubbleAnchor.project(camera);
+ if(bubbleAnchor.z<-1||bubbleAnchor.z>1){el.classList.remove('show');return}
+ const x=(bubbleAnchor.x*.5+.5)*innerWidth,y=(-bubbleAnchor.y*.5+.5)*innerHeight;
+ if(x<0||x>innerWidth||y<0||y>innerHeight){el.classList.remove('show');return}
+ el.style.left=Math.max(100,Math.min(innerWidth-100,x))+'px';
+ el.style.top=Math.max(105,Math.min(innerHeight-35,y))+'px';el.classList.add('show');
+}
+function clockParts(){
+ const dayTime=elapsed%DAY_SECONDS,hr=6+dayTime/DAY_SECONDS*24;
+ return {day:Math.floor(elapsed/DAY_SECONDS)+1,h:Math.floor(hr)%24,m:Math.floor((hr%1)*60),dayTime};
+}
+function log(t){
+ const key=clockParts();let e=document.createElement('div');
+ e.textContent=`D${key.day} ${String(key.h).padStart(2,'0')}:${String(key.m).padStart(2,'0')}  ${t}`;
+ $('log').prepend(e);
+ if($('log').children.length>90)$('log').lastChild.remove();
+}
+function say(t){
+ $('thought').textContent='“'+t+'”';$('bubble').textContent=t;
+ bubbleUntil=elapsed+Math.max(7,Math.min(15,4+t.length*.24));
+}
+function setState(s,g,p,words){
+ state=s;goal=g;phaseAt=elapsed;target=p?sites[p].clone():null;
+ if(s==='returnHesitate')randomHesitationDuration=randomBetween(5,13);
+ $('phase').textContent=g;say(words);log(g);actions++;
+}
+function init(){
+ elapsed=0;day=1;state='confused';phaseAt=0;water=food=shelter=failedFire=rested=false;
+ knownWater=knownBerries=knownCave=seenRabbit=seenFish=false;actions=0;
+ stats={energy:92,thirst:85,hunger:83,will:72};redrawNeeds();loneliness=0;lastMoraleMessage=0;exhaustionCooldown=0;previousEnergyBand=100;resetBerryTrees();
+ fireAttempts=0;fireSuccess=false;fireKnowledge=0;fireDryStock=0;fireLearnedWet=false;nextFireAttempt=0;lastWeatherDay=0;
+ hana.position.set(9,.4,5);hana.rotation.set(0,0,0);explored.clear();explorationExperience=0;previousExplorationCount=0;discoveryBoostAt=0;updateExploration();
+ $('log').innerHTML='';lastLog='';
+ setState('confused','워프 직후 · 혼란',null,'여긴... 어디지? 애들은 어디 간 거야?');
+}
+function finishDayOne(){
+ if(state!=='night'&&state!=='rest')return;
+ if(elapsed-phaseAt>18)setState('rest','동굴에서 휴식',null,'오늘은 아무것도 모르겠어... 내일 다시 해보자.');
+}
+function dayOneDecide(){
+ const d=elapsed;
+ if(d<30)return;
+ if(state==='confused'){setState('orient','주변 확인',null,'진정하자... 일단 주변부터 살펴보자.');return}
+ if(state==='orient'&&elapsed-phaseAt>12){
+  setState('waterScout','물소리 탐색','water','목말라... 물이 있는 곳부터 알아둬야겠어.');return;
+ }
+ if(state==='waterScout'&&!target){
+  knownWater=true;setState('waterObserve','물가 관찰',null,'물이 있네. 그런데 그냥 마셔도 되는 걸까?');return;
+ }
+ if(state==='waterObserve'&&elapsed-phaseAt>14){
+  setState('berryScout','열매 탐색','berries','배도 고프네... 저 빨간 열매는 뭘까?');return;
+ }
+ if(state==='berryScout'&&!target){
+  knownBerries=true;setState('berryObserve','열매 관찰',null,'먹어도 되는 열매일까? 오늘은 함부로 먹지 말자.');return;
+ }
+ if(state==='berryObserve'&&elapsed-phaseAt>14){
+  setState('wildlifeScout','동물 관찰','wildlife','토끼 같은 동물이네! 하지만 지금은 잡을 방법이 없어.');return;
+ }
+ if(state==='wildlifeScout'&&!target){
+  seenRabbit=true;seenFish=true;
+  setState('wildlifeObserve','야생동물 관찰',null,'바다엔 물고기도 있구나. 아직 잡을 수는 없겠어.');return;
+ }
+ if(state==='wildlifeObserve'&&elapsed-phaseAt>12){
+  setState('caveScout','쉴 곳 찾기','shelter','날이 어두워져... 바위 아래에 빈 곳이 보여.');return;
+ }
+ if(state==='caveScout'&&!target){
+  knownCave=true;shelter=true;
+  setState('fireTry','불 피우기 고민',null,'불이 있으면 좋겠는데... 어떻게 피우는 거지?');return;
+ }
+ if(state==='fireTry'&&elapsed-phaseAt>18){
+  failedFire=true;setState('night','불 없이 동굴에서 첫날 밤',null,'불은 못 피우겠어... 오늘은 여기서 버텨야지.');return;
+ }
+ finishDayOne();
+}
+function chooseNextDayAction(){
+ // Need thresholds vary by day, temperament, distance and urgency.
+ if(shouldAddressNeed('thirst')){
+  setState('drinkTravel','갈증 해소 · 물가로 이동','water',stats.thirst<20?'너무 멀리 왔나 봐... 목이 바짝 말라! 물가로 돌아가야겠어.':'슬슬 물을 마셔야겠어. 물가로 돌아가자.');return;
+ }
+ if(shouldAddressNeed('hunger')){
+  const tree=closestFruitTree();
+  if(tree)sites.berries.set(tree.group.position.x,.5,tree.group.position.z);
+  else {setState('berrySearch','열매가 다시 열렸는지 확인','berries','배가 고픈데... 열매가 아직 안 열렸을지도 몰라.');return;}
+  setState('eatTravel','허기 해소 · 열매나무로 이동','berries',stats.hunger<20?'탐험하느라 먹는 걸 잊었어... 배고파!':'배가 슬슬 고프네. 열매를 조금 따러 가자.');return;
+ }
+ if(stats.energy<47){
+  setState('sleepTravel','피로 회복 · 동굴로 이동','shelter','너무 피곤해... 동굴에서 좀 쉬어야겠어.');return;
+ }
+ const current=clockParts();
+ // Fire is learned through actual trials, not unlocked by the calendar or survival score.
+ if(!fireSuccess&&current.day>=3&&current.h>=10&&current.h<18&&
+    stats.thirst>=40&&stats.hunger>=40&&stats.energy>=49&&elapsed>=nextFireAttempt){
+  setState('fireTravel','불 피우기 실험 · 동굴 앞','shelter',
+    fireAttempts===0?'밤에 불이 있으면 좋겠어... 나무로 한번 해볼까?':
+    raining()?'비가 오네... 젖은 나무로도 될까?':
+    fireLearnedWet?'지난번엔 젖어서 안 됐지. 이번엔 마른 재료를 찾아보자.':
+    '지난번에 실패했지만... 다시 해보자.');return;
+ }
+ if(current.h>=19||current.h<6){
+  if(Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)>1.5){
+   setState('sleepTravel','밤 · 동굴로 돌아가기','shelter','어두워지기 전에 동굴로 돌아가자.');return;
+  }
+  setState('rest','동굴에서 밤 보내기',null,'오늘도 무사히 지나갔네...');return;
+ }
+ // Idle roaming creates small variations and gives wildlife time to pass by.
+ const choices=[
+  ['outerNorth','북쪽 숲 탐험','저 멀리도 숲이 있네... 조금 가볼까?'],
+  ['outerEast','동쪽 해안 탐험','처음 보는 해변이야. 돌아갈 길은 기억하자.'],
+  ['outerSouth','남쪽 언덕 탐험','저 언덕 너머는 어떻게 생겼을까?'],
+   ['farWest','서쪽 절벽 탐험','여기까지 오니 섬이 정말 크다는 게 느껴져...'],
+   ['farNorth','북쪽 고원 탐험','저 고원까지 갈 수 있을까? 돌아올 힘은 남겨야지.'],
+   ['farSouth','남쪽 숲 탐험','꽤 멀리 왔어... 돌아가는 길을 잊으면 안 돼.'],
+  ['beach','해변 관찰','파도가 예쁘다... 그래도 친구들은 어디에 있을까?'],
+  ['trees','숲 주변 탐색','조금 더 둘러보자. 새로운 게 있을지도 몰라.'],
+  ['wildlife','토끼 관찰','토끼다! 아직 잡을 능력은 없으니까 보기만 하자.'],
+  ['water','물고기 관찰','물고기가 헤엄치네. 아직 잡을 방법을 모르겠어.']
+ ];
+ const c=choices[(actions+Math.floor(elapsed/77))%choices.length];
+ // Low will makes Hina hesitate to venture into distant, unfamiliar terrain.
+ if((c[0].startsWith('outer')||c[0].startsWith('far'))&&stats.will<48){
+  setState('hesitate','낯선 지역 앞에서 망설임',null,'너무 멀리 가는 건 아직 무서워... 주변부터 익히자.');
+ }else setState('wander','주변 탐색 · '+c[1],c[0],c[2]);
+}
+function attemptFire(){
+ fireAttempts++;
+ const wet=groundWet(),rain=raining();
+ const chance=fireChance();
+ const succeeded=Math.random()<chance;
+ fireKnowledge=Math.min(35,fireKnowledge+(succeeded?5:1.5));
+ if(!succeeded)changeWill(-randomBetween(4,8),'불 피우기 실패');
+ if(succeeded){
+  fireSuccess=true;changeWill(16,'첫 불씨 성공');
+  log(`불씨 생성 성공 · ${fireAttempts}번째 시도`);
+  setState('fireResult','첫 불씨 성공',null,'어?! 연기가 나! 진짜 불씨가 생겼어!');
+ }else{
+  if(wet)fireLearnedWet=true;
+  const phrase=rain?'비가 와서 그런가... 나무가 너무 젖었어.':
+    wet?'어제 비 때문에 아직 축축한가 봐...':
+    fireAttempts===1?'나무를 비비면 될 줄 알았는데... 손만 아프네.':
+    fireAttempts<4?'지난번보다 조금 나은 것 같기도 한데... 다시 배워야겠어.':
+    '마른 재료를 모으고 방법을 바꿔야겠어.';
+  log(`불 피우기 ${fireAttempts}번째 실패 · ${rain?'비':wet?'젖은 재료':'기술 미숙'}`);
+  setState('fireResult','불 피우기 실패',null,phrase);
+ }
+ nextFireAttempt=elapsed+85;
+}
+function dayTwoPlusDecide(){
+ if(state==='fireTravel'&&!target){
+  setState('fireExperiment','나무 마찰 시도',null,
+   raining()?'나무가 젖어 있는데... 그래도 해볼까?':
+   fireAttempts===0?'영화에서는 이렇게 하던데...':'이번엔 천천히 해보자.');return;
+ }
+ if(state==='fireExperiment'){
+  if(elapsed-phaseAt>14)attemptFire();
+  return;
+ }
+ if(state==='fireResult'&&elapsed-phaseAt<15)return;
+ if(state==='confused'||state==='orient'||state==='waterScout'||state==='waterObserve'||
+ state==='berryScout'||state==='berryObserve'||state==='wildlifeScout'||state==='wildlifeObserve'||
+ state==='caveScout'||state==='fireTry'||state==='night'){
+  setState('wake','둘째 날 · 행동 시작',null,'어제 물이랑 열매를 봤지. 오늘은 직접 해보자.');return;
+ }
+ if(state==='drinkTravel'&&!target){
+  setState('drinking','물 마시기',null,'일단 물을 마시자... 배탈은 안 나야 할 텐데.');return;
+ }
+ if(state==='drinking'&&elapsed-phaseAt>9){
+  stats.thirst=Math.min(100,stats.thirst+randomBetween(48,73));water=true;thirstTrigger=randomBetween(24,64);thirstRate=randomBetween(.078,.137);
+  log('물을 마셔 갈증이 회복됨 (위생 위험은 아직 모름)');
+  setState('recover','갈증 해소',null,'살 것 같아... 물은 여기 있다는 걸 기억하자.');return;
+ }
+ if(state==='berrySearch'&&!target){
+  const tree=closestFruitTree();
+  if(tree){sites.berries.set(tree.group.position.x,.5,tree.group.position.z);setState('eatTravel','열매 발견 · 채집하러 이동','berries','앗! 열매가 열렸어. 이번엔 조금 따보자.');}
+  else setState('recover','열매가 아직 없음',null,'열매가 없네... 다시 열릴 때까지 기다려야겠어.');
+  return;
+ }
+ if(state==='eatTravel'&&!target){
+  setState('eating','열매 따서 먹기',null,'먹어본 적 없는 열매지만... 배가 너무 고파.');return;
+ }
+ if(state==='eating'&&elapsed-phaseAt>9){
+  const picked=pickBerries();
+  if(picked>0){
+   stats.hunger=Math.min(100,stats.hunger+picked*randomBetween(7,11));
+   food=true;hungerTrigger=randomBetween(23,65);hungerRate=randomBetween(.064,.118);
+   changeWill(2,'채집 성공');
+   log(`열매 ${picked}개 채집 · 나무에서 실제로 사라짐`);
+   setState('recover','열매 채집 완료',null,`열매를 ${picked}개 땄어! 남은 건 다음에 먹어야지.`);
+  }else setState('recover','열매 채집 실패',null,'어? 열매가 하나도 없네... 다른 곳을 찾아봐야겠어.');
+  return;
+ }
+ if(state==='sleepTravel'&&!target){
+  setState('rest','동굴에서 쉬기',null,'잠깐이라도 쉬어야겠어.');return;
+ }
+ if(state==='returnHesitate'){
+  if(elapsed-phaseAt<randomHesitationDuration)return;
+  const need=stats.thirst<=stats.hunger?'thirst':'hunger';
+  setState(need==='thirst'?'drinkTravel':'eatTravel','망설임 끝 · 생존 우선',need==='thirst'?'water':'berries',
+    need==='thirst'?'그래, 물부터 마시고 다시 탐험하자.':'아쉽지만 열매를 먹고 다시 오자.');return;
+ }
+ if(state==='rest'){
+  stats.energy=Math.min(95,stats.energy+.12);
+  if(elapsed-phaseAt>28&&clockParts().h>=6&&clockParts().h<19){
+   setState('recover','휴식 완료',null,'조금 나아졌어. 다시 움직여 보자.');return;
+  }
+  if(clockParts().h>=19||clockParts().h<6)return;
+ }
+ if(target)return;
+ if(elapsed-phaseAt>11)chooseNextDayAction();
+}
+function decide(){
+ const current=clockParts();
+ if(current.day!==day){
+  day=current.day;
+  log(`${day}일째 아침 · 생존 계속`);
+  setState('wake',`${day}일째 · 새로운 하루`,null,'또 하루가 시작됐네. 오늘은 조금 더 잘할 수 있을 거야.');
+ }
+ if(day===1)dayOneDecide();
+ else dayTwoPlusDecide();
+}
+function update(dt){
+ if(paused)return;
+ const step=dt*speed;elapsed+=step;
+ // Physical fatigue: long walks, rain, poor nutrition and stress all have costs.
+ const walking=Boolean(target);
+ const away=distanceTo('shelter');
+ const wetExposure=raining()&&walking;
+ let fatigue=.085;
+ if(walking)fatigue+=.15+(away>24?.07:0)+(away>52?.08:0);
+ if(wetExposure)fatigue+=.11;
+ if(stats.hunger<35)fatigue+=.065;
+ if(stats.thirst<35)fatigue+=.08;
+ if(stats.will<25)fatigue+=.035;
+ if(state==='rest'||state==='night')fatigue=.018;
+ stats.energy=Math.max(5,stats.energy-step*fatigue);
+ if(stats.energy<26&&elapsed>exhaustionCooldown){
+  exhaustionCooldown=elapsed+55;
+  say('다리가 후들거려... 너무 무리했나 봐. 잠깐 쉬고 싶어.');
+  log('심한 피로 · 이동 속도 감소');
+ }
+ stats.thirst=Math.max(7,stats.thirst-step*thirstRate*(target?1.16:1));
+ stats.hunger=Math.max(7,stats.hunger-step*hungerRate*(target?1.09:1));
+ moraleUpdate(step);
+ if(state==='rest')stats.energy=Math.min(96,stats.energy+step*.55);
+ // Exploration can be interrupted by needs; distant return trips can trigger hesitation.
+ if(state==='wander'&&target&&stats.energy<17){
+  setState('sleepTravel','체력 고갈 · 동굴로 귀환','shelter','더는 걷기 힘들어... 탐험은 그만하고 쉬러 가자.');
+ }
+ if(state==='wander'&&target){
+  const urgent=stats.thirst<=12||stats.hunger<=12;
+  const hungry=stats.hunger<=hungerTrigger-4;
+  const thirsty=stats.thirst<=thirstTrigger-4;
+  if(urgent||((hungry||thirsty)&&elapsed-phaseAt>8&&Math.random()<step*.16)){
+   const need=stats.thirst<=12||thirsty&&!hungry?'thirst':'hunger';
+   if(need==='hunger'){
+    const tree=closestFruitTree();
+    if(tree)sites.berries.set(tree.group.position.x,.5,tree.group.position.z);
+    else {setState('berrySearch','먹을 열매 탐색','berries','열매가 아직 열리지 않았을지도 몰라... 확인해 보자.');return;}
+   }
+   const destination=need==='thirst'?'water':'berries';
+   const distance=distanceTo(destination);
+   if(distance>24&&stats[need]>12&&Math.random()<.48){
+    setState('returnHesitate','탐험 중 귀환을 망설임',null,need==='thirst'?'물이 있는 곳까지 꽤 먼데... 조금만 더 둘러볼까?':'열매나무까지 돌아가야 하나... 아쉽지만 배가 고파.');
+   }else{
+    setState(need==='thirst'?'drinkTravel':'eatTravel',need==='thirst'?'탐험 중단 · 물가로 귀환':'탐험 중단 · 열매 채집',destination,
+      need==='thirst'?'이제 안 되겠어. 탐험은 나중에 하고 물부터 마시자.':'배가 너무 고파... 여기까지 왔지만 탐험을 포기하고 돌아가자.');
+   }
+  }
+ }
+ if(target){
+  const delta=target.clone().sub(hana.position);delta.y=0;
+  const dist=delta.length();
+  if(dist<.42)target=null;
+  else{
+   delta.normalize();hana.position.addScaledVector(delta,Math.min(dist,step*1.8*(stats.energy<25?.52:stats.energy<45?.76:1)));
+   hana.rotation.y=Math.atan2(delta.x,delta.z);
+   legs[0].rotation.x=Math.sin(elapsed*11)*.28;
+   legs[1].rotation.x=-legs[0].rotation.x;arms[0].rotation.x=-legs[0].rotation.x*.5;arms[1].rotation.x=-legs[1].rotation.x*.5;head.rotation.z=Math.sin(elapsed*6)*.022;
+  }
+ }else {legs.forEach(l=>l.rotation.x=0);arms.forEach(a=>a.rotation.x=0);head.rotation.z=0;}
+ decide();
+ updateCharacterPose();
+ updateExploration();
+ updateBerryTrees();
+ const visited=explored.size;
+ if(visited>previousExplorationCount+28&&elapsed>discoveryBoostAt+45){
+  previousExplorationCount=visited;discoveryBoostAt=elapsed;
+  changeWill(randomBetween(3,5),'새로운 지역 발견');
+ }
+ const t=clockParts();
+ $('dayLabel').textContent=`· DAY ${String(t.day).padStart(2,'0')}`;
+ $('clock').textContent=`${String(t.h).padStart(2,'0')}:${String(t.m).padStart(2,'0')}`;
+ $('elapsed').textContent=`D${t.day} ${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(Math.floor(elapsed%60)).padStart(2,'0')}`;
+ waterSurface.position.y=-.52+Math.sin(elapsed*.8)*.035;
+ pondWater.position.y=.19+Math.sin(elapsed*1.1)*.006;
+ pondRipples.forEach((r,i)=>{const pulse=(elapsed*.16+i*.24)%1;r.scale.setScalar(.6+pulse*.55);r.material.opacity=.6;});
+ waveMat.opacity=.15+Math.sin(elapsed*1.7)*.09;
+ const dayLight=Math.max(.06,Math.sin(t.dayTime/DAY_SECONDS*Math.PI*2+.38)*.48+.52);
+ for(const mote of motes)mote.visible=dayLight<.4;
+ scene.background.setRGB(.07+dayLight*.53,.12+dayLight*.71,.22+dayLight*.69);
+ scene.fog.color.copy(scene.background);sun.intensity=.15+dayLight*2.3;
+ ambient.intensity=.35+dayLight*1.8;
+ weatherUpdate(step);updateSound(dt,dayLight<.25);
+ // Cool, blue rainy light without changing individual material colors permanently.
+ const cool=raining()?0.72:groundWet()?0.91:1;
+ scene.background.setRGB((.07+dayLight*.53)*cool,(.12+dayLight*.71)*(.95+.05*cool),(.22+dayLight*.69)*1.04);
+ scene.fog.color.copy(scene.background);
+ sun.color.setRGB(cool,.94,1);
+ ambient.color.setRGB(.82*cool,.91,1);
+ if(raining())ambient.intensity*=.82;
+ $('stats').innerHTML=Object.entries({체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불경험:Math.min(100,fireKnowledge*3)})
+ .map(([k,v])=>`<div class="stat"><label>${k}</label><div class="bar"><div class="fill" style="width:${v}%;background:${v<30?'#db826f':v<55?'#d8b65b':'#68d3b1'}"></div></div><span class="val">${Math.round(v)}</span></div>`).join('');
+}
+
+// Lightweight procedural ambience, unlocked only by a user click (browser autoplay policy).
+// Sound is enabled by default; browsers require an interaction to unlock playback.
+let soundEnabled=true,audioCtx=null,ambientTimer=0,chirpClock=0;
+let audioUnlockAttached=false;
+async function unlockAmbient(){
+ if(!soundEnabled)return;
+ if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;audioCtx=new C();}
+ if(audioCtx.state!=='running')await audioCtx.resume();
+ ambientTimer=0;
+}
+function firstInteractionUnlock(){unlockAmbient().catch(()=>{});}
+window.addEventListener('pointerdown',firstInteractionUnlock,{passive:true});
+window.addEventListener('keydown',firstInteractionUnlock);
+function tone(freq,duration,type='sine',volume=.035,delay=0){
+ if(!soundEnabled||!audioCtx)return;
+ const now=audioCtx.currentTime+delay,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+ osc.type=type;osc.frequency.setValueAtTime(freq,now);
+ gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),now+.035);
+ gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+ osc.connect(gain);gain.connect(audioCtx.destination);osc.start(now);osc.stop(now+duration+.04);
+}
+function birdCall(){
+ const base=randomBetween(1200,1900);
+ tone(base,.11,'sine',.022);tone(base*1.23,.10,'sine',.018,.12);tone(base*.91,.16,'sine',.022,.25);
+}
+function owlCall(){tone(420,.43,'sine',.045);tone(335,.53,'sine',.037,.5);}
+function updateSound(dt,isNight){
+ if(!soundEnabled||!audioCtx||audioCtx.state!=='running'||paused)return;
+ ambientTimer-=dt;
+ if(ambientTimer<=0){if(isNight)owlCall();else birdCall();ambientTimer=isNight?randomBetween(5,11):randomBetween(2,5);}
+}
+$('soundToggle').onclick=async()=>{
+ soundEnabled=!soundEnabled;ambientTimer=0;
+ if(soundEnabled)await unlockAmbient();
+ $('soundToggle').textContent=soundEnabled?'환경음 ON':'환경음 OFF';$('soundToggle').setAttribute('aria-pressed',String(soundEnabled));
+};
+
+$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 암막 ON':'미탐험 암막 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration()};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};$('speed').onclick=()=>{speed=speed===1?2:speed===2?4:1;$('speed').textContent='속도 ×'+speed};$('reset').onclick=()=>{init();paused=false;$('pause').textContent='일시정지'};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();function animate(t){requestAnimationFrame(animate);let dt=Math.min(.05,(t-prev)/1000);prev=t;update(dt);if(!paused)animateWildlife(t*.001,dt*speed);orbit.update();updateBubble();renderer.render(scene,camera)}requestAnimationFrame(animate);
+</script></body></html>
