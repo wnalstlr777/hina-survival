@@ -1,5 +1,5 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
-#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
+#dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media(max-width:700px){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
  #ui{display:none;position:fixed;z-index:11;top:61px;left:auto;right:8px;width:min(285px,calc(100vw - 38px));max-height:calc(100dvh - 160px);overflow:auto;padding:12px;background:#101d24f2}
@@ -17,7 +17,7 @@
 #bubble.sleep-bubble{font-size:18px;font-weight:850;letter-spacing:2px;padding:8px 15px;min-width:80px;max-width:105px;background:#eef4ff;color:#35476c;border-color:#6e85ac;animation:sleepFloat 2.6s ease-in-out infinite}
 #bubble.sleep-bubble:after{background:#eef4ff;border-color:#6e85ac}
 @keyframes sleepFloat{0%,100%{margin-top:0}50%{margin-top:-6px}}
-</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ui"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div><div style="margin-top:12px"><b>AI 행동 기록</b><div id="log"></div></div></div><div id="badge"><b id="clock">06:00</b><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">탐험 반경 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><div id="extraControls"><button id="reset">다시 시작</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><button id="qualityToggle">화질: 자동</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대 · F: 히나 찾기 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
+</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ui"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div><div style="margin-top:12px"><b>AI 행동 기록</b><div id="log"></div></div></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">탐험 반경 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><div id="extraControls"><button id="reset">다시 시작</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><button id="qualityToggle">화질: 자동</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대 · F: 히나 찾기 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia('(max-width:700px)').matches;
@@ -26,7 +26,8 @@ const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ad4e7);scene.f
 const solidObstacles=[];const detailMeshes=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x3eabc2),riverMat=mat(0x66c6d5),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);
  // Solid objects whose lower portion intersects Hina's chest-height walking space.
  // Exclude the broad floor/shore and horizontal platforms.
- if(h>=1.15 && w<65 && d<65 && y-h/2<1.3 && y+h/2>.65)
+ if(h>=1.15 && w<65 && d<65 && y-h/2<1.3 && y+h/2>.65
+    && !(h>1.4 && w<=2.1 && d<=2.1))
   solidObstacles.push({x,z,rx:w*.5+.34,rz:d*.5+.34});
  if(Math.max(w,h,d)<4&&Math.hypot(x,z)>23)detailMeshes.push(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
 grass.polygonOffset=true;grass.polygonOffsetFactor=-1;grass.polygonOffsetUnits=-1;
@@ -59,17 +60,17 @@ for(let x=-104;x<=104;x+=1.04)for(let z=-90;z<=90;z+=1.04){
 shoreMesh.count=shoreCount;shoreMesh.instanceMatrix.needsUpdate=true;scene.add(shoreMesh);
 
 // Ocean shallows, beach ledges, terraced forest: walkable ground heights are defined below.
-const terraces=[[-16,-11,13,11,1.0],[-14,-12,10,8,1.7],[-13,-13,7,6,2.4],[-9,-12,7,7,1.0],[-17,7,11,9,.9],[-15,8,7,7,1.55],[-9,8,8,7,.95],[-3,-13,8,7,.75],[-2,12,9,7,.7],[8,-13,9,7,.6]];
+const terraces=[[-16,-11,13,11,1.0],[-14,-12,10,8,1.7],[-13,-13,7,6,2.4],[-9,-12,7,7,1.0],[-19,9,7,5,.55],[-16,10,5,4,.82],[-9,10.4,5,3.2,.52],[-3,-13,8,7,.75],[-2,12,9,7,.7],[8,-13,9,7,.6]];
 for(const [x,z,w,d,h] of terraces){box(w,h,d,dirt,x,h/2,z);box(w,.16,d,grass,x,h+.08,z)}
 // Additional raised natural headland; irregular stepped silhouette.
 for(const [x,z,w,d,h] of [[-17,-5,5,5,1.5],[-12,-4,6,5,1.0],
  [-15,-8,5,5,2.0],[-11,-9,5,5,2.65],[-7,-15,5,4,2.1],
- [-6,-17,3,3,1.25],[-16,1,6,5,.65],[5,-11,6,5,.75],
+ [-6,-17,3,3,1.25],[-18,0,3.5,3.5,.38],[5,-11,6,5,.75],
  [9,-7,6,5,.65],[13,-5,4,5,.45]]){
  box(w,h,d,dirt,x,h/2,z);box(w,.15,d,grass,x,h+.07,z);
 }
 // Low stepping-stone terraces form a plausible route between beach and the forest.
-for(const [x,z,h] of [[5,2,.18],[2,2,.36],[-1,2,.48],[-4,2,.52],[-7,2,.7]]){box(3.1,h,3.1,dirt,x,h/2,z);box(3.1,.12,3.1,grass,x,h+.06,z)}
+for(const [x,z,h] of [[5,2,.18],[2,2,.36],[-1,2,.48],[-4,2,.52]]){box(3.1,h,3.1,dirt,x,h/2,z);box(3.1,.12,3.1,grass,x,h+.06,z)}
 // The natural cave is cut into a cliff at (-4,-10), opening toward +Z.
 // Back, side walls and ceiling are separate voxel rock pieces: a real hollow space.
 const caveX=-4,caveZ=-10;
@@ -88,15 +89,14 @@ for(const [x,y,z,w,d] of [[-9.2,5.6,-10,3,3],[-4,5.6,-12,4,3],[.6,5.6,-9.5,3,4],
 // The pond is a genuine opening in the sand voxel field, not a coplanar blue box.
 // Deep basin, translucent water, terraced sandy banks and stones.
 const pondBottom=box(8.5,.2,6.6,dirt,-9,-.40,4);
-const pondWaterMat=new THREE.MeshPhysicalMaterial({color:0x3bbfcb,roughness:.16,metalness:0,
- transparent:true,opacity:.78,depthWrite:false,side:THREE.DoubleSide});
+const pondWaterMat=new THREE.MeshBasicMaterial({color:0x38d2d7,transparent:true,opacity:.88,depthWrite:false,side:THREE.DoubleSide});
 const pondWater=new THREE.Mesh(new THREE.CircleGeometry(1,48),pondWaterMat);
-pondWater.rotation.x=-Math.PI/2;pondWater.scale.set(4.1,3.15,1);
-pondWater.position.set(-9,.19,4);pondWater.renderOrder=3;scene.add(pondWater);
+pondWater.rotation.x=-Math.PI/2;pondWater.scale.set(4.65,3.45,1);
+pondWater.position.set(-9,.49,4);pondWater.renderOrder=7;scene.add(pondWater);
 const pondRim=mat(0xc5b18b),pondRock=mat(0x929b91);
 for(let j=0;j<44;j++){
  const a=j*Math.PI*2/44,r=1+.06*Math.sin(j*2.7),x=-9+Math.cos(a)*4.2*r,z=4+Math.sin(a)*3.27*r;
- const peb=box(.48+randSafe(j)*.38,.24,.45+randSafe(j+13)*.3,j%3?pondRim:pondRock,x,.32,z);
+ const peb=box(.48+randSafe(j)*.38,.24,.45+randSafe(j+13)*.3,j%3?pondRim:pondRock,x,.36,z);
  peb.rotation.y=a;
 }
 function randSafe(n){return (Math.sin(n*127.1+15.7)*43758.5453)%1<0?1+((Math.sin(n*127.1+15.7)*43758.5453)%1):((Math.sin(n*127.1+15.7)*43758.5453)%1)}
@@ -104,9 +104,25 @@ const pondRippleMat=new THREE.MeshBasicMaterial({color:0xe5fff6,transparent:true
 const pondRipples=[];
 for(let i=0;i<4;i++){
  const ring=new THREE.Mesh(new THREE.RingGeometry(.35+i*.46,.39+i*.46,36),pondRippleMat);
- ring.rotation.x=-Math.PI/2;ring.position.set(-9,.235,4);ring.renderOrder=4;scene.add(ring);pondRipples.push(ring);
+ ring.rotation.x=-Math.PI/2;ring.position.set(-9,.52,4);ring.renderOrder=8;scene.add(ring);pondRipples.push(ring);
 }
 
+// Readable pond detail: bright edge stones, reeds and reflected glints.
+const pondGlintMat=new THREE.MeshBasicMaterial({color:0xe9ffff,transparent:true,opacity:.8,depthWrite:false,side:THREE.DoubleSide});
+const pondGlints=[];
+for(let i=0;i<14;i++){
+ const a=i*2.39996,rad=.4+(i%5)*.52;
+ const glint=new THREE.Mesh(new THREE.PlaneGeometry(.26+(i%3)*.13,.065),pondGlintMat);
+ glint.rotation.x=-Math.PI/2;glint.rotation.z=a;
+ glint.position.set(-9+Math.cos(a)*rad,.47,4+Math.sin(a)*rad*.7);
+ glint.renderOrder=9;scene.add(glint);pondGlints.push(glint);
+}
+const reedMat=mat(0x64945a);
+for(let i=0;i<18;i++){
+ const a=i*Math.PI*2/18,x=-9+Math.cos(a)*4.65,z=4+Math.sin(a)*3.68;
+ const reed=box(.13,.35+(i%4)*.11,.13,reedMat,x,.47,z);
+ reed.rotation.z=(i%3-1)*.12;
+}
 // Seeded decorative placement to keep the scene stable across reloads.
 let seed=2143;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
 function palm(x,z,h=0){const ht=2.6+rand()*1.7;box(.43,ht,.43,wood,x,h+ht/2,z);for(let i=0;i<5;i++){let angle=i*Math.PI*2/5;let f=box(2.8,.22,.78,palmLeaf,x+Math.cos(angle)*1.15,h+ht+.12,z+Math.sin(angle)*1.15);f.rotation.y=-angle;f.rotation.z=(i%2?-.15:.15)}}
@@ -129,7 +145,7 @@ for(const [x,z,w,d,h] of farRidges){
 }
 for(let i=0;i<220;i++){
  const x=-86+rand()*172,z=-71+rand()*142;
- if(!landAt(x,z)||Math.hypot(x,z)<26)continue;
+ if(!landAt(x,z)||Math.hypot(x,z)<26||Math.hypot(x+9,z-4)<13)continue;
  const h=.2+rand()*.9;
  if(rand()<.43)palm(x,z,h);
  else {
@@ -137,8 +153,8 @@ for(let i=0;i<220;i++){
   box(size,size*.7,size,rand()<.5?stone:rock,x,size*.35,z);
  }
 }
-for(let i=0;i<32;i++){let x=-20+rand()*39,z=-18+rand()*35;if(!landAt(x,z)||(x>-12&&x<-5&&z>1&&z<8)||(x>-10&&x<3&&z>-16&&z<-5)||(x>3&&x<13&&z>0&&z<9))continue;let h=x<-11&&z<0?1.8:x<-10&&z>4?1.1:0;palm(x,z,h)}
-for(let i=0;i<62;i++){let x=-21+rand()*43,z=-18+rand()*36;if(!landAt(x,z)||(x>-10&&x<2&&z>-15&&z<-5))continue;let size=.24+rand()*.6;box(size,size*.65,size,rand()>.45?stone:rock,x,size*.33,z)}
+for(let i=0;i<32;i++){let x=-20+rand()*39,z=-18+rand()*35;if(!landAt(x,z)||(Math.pow((x+9)/7.2,2)+Math.pow((z-4)/6.3,2)<1)||(x>-12&&x<-5&&z>1&&z<8)||(x>-10&&x<3&&z>-16&&z<-5)||(x>3&&x<13&&z>0&&z<9))continue;let h=x<-11&&z<0?1.8:x<-10&&z>4?1.1:0;palm(x,z,h)}
+for(let i=0;i<62;i++){let x=-21+rand()*43,z=-18+rand()*36;if(!landAt(x,z)||(Math.pow((x+9)/5.3,2)+Math.pow((z-4)/4.4,2)<1)||(x>-10&&x<2&&z>-15&&z<-5))continue;let size=.24+rand()*.6;box(size,size*.65,size,rand()>.45?stone:rock,x,size*.33,z)}
 // Berry bush to inspect, not automatically eat.
 for(let i=0;i<6;i++){let x=-2.5+(i%3)*.65,z=9.4+Math.floor(i/3)*.65;box(.75,.8,.75,leaf,x,.45,z);}
 // Small, nonflammable wood pieces by the cave; no campfire is granted.
@@ -292,14 +308,14 @@ for(let i=0;i<28;i++){
 const berryRed=mat(0xd94848),berryDark=mat(0x9e3039),twigMat=mat(0x665039);
 const berryTrees=[];
 function berryTree(x,z,ground=0){
- const g=new THREE.Group();g.position.set(x,ground,z);scene.add(g);solidObstacles.push({x,z,rx:.52,rz:.52});
+ const g=new THREE.Group();g.position.set(x,ground,z);scene.add(g);/* Tree collision disabled: trunks do not block navigation. */
  groupCube(g,.42,2.8,.42,trunkLight,0,1.4,0);
  for(const [dx,dy,dz,size] of [[0,3.1,0,1.6],[-.85,2.7,0,1.2],[.85,2.75,.25,1.25],[0,2.65,-.9,1.1]])
   groupCube(g,size,size*.82,size,fernGreen,dx,dy,dz);
  const fruits=[];
  for(let j=0;j<16;j++){
-  const a=rand()*Math.PI*2,r=.45+rand()*1.05,y=2.4+rand()*1.25;
-  const f=groupCube(g,.17,.17,.17,j%3===0?berryDark:berryRed,Math.cos(a)*r,y,Math.sin(a)*r);
+  const a=rand()*Math.PI*2,r=.62+rand()*1.03,y=2.4+rand()*1.25;
+  const f=groupCube(g,.35,.35,.35,j%3===0?berryDark:berryRed,Math.cos(a)*r,y,Math.sin(a)*r);
   fruits.push(f);
  }
  berryTrees.push({group:g,fruits,stock:0,regrowAt:0});return g;
@@ -467,6 +483,15 @@ part(.49,.11,.37,skin,0,1.95,0);
 const head=new THREE.Group();hana.add(head);head.position.y=2.28;
 function facepart(w,h,d,m,x,y,z){const p=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);p.position.set(x,y,z);p.castShadow=true;head.add(p);return p}
 facepart(.67,.65,.59,skin,0,0,0);
+// Back hair: opaque cap and overlapping locks prevent the bare scalp from showing behind.
+facepart(.73,.65,.19,hair,0,.005,-.35);
+facepart(.78,.25,.24,hair,0,.31,-.29);
+for(let i=-2;i<=2;i++){
+ const x=i*.145;
+ facepart(.18,.38+(2-Math.abs(i))*.065,.19,i%2?hairLight:hair,x,-.35,-.37);
+}
+facepart(.25,.38,.24,hair,-.32,-.38,-.32);
+facepart(.25,.38,.24,hair,.32,-.38,-.32);
 facepart(.76,.24,.66,hair,0,.38,-.02);facepart(.76,.15,.65,hair,0,.27,-.04);
 facepart(.19,.34,.64,hair,-.33,.17,-.02);facepart(.19,.34,.64,hair,.33,.17,-.02);
 facepart(.19,.19,.12,hair,-.24,.22,.31);facepart(.18,.26,.12,hair,-.08,.20,.31);facepart(.18,.17,.12,hair,.11,.23,.31);
@@ -575,9 +600,12 @@ function shouldAddressNeed(which){
 // A rainy day every seventh day; ground stays damp until the following morning.
 let lastWeatherDay=0, fireAttempts=0, fireSuccess=false, fireKnowledge=0;
 let sleepRestored=false,sleepStartEnergy=0,sleepQuality=0;
-let fieldRestEnd=0,fieldRestRecovery=0,fieldRestStarted=0;
+let fieldRestEnd=0,fieldRestRecovery=0,fieldRestStarted=0,restCooldownUntil=0;
 let rabbitObservations=0,rabbitAttempts=0,rabbitCaught=0,lastRabbitAttemptDay=0;
 let fireDay10Planned=false;
+let fireEverLit=false,fireSkill=0,lastFireOutDay=0,lastBranchDay=0;
+let fishObservations=0,fishAttempts=0,fishCaught=0,lastFishDay=0;
+let rabbitPattern=0;
 let fireDryStock=0, fireLearnedWet=false, nextFireAttempt=0;
 const rainDrops=[];
 const rainMaterial=new THREE.MeshBasicMaterial({color:0xb7dcf5,transparent:true,opacity:.55,depthWrite:false});
@@ -620,10 +648,12 @@ farWest:new THREE.Vector3(-58,.5,-21),farNorth:new THREE.Vector3(6,.5,51),farSou
 // Navigation and collision: objects higher than chest height are impassable.
 // A* computes a detour once per destination (not every animation frame).
 const NAV_CELL=1.25,NAV_LIMIT=9500;
-let navPath=[],navGoal=null,navReplanAt=0,navStuck=0;
+let navPath=[],navGoal=null,navReplanAt=0,navStuck=0,navNoPathSince=0,navLastProgressAt=0,navLastPosition=null;
 const navDirs=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
 function navBlocked(x,z){
  if(!landAt(x,z))return true;
+ // Pond shore is deliberately open to approach, even when a nearby bank overlaps.
+ if(Math.pow((x+9)/6.4,2)+Math.pow((z-4)/5.3,2)<1)return false;
  for(const o of solidObstacles){
   if(Math.abs(x-o.x)<o.rx&&Math.abs(z-o.z)<o.rz)return true;
  }
@@ -688,7 +718,7 @@ function navBuild(from,to){
  }
  return smoothed;
 }
-function navReset(){navPath=[];navGoal=null;navReplanAt=0;navStuck=0;}
+function navReset(){navPath=[];navGoal=null;navReplanAt=0;navStuck=0;navNoPathSince=0;navLastProgressAt=elapsed;navLastPosition=null;}
 function turnTowards(angle,step){
  const delta=Math.atan2(Math.sin(angle-hana.rotation.y),Math.cos(angle-hana.rotation.y));
  hana.rotation.y+=Math.max(-step*5,Math.min(step*5,delta));
@@ -805,6 +835,7 @@ function setState(s,g,p,words){
  }
  navReset();
  if(s==='rest'){sleepRestored=false;sleepStartEnergy=stats.energy;sleepQuality=Math.random();}
+ if(s==='rest')restCooldownUntil=elapsed+50;
  if(s==='fieldRest'){
   // A short daytime nap in place: no routefinding or movement required.
   sleepStartEnergy=stats.energy;
@@ -824,11 +855,12 @@ function init(){
  stats={energy:92,thirst:85,hunger:83,will:72};redrawNeeds();
  loneliness=0;lastMoraleMessage=0;introSpeechStage=0;
  exhaustionCooldown=0;previousEnergyBand=100;moraleCooldown=0;
- fireAttempts=0;fireSuccess=false;fireKnowledge=0;fireDryStock=0;campfire.visible=false;fireLight.intensity=0;
+ fireAttempts=0;fireSuccess=false;fireKnowledge=0;fireSkill=0;fireEverLit=false;lastFireOutDay=0;lastBranchDay=0;fireDryStock=0;
+ fishObservations=0;fishAttempts=0;fishCaught=0;lastFishDay=0;rabbitPattern=0;campfire.visible=false;fireLight.intensity=0;
  fireLearnedWet=false;nextFireAttempt=0;lastWeatherDay=0;fireDay10Planned=false;
  rabbitObservations=0;rabbitAttempts=0;rabbitCaught=0;lastRabbitAttemptDay=0;
  sleepRestored=false;sleepStartEnergy=0;sleepQuality=0;sleepingPose=false;
- fieldRestEnd=0;fieldRestRecovery=0;fieldRestStarted=0;
+ fieldRestEnd=0;fieldRestRecovery=0;fieldRestStarted=0;restCooldownUntil=0;
  randomHesitationDuration=0;
  explorationExperience=0;previousExplorationCount=0;discoveryBoostAt=0;
  explorationNextUpdate=0;detailNextUpdate=0;uiNextUpdate=0;
@@ -905,35 +937,69 @@ function dayOneDecide(){
 }
 function chooseNextDayAction(){
  if(stats.energy<=20){
+  if(distanceTo('shelter')<12&&stats.energy>=15&&Math.random()<.75){
+   setState('sleepTravel','체력 부족 · 동굴로 이동','shelter','동굴이 가까워... 안전한 곳에서 쉬는 게 좋겠어.');return;
+  }
   setState('fieldRest','체력 부족 · 현장에서 휴식',null,'너무 지쳤어... 여기서 잠깐 누워 쉬어야겠어.');return;
  }
  // Day 10: prioritize the prepared campfire once immediate survival is not critical.
  const today=clockParts().day, hour=clockParts().h;
- if(!fireSuccess&&today>=10&&today%7!==0&&hour>=7&&hour<20&&
+ if(!fireEverLit&&today>=10&&today%7!==0&&hour>=7&&hour<20&&
     stats.thirst>14&&stats.hunger>14&&elapsed>=nextFireAttempt){
   fireDay10Planned=true;
   setState('fireTravel','열흘간의 경험 · 모닥불 도전','shelter',
    '열흘 동안 실패했지만... 이제는 마른 나무를 어떻게 써야 하는지 알 것 같아.');return;
+ }
+ // Collect branches whenever the fire is getting low; wet days are harder.
+ if(fireEverLit&&fireSuccess&&fireKnowledge<63&&stats.energy>27&&stats.thirst>18&&
+    stats.hunger>18&&elapsed>=nextFireAttempt){
+  setState('branchTravel','모닥불 연료 · 나뭇가지 줍기','shelter',
+   '불이 약해졌어. 근처에 떨어진 나뭇가지를 주워 와야겠어.');return;
+ }
+ // Extinguished fires need new tinder and a learned relighting attempt.
+ if(fireEverLit&&!fireSuccess&&stats.energy>35&&stats.thirst>23&&stats.hunger>23&&
+    elapsed>=nextFireAttempt){
+  setState('branchTravel','꺼진 불 다시 살리기','shelter',
+   '아차, 불이 완전히 꺼졌어... 마른 나뭇가지를 모아서 다시 해보자.');return;
  }
  // Need thresholds vary by day, temperament, distance and urgency.
  if(shouldAddressNeed('thirst')){
   setState('drinkTravel','갈증 해소 · 물가로 이동','water',stats.thirst<20?'너무 멀리 왔나 봐... 목이 바짝 말라! 물가로 돌아가야겠어.':'슬슬 물을 마셔야겠어. 물가로 돌아가자.');return;
  }
  if(shouldAddressNeed('hunger')){
+  const now=clockParts();
+  // Hungry Hina actively uses learned hunting/fishing rather than relying solely on fruit.
+  if(now.h>=7&&now.h<18&&stats.energy>27&&stats.thirst>18){
+   const live=critters.find(r=>!r.caught);
+   if(live&&rabbitPattern>=45&&lastRabbitAttemptDay!==now.day&&stats.hunger<48){
+    lastRabbitAttemptDay=now.day;
+    sites.wildlife.set(live.g.position.x,.5,live.g.position.z);
+    setState('rabbitTravel','허기 해소 · 배운 패턴으로 토끼 사냥','wildlife',
+      '열매만 먹어서는 부족해... 토끼가 지나가는 길을 노려보자.');return;
+   }
+   if(fishObservations>=2&&lastFishDay!==now.day&&stats.hunger<55){
+    lastFishDay=now.day;
+    setState('fishTravel','허기 해소 · 물고기 포획','water',
+      '배가 고프네... 물고기가 얕은 곳으로 올 때를 기다려보자.');return;
+   }
+  }
   const tree=closestFruitTree();
   if(tree)sites.berries.set(tree.group.position.x,.5,tree.group.position.z);
   else {setState('berrySearch','열매가 다시 열렸는지 확인','berries','배가 고픈데... 열매가 아직 안 열렸을지도 몰라.');return;}
   setState('eatTravel','허기 해소 · 열매나무로 이동','berries',stats.hunger<20?'탐험하느라 먹는 걸 잊었어... 배고파!':'배가 슬슬 고프네. 열매를 조금 따러 가자.');return;
  }
  if(stats.energy<39){
-  if(distanceTo('shelter')<10&&stats.energy>27){
-   setState('sleepTravel','피로 회복 · 동굴로 이동','shelter','동굴이 가까우니까 돌아가서 조금 쉬자.');return;
+  // Prefer sleeping in the known cave. Very low energy / long distance can force field rest.
+  const caveDistance=distanceTo('shelter');
+  const cavePreferred=elapsed>=restCooldownUntil&&stats.energy>=23&&caveDistance<48&&Math.random()<.88;
+  if(cavePreferred){
+   setState('sleepTravel','피로 회복 · 동굴로 이동','shelter','동굴에서 쉬는 게 더 안전하겠어. 돌아가자.');return;
   }
-  setState('fieldRest','체력 회복 · 현장에서 휴식',null,'멀리 돌아가기엔 힘들어... 잠깐 쉬었다 가자.');return;
+  setState('fieldRest','체력 회복 · 현장에서 휴식',null,'여기서 조금 쉬었다가 움직이자.');return;
  }
  const current=clockParts();
  // Fire is learned through actual trials, not unlocked by the calendar or survival score.
- if(!fireSuccess&&current.day>=3&&current.day<10&&current.h>=10&&current.h<18&&
+ if(!fireEverLit&&current.day>=3&&current.day<10&&current.h>=10&&current.h<18&&
     stats.thirst>=40&&stats.hunger>=40&&stats.energy>=49&&elapsed>=nextFireAttempt){
   setState('fireTravel','불 피우기 실험 · 동굴 앞','shelter',
     fireAttempts===0?'밤에 불이 있으면 좋겠어... 나무로 한번 해볼까?':
@@ -946,6 +1012,15 @@ function chooseNextDayAction(){
    setState('sleepTravel','밤 · 동굴로 돌아가기','shelter','어두워지기 전에 동굴로 돌아가자.');return;
   }
   setState('rest','동굴에서 밤 보내기',null,'오늘도 무사히 지나갔네...');return;
+ }
+ // Observe fish movement first, then try fishing in the shallow pond.
+ if(current.day>=3&&current.h>=8&&current.h<18&&
+    lastFishDay!==current.day&&stats.energy>38&&stats.thirst>23&&stats.hunger>20){
+  lastFishDay=current.day;
+  setState(fishObservations>=2?'fishTravel':'fishObserveTravel',
+   fishObservations>=2?'물고기 잡기 시도':'물고기 움직임 관찰','water',
+   fishObservations>=2?'물고기가 얕은 쪽으로 도는 순간을 기다려보자.':
+   '물고기들이 어느 쪽으로 헤엄치는지 살펴보자.');return;
  }
  // Watching rabbits repeatedly teaches timing; hunting starts around Day 8.
  if(current.day>=3&&current.h>=8&&current.h<18&&rabbitCaught<2&&
@@ -988,10 +1063,10 @@ function attemptFire(){
  const today=clockParts().day;
  // Day 3-9 are genuine learning attempts; on Day 10 a prepared attempt succeeds.
  const succeeded=today>=10&&today%7!==0?true:false;
- fireKnowledge=Math.min(100,fireKnowledge+(succeeded?24:6+Math.random()*4));
+ fireSkill=Math.min(100,fireSkill+(succeeded?24:6+Math.random()*4));
  if(!succeeded)changeWill(-randomBetween(4,8),'불 피우기 실패');
  if(succeeded){
-  fireSuccess=true;campfire.visible=true;changeWill(16,'첫 불씨 성공');
+  fireSuccess=true;fireEverLit=true;fireKnowledge=100;campfire.visible=true;changeWill(16,'첫 불씨 성공');
   log(`불씨 생성 성공 · ${fireAttempts}번째 시도`);
   setState('fireResult','첫 모닥불 성공',null,'됐다!! 장작에 불이 붙었어! 드디어 따뜻한 밤을 보낼 수 있겠어!');
  }else{
@@ -1016,6 +1091,57 @@ function dayTwoPlusDecide(){
   }
   return;
  }
+ if(state==='branchTravel'&&!target){
+  setState('branchGather','주변의 떨어진 나뭇가지 수집',null,
+   raining()?'나뭇가지가 젖었네... 그래도 쓸 만한 걸 찾아보자.':'마른 나뭇가지부터 모으자.');return;
+ }
+ if(state==='branchGather'){
+  if(elapsed-phaseAt<9)return;
+  const gained=raining()?randomBetween(7,13):randomBetween(24,39);
+  fireDryStock=Math.min(8,fireDryStock+1);
+  if(fireSuccess){
+   fireKnowledge=Math.min(100,fireKnowledge+gained);
+   log(`나뭇가지 보충 · 불 유지력 +${Math.round(gained)} (${Math.round(fireKnowledge)})`);
+   nextFireAttempt=elapsed+18;
+   setState('recover','모닥불 연료 보충',null,'이제 불이 조금 더 오래 가겠어.');return;
+  }
+  const chance=raining()?.22:Math.min(.94,.50+fireSkill*.004);
+  if(Math.random()<chance){
+   fireSuccess=true;fireKnowledge=100;campfire.visible=true;
+   log('꺼졌던 모닥불 다시 피우기 성공 · 연료 100');
+   setState('recover','모닥불 재점화 성공',null,'휴... 다시 불이 붙었어! 이번엔 꺼뜨리지 말아야지.');return;
+  }
+  nextFireAttempt=elapsed+55;
+  log('재점화 실패 · 젖은 나뭇가지 또는 불씨 부족');
+  setState('recover','불 다시 피우기 실패',null,'이번엔 안 되네... 마른 나뭇가지가 더 필요해.');return;
+ }
+ if(state==='fishObserveTravel'&&!target){
+  fishObservations++;
+  setState('fishObserve','물고기 이동 경로 관찰',null,
+   fishObservations===1?'가까이 가니까 깊은 곳으로 도망가네...':'얕은 물로 돌아오는 주기가 있구나.');return;
+ }
+ if(state==='fishObserve'&&elapsed-phaseAt>12){
+  setState('recover','물고기 관찰 마침',null,'물고기 움직임을 조금 기억해 뒀어.');return;
+ }
+ if(state==='fishTravel'&&!target){
+  setState('fishCatch','물고기 포획 타이밍 기다리기',null,'지금은 기다렸다가 얕은 곳으로 올 때 잡아보자.');return;
+ }
+ if(state==='fishCatch'&&elapsed-phaseAt>12){
+  fishAttempts++;
+  const chance=Math.min(.82,.12+fishObservations*.12+fishAttempts*.09);
+  if(Math.random()<chance){
+   fishCaught++;
+   const fishNutrition=fireSuccess?randomBetween(27,39):randomBetween(14,23);
+   stats.hunger=Math.min(100,stats.hunger+fishNutrition);
+   hungerDelayUntil=elapsed+25;
+   log(`물고기 포획 성공 · ${fishCaught}마리 · 허기 +${Math.round(fishNutrition)}${fireSuccess?' (불로 익힘)':''}`);
+   setState('fishResult','물고기 포획 성공',null,'잡았다! 움직이는 방향을 기다린 게 도움이 됐어.');return;
+  }
+  fishObservations++;
+  log('물고기 놓침 · 물살과 이동 패턴 경험 축적');
+  setState('fishResult','물고기 포획 실패',null,'앗, 미끄러졌어! 다음엔 조금 더 기다려야겠어.');return;
+ }
+ if(state==='fishResult'&&elapsed-phaseAt<12)return;
  if(state==='fireTravel'&&!target){
   setState('fireExperiment','나무 마찰 시도',null,
    raining()?'나무가 젖어 있는데... 그래도 해볼까?':
@@ -1027,7 +1153,7 @@ function dayTwoPlusDecide(){
  }
  if(state==='fireResult'&&elapsed-phaseAt<15)return;
  if(state==='rabbitObserveTravel'&&!target){
-  rabbitObservations++;
+  rabbitObservations++;rabbitPattern=Math.min(100,rabbitPattern+24);
   setState('rabbitObserve','토끼 행동 관찰',null,
    rabbitObservations<2?'가까이 가면 바로 달아나는구나...':
    '풀숲 쪽으로 도망가네. 무작정 쫓으면 안 되겠어.');return;
@@ -1040,15 +1166,17 @@ function dayTwoPlusDecide(){
     rabbitAttempts===0?'천천히... 놀라게 하면 도망갈 거야.':'지난번에 너무 서둘렀어. 이번에는 타이밍을 보자.');return;
  }
  if(state==='rabbitHunt'&&elapsed-phaseAt>11){
-  rabbitAttempts++;
+  rabbitAttempts++;rabbitPattern=Math.min(100,rabbitPattern+15);
   const live=critters.filter(r=>!r.caught);
-  const success=live.length>0&&(rabbitAttempts>=3||Math.random()<Math.min(.7,.13+rabbitAttempts*.16));
+  const success=live.length>0&&Math.random()<Math.min(.82,.08+rabbitPattern*.007);
   if(success){
    const prey=live.reduce((a,b)=>Math.hypot(a.g.position.x-hana.position.x,a.g.position.z-hana.position.z)<Math.hypot(b.g.position.x-hana.position.x,b.g.position.z-hana.position.z)?a:b);
    prey.caught=true;prey.g.visible=false;rabbitCaught++;
-   stats.hunger=Math.min(100,stats.hunger+randomBetween(18,32));
+   const rabbitNutrition=fireSuccess?randomBetween(42,57):randomBetween(13,21);
+   stats.hunger=Math.min(100,stats.hunger+rabbitNutrition);
+   hungerDelayUntil=elapsed+30;
    changeWill(7,'첫 토끼 포획 경험');
-   log('토끼 포획 성공 · 야생동물 한 마리가 맵에서 사라짐');
+   log(`토끼 포획 성공 · 허기 +${Math.round(rabbitNutrition)}${fireSuccess?' (불로 익힘)':' (불이 없어 충분히 먹지 못함)'}`);
    setState('rabbitResult','토끼 포획 성공',null,'잡았다...! 정말 잡았어! 그런데 이제 어떻게 먹어야 하지...?');
   }else{
    changeWill(-2,'토끼 사냥 실패');
@@ -1132,7 +1260,9 @@ function dayTwoPlusDecide(){
 function completeDayTenFire(){
  if(fireSuccess)return;
  fireAttempts=Math.max(fireAttempts,3);
+ fireSkill=100;
  fireKnowledge=100;
+ fireEverLit=true;
  fireDryStock=Math.max(fireDryStock,1);
  fireSuccess=true;
  fireDay10Planned=false;
@@ -1161,7 +1291,7 @@ function decide(){
  if(current.day!==day){
   day=current.day;
   // Day 10's milestone has priority over the normal wake-up state.
-  if(day>=10&&!fireSuccess){
+  if(day>=10&&!fireEverLit){
    completeDayTenFire();
    return;
   }
@@ -1171,7 +1301,7 @@ function decide(){
    if(state!=='fieldRest')setState('wake',`${day}일째 · 새로운 하루`,null,'또 하루가 시작됐네. 오늘은 조금 더 잘할 수 있을 거야.');
   }
  }
- if(day>=10&&!fireSuccess){completeDayTenFire();return;}
+ if(day>=10&&!fireEverLit){completeDayTenFire();return;}
  if(day===1)dayOneDecide();
  else dayTwoPlusDecide();
 }
@@ -1195,35 +1325,80 @@ function update(dt){
  if(paused)return;
  const step=Math.max(0,dt)*speed;elapsed=Math.max(0,elapsed+step);
  // Physical fatigue: long walks, rain, poor nutrition and stress all have costs.
- const walking=Boolean(target);
+ const walking=Boolean(target)&&navPath.length>0;
  const away=distanceTo('shelter');
  const wetExposure=raining()&&walking;
- let fatigue=.085;
- if(walking)fatigue+=.15+(away>24?.07:0)+(away>52?.08:0);
+ let fatigue=.018; // Standing still should not drain energy like walking.
+ if(walking)fatigue+=.16+(away>24?.07:0)+(away>52?.08:0);
  if(wetExposure)fatigue+=.11;
  if(stats.hunger<35)fatigue+=.065;
  if(stats.thirst<35)fatigue+=.08;
  if(stats.will<25)fatigue+=.035;
- if(state==='rest'||state==='night'||state==='fieldRest')fatigue=.012;
+ if(state==='rest'||state==='night'||state==='fieldRest')fatigue=0;
  stats.energy=Math.max(5,stats.energy-step*fatigue);
+ // If pathfinding cannot reach a destination, stop exhausting the character.
+ if(target){
+  if(!navLastPosition){navLastPosition=hana.position.clone();navLastProgressAt=elapsed;}
+  else if(hana.position.distanceToSquared(navLastPosition)>.55*.55){
+   navLastPosition.copy(hana.position);navLastProgressAt=elapsed;navNoPathSince=0;
+  }
+  if(elapsed-navLastProgressAt>17){
+   const oldGoal=goal;
+   target=null;navReset();
+   if(stats.energy<40){
+    setState('fieldRest','이동 중단 · 현장에서 휴식',null,
+     '길이 막혀서 한참 헤맸어... 일단 쉬고 다른 길을 찾아보자.');
+   }else{
+    setState('recover','목적지 접근 실패',null,
+     '여기는 길이 막혔네. 무리하지 말고 다른 곳으로 가보자.');
+   }
+   log(`이동 정체 감지 · ${oldGoal} 포기`);
+  }
+ }else {navLastPosition=null;navLastProgressAt=elapsed;}
+ if(!target&&state!=='fieldRest'&&state!=='rest'&&state!=='night'&&stats.energy<55){
+  stats.energy=Math.min(55,stats.energy+step*.045);
+ }
  if(state==='fieldRest'){
   const duration=Math.max(1,fieldRestEnd-fieldRestStarted);
   stats.energy=Math.min(85,stats.energy+step*fieldRestRecovery/duration);
  }
  // Any active travel can be interrupted before exhaustion makes the return trip impossible.
  // Do not interrupt the introductory Day 1 sequence or actions that are already resting.
- if(day>=2&&stats.energy<=20&&!['fieldRest','rest','night','drinking','eating'].includes(state)){
-  setState('fieldRest','체력 고갈 · 그 자리에서 쉬기',null,
-   '다리가 후들거려... 동굴까지 가긴 힘들어. 여기서 조금 쉬자.');
+ if(day>=2&&stats.energy<=20&&!['fieldRest','rest','night','drinking','eating','sleepTravel'].includes(state)){
+  if(stats.energy>=15&&distanceTo('shelter')<14&&Math.random()<.8){
+   setState('sleepTravel','피곤해서 동굴로 귀환','shelter',
+    '이제 힘이 없네... 동굴로 돌아가서 쉬자.');
+  }else{
+   setState('fieldRest','체력 고갈 · 그 자리에서 쉬기',null,
+    '다리가 후들거려... 동굴까지 가긴 힘들어. 여기서 조금 쉬자.');
+  }
  }
  if(stats.energy<26&&elapsed>exhaustionCooldown){
   exhaustionCooldown=elapsed+55;
   say('다리가 후들거려... 너무 무리했나 봐. 잠깐 쉬고 싶어.');
   log('심한 피로 · 이동 속도 감소');
  }
- stats.thirst=Math.max(7,stats.thirst-step*thirstRate*(target?1.16:1));
+ if(raining()){
+  // Rain provides an ambient hydration bonus, overriding normal thirst decay.
+  stats.thirst=Math.min(100,stats.thirst+step*.085);
+ }else{
+  stats.thirst=Math.max(7,stats.thirst-step*thirstRate*(target?1.16:1));
+ }
  stats.hunger=Math.max(7,stats.hunger-step*hungerRate*(target?1.09:1));
  moraleUpdate(step);
+ if(fireSuccess){
+  fireKnowledge=Math.max(0,fireKnowledge-step*(raining()?.24:.085));
+  // Rare accident: rain or a missed branch delivery can suddenly extinguish the embers.
+  if(fireKnowledge<33&&Math.random()<step*(raining()?.004:.0012)){
+   fireKnowledge=0;log('실수로 모닥불 불씨를 놓침 · 불이 꺼짐');
+  }
+  if(fireKnowledge<=0){
+   fireKnowledge=0;fireSuccess=false;campfire.visible=false;lastFireOutDay=day;
+   nextFireAttempt=elapsed+24;
+   log('모닥불 소화 · 나뭇가지와 재점화 필요');
+   say('앗! 불이 꺼져버렸어... 다시 피워야 해!');
+  }
+ }
  // Rest restores a single randomized amount after a sleep period, not every frame.
  // Exploration can be interrupted by needs; distant return trips can trigger hesitation.
  if(state==='wander'&&target){
@@ -1256,6 +1431,7 @@ function update(dt){
    }
    // An unreachable point is never approached by walking through an obstacle.
    if(!navPath.length){
+    // No valid route: remain stationary and let the stuck watchdog recover.
     walkPose(step,false);
     if(elapsed>navReplanAt){
      navReplanAt=elapsed+9;
@@ -1299,14 +1475,18 @@ function update(dt){
  $('clock').textContent=`${String(t.h).padStart(2,'0')}:${String(t.m).padStart(2,'0')}`;
  $('elapsed').textContent=`D${t.day} ${String(Math.floor(elapsed/60)).padStart(2,'0')}:${String(Math.floor(elapsed%60)).padStart(2,'0')}`;
  waterSurface.position.y=-.52+Math.sin(elapsed*.8)*.035;
- pondWater.position.y=.19+Math.sin(elapsed*1.1)*.006;
+ pondWater.position.y=.49+Math.sin(elapsed*1.1)*.006;
  pondRipples.forEach((r,i)=>{const pulse=(elapsed*.16+i*.24)%1;r.scale.setScalar(.6+pulse*.55);r.material.opacity=.6;});
  waveMat.opacity=.15+Math.sin(elapsed*1.7)*.09;
- const dayLight=Math.max(.06,Math.sin(t.dayTime/DAY_SECONDS*Math.PI*2+.38)*.48+.52);
+ const rawDayLight=Math.sin(t.dayTime/DAY_SECONDS*Math.PI*2+.38)*.48+.52;
+ const dayLight=Math.pow(Math.max(0,rawDayLight),1.65);
+ const darkNight=(t.h>=19||t.h<6);
+ renderer.toneMappingExposure=darkNight?.91:1.25;
  for(const mote of motes)mote.visible=dayLight<.4;
  scene.background.setRGB(.07+dayLight*.53,.12+dayLight*.71,.22+dayLight*.69);
- scene.fog.color.copy(scene.background);sun.intensity=.15+dayLight*2.3;
- ambient.intensity=.35+dayLight*1.8;
+ scene.fog.color.copy(scene.background);sun.intensity=(darkNight?.025:.12)+dayLight*2.3;
+ ambient.intensity=(darkNight?.12:.24)+dayLight*1.85;
+ fill.intensity=darkNight?.10:.65;
  weatherUpdate(step);updateSound(dt,dayLight<.25);updateCampfire(elapsed);
  // Cool, blue rainy light without changing individual material colors permanently.
  const cool=raining()?0.72:groundWet()?0.91:1;
@@ -1316,7 +1496,7 @@ function update(dt){
  ambient.color.setRGB(.82*cool,.91,1);
  if(raining())ambient.intensity*=.82;
  if(elapsed>=uiNextUpdate){uiNextUpdate=elapsed+.3;
- $('stats').innerHTML=Object.entries({체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불경험:Math.min(100,fireKnowledge)})
+ $('stats').innerHTML=Object.entries({체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불유지:Math.min(100,fireKnowledge),불기술:Math.min(100,fireSkill),토끼패턴:Math.min(100,rabbitPattern),물고기관찰:Math.min(100,fishObservations*25)})
  .map(([k,v])=>`<div class="stat"><label>${k}</label><div class="bar"><div class="fill" style="width:${v}%;background:${v<30?'#db826f':v<55?'#d8b65b':'#68d3b1'}"></div></div><span class="val">${Math.round(v)}</span></div>`).join('');
  }
 }
@@ -1381,8 +1561,11 @@ applyQuality();
 // F: snap camera to Hina while preserving the current orbit viewing angle.
 function focusHina(){
  const offset=camera.position.clone().sub(orbit.target);
- if(offset.length()<6)offset.set(9,9,14);
- const focus=hana.position.clone().add(new THREE.Vector3(0,1.3,0));
+ // Keep the viewing direction, but always move to a close character shot.
+ if(offset.lengthSq()<.001)offset.set(0,4,8);
+ offset.normalize().multiplyScalar(8.5);
+ offset.y=Math.max(3.1,Math.min(5.5,offset.y));
+ const focus=hana.position.clone().add(new THREE.Vector3(0,1.25,0));
  orbit.target.copy(focus);
  camera.position.copy(focus).add(offset);
  orbit.update();
@@ -1392,5 +1575,11 @@ window.addEventListener('keydown',e=>{
  if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;
  e.preventDefault();focusHina();
 });
-$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 암막 ON':'미탐험 암막 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration(true);updateDetailVisibility(true)};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};$('speed').onclick=()=>{speed=speed===1?2:speed===2?4:1;$('speed').textContent='속도 ×'+speed};$('reset').onclick=()=>{init()};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();function animate(t){requestAnimationFrame(animate);let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused&&(!isMobile||Math.floor(t/65)!==Math.floor((t-dt*1000)/65)))animateWildlife(t*.001,dt*speed);orbit.update();updateBubble();renderer.render(scene,camera)}requestAnimationFrame(animate);
+$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 암막 ON':'미탐험 암막 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration(true);updateDetailVisibility(true)};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};$('speed').onclick=()=>{speed=speed===1?2:speed===2?4:1;$('speed').textContent='속도 ×'+speed};$('reset').onclick=()=>{init()};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();function animate(t){requestAnimationFrame(animate);let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused&&(!isMobile||Math.floor(t/65)!==Math.floor((t-dt*1000)/65)))animateWildlife(t*.001,dt*speed);orbit.update();updateBubble();
+ const clockNow=clockParts();
+ const nightNow=clockNow.h>=19||clockNow.h<6;
+ const dn=$('dayNight');
+ const dnText=nightNow?'🌙 밤':'☀️ 낮';
+ if(dn.textContent!==dnText){dn.textContent=dnText;dn.classList.toggle('night',nightNow);}
+ renderer.render(scene,camera)}requestAnimationFrame(animate);
 </script></body></html>
