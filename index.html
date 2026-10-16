@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v5.2</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v5.9</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media(max-width:700px){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
@@ -20,7 +20,7 @@
 #ambientBubble{position:fixed;pointer-events:none;z-index:3;opacity:0;transition:opacity .5s;transform:translate(-50%,-100%);padding:6px 11px;border-radius:15px;background:#172a30e8;color:#d3e7db;border:1px solid #668078;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 3px 12px #0007}
 #ambientBubble.show{opacity:1}
 @keyframes sleepFloat{0%,100%{margin-top:0}50%{margin-top:-6px}}
-</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ambientBubble" aria-hidden="true"></div><div id="ui"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div><details id="masteryPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🏅 숙련도 · 기술 기록</summary><div id="masteryContent" style="font-size:12px;line-height:1.65;padding:8px 2px"></div></details><details id="mindPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🧠 히나의 마음 · 기억 일기</summary><div id="mindContent" style="font-size:12px;line-height:1.55;padding:8px 2px;white-space:pre-line"></div></details><details id="actionLogPanel" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">📋 AI 행동 기록 · 펼쳐보기</summary><div id="log" style="margin-top:8px"></div></details></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">발견도 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><button id="cameraMode" aria-pressed="false">카메라: 자유</button><div id="extraControls"><button id="reset">다시 시작</button><button id="devDay10" title="테스트용: DAY 10의 생존·탐험·학습·제작 상태를 한 번에 불러옵니다">🧪 10일 차</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><button id="qualityToggle">화질: 자동</button><button id="perfToggle" aria-pressed="false">성능 정보 OFF</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대(팔로우에서도 가능) · F: 히나 찾기 · C: 카메라 모드 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
+</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ambientBubble" aria-hidden="true"></div><div id="ui"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div><details id="skillPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">📚 숙련도 · 탐험 기록</summary><div id="skillContent" style="font-size:12px;line-height:1.7;padding:8px 2px"></div></details><details id="mindPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🧠 히나의 마음 · 기억 일기</summary><div id="mindContent" style="font-size:12px;line-height:1.55;padding:8px 2px;white-space:pre-line"></div></details><details id="actionLogPanel" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">📋 AI 행동 기록 · 펼쳐보기</summary><div id="log" style="margin-top:8px"></div></details></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">발견도 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><button id="cameraMode" aria-pressed="false">카메라: 자유</button><div id="extraControls"><button id="reset">다시 시작</button><button id="devDay10" title="테스트용: DAY 10의 생존·탐험·학습·제작 상태를 한 번에 불러옵니다">🧪 10일 차</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><button id="qualityToggle">화질: 자동</button><button id="perfToggle" aria-pressed="false">성능 정보 OFF</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대(팔로우에서도 가능) · F: 히나 찾기 · C: 카메라 모드 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia('(max-width:700px)').matches;
@@ -75,13 +75,13 @@ shoreMesh.count=shoreCount;shoreMesh.instanceMatrix.needsUpdate=true;scene.add(s
 
 // Ocean shallows, beach ledges, terraced forest: walkable ground heights are defined below.
 const terraces=[[-16,-11,13,11,1.0],[-14,-12,10,8,1.7],[-13,-13,7,6,2.4],[-9,-12,7,7,1.0],[-19,9,7,5,.55],[-16,10,5,4,.82],[-9,10.4,5,3.2,.52],[-3,-13,8,7,.75],[-2,12,9,7,.7],[8,-13,9,7,.6]];
-for(const [x,z,w,d,h] of terraces){box(w,h,d,dirt,x,h/2,z);box(w,.16,d,grass,x,h+.08,z)}
+for(const [x,z,w,d,h0] of terraces){const h=h0*.64;box(w,h,d,dirt,x,h/2,z);box(w,.16,d,grass,x,h+.08,z)}
 // Additional raised natural headland; irregular stepped silhouette.
 for(const [x,z,w,d,h] of [[-17,-5,5,5,1.5],[-12,-4,6,5,1.0],
  [-15,-8,5,5,2.0],[-11,-9,5,5,2.65],[-7,-15,5,4,2.1],
  [-6,-17,3,3,1.25],[-18,0,3.5,3.5,.38],[5,-11,6,5,.75],
  [9,-7,6,5,.65],[13,-5,4,5,.45]]){
- box(w,h,d,dirt,x,h/2,z);box(w,.15,d,grass,x,h+.07,z);
+ const hh=h*.64;box(w,hh,d,dirt,x,hh/2,z);box(w,.15,d,grass,x,hh+.07,z);
 }
 // Low stepping-stone terraces form a plausible route between beach and the forest.
 for(const [x,z,h] of [[5,2,.18],[2,2,.36],[-1,2,.48],[-4,2,.52]]){box(3.1,h,3.1,dirt,x,h/2,z);box(3.1,.12,3.1,grass,x,h+.06,z)}
@@ -91,8 +91,8 @@ for(const [x,z,w,d,h] of [
  [-5,-19,23,10,5.2],[-13,-15,10,9,4.5],[5,-16,9,9,4.35],
  [-8,-24,23,10,6.5],[-19,-20,12,11,5.5],[-4,-29,18,9,7.3],
  [-22,-27,16,12,4.3],[-31,-22,14,15,3.2]]){
- box(w,h,d,rock,x,h/2,z);
- box(w,.18,d,grass,x,h+.09,z);
+ const hh=h*.72;box(w,hh,d,rock,x,hh/2,z);
+ box(w,.18,d,grass,x,hh+.09,z);
 }
 // The front-facing cliff lip is visibly fused with the mountain above the cave.
 // The natural cave is cut into a cliff at (-4,-10), opening toward +Z.
@@ -177,8 +177,8 @@ const farRidges=[
 ];
 for(const [x,z,w,d,h] of farRidges){
  if(!landAt(x,z))continue;
- box(w,h,d,dirt,x,h/2,z);
- box(w,.18,d,grass,x,h+.095,z);
+ const hh=h*.65;box(w,hh,d,dirt,x,hh/2,z);
+ box(w,.18,d,grass,x,hh+.095,z);
 }
 for(let i=0;i<220;i++){
  const x=-86+rand()*172,z=-71+rand()*142;
@@ -470,7 +470,7 @@ for(let i=0;i<56;i++){
  const a=rand()*Math.PI*2,r=.50+rand()*.40;
  const x=Math.cos(a)*43*r,z=Math.sin(a)*35*r;
  if(!landAt(x,z)||Math.hypot(x+9,z-4)<9)continue;
- const w=3.3+rand()*5.8,d=3+rand()*5.2,h=.45+rand()*2.1;
+ const w=3.3+rand()*5.8,d=3+rand()*5.2,h=(.45+rand()*2.1)*.65;
  box(w,h,d,i%4===0?rock:dirt,x,h/2,z);
  box(w-.04,.13,d-.04,i%4===0?moss:grass,x,h+.085,z);
  outerTerraces.push([x,z,h,w,d]);
@@ -536,9 +536,10 @@ function rabbit(x,z,seedPhase){
 rabbit(11.7,8.3,.5);rabbit(27,17,2.2);rabbit(-30,21,4.5);
 // Random low-poly snakes: danger from proximity, not a permanent scripted penalty.
 const snakes=[];
-const snakeMat=mat(0x637b42),snakeStripe=mat(0x9fb16a),snakeEye=mat(0x181e16);
+const snakeMat=mat(0x7fa85a),snakeStripe=mat(0xc3d886),snakeEye=mat(0x181e16);
 function makeSnake(x,z){
  const g=new THREE.Group();scene.add(g);
+ g.scale.setScalar(1.35); // readable silhouette from normal gameplay camera
  for(let i=0;i<6;i++){
   const seg=groupCube(g,.20-i*.018,.16-i*.012,.36,snakeMat,Math.sin(i*.8)*.23,.15,(-i*.24));
   seg.rotation.y=Math.sin(i*.8)*.28;
@@ -554,15 +555,15 @@ let nextSnakeSpawn=0,lastSnakeWarning=-999;
 function updateSnakes(step){
  if(clockParts().day<2)return;
  if(elapsed>=nextSnakeSpawn&&snakes.length<2){
-  nextSnakeSpawn=elapsed+randomBetween(95,220);
-  const a=Math.random()*Math.PI*2,d=randomBetween(12,26);
+  nextSnakeSpawn=elapsed+randomBetween(70,135);
+  const a=Math.random()*Math.PI*2,d=randomBetween(5,11);
   const x=hana.position.x+Math.cos(a)*d,z=hana.position.z+Math.sin(a)*d;
-  if(landAt(x,z)&&Math.hypot(x-sites.shelter.x,z-sites.shelter.z)>8){
-   makeSnake(x,z);log('숲 어딘가에서 뱀이 움직이기 시작함');
-  }
+  if(landAt(x,z)&&Math.hypot(x-sites.shelter.x,z-sites.shelter.z)>5){
+   makeSnake(x,z);log('🐍 주변 풀숲에 뱀이 나타남');
+  }else nextSnakeSpawn=elapsed+20; // retry soon if location is invalid
  }
  for(const s of [...snakes]){
-  s.phase+=step*.5;s.g.rotation.y=Math.sin(s.phase)*.35;
+  s.phase+=step*.8;s.g.rotation.y=Math.sin(s.phase)*.48;s.g.position.y=Math.sin(s.phase*2)*.035;
   const d=Math.hypot(hana.position.x-s.g.position.x,hana.position.z-s.g.position.z);
   if(d<4.0&&elapsed-s.lastScare>95){
    s.lastScare=elapsed;
@@ -592,9 +593,7 @@ for(let i=0;i<23;i++){
 }
 // A few fish in the freshwater pond make the first water discovery more legible.
 for(let i=0;i<6;i++)fish(-10.6+rand()*3.4,3+rand()*1.8,i*1.1,fishSilver);
-let petFollowLastTime=0;
 function animateWildlife(t,dt){
- const followDt=petFollowLastTime?Math.min(.18,Math.max(0,t-petFollowLastTime)):dt;petFollowLastTime=t;
  for(const r of critters){
   if(r.pet){
    // Pet rabbit follows Hina without navigation/collision calculations.
@@ -603,7 +602,7 @@ function animateWildlife(t,dt){
    const px=backX-r.g.position.x,pz=backZ-r.g.position.z;
    const d=Math.hypot(px,pz);
    if(d>13){r.g.position.x=backX;r.g.position.z=backZ;}
-   else if(d>.35){const stride=Math.min(d,followDt*3.8);r.g.position.x+=px/d*stride;r.g.position.z+=pz/d*stride;}
+   else if(d>.35){const stride=Math.min(d,dt*2.7);r.g.position.x+=px/d*stride;r.g.position.z+=pz/d*stride;}
    r.g.position.y=.04+Math.sin(t*8+r.phase)*.065;
    r.g.rotation.y=Math.atan2(px,pz);
    continue;
@@ -675,29 +674,33 @@ const arms=[pivotAt(-.46,1.78,0),pivotAt(.46,1.78,0)];
 for(const a of arms){limbCube(a,.19,.62,.24,shirt,0,-.30,0);limbCube(a,.16,.19,.19,skin,0,-.66,0);}
 // Learned-fire equipment: a small hand-held torch, visible only on planned dark excursions.
 const torchGroup=new THREE.Group();arms[1].add(torchGroup);
-torchGroup.position.set(.03,-.78,.13);
-const torchWood=new THREE.Mesh(new THREE.CylinderGeometry(.045,.055,.88,5),new THREE.MeshLambertMaterial({color:0x6c4124}));
-torchWood.position.y=-.04;torchGroup.add(torchWood);
+torchGroup.position.set(.03,-.66,.12); // palm grips the bottom of the torch
+const torchWood=new THREE.Mesh(new THREE.CylinderGeometry(.047,.065,1.12,6),new THREE.MeshLambertMaterial({color:0x6c4124}));
+torchWood.position.y=.52;torchGroup.add(torchWood); // wooden shaft rises from hand
 const torchFlame=new THREE.Mesh(new THREE.ConeGeometry(.15,.40,6),new THREE.MeshBasicMaterial({color:0xffae38}));
-torchFlame.position.y=.53;torchGroup.add(torchFlame);
+torchFlame.position.y=1.31;torchGroup.add(torchFlame); // flame sits above shaft, away from hand
 const torchLight=new THREE.PointLight(0xffa14b,0,12,1.65);torchLight.castShadow=false;
 scene.add(torchLight);torchGroup.visible=false;
 let torchOuting=false,torchNightDay=0,torchOutingsToday=0,torchDecisionAt=-Infinity;
 // Torch is physical camp equipment: Hina must collect it at the cave before leaving.
-let torchCarried=false; // Compatibility state: torch now lights automatically when campfire embers remain.
+let torchCarried=false;
 function atCaveForTorch(){return Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<4.0;}
 function prepareCaveTorch(){
- // No cave pickup requirement: torch is automatically available while campfire has fuel.
- torchCarried=fireSuccess&&fireKnowledge>0;
+ if(!torchCarried&&fireEverLit&&fireSuccess&&!raining()&&atCaveForTorch()){
+  torchCarried=true;log('동굴 모닥불에서 횃불을 챙김');
+ }
 }
 function darkHours(){const h=clockParts().h;return h>=19||h<4;}
 function updateTorch(){
- const available=fireSuccess&&fireKnowledge>0&&!raining();
- torchCarried=available;
- const active=available&&darkHours()&&Boolean(target)&&state!=='fieldRest'&&state!=='rest'&&state!=='night'&&state!=='mentalRest';
+ // A torch is only acquired at the cave's burning fire. A moving goal is NOT required for visibility.
+ if(raining()&&torchCarried){torchCarried=false;log('비에 횃불이 꺼짐 · 동굴에서 다시 챙겨야 함');}
+ const nearCave=atCaveForTorch();
+ const actuallyResting=nearCave&&(state==='rest'||state==='night'||state==='mentalRest');
+ if(actuallyResting)torchCarried=false;
+ const active=torchCarried&&darkHours()&&!raining()&&!actuallyResting&&state!=='fieldRest';
  torchGroup.visible=active;
  torchLight.intensity=active?(isMobile?2.1:3.0)*(0.94+Math.sin(elapsed*9)*.06):0;
- if(active){torchGroup.updateWorldMatrix(true,false);torchGroup.localToWorld(torchLight.position.set(0,.52,0));
+ if(active){torchGroup.updateWorldMatrix(true,false);torchGroup.localToWorld(torchLight.position.set(0,1.30,0));
  torchFlame.scale.y=.9+Math.sin(elapsed*10)*.11;}
 }
 const legs=[pivotAt(-.20,.75,0),pivotAt(.20,.75,0)];
@@ -1034,7 +1037,7 @@ function walkPose(step,moving){
  const armSwing=moving?Math.sin(walkAnimationTime*16.8)*.58:0;
  arms[0].rotation.x+=(-armSwing-arms[0].rotation.x)*weight;
  // Right hand remains raised and steady when carrying a burning torch.
- const torchArmTarget=torchGroup.visible?-1.15:armSwing*.88;
+ const torchArmTarget=torchGroup.visible?-.48:armSwing*.88; // raised, steady forearm; flame above fist
  arms[1].rotation.x+=(torchArmTarget-arms[1].rotation.x)*Math.min(1,torchGroup.visible?realStep*14:weight);
  body.rotation.z=moving?Math.sin(walkAnimationTime*8.4)*.016:0;
  head.rotation.z=moving?Math.sin(walkAnimationTime*8.4)*.020:0;
@@ -1284,7 +1287,7 @@ function setState(s,g,p,words){
   else{target=sites.shelter.clone();}
  }
  navReset();
- 
+ if(target&&darkHours()&&distanceTo('shelter')<4)prepareCaveTorch();
  if(s==='rest'){sleepRestored=false;sleepStartEnergy=stats.energy;sleepQuality=Math.random();}
  if(s==='rest')restCooldownUntil=elapsed+50;
  if(s==='fieldRest'){
@@ -1300,7 +1303,7 @@ function setState(s,g,p,words){
 function init(){
  for(const [mesh,original] of fadedMeshes){mesh.material.dispose();mesh.material=original;}fadedMeshes.clear();
  // Restore both simulation data and visuals. A reset must match a fresh page load.
- paused=false;speed=1;prev=0;elapsed=0;day=1;walkAnimationTime=0;torchCarried=false;resetSnakes();nextSnakeSpawn=DAY_SECONDS+randomBetween(25,95);lastSnakeWarning=-999;
+ paused=false;speed=1;prev=0;elapsed=0;day=1;walkAnimationTime=0;torchCarried=false;resetSnakes();nextSnakeSpawn=DAY_SECONDS+randomBetween(15,45);lastSnakeWarning=-999;
  branchPiles.forEach(p=>{p.available=true;p.respawnAt=0;p.group.visible=true;});
  carriedBerries=0;caveBerries=0;lastBerryStorageAt=-999;climbUntil=0;climbCooldownUntil=0;climbBlockedSince=0;navReset();routeFailures=0;blockedGoalUntil.clear();lastBlockedSpeechAt=-999;
  state='confused';phaseAt=0;target=null;goal='';lastLog='';actions=0;
@@ -1315,7 +1318,7 @@ function init(){
  fishSkill=0;fishSpear=false;storedFish=[];carriedFish=[];rainWater=0;waterVessel=false;lastFoodCheckAt=0;
  leafBed=false;leafStock=0;plantKnowledge=0;petBond=0;friendClue=0;
  lastBuildDay=lastPlantDay=lastPetCareDay=lastClueDay=lastRainCollectionDay=0;
- rabbitPattern=0;petRabbit=null;petFollowLastTime=0;campfire.visible=false;fireLight.intensity=0;
+ rabbitPattern=0;petRabbit=null;campfire.visible=false;fireLight.intensity=0;
  fireLearnedWet=false;nextFireAttempt=0;lastWeatherDay=0;fireDay10Planned=false;
  rabbitObservations=0;rabbitAttempts=0;rabbitCaught=0;lastRabbitAttemptDay=0;
  sleepRestored=false;sleepStartEnergy=0;sleepQuality=0;sleepingPose=false;
@@ -1405,7 +1408,7 @@ function chooseNextDayAction(){
   const deepDark=h>=0&&h<4;
   const fit=stats.energy>57&&stats.thirst>55&&stats.hunger>55&&stats.will>47&&!raining();
   // One brief torch-lit scouting trip at most per night; never wander unlit in darkness.
-  if(deepDark&&fireEverLit&&fit&&torchOutingsToday<1&&elapsed-torchDecisionAt>95&&Math.random()<.34){
+  if(deepDark&&fireEverLit&&fireSuccess&&atCaveForTorch()&&fit&&torchOutingsToday<1&&elapsed-torchDecisionAt>95&&Math.random()<.34){
    torchDecisionAt=elapsed;torchOutingsToday++;torchOuting=true;
    const dest=['trees','beach','water'][Math.floor(Math.random()*3)];
    setState('torchExplore','횃불을 들고 짧은 심야 탐험',dest,'불을 다룰 수 있으니... 횃불을 들고 가까운 곳만 살펴보자.');
@@ -1414,7 +1417,7 @@ function chooseNextDayAction(){
   // At night, favor shelter strongly. Only exhaustion or immediate survival need justifies sleeping outdoors.
   const caveReachable=stats.energy>12 && stats.thirst>10 && stats.hunger>10;
   if(caveReachable){
-   setState('sleepTravel',deepDark?'암흑 · 동굴로 귀환':'밤 · 동굴로 이동','shelter',fireEverLit&&deepDark?'어두워... 횃불을 들고 동굴로 돌아가자.':'밤에는 동굴에서 쉬는 게 안전해.');
+   setState('sleepTravel',deepDark?'암흑 · 동굴로 귀환':'밤 · 동굴로 이동','shelter',torchCarried&&deepDark?'횃불을 조심히 들고 동굴로 돌아가자.':'밤에는 동굴에서 쉬는 게 안전해.');
   }else{
    setState('fieldRest','기력 고갈 · 야외에서 취침',null,'동굴로 갈 힘이 없어... 잠깐이라도 쉬자.');
   }
@@ -1532,7 +1535,7 @@ function chooseNextDayAction(){
   if(Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)>1.5){
    setState('sleepTravel','밤 · 동굴로 돌아가기','shelter','어두워지기 전에 동굴로 돌아가자.');return;
   }
-  setState('rest','동굴에서 밤 보내기',null,'오늘도 무사히 지나갔네...');return;
+  return; // Keep sleepTravel until the cave is actually reached.
  }
  // Independent, limited-frequency life skills; critical needs above always win.
  const safeForProjects=stats.energy>46&&stats.hunger>48&&stats.thirst>43&&stats.will>32;
@@ -1550,7 +1553,7 @@ function chooseNextDayAction(){
    lastPetCareDay=current.day;setState('petCare','토끼와 잠깐 놀아주기',null,'같이 있으니 덜 외롭네.');return;
   }
   if(current.day>=7&&lastClueDay!==current.day&&Math.random()<.24){
-   lastClueDay=current.day;setState('clueSearchTravel','다른 생존자의 흔적 조사','beach','혹시 다른 친구도 이 섬에 있을까?');return;
+   lastClueDay=current.day;const clueDest=['outerNorth','outerEast','outerSouth','farWest','farNorth','farSouth'][Math.floor(Math.random()*6)];setState('clueSearchTravel','멀리 떨어진 생존자 흔적 조사',clueDest,'거점에서 멀리 떨어진 곳에 누군가의 흔적이 있을지도 몰라.');return;
   }
  }
  // Observe fish movement first, then try fishing in the shallow pond.
@@ -1904,7 +1907,7 @@ function dayTwoPlusDecide(){
      stats.thirst>60&&stats.hunger>60&&stats.will>55&&!raining()&&
      torchNightDay!==clockParts().day){
     torchNightDay=clockParts().day;torchOutingsToday=0;
-    if(Math.random()<.34){
+    if(fireSuccess&&atCaveForTorch()&&Math.random()<.34){
      torchOutingsToday=1;torchDecisionAt=elapsed;torchOuting=true;
      const dest=['trees','beach','water'][Math.floor(Math.random()*3)];
      setState('torchExplore','횃불을 들고 짧은 심야 탐험',dest,
@@ -2090,7 +2093,7 @@ function update(dt){
    fireKnowledge=0;log('실수로 모닥불 불씨를 놓침 · 불이 꺼짐');
   }
   if(fireKnowledge<=0){
-   torchOuting=false;torchCarried=false;torchGroup.visible=false;torchLight.intensity=0;
+   torchOuting=false;
    fireKnowledge=0;fireSuccess=false;campfire.visible=false;lastFireOutDay=day;
    nextFireAttempt=elapsed+24;
    log('모닥불 소화 · 나뭇가지와 재점화 필요');
@@ -2167,7 +2170,7 @@ function update(dt){
   if(day===1&&(state==='confused'||state==='orient'))updateIntroMovement(step);
   else {walkPose(step,false);head.rotation.y=0;}
  }
- 
+ if(target&&darkHours()&&atCaveForTorch()&&!torchCarried)prepareCaveTorch();
  decide();
  updateCharacterPose();updateTorch();
  terrainSafetyWatch();
@@ -2229,9 +2232,9 @@ function update(dt){
  weatherUpdate(step);updateSound(dt,lightLevel<.25);updateCampfire(elapsed);
  // WeatherUpdate modifies sunlight for rain and wet ground; keep its existing behavior.
  if(elapsed>=uiNextUpdate){uiNextUpdate=elapsed+.3;
- $('stats').innerHTML=Object.entries({체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불유지:Math.min(100,fireKnowledge),...(fireSkill<100?{불기술:Math.min(100,fireSkill)}:{}),...(rabbitPattern<100?{토끼패턴:Math.min(100,rabbitPattern)}:{}),...(fishSkill<100?{물고기숙련:Math.round(fishSkill)}:{}),...(plantKnowledge<100?{식물연구:Math.round(plantKnowledge)}:{}),친구단서:Math.round(friendClue)})
+ $('stats').innerHTML=Object.entries({체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불유지:Math.min(100,fireKnowledge),불기술:Math.min(100,fireSkill),토끼패턴:Math.min(100,rabbitPattern)})
  .map(([k,v])=>`<div class="stat"><label>${k}</label><div class="bar"><div class="fill" style="width:${v}%;background:${v<30?'#db826f':v<55?'#d8b65b':'#68d3b1'}"></div></div><span class="val">${Math.round(v)}</span></div>`).join('')+`<div style="font-size:12px;color:#e8d8b8;margin-top:7px">🏕 동굴 생선 ${storedFish.length}/${MAX_CAVE_FISH} · 휴대 ${carriedFish.length}/${MAX_CARRY_FISH} · 동굴 열매 ${caveBerries}/${MAX_CAVE_BERRIES} · ${fishSpear?'작살 완성':'맨손 포획'} · 💧 빗물 ${rainWater}/4 · ${leafBed?'🛏️ 침상 완성':'침상 미제작'}${petRabbit?' · 🐇 펫 친밀도 '+Math.round(petBond):''}</div>`;
- $('masteryContent').innerHTML=[['🔥 불 피우기',fireSkill],['🐇 토끼 패턴',rabbitPattern],['🐟 물고기 숙련',fishSkill],['🌿 식물 연구',plantKnowledge]].map(([name,value])=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid #ffffff18"><span>${name}</span><strong>${Math.round(value)}% ${value>=100?'· 마스터':''}</strong></div>`).join('')+`<div style="margin-top:8px;opacity:.8">${fishSpear?'🐟 작살 제작 완료':'🐟 작살 미제작'} · ${leafBed?'🛏 침상 완성':'🛏 침상 미제작'} · ${petRabbit?'🐇 펫 동행 중':'🐇 펫 없음'}</div>`;
+ $('skillContent').innerHTML=`<b>숙련도</b> · 불 기술 ${Math.round(fireSkill)}% · 토끼 패턴 ${Math.round(rabbitPattern)}% · 물고기 ${Math.round(fishSkill)}% · 식물 연구 ${Math.round(plantKnowledge)}% · 펫 친밀도 ${Math.round(petBond)}%<hr style="opacity:.2"><b>탐험 기록</b> · 섬 발견도 ${Math.round(discoveryPercent())}% · 생존자 흔적 조사 ${Math.round(friendClue)}%<div style="opacity:.7;margin-top:4px">발견도는 새로 확인한 지형만 반영해. 식물 연구는 숙련도, 친구 단서는 별도 탐험 기록이야.</div>`;
  }
 }
 
