@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v8.5</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v8.9</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileCategories{display:none}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media(max-width:700px){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
@@ -42,7 +42,17 @@
 #memoryCard img{display:block;width:100%;max-height:58dvh;object-fit:contain;border-radius:10px;background:#0d171c}
 #memoryCard p{line-height:1.6;white-space:pre-line}#memoryClose{float:right}
 @media(max-width:700px){#memoryContent{grid-template-columns:repeat(2,minmax(0,1fr))}}
-</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ambientBubble" aria-hidden="true"></div><div id="collisionPanel"></div><div id="memoryToast" style="position:fixed;z-index:35;top:72px;left:50%;transform:translateX(-50%);pointer-events:none;background:#284a46;color:#fff;border:1px solid #83b9a8;border-radius:12px;padding:9px 13px;opacity:0;transition:opacity .4s"></div><div id="ui"><nav id="mobileCategories"><button data-pane="vitals" class="selected">생존</button><button data-pane="skills">숙련도</button><button data-pane="mind">마음</button><button data-pane="memories">추억</button><button data-pane="logs">기록</button><button data-pane="settings">설정</button></nav><div id="vitalsPane"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div></div><details id="skillPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">📚 숙련도 · 탐험 기록</summary><div id="skillContent" style="font-size:12px;line-height:1.7;padding:8px 2px"></div></details><details id="mindPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🧠 히나의 마음 · 기억 일기</summary><div id="mindContent" style="font-size:12px;line-height:1.55;padding:8px 2px;white-space:pre-line"></div></details><details id="actionLogPanel" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">📋 AI 행동 기록 · 펼쳐보기</summary><div id="log" style="margin-top:8px"></div></details><details id="memoryPanel" style="margin-top:10px"><summary>📸 히나의 추억 · 웹툰 앨범 <span id="memoryCount">0/5</span></summary><div id="memoryContent"></div></details></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">발견도 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="cameraMode" aria-pressed="false">카메라: 자유</button><div id="extraControls"><button id="reset">다시 시작</button><button id="devDay10" title="테스트용: DAY 10의 추정 생존 상태">🧪 10일 차</button><button id="devDay20" title="테스트용: DAY 20의 추정 생존 상태">🧪 20일 차</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 안개 ON</button><button id="qualityToggle">화질: 자동</button><button id="perfToggle" aria-pressed="false">성능 정보 OFF</button><button id="collisionDebug" aria-pressed="false">🧱 충돌 검수 OFF</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대(팔로우에서도 가능) · F: 히나 찾기 · C: 카메라 모드 · 회색 영역은 미탐험</div><script>window.addEventListener('error',e=>{const p=document.getElementById('runtimeError');if(p){p.style.display='block';p.textContent='실행 오류: '+e.message+' ('+e.lineno+'행)';}});window.addEventListener('unhandledrejection',e=>{const p=document.getElementById('runtimeError');if(p){p.style.display='block';p.textContent='실행 오류: '+String(e.reason);}});</script><div id="memoryViewer" role="dialog" aria-modal="true" aria-label="히나의 추억"><div id="memoryCard"><button id="memoryClose" type="button">닫기 ✕</button><h2 id="memoryTitle"></h2><img id="memoryImage" alt="대사 없는 추억 웹툰 일러스트"><p id="memoryDescription"></p></div></div><div id="runtimeError" style="display:none;position:fixed;bottom:80px;left:12px;z-index:9999;background:#521e27;color:#fff;padding:12px;border-radius:8px;max-width:90vw"></div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
+
+/* v8.8: skill meters, exploration rings, distraction-free view */
+#skillContent{font-size:12px;line-height:1.5!important}
+.skillMeter{margin:10px 0}.skillMeterHead{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px;color:#d9e9e5}.skillMeterTrack{height:10px;background:#33454b;border-radius:20px;overflow:hidden}.skillMeterFill{height:100%;border-radius:20px;background:linear-gradient(90deg,#469c92,#9cdbc2);transition:width .3s}
+.skillMeterFill.completed{background:#d5b969}.skillSectionTitle{font-weight:750;margin:12px 0 8px}
+.exploreRings{display:flex;gap:12px;align-items:center;justify-content:space-around;flex-wrap:wrap}.exploreRing{width:112px;text-align:center}.exploreCircle{--value:0;--ring:#72cbb2;width:88px;height:88px;border-radius:50%;background:conic-gradient(var(--ring) calc(var(--value)*1%),#35474c 0);margin:0 auto 7px;display:grid;place-items:center}.exploreCircleInner{width:68px;height:68px;border-radius:50%;background:#15272d;display:grid;place-items:center;font-weight:800;font-size:18px}.exploreRingLabel{font-size:11px;color:#c5d9d4}.skillFootnote{font-size:11px;opacity:.75;margin-top:12px}
+#hideAllUI{position:fixed;z-index:60;right:12px;bottom:82px;background:#264e54ed;border:1px solid #7ba9a5;color:#fff;padding:9px 12px;border-radius:12px;font-weight:700;box-shadow:0 3px 14px #0006}
+body.cinematic-mode #ui,body.cinematic-mode #badge,body.cinematic-mode #controls,body.cinematic-mode #hint,body.cinematic-mode #mobileMenu,body.cinematic-mode #bubble,body.cinematic-mode #ambientBubble,body.cinematic-mode #collisionPanel,body.cinematic-mode #memoryToast,body.cinematic-mode #perfHud,body.cinematic-mode #runtimeError{display:none!important}
+body.cinematic-mode #hideAllUI{opacity:.28}body.cinematic-mode #hideAllUI:hover,body.cinematic-mode #hideAllUI:focus{opacity:1}
+@media(max-width:700px){#hideAllUI{bottom:calc(72px + env(safe-area-inset-bottom));right:8px;font-size:12px;padding:9px 10px}body.cinematic-mode #hideAllUI{bottom:calc(10px + env(safe-area-inset-bottom))}}
+</style></head><body><div id="view"></div><button id="hideAllUI" type="button" aria-pressed="false" title="모든 UI 숨기기 · 다시 누르면 복원">◉ 화면 감상</button><div id="bubble" role="status" aria-live="off"></div><div id="ambientBubble" aria-hidden="true"></div><div id="collisionPanel"></div><div id="memoryToast" style="position:fixed;z-index:35;top:72px;left:50%;transform:translateX(-50%);pointer-events:none;background:#284a46;color:#fff;border:1px solid #83b9a8;border-radius:12px;padding:9px 13px;opacity:0;transition:opacity .4s"></div><div id="ui"><nav id="mobileCategories"><button data-pane="vitals" class="selected">생존</button><button data-pane="skills">숙련도</button><button data-pane="mind">마음</button><button data-pane="memories">추억</button><button data-pane="logs">기록</button><button data-pane="settings">설정</button></nav><div id="vitalsPane"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div></div><details id="skillPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">📚 숙련도 · 탐험 기록</summary><div id="skillContent" style="font-size:12px;line-height:1.7;padding:8px 2px"></div></details><details id="mindPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🧠 히나의 마음 · 기억 일기</summary><div id="mindContent" style="font-size:12px;line-height:1.55;padding:8px 2px;white-space:pre-line"></div></details><details id="actionLogPanel" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">📋 AI 행동 기록 · 펼쳐보기</summary><div id="log" style="margin-top:8px"></div></details><details id="memoryPanel" style="margin-top:10px"><summary>📸 히나의 추억 · 웹툰 앨범 <span id="memoryCount">0/5</span></summary><div id="memoryContent"></div></details></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">발견도 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="cameraMode" aria-pressed="false">카메라: 자유</button><div id="extraControls"><button id="devDay10" title="테스트용: DAY 10의 추정 생존 상태">🧪 10일 차</button><button id="devDay20" title="테스트용: DAY 20의 추정 생존 상태">🧪 20일 차</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 안개 ON</button><button id="qualityToggle">화질: 자동</button><button id="perfToggle" aria-pressed="false">성능 정보 OFF</button><button id="collisionDebug" aria-pressed="false">🧱 충돌 검수 OFF</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대(팔로우에서도 가능) · F: 히나 찾기 · C: 카메라 모드 · 회색 영역은 미탐험</div><script>window.addEventListener('error',e=>{const p=document.getElementById('runtimeError');if(p){p.style.display='block';p.textContent='실행 오류: '+e.message+' ('+e.lineno+'행)';}});window.addEventListener('unhandledrejection',e=>{const p=document.getElementById('runtimeError');if(p){p.style.display='block';p.textContent='실행 오류: '+String(e.reason);}});</script><div id="memoryViewer" role="dialog" aria-modal="true" aria-label="히나의 추억"><div id="memoryCard"><button id="memoryClose" type="button">닫기 ✕</button><h2 id="memoryTitle"></h2><img id="memoryImage" alt="대사 없는 추억 웹툰 일러스트"><p id="memoryDescription"></p></div></div><div id="runtimeError" style="display:none;position:fixed;bottom:80px;left:12px;z-index:9999;background:#521e27;color:#fff;padding:12px;border-radius:8px;max-width:90vw"></div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia('(max-width:700px)').matches;
@@ -624,12 +634,13 @@ function makeSnake(x,z){
 function resetSnakes(){for(const s of snakes){scene.remove(s.g);s.g.traverse(o=>{if(o.geometry)o.geometry.dispose();});}snakes.length=0;}
 let nextSnakeSpawn=0,lastSnakeWarning=-999;
 function updateSnakes(step){
- if(clockParts().day<2)return;
+ // Snakes are a mid-exploration encounter, never an immediate cave-side threat.
+ if(clockParts().day<3||discoveryPercent()<12||Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<22)return;
  if(elapsed>=nextSnakeSpawn&&snakes.length<2){
   nextSnakeSpawn=elapsed+randomBetween(85,145);
   const a=Math.random()*Math.PI*2,d=randomBetween(4,7);
   const x=hana.position.x+Math.cos(a)*d,z=hana.position.z+Math.sin(a)*d;
-  if(landAt(x,z)&&Math.hypot(x-sites.shelter.x,z-sites.shelter.z)>5&&!wildlifeFireAvoidance(x,z)){
+  if(landAt(x,z)&&Math.hypot(x-sites.shelter.x,z-sites.shelter.z)>22&&!wildlifeFireAvoidance(x,z)){
    makeSnake(x,z);log('🐍 주변 풀숲에 뱀이 나타남');
   }else nextSnakeSpawn=elapsed+20; // retry soon if location is invalid
  }
@@ -1175,7 +1186,7 @@ const MAX_STEP_HEIGHT=1.15; // approximately below Hina's chest
 // Right wall, roof and decorative ledges must never enter the walkable-height solver.
 function inCaveWalkZone(x,z){
  // Inside the actual wall faces, stopping before the back wall. Front stays open.
- return x>caveX-3.65&&x<caveX+3.65&&z>caveZ-2.60&&z<caveZ+5.35;
+ return x>caveX-3.72&&x<caveX+3.72&&z>caveZ-2.95&&z<caveZ+5.65;
 }
 function caveTerrainPiece(p){return false;}
 function surfaceContains(p,x,z,pad=0){return Math.abs(x-p.x)<=p.rx+pad&&Math.abs(z-p.z)<=p.rz+pad;}
@@ -1191,7 +1202,7 @@ function wildlifeGroundY(x,z){
  let top=interior?.31:.30;for(const p of nearbySurfaces(x,z))if(!p.minorDecoration&&(!interior||p.top<1.45)&&surfaceContains(p,x,z))top=Math.max(top,p.top);
  return top;
 }
-function caveEntrancePortal(x,z){return Math.abs(x-caveX)<3.25&&z>caveZ+2.2&&z<caveZ+6.3;}
+function caveEntrancePortal(x,z){return Math.abs(x-caveX)<4.45&&z>caveZ+1.5&&z<caveZ+7.4;}
 function terrainPassable(fromX,fromZ,toX,toZ){
  if(!Number.isFinite(toX)||!Number.isFinite(toZ)||!landAt(toX,toZ))return false;
  // Each edge is sampled independently of Hina's current elevation (A* may be far away).
@@ -1204,7 +1215,7 @@ function terrainPassable(fromX,fromZ,toX,toZ){
   // Body clearance: never overlap a cliff side or cave wall/ceiling.
   for(const p of nearbySurfaces(x,z)){
    if(p.minorDecoration||p.rx<.4||p.rz<.4)continue;
-   if(!caveEntrancePortal(x,z)&&surfaceContains(p,x,z,.20)&&p.top>next+MAX_STEP_HEIGHT+.001&&p.bottom<next+1.95)return false;
+   if(!caveEntrancePortal(x,z)&&!inCaveWalkZone(x,z)&&surfaceContains(p,x,z,.20)&&p.top>next+MAX_STEP_HEIGHT+.001&&p.bottom<next+1.95)return false;
   }
   current=next;
  }
@@ -1620,11 +1631,11 @@ function renderMind(){
 }
 // Event-driven webtoon memory album. Only real play events unlock panels.
 const MEMORY_DEFS=[
- {id:'snake',title:'뱀과 처음 마주친 날',image:'memories/snake.webp'},
- {id:'rabbit',title:'처음 잡은 토끼',image:'memories/rabbit.webp'},
- {id:'wash',title:'처음 씻었던 날',image:'memories/wash.webp'},
- {id:'fire',title:'첫 모닥불',image:'memories/fire.webp'},
- {id:'fish',title:'첫 물고기',image:'memories/fish.webp'}
+ {id:'snake',title:'처음으로 만난 뱀',image:'memories/snake.webp'},
+ {id:'rabbit',title:'처음으로 잡은 토끼',image:'memories/rabbit.webp'},
+ {id:'wash',title:'처음으로 씻은 날',image:'memories/wash.webp'},
+ {id:'fire',title:'처음으로 불을 피운 날',image:'memories/fire.webp'},
+ {id:'fish',title:'처음으로 잡은 물고기',image:'memories/fish.webp'}
 ];
 const MEMORY_KEY='hina_survival_memory_v85';
 let unlockedMemories={};
@@ -1737,7 +1748,7 @@ function init(){
  if(memoryFirstInit){memoryFirstInit=false;}else{unlockedMemories={};try{localStorage.removeItem(MEMORY_KEY);}catch(e){}}renderMemoryAlbum();document.getElementById('memoryToast').style.opacity='0';
  for(const [mesh,original] of fadedMeshes){mesh.material=original;}fadedMeshes.clear();
  // Restore both simulation data and visuals. A reset must match a fresh page load.
- paused=false;speed=4;prev=0;elapsed=0;day=1;walkAnimationTime=0;torchCarried=false;outdoorTorchAttemptAt=-Infinity;resetSnakes();nextSnakeSpawn=DAY_SECONDS+randomBetween(15,45);lastSnakeWarning=-999;
+ paused=false;speed=4;prev=0;elapsed=0;day=1;walkAnimationTime=0;torchCarried=false;outdoorTorchAttemptAt=-Infinity;resetSnakes();nextSnakeSpawn=DAY_SECONDS*2+randomBetween(50,100);lastSnakeWarning=-999;
  branchPiles.forEach(p=>{p.available=true;p.respawnAt=0;p.group.visible=true;});
  carriedBerries=0;caveBerries=0;lastBerryStorageAt=-999;climbUntil=0;climbCooldownUntil=0;climbBlockedSince=0;navReset();routeFailures=0;blockedGoalUntil.clear();lastBlockedSpeechAt=-999;
  lastWashDay=0;lastWashAttemptDay=0;state='confused';phaseAt=0;target=null;goal='';lastLog='';actions=0;
@@ -1763,7 +1774,7 @@ function init(){
  bubbleUntil=0;ambientTimer=0;
  mind={traits:{...BASE_TRAITS},memories:[],likes:{pond:0,cave:0,beach:0,forest:0},plan:[],planDay:0,planDone:[],lastReflectionDay:0,lastLeisureDay:0,lastChoiceAt:0,lastMindUI:0,rememberedRoutes:new Map(),lastRecallAt:0,discoveries:0,mistakes:0,regrets:0,keepsakes:0,identity:'처음에는 겁이 많지만 호기심 많은 졸업생'};renderMind();
  $('log').innerHTML='';$('actionLogPanel').open=false;$('thought').textContent='';$('bubble').textContent='';$('bubble').classList.remove('show','sleep-bubble');$('ambientBubble').classList.remove('show');nextNightSoundAt=0;nightSoundUntil=0;
- $('pause').textContent='일시정지';
+ 
  $('dayLabel').textContent='· DAY 01';$('clock').textContent='06:00';
  $('elapsed').textContent='D1 00:00';
  $('phase').textContent='워프 직후 · 혼란';
@@ -2250,6 +2261,12 @@ function dayTwoPlusDecide(){
     rabbitAttempts===0?'패턴은 알겠어... 하지만 실제로 잡는 건 처음이잖아. 떨린다.':rabbitAttempts<4?'이번엔 조금 더 가까이... 앗, 너무 빨리 움직이면 안 돼.':'몇 번 놓쳤지만, 이제 도망가는 순간이 조금 보여.');return;
  }
  if(state==='rabbitHunt'&&elapsed-phaseAt>11){
+  // Chasing a rabbit costs stamina and increases hunger, whether caught or missed.
+  const chaseEnergyCost=randomBetween(2,4);
+  const chaseHungerCost=randomBetween(1,3);
+  stats.energy=Math.max(0,stats.energy-chaseEnergyCost);
+  stats.hunger=Math.max(0,stats.hunger-chaseHungerCost);
+  log(`🐇 토끼 추격 · 체력 -${chaseEnergyCost.toFixed(1)} · 허기 -${chaseHungerCost.toFixed(1)}`);
   rabbitAttempts++;rabbitPattern=Math.min(100,rabbitPattern+15);
   const live=critters.filter(r=>!r.caught);
   // Knowing a pattern unlocks attempts, not guaranteed success. Experience helps, but never guarantees a catch.
@@ -2604,14 +2621,21 @@ function update(dt){
     if(!navNoPathSince)navNoPathSince=elapsed;
     if(elapsed-navNoPathSince>2.5&&beginBreadcrumbRetreat('목적지 경로 없음')){navNoPathSince=0;}
     if(target&&elapsed-navNoPathSince>3.5){
+     // The cave mouth has a broad walkable corridor. Avoid falsely rejecting a
+     // reachable shelter goal because the coarse A* grid sampled its rim.
+     const nearCave= Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<13;
+     if(nearCave&&Math.hypot(target.x-sites.shelter.x,target.z-sites.shelter.z)<5&&elapsed-navNoPathSince<13){
+      navGoal=null;navReplanAt=elapsed+1.5;
+     }else{
      const failed=goal;
      const failedKey=Math.round(target.x/4)+':'+Math.round(target.z/4);
-     blockedGoalUntil.set(failedKey,elapsed+100);
+     if(Math.hypot(target.x-sites.shelter.x,target.z-sites.shelter.z)>5)blockedGoalUntil.set(failedKey,elapsed+100);
      routeFailures++;
      target=null;navReset();
      // Rest and reconsider; never count this as a successful trip.
-     setState('recover','접근 불가 · 다른 경로와 행동 검토',null,'이쪽 길은 막혀 있네. 다른 방법을 찾아보자.');
-     if(elapsed-lastBlockedSpeechAt>16){lastBlockedSpeechAt=elapsed;log('목적지 접근 실패 · '+failed);}
+     setState('recover','경로 재검토 · 다른 행동 선택',null,'잠깐 방향을 다시 살펴보자.');
+     if(elapsed-lastBlockedSpeechAt>40){lastBlockedSpeechAt=elapsed;log('목적지 접근 실패 · '+failed);}
+     }
     }
    }else{
     const waypoint=navPath[0],dx=waypoint.x-hana.position.x,dz=waypoint.z-hana.position.z;
@@ -2712,7 +2736,12 @@ function update(dt){
  $('stats').innerHTML=Object.entries({체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불유지:Math.min(100,fireKnowledge)})
  .map(([k,v])=>`<div class="stat"><label>${k}</label><div class="bar"><div class="fill" style="width:${v}%;background:${v<30?'#db826f':v<55?'#d8b65b':'#68d3b1'}"></div></div><span class="val">${Math.round(v)}</span></div>`).join('')+`<div style="font-size:12px;color:#e8d8b8;margin-top:7px">🏕 동굴 생선 ${storedFish.length}/${MAX_CAVE_FISH} · 휴대 ${carriedFish.length}/${MAX_CARRY_FISH} · 동굴 열매 ${caveBerries}/${MAX_CAVE_BERRIES} · ${fishSpear?'작살 완성':'맨손 포획'} · 💧 빗물 ${rainWater}/4 · ${leafBed?'🛏️ 침상 완성':'침상 미제작'}${petRabbit?' · 🐇 펫 친밀도 '+Math.round(petBond):''}</div>`;
  
- $('skillContent').innerHTML=`<b>숙련도</b> · 불 기술 ${pct(fireSkill)}% · 토끼 패턴 ${pct(rabbitPattern)}% · 물고기 ${pct(fishSkill)}% · 식물 연구 ${pct(plantKnowledge)}% · 펫 친밀도 ${pct(petBond)}%<hr style="opacity:.2"><b>탐험 기록</b> · 섬 발견도 ${Math.round(discoveryPercent())}% · 생존자 흔적 조사 ${pct(friendClue)}%<div style="opacity:.7;margin-top:4px">발견도는 새로 확인한 지형만 반영해. 식물 연구는 숙련도, 친구 단서는 별도 탐험 기록이야.</div>`;
+ $('skillContent').innerHTML='<div class="skillSectionTitle">📚 생존 숙련도</div>'+[
+  ['불 기술',fireSkill],['토끼 패턴',rabbitPattern],['물고기',fishSkill],['식물 연구',plantKnowledge],['펫 친밀도',petBond]
+ ].map(([label,value])=>{const v=Math.max(0,Math.min(100,Number(value)||0));return `<div class="skillMeter"><div class="skillMeterHead"><span>${label}</span><b>${Math.round(v)}%</b></div><div class="skillMeterTrack"><div class="skillMeterFill ${v>=100?'completed':''}" style="width:${v}%"></div></div></div>`;}).join('')+
+ '<div class="skillSectionTitle">🗺️ 탐험 기록</div><div class="exploreRings">'+[
+  ['섬 발견도',discoveryPercent(),'#72cbb2'],['친구 단서',friendClue,'#d9b977']
+ ].map(([label,value,color])=>{const v=Math.max(0,Math.min(100,Number(value)||0));return `<div class="exploreRing"><div class="exploreCircle" style="--value:${v};--ring:${color}"><div class="exploreCircleInner">${Math.round(v)}%</div></div><div class="exploreRingLabel">${label}</div></div>`;}).join('')+'</div><div class="skillFootnote">발견도는 새로 확인한 섬 지역만 계산해. 친구 단서는 별도의 탐험 기록이야.</div>';
  }
 }
 
@@ -2753,6 +2782,15 @@ $('soundToggle').onclick=async()=>{
  $('soundToggle').textContent=soundEnabled?'환경음 ON':'환경음 OFF';$('soundToggle').setAttribute('aria-pressed',String(soundEnabled));
 };
 
+// Distraction-free viewing: retain one small restore button on both desktop and mobile.
+const hideAllUIButton=document.getElementById('hideAllUI');
+function setCinematicMode(enabled){
+ document.body.classList.toggle('cinematic-mode',enabled);
+ if(enabled)document.body.classList.remove('menu-open');
+ hideAllUIButton.textContent=enabled?'◉ UI 표시':'◉ 화면 감상';
+ hideAllUIButton.setAttribute('aria-pressed',String(enabled));
+}
+hideAllUIButton.addEventListener('click',()=>setCinematicMode(!document.body.classList.contains('cinematic-mode')));
 $('ui').dataset.pane='vitals';
 document.querySelectorAll('#mobileCategories [data-pane]').forEach(button=>button.onclick=()=>{
  if(button.dataset.pane==='memories')document.getElementById('memoryPanel').open=true;
@@ -2974,7 +3012,7 @@ window.addEventListener('keydown',e=>{
  if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;
  e.preventDefault();if(e.code==='KeyC')setCameraMode(!followCamera);else focusHina();
 });
-$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 안개 ON':'미탐험 안개 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration(true);updateDetailVisibility(true)};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};// DAY 10 scenario: a representative, hand-tuned snapshot, NOT a measured statistical mean.
+$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 안개 ON':'미탐험 안개 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration(true);updateDetailVisibility(true)};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};// DAY 10 scenario: a representative, hand-tuned snapshot, NOT a measured statistical mean.
 // A true mean requires recorded data from multiple full 10-day runs.
 function devJumpToDay10(){
  init();
@@ -3038,7 +3076,7 @@ function devJumpToDay20(){
  redrawNeeds();
 }
 $('devDay20').onclick=()=>devJumpToDay20();
-$('reset').onclick=()=>{init();setCameraMode(true)};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();setCameraMode(true);function animate(t){requestAnimationFrame(animate);
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();setCameraMode(true);function animate(t){requestAnimationFrame(animate);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
  lastRenderAt=t;
  let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused)animateWildlife(t*.001,dt*speed);if(followCamera){
