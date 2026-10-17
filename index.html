@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v9.2</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v10.9</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileCategories{display:none}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media(max-width:700px){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
@@ -59,7 +59,22 @@ const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia
 let highQuality=!isMobile;
 let mobileTargetFPS=20;let lastRenderAt=0;let ultraLowPower=isMobile;let nextUiFrame=0;
 let followCamera=false;let followDistance=21.4;const followOffset=new THREE.Vector3(12,13,12);const followFocus=new THREE.Vector3();const followDesired=new THREE.Vector3();
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ad4e7);scene.fog=new THREE.Fog(0x9ad4e7,165,380);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,380);camera.position.set(32,35,49);const renderer=new THREE.WebGLRenderer({antialias:!isMobile,powerPreference:isMobile?"low-power":"high-performance"});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.15:2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('view').appendChild(renderer.domElement);const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(-4,1,-3);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI/2.08;orbit.minDistance=5;orbit.maxDistance=255;const ambient=new THREE.HemisphereLight(0xffffff,0x516d4b,2.2);scene.add(ambient);const sun=new THREE.DirectionalLight(0xffe4aa,2.4);sun.position.set(-12,25,14);sun.castShadow=true;sun.shadow.mapSize.set(isMobile?512:2048,isMobile?512:2048);sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.025;sun.shadow.camera.left=isMobile?-38:-155;sun.shadow.camera.right=isMobile?38:155;sun.shadow.camera.top=isMobile?38:155;sun.shadow.camera.bottom=isMobile?-38:-155;scene.add(sun);const fill=new THREE.DirectionalLight(0xa4d9ff,.65);fill.position.set(14,10,-18);scene.add(fill);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ad4e7);scene.fog=new THREE.Fog(0x9ad4e7,165,380);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,380);camera.position.set(32,35,49);const renderer=new THREE.WebGLRenderer({antialias:!isMobile,powerPreference:isMobile?"low-power":"high-performance"});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.15:2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('view').appendChild(renderer.domElement);// v10.9: subtle downsampled screen glow; no second Three.js scene render.
+const glowCanvas=document.createElement('canvas');
+glowCanvas.setAttribute('aria-hidden','true');
+glowCanvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen;filter:blur(9px);opacity:.14;';
+document.getElementById('view').appendChild(glowCanvas);
+const glowCtx=glowCanvas.getContext('2d',{alpha:false});
+let nextGlowAt=0;
+function updateSubtleBloom(now){
+ if(!highQuality||ultraLowPower||!glowCtx||now<nextGlowAt)return;
+ nextGlowAt=now+(isMobile?250:125);
+ const w=Math.max(1,Math.round(innerWidth*(isMobile?.15:.22)));
+ const h=Math.max(1,Math.round(innerHeight*(isMobile?.15:.22)));
+ if(glowCanvas.width!==w||glowCanvas.height!==h){glowCanvas.width=w;glowCanvas.height=h;}
+ try{glowCtx.drawImage(renderer.domElement,0,0,w,h);}catch(e){glowCanvas.style.display='none';}
+}
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(-4,1,-3);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI/2.08;orbit.minDistance=5;orbit.maxDistance=255;const ambient=new THREE.HemisphereLight(0xffffff,0x516d4b,2.2);scene.add(ambient);const sun=new THREE.DirectionalLight(0xffe4aa,2.4);sun.position.set(-12,25,14);sun.castShadow=true;sun.shadow.mapSize.set(isMobile?512:2048,isMobile?512:2048);sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.025;sun.shadow.camera.left=isMobile?-38:-155;sun.shadow.camera.right=isMobile?38:155;sun.shadow.camera.top=isMobile?38:155;sun.shadow.camera.bottom=isMobile?-38:-155;scene.add(sun);const fill=new THREE.DirectionalLight(0xa4d9ff,.65);fill.position.set(14,10,-18);scene.add(fill);
 let terrainGrid=null;const vegetationRoots=[];const groundPlatforms=[];const wildlifeSurfaces=[];const solidObstacles=[];const detailMeshes=[];const cameraOccluders=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x217db5),riverMat=mat(0x4aafd9),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=(h>=1.5||w>=2.2||d>=2.2);o.receiveShadow=true;scene.add(o);
  // Keep the actual solid volume, including caps and cave ceiling underside.
  if((m===grass||m===dirt||m===dirt2||m===rock||m===rockDark||m===stone||m===moss)&&w>=.08&&d>=.08&&w<100&&d<100){
@@ -76,7 +91,7 @@ let terrainGrid=null;const vegetationRoots=[];const groundPlatforms=[];const wil
   /* v4.3: scenery never creates navigation blockers */
  if(Math.max(w,h,d)<4&&Math.hypot(x,z)>23)detailMeshes.push(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=h>=1.5||Math.max(r1,r2)>=.9;scene.add(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
 grass.polygonOffset=true;grass.polygonOffsetFactor=-1;grass.polygonOffsetUnits=-1;
-const dirt=mat(0x9a7656),dirt2=mat(0x82654f),rockDark=mat(0x4d5356),rock=mat(0x777979),moss=mat(0x64885a),palmLeaf=mat(0x4d9664),foam=mat(0xa7e9dc);
+const dirt=mat(0x9a7656),dirt2=mat(0x82654f),rockDark=mat(0x4d5356),rock=mat(0x777979),moss=mat(0x64885a),palmLeaf=mat(0xa2d76a),foam=mat(0xa7e9dc);
 box(460,.25,460,sea,0,-.85,0);
 const waterSurface=new THREE.Mesh(new THREE.PlaneGeometry(455,455),new THREE.MeshPhongMaterial({color:0x198ec9,transparent:true,opacity:.88,shininess:85,specular:0x6ec3e8,side:THREE.DoubleSide,depthWrite:false}));
 waterSurface.rotation.x=-Math.PI/2;waterSurface.position.y=-.52;scene.add(waterSurface);
@@ -210,6 +225,8 @@ const caveCeilingRock=box(12,1.35,8.4,rock,caveX,4.65,caveZ-1.0); // natural ove
 const caveCeilingCap=box(12,.25,8.4,grass,caveX,5.43,caveZ-1.0);
 caveCeilingRock.userData.caveOccluder=true;
 caveCeilingCap.userData.caveOccluder=true;
+caveCeilingRock.userData.caveRoofFade=true;
+caveCeilingCap.userData.caveRoofFade=true;
 box(10,.22,7.5,stone,caveX,.13,caveZ-1.1); // dry cave floor
 // Irregular rocks frame the cave entrance, leaving a clear opening.
 for(const [x,y,z,w,h,d] of [[-9.3,1.2,-6.1,2.1,2.4,2.4],[1.3,1.25,-6.1,2.1,2.5,2.4],[-8,3.55,-6.4,2.3,1.3,2.5],[0,3.5,-6.4,2.3,1.4,2.5],[-4,4.1,-6.3,4.4,.75,2.5],[-9.4,2.4,-12,2.2,4.8,3],[1.4,2.3,-12,2.2,4.6,3]])box(w,h,d,rock,x,y,z);
@@ -223,11 +240,13 @@ const pondBottom=box(8.5,.2,6.6,dirt,-9,-.40,4);
 const pondWaterMat=new THREE.MeshPhongMaterial({color:0x329fda,transparent:true,opacity:.94,shininess:115,specular:0x86cbed,depthWrite:false,side:THREE.DoubleSide});
 const pondWater=new THREE.Mesh(new THREE.CircleGeometry(1,48),pondWaterMat);
 pondWater.rotation.x=-Math.PI/2;pondWater.scale.set(4.65,3.45,1);
-pondWater.position.set(-9,.49,4);pondWater.renderOrder=7;scene.add(pondWater);
+pondWater.position.set(-9,.31,4);pondWater.renderOrder=7;scene.add(pondWater);
 const pondRim=mat(0xc5b18b),pondRock=mat(0x929b91);
 for(let j=0;j<44;j++){
  const a=j*Math.PI*2/44,r=1+.06*Math.sin(j*2.7),x=-9+Math.cos(a)*4.2*r,z=4+Math.sin(a)*3.27*r;
- const peb=box(.48+randSafe(j)*.38,.24,.45+randSafe(j+13)*.3,j%3?pondRim:pondRock,x,.36,z);
+ const pebScale=.65+randSafe(j+31)*1.75;
+ const pebHeight=.26+randSafe(j+71)*.52;
+ const peb=box((.48+randSafe(j)*.38)*pebScale,pebHeight,(.45+randSafe(j+13)*.3)*pebScale,j%3?pondRim:pondRock,x,.12+pebHeight*.5,z);
  peb.rotation.y=a;
 }
 function randSafe(n){return (Math.sin(n*127.1+15.7)*43758.5453)%1<0?1+((Math.sin(n*127.1+15.7)*43758.5453)%1):((Math.sin(n*127.1+15.7)*43758.5453)%1)}
@@ -235,28 +254,81 @@ const pondRippleMat=new THREE.MeshLambertMaterial({color:0xe5fff6,transparent:tr
 const pondRipples=[];
 for(let i=0;i<4;i++){
  const ring=new THREE.Mesh(new THREE.RingGeometry(.35+i*.46,.39+i*.46,36),pondRippleMat);
- ring.rotation.x=-Math.PI/2;ring.position.set(-9,.52,4);ring.renderOrder=8;scene.add(ring);pondRipples.push(ring);
+ ring.rotation.x=-Math.PI/2;ring.position.set(-9,.325,4);ring.renderOrder=8;scene.add(ring);pondRipples.push(ring);
 }
 
 // Readable pond detail: bright edge stones, reeds and reflected glints.
 const pondGlintMat=new THREE.MeshBasicMaterial({color:0xe9ffff,transparent:true,opacity:.8,depthWrite:false,side:THREE.DoubleSide});
 const pondGlints=[];
-for(let i=0;i<14;i++){
+for(let i=0;i<0;i++){
  const a=i*2.39996,rad=.4+(i%5)*.52;
  const glint=new THREE.Mesh(new THREE.PlaneGeometry(.26+(i%3)*.13,.065),pondGlintMat);
  glint.rotation.x=-Math.PI/2;glint.rotation.z=a;
  glint.position.set(-9+Math.cos(a)*rad,.47,4+Math.sin(a)*rad*.7);
  glint.renderOrder=9;scene.add(glint);pondGlints.push(glint);
 }
-const reedMat=mat(0x64945a);
-for(let i=0;i<18;i++){
- const a=i*Math.PI*2/18,x=-9+Math.cos(a)*4.65,z=4+Math.sin(a)*3.68;
- const reed=box(.13,.35+(i%4)*.11,.13,reedMat,x,.47,z);
- reed.rotation.z=(i%3-1)*.12;
-}
+// v10.1: pointed reeds removed as requested.
 // Seeded decorative placement to keep the scene stable across reloads.
 // Seeded PRNG is declared before the first crab is constructed.
-function palm(x,z,h=0){const before=scene.children.length;const ht=2.6+rand()*1.7;box(.43,ht,.43,wood,x,h+ht/2,z);for(let i=0;i<5;i++){let angle=i*Math.PI*2/5;let f=box(2.8,.22,.78,palmLeaf,x+Math.cos(angle)*1.15,h+ht+.12,z+Math.sin(angle)*1.15);f.rotation.y=-angle;f.rotation.z=(i%2?-.15:.15)};vegetationRoots.push({x,z,h,parts:scene.children.slice(before)});}
+// v10.0: Keep a broad, asymmetric camera sightline clear in front of the cave.
+// Cave mouth is centered at (-4,-10), facing +Z. This is visual clearance only;
+// existing collision/terrain and distant fruit trees remain untouched.
+function blocksCaveEntranceView(x,z){
+ // Only the immediate doorway and the near-center quarter-view sightline stay clear.
+ // Farther forest on both flanks is allowed to frame the cave.
+ const forward=z-(caveZ+2.3);
+ if(forward < -3 || forward > 11.5)return false;
+ const centerX=caveX+Math.max(0,forward)*.14;
+ const halfWidth=forward<1.5?5.8:5.8+Math.min(forward,10)*.15;
+ return Math.abs(x-centerX)<halfWidth;
+}
+// v10.5: the cave belongs to the mountain forest, never to the palm coastline.
+// Track ALL procedural trees (including legacy palms) to prevent overlapping crowns.
+const plantedTreeSites=[];
+function isMountainForestZone(x,z){
+ // The cave's wooded hills, not a coastal-only palm zone.
+ return Math.hypot(x-caveX,z-caveZ)<31 && z<caveZ+10 &&
+        (z<caveZ-2 || Math.abs(x-caveX)>10);
+}
+function isCoastalPalmZone(x,z){
+ // Legacy name retained for compatibility; palms grow island-wide.
+ return landAt(x,z) && Math.hypot(x+9,z-4)>5.8 &&
+        (!isMountainForestZone(x,z) || rand()<.045);
+}
+// Reserve clear visual space around the original berry trees before palms/forest generate.
+const protectedBerrySites=[[-3.6,10.7],[-1.6,12.4],[13.7,-1.2]];
+function nearProtectedBerrySite(x,z,radius=0){
+ return protectedBerrySites.some(([bx,bz])=>Math.hypot(x-bx,z-bz)<radius+3.3);
+}
+function reserveTreeSite(x,z,radius){
+ if(nearProtectedBerrySite(x,z,radius))return false;
+ if(plantedTreeSites.some(t=>Math.hypot(t.x-x,t.z-z)<t.radius+radius))return false;
+ plantedTreeSites.push({x,z,radius});return true;
+}
+// v10.9: every palm, including legacy placement, has the SAME ringed palm trunk.
+const earlyPalmTrunkLight=mat(0xaa8255); // Available before the first palm is spawned.
+function palm(x,z,h=0){
+ const g=new THREE.Group();g.position.set(x,h,z);g.userData.treeOccluder=true;
+ scene.add(g);vegetationRoots.push({x,z,h,parts:[g]});
+ const ht=(4.6+rand()*2.0)*1.25,lean=.38;
+ for(let k=0;k<9;k++){
+  const y=(k+.5)*ht/9, width=.54-k*.020;
+  const segment=groupPalmPart(g,width,ht/9+.09,width,k%2?wood:earlyPalmTrunkLight,Math.sin(k/9*1.35)*lean,y,0);
+  segment.rotation.z=-.04;
+ }
+ const cx=Math.sin(1.35)*lean;
+ for(let i=0;i<9;i++){
+  const a=i*Math.PI*2/9,reach=2.3+(i%3)*.19;
+  const f=groupPalmPart(g,reach,.23,.67,palmLeaf,cx+Math.cos(a)*reach*.44,ht+.05,Math.sin(a)*reach*.44);
+  f.rotation.y=-a;f.rotation.z=i%2?-.15:.12;
+ }
+}
+// Palm parts are grouped so trunks and leaves always fade together.
+function groupPalmPart(g,w,h,d,m,x,y,z){
+ const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+ o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);
+ o.userData.treePart=true;o.geometry.computeBoundingSphere();cameraOccluders.push(o);return o;
+}
 // Expanded island: distant ridges, plateaus, groves and boulders. Keep the original
 // cave, pond and first-day landmarks unchanged so the existing AI still works.
 const farRidges=[
@@ -278,13 +350,13 @@ for(let i=0;i<220;i++){
  const x=-86+rand()*172,z=-71+rand()*142;
  if(!landAt(x,z)||Math.hypot(x,z)<26||Math.hypot(x+9,z-4)<13)continue;
  const h=.2+rand()*.9;
- if(rand()<.43)palm(x,z,h);
+ if(rand()<.43&&isCoastalPalmZone(x,z)&&!blocksCaveEntranceView(x,z)&&reserveTreeSite(x,z,4.6))palm(x,z,h);
  else {
   const size=.35+rand()*1.4;
   box(size,size*.7,size,rand()<.5?stone:rock,x,size*.35,z);
  }
 }
-for(let i=0;i<32;i++){let x=-20+rand()*39,z=-18+rand()*35;if(!landAt(x,z)||(Math.pow((x+9)/7.2,2)+Math.pow((z-4)/6.3,2)<1)||(x>-12&&x<-5&&z>1&&z<8)||(x>-10&&x<3&&z>-16&&z<-5)||(x>3&&x<13&&z>0&&z<9))continue;let h=x<-11&&z<0?1.8:x<-10&&z>4?1.1:0;palm(x,z,h)}
+for(let i=0;i<32;i++){let x=-20+rand()*39,z=-18+rand()*35;if(!landAt(x,z)||blocksCaveEntranceView(x,z)||(Math.pow((x+9)/7.2,2)+Math.pow((z-4)/6.3,2)<1)||(x>-12&&x<-5&&z>1&&z<8)||(x>-10&&x<3&&z>-16&&z<-5)||(x>3&&x<13&&z>0&&z<9))continue;let h=x<-11&&z<0?1.8:x<-10&&z>4?1.1:0;if(isCoastalPalmZone(x,z)&&reserveTreeSite(x,z,4.6))palm(x,z,h)}
 for(let i=0;i<62;i++){let x=-21+rand()*43,z=-18+rand()*36;if(!landAt(x,z)||(Math.pow((x+9)/5.3,2)+Math.pow((z-4)/4.4,2)<1)||(x>-10&&x<2&&z>-15&&z<-5))continue;let size=.24+rand()*.6;box(size,size*.65,size,rand()>.45?stone:rock,x,size*.33,z)}
 // Berry bush to inspect, not automatically eat.
 for(let i=0;i<6;i++){let x=-2.5+(i%3)*.65,z=9.4+Math.floor(i/3)*.65;box(.75,.8,.75,leaf,x,.45,z);}
@@ -360,46 +432,22 @@ for(let i=0;i<215;i++){
  if(rand()<.68)box(s,.10,s,rand()>.5?grassBright:grassDeep,x,h+.2,z);
  else box(s,.18,s,rand()>.5?warmRock:paleStone,x,h+.22,z);
 }
-// Low-poly grass tufts: one geometry, a few chunked InstancedMeshes instead of hundreds of draws.
-const grassTuftGeometry=new THREE.ConeGeometry(.105,.42,3);
-grassTuftGeometry.translate(0,.21,0);
-const grassTuftMaterial=new THREE.MeshLambertMaterial({color:0x72a956,side:THREE.DoubleSide});
-const grassTuftChunks=[],tuftMatrix=new THREE.Object3D();
-for(let cx=-2;cx<=1;cx++)for(let cz=-2;cz<=1;cz++){
- const transforms=[];
- for(let j=0;j<100;j++){
-  const x=cx*12+rand()*12,z=cz*12+rand()*12;
-  if(!landAt(x,z)||Math.hypot(x+9,z-4)<8||Math.hypot(x+4,z+9)<8)continue;
-  let h=0;
-  for(const [tx,tz,w,d,th] of terraces){
-   if(Math.abs(x-tx)<w*.45&&Math.abs(z-tz)<d*.45)h=Math.max(h,th);
-  }
-  if(h<.15)continue;
-  transforms.push({x,z,h,rot:rand()*6.28,scale:.65+rand()*.9});
- }
- if(!transforms.length)continue;
- const inst=new THREE.InstancedMesh(grassTuftGeometry,grassTuftMaterial,transforms.length);
- inst.castShadow=false;inst.receiveShadow=false;
- transforms.forEach((v,i)=>{
-  tuftMatrix.position.set(v.x,v.h+.19,v.z);
-  tuftMatrix.rotation.set(0,v.rot,0);
-  tuftMatrix.scale.set(v.scale,v.scale,v.scale);
-  tuftMatrix.updateMatrix();inst.setMatrixAt(i,tuftMatrix.matrix);
- });
- inst.instanceMatrix.needsUpdate=true;inst.computeBoundingSphere();
- scene.add(inst);grassTuftChunks.push({mesh:inst,cx:cx*12+6,cz:cz*12+6});
-}
+// v10.1: pointed grass tufts removed from the whole island.
+const grassTuftChunks=[];
 // Strata and protruding boulders around cave, keep front entrance open.
 for(let i=0;i<105;i++){
  let x=-11+rand()*15,z=-16+rand()*12;
+ if(z>caveZ+1.2 && z<caveZ+7.7 && x>caveX-7.5 && x<caveX+7.5)continue;
  if(x>-8.3&&x<.5&&z>-7.5&&z<-4.7)continue;
  const s=.25+rand()*1.15;
- const y=rand()*3.6+.2;
- if(z>-8.3&&y>2.3)continue;
+ const y=groundHeightAt(x,z,0)+s*.275;
+ // All surviving loose boulders sit on the walkable surface.
+ if(z>-8.3 && x>caveX-8 && x<caveX+8)continue;
  box(s,s*.55,s,rand()>.45?warmRock:rock,x,y,z);
 }
 for(let i=0;i<40;i++){
  const x=-9.5+rand()*11,z=-13.8+rand()*6;
+ if(z>caveZ+1.2 && x>caveX-8 && x<caveX+8)continue;
  if(x>-8&&x<0&&z>-7.5)continue;
  const s=.16+rand()*.36;
  box(s,.1,s,rand()>.5?rock:paleStone,x,.3,z);
@@ -414,42 +462,192 @@ for(let i=0;i<16;i++){
 }
 // Voxel palm trees with curved trunks and tiered fronds.
 function lushPalm(x,z,h=0,scale=1){
- const g=new THREE.Group();g.position.set(x,h,z);scene.add(g);vegetationRoots.push({x,z,h,parts:[g]});
- const height=(5.5+rand()*2.3)*scale;
- // Tapered tall trunk with a subtle lean; short branches and clustered crowns.
- for(let k=0;k<8;k++){
-  const y=(k+.5)*height/8;
-  const lean=Math.sin(k/8*1.3)*.35*scale;
-  groupCube(g,(.62-k*.028)*scale,height/8+.055,(.62-k*.028)*scale,k%2?wood:trunkLight,lean,y,0);
+ const g=new THREE.Group();g.position.set(x,h,z);g.userData.treeOccluder=true;
+ scene.add(g);vegetationRoots.push({x,z,h,parts:[g]});
+ const height=(5.5+rand()*2.3)*scale*1.25;
+ // Ringed, slightly bent palm trunk; thickness stays almost unchanged.
+ for(let k=0;k<9;k++){
+  const y=(k+.5)*height/9;
+  const lean=Math.sin(k/9*1.35)*.52*scale;
+  const width=(.60-k*.024)*scale;
+  const segment=groupPalmPart(g,width,height/9+.10,width,k%2?wood:trunkLight,lean,y,0);
+  segment.rotation.z=-.055;
  }
- const cx=Math.sin(1.3)*.35*scale;
- // Three chunky, overlapping crown levels read as a single full tree at game camera distance.
- for(let layer=0;layer<3;layer++){
-  const crownY=height+(.25-layer*.65)*scale;
-  const spread=(2.35-layer*.25)*scale;
-  for(let j=0;j<7;j++){
-   const a=j*Math.PI*2/7+layer*.3;
-   const r=(j%2?.74:1.0)*spread;
-   const size=(1.30+((j+layer)%3)*.22)*scale;
-   groupCube(g,size,.85*scale,size,(j+layer)%2?fernGreen:fernLight,
-      cx+Math.cos(a)*r,crownY+Math.sin(j*2.1)*.17*scale,Math.sin(a)*r);
-  }
-  groupCube(g,2.1*scale,.95*scale,2.1*scale,layer%2?fernLight:fernGreen,cx,crownY+.17*scale,0);
+ const cx=Math.sin(1.35)*.52*scale;
+ // Long, light lime-green fronds instead of broadleaf-like cube crowns.
+ for(let j=0;j<9;j++){
+  const a=j*Math.PI*2/9,reach=(2.5+(j%3)*.27)*scale;
+  const leafMesh=groupPalmPart(g,reach,.24*scale,.76*scale,
+    j%3===0?palmLeaf:palmFrondLight,
+    cx+Math.cos(a)*reach*.44,height+.06*scale+(j%2)*.10*scale,
+    Math.sin(a)*reach*.44);
+  leafMesh.rotation.y=-a;leafMesh.rotation.z=(j%2?-.16:.13);
  }
- groupCube(g,1.35*scale,.75*scale,1.35*scale,fernLight,cx,height+1.05*scale,0);
+ groupPalmPart(g,1.25*scale,.42*scale,1.25*scale,palmLeaf,cx,height+.22*scale,0);
 }
-for(let i=0;i<19;i++){
- const x=-20+rand()*37,z=-17+rand()*33;
- if(!landAt(x,z)||(x>-11&&x<3&&z>-16&&z<-4)||(x>-11&&x<-5&&z>1&&z<8))continue;
+const palmFrondLight=mat(0xb4df7b);
+for(let i=0;i<110;i++){
+ const x=-60+rand()*120,z=-53+rand()*106;
+ if(!isCoastalPalmZone(x,z)||blocksCaveEntranceView(x,z)||!reserveTreeSite(x,z,5.0))continue;
  let h=0;
  for(const [tx,tz,w,d,th] of terraces)if(Math.abs(x-tx)<w*.42&&Math.abs(z-tz)<d*.42)h=Math.max(h,th+.15);
- lushPalm(x,z,h,.72+rand()*.38);
+ lushPalm(x,z,Math.max(h,groundHeightAt(x,z,0)),.72+rand()*.38);
 }
+// v10.7: Additional palms around the pond, with spacing and clear water sightlines.
+for(let i=0;i<28;i++){
+ const a=i*2.39996,dist=8.3+(i%4)*1.65;
+ const x=-9+Math.cos(a)*dist,z=4+Math.sin(a)*dist;
+ if(!isCoastalPalmZone(x,z)||blocksCaveEntranceView(x,z)||!reserveTreeSite(x,z,4.3))continue;
+ lushPalm(x,z,groundHeightAt(x,z,0),.75+(i%4)*.10);
+}
+// v10.1: restore one framing tree on the lower-right of the quarter view.
+// Keep the central cave entrance and its traversal corridor unobstructed.
+// Cave-side framing tree is a broadleaf; planted below after broadleaf is defined.
+// v10.4: Restore the TWO non-fruit tree families: lime palms on the shore,
+// and larger, differently-sized dark-green broadleaf trees inland by the mountains.
+// These are separate from berry trees and never placed on the coastal strip.
+const broadleafTrunk=mat(0x765338),broadleafLeafA=mat(0x51985e),
+      broadleafLeafB=mat(0x70b46d),broadleafLeafC=mat(0x83bd78);
+function mountainBroadleaf(x,z,ground,scale=1,variant=0){
+ const g=new THREE.Group();g.position.set(x,ground,z);
+ g.userData.treeOccluder=true;scene.add(g);
+ vegetationRoots.push({x,z,h:ground,parts:[g]});
+ const trunkHeight=(2.2+rand()*.75)*scale; // v11.2: half-length broadleaf trunk
+ const trunkWidth=(.70+rand()*.15)*scale;
+ // Broadleaf trunks are straight and smooth, unlike the palm's bent ringed trunk.
+ groupPalmPart(g,trunkWidth,trunkHeight,trunkWidth,broadleafTrunk,0,trunkHeight*.5,0);
+ const crownY=trunkHeight+.95*scale; // canopy lowered together with trunk
+ // Compact overlapping box clusters, as in the original dense voxel broadleaf.
+ // All foliage shares the same parent and occluder registration as the trunk.
+ const count=18+(variant%3)*3;
+ const palette=[broadleafLeafA,broadleafLeafB,broadleafLeafC];
+ // Core ensures a continuous silhouette instead of a few separated tiers.
+ groupPalmPart(g,3.05*scale,1.75*scale,3.0*scale,broadleafLeafA,0,crownY+.35*scale,0);
+ for(let i=0;i<count;i++){
+  const a=i*2.399963+variant*.37;
+  const ring=.72+Math.sqrt((i+.5)/count)*1.63; // v11.2: spread foliage clusters
+  const xx=Math.cos(a)*ring*scale;
+  const zz=Math.sin(a)*ring*.94*scale;
+  const yy=crownY+(.12+((i*7)%11)/11*1.58)*scale;
+  const w=(1.05+rand()*.55)*scale;
+  const hh=(.88+rand()*.46)*scale;
+  const d=(1.03+rand()*.57)*scale;
+  groupPalmPart(g,w,hh,d,palette[(i+variant)%palette.length],xx,yy,zz);
+ }
+ // A handful of upper clusters soften the square silhouette.
+ for(let i=0;i<5;i++){
+  const a=i*1.2566+variant;
+  groupPalmPart(g,(1.05+rand()*.35)*scale,(.8+rand()*.3)*scale,(1.05+rand()*.35)*scale,
+    palette[(i+1)%3],Math.cos(a)*1.08*scale,crownY+(1.82+rand()*.50)*scale,Math.sin(a)*1.08*scale);
+ }
+ return g;
+}
+// The mountain slopes behind and beside the cave are forested, but the cave
+// mouth and its quarter-view sightline remain open. Shoreline gets palms only.
+let broadleafCount=0;
+const broadleafLocations=[];
+// Place the forest FIRST in the visible mountain area, not just distant terrain.
+// Reject the cave mouth sightline and preserve berry-tree clearance.
+const caveForestSites=[
+ [-21,-25],[-14,-27],[-6,-29],[4,-27],[13,-25],[20,-20],
+ [-24,-16],[-19,-11],[12,-17],[19,-11],[-27,-7],[-24,0],
+ [-18,-32],[-2,-37],[9,-35],[24,-29],[-31,-23]
+];
+for(let i=0;i<caveForestSites.length;i++){
+ const [x,z]=caveForestSites[i];
+ if(!landAt(x,z)||blocksCaveEntranceView(x,z))continue;
+ const scale=1.05+(i%5)*.15;
+ if(!reserveTreeSite(x,z,3.35*scale))continue;
+ const h=groundHeightAt(x,z,0);
+ if(!Number.isFinite(h))continue;
+ mountainBroadleaf(x,z,h,scale,i%2);
+ broadleafLocations.push({x,z});broadleafCount++;
+}
+// v11.1: guaranteed broadleaf framing around the cave, with a clear central entrance.
+// These trees are evaluated before the wider random forest, and never placed in the doorway.
+const caveFlankSites=[
+ [-15,-7],[-17,-2],[-18,5],[-22,-12],[-25,-5],
+ [8,-8],[11,-3],[15,3],[18,-13],
+ [-13,-20],[-5,-23],[5,-22],[13,-20]
+];
+for(let i=0;i<caveFlankSites.length;i++){
+ const [x,z]=caveFlankSites[i];
+ if(!landAt(x,z)||blocksCaveEntranceView(x,z))continue;
+ const scale=.93+(i%4)*.12;
+ if(!reserveTreeSite(x,z,3.25*scale))continue;
+ const h=groundHeightAt(x,z,0);
+ if(!Number.isFinite(h)||h<-.5||h>18)continue;
+ mountainBroadleaf(x,z,h,scale,i%3);
+ broadleafLocations.push({x,z});broadleafCount++;
+}
+// v11.2: broaden the FRONT flanks of the cave forest, without covering the doorway.
+// The central path remains excluded by blocksCaveEntranceView().
+const caveFrontForestSites=[
+ [-17,1],[-15,7],[-20,8],[-23,3],[-13,10],
+ [9,1],[13,6],[17,9],[19,2],[12,12]
+];
+for(let i=0;i<caveFrontForestSites.length;i++){
+ const [x,z]=caveFrontForestSites[i];
+ if(!landAt(x,z)||blocksCaveEntranceView(x,z))continue;
+ const scale=.92+(i%4)*.11;
+ const h=groundHeightAt(x,z,0);
+ if(!Number.isFinite(h)||h<-.5||h>18)continue;
+ if(!reserveTreeSite(x,z,2.9*scale))continue;
+ mountainBroadleaf(x,z,h,scale,i%3);
+ broadleafLocations.push({x,z});broadleafCount++;
+}
+// v11.4: fixed broadleaf trees at the THREE marked foreground gaps.
+// Previous v11.3 used optional placement and silently skipped these sites because
+// reserveTreeSite / berry exclusion / view checks rejected them.
+// The markers correspond to: left of pond, upper-left approach, and front-right of pond.
+// Plant these as deliberate set pieces rather than optional procedural candidates.
+const markedCaveFrontTrees=[
+ {x:-22.2,z:4.0,scale:.96},
+ {x:-17.2,z:-.5,scale:1.00},
+ {x:-2.0,z:9.2,scale:.93}
+];
+const guaranteedCaveFrontTrees=[];
+for(let i=0;i<markedCaveFrontTrees.length;i++){
+ const t=markedCaveFrontTrees[i];
+ // Stay clear of the cave mouth, pond water and protected fruit-tree trunks.
+ // These are hand-authored locations, not random candidates: never skip because
+ // the optional procedural-tree reservation grid was already occupied.
+ const x=t.x,z=t.z;
+ const ground=groundHeightAt(x,z,0);
+ const tree=mountainBroadleaf(x,z,Number.isFinite(ground)?ground:.3,t.scale,i%3);
+ tree.userData.handPlantedCaveFront=true;
+ guaranteedCaveFrontTrees.push(tree);
+ plantedTreeSites.push({x,z,radius:2.35*t.scale});
+ broadleafLocations.push({x,z});broadleafCount++;
+}
+// Additional irregularly sized mountain broadleaf trees, avoiding the beach.
+for(let attempt=0;attempt<420&&broadleafCount<52;attempt++){
+ const x=-38+rand()*72,z=-46+rand()*48;
+ if(!landAt(x,z)||islandValue(x,z)<.16||!isMountainForestZone(x,z))continue;
+ if(blocksCaveEntranceView(x,z)||Math.hypot(x-caveX,z-caveZ)<8)continue;
+ const scale=.94+rand()*.75;
+ if(!reserveTreeSite(x,z,3.35*scale))continue;
+ const h=groundHeightAt(x,z,0);
+ if(!Number.isFinite(h)||h<-.5||h>18)continue;
+ mountainBroadleaf(x,z,h,scale,broadleafCount%2);
+ broadleafLocations.push({x,z});broadleafCount++;
+}
+// Broadleaf pond-side grove: inland only, away from the water edge.
+for(let i=0;i<14;i++){
+ const a=i*2.39996,dist=10.5+(i%4)*1.3;
+ const x=-9+Math.cos(a)*dist,z=4+Math.sin(a)*dist;
+ if(!landAt(x,z)||islandValue(x,z)<.24||blocksCaveEntranceView(x,z)||!reserveTreeSite(x,z,4.5))continue;
+ mountainBroadleaf(x,z,groundHeightAt(x,z,0),.9+(i%4)*.12,i%2);
+}
+// An intentionally placed mountain tree frames the lower-right without blocking the cave.
+if(landAt(17,12)&&reserveTreeSite(17,12,5.3))mountainBroadleaf(17,12,groundHeightAt(17,12,0),1.12,1);
 // Dense cube bushes, ferns, flowering plants and cliff vines.
 function bush(x,y,z,s){
+ // v11.5: preserve the 1.4x bush size while spreading its cube clusters horizontally.
+ s *= 1.4;
  const g=new THREE.Group();g.position.set(x,y,z);scene.add(g);
  for(let j=0;j<7;j++){
-  const a=rand()*Math.PI*2,r=rand()*s*.7;
+  const a=rand()*Math.PI*2,r=Math.sqrt(rand())*s*1.02;
   groupCube(g,s*(.42+rand()*.32),s*(.35+rand()*.25),s*(.42+rand()*.32),
      rand()>.5?fernGreen:fernLight,Math.cos(a)*r,s*.25+rand()*s*.32,Math.sin(a)*r);
  }
@@ -542,14 +740,15 @@ function animateFireflies(){
 const berryRed=mat(0xd94848),berryDark=mat(0x9e3039),twigMat=mat(0x665039);
 const berryTrees=[];
 function berryTree(x,z,ground=0){
- const g=new THREE.Group();g.position.set(x,ground,z);scene.add(g);vegetationRoots.push({x,z,h:ground,parts:[g]});/* Tree collision disabled: trunks do not block navigation. */
- groupCube(g,.42,2.8,.42,trunkLight,0,1.4,0);
- for(const [dx,dy,dz,size] of [[0,3.1,0,1.6],[-.85,2.7,0,1.2],[.85,2.75,.25,1.25],[0,2.65,-.9,1.1]])
+ const g=new THREE.Group();g.position.set(x,ground,z);g.userData.treeOccluder=true;scene.add(g);vegetationRoots.push({x,z,h:ground,parts:[g]});/* Tree collision disabled: trunks do not block navigation. */
+ groupCube(g,.50,3.05,.50,trunkLight,0,1.525,0);
+ for(const [dx,dy,dz,size] of [[0,3.25,0,1.75],[-.9,2.85,0,1.3],[.9,2.9,.25,1.35],[0,2.8,-.9,1.2]])
   groupCube(g,size,size*.82,size,fernGreen,dx,dy,dz);
  const fruits=[];
  for(let j=0;j<16;j++){
   const a=rand()*Math.PI*2,r=.62+rand()*1.03,y=2.4+rand()*1.25;
   const f=groupCube(g,.35,.35,.35,j%3===0?berryDark:berryRed,Math.cos(a)*r,y,Math.sin(a)*r);
+  f.userData.treePart=true; // berry fruit must fade together with its parent tree
   fruits.push(f);
  }
  berryTrees.push({group:g,fruits,stock:0,regrowAt:0});return g;
@@ -614,7 +813,7 @@ for(let i=0;i<155;i++){
  if(!landAt(x,z)||Math.abs(x)<20&&Math.abs(z)<18||Math.hypot(x+9,z-4)<9)continue;
  let h=0;for(const [tx,tz,th,w,d] of outerTerraces)
   if(Math.abs(x-tx)<w*.44&&Math.abs(z-tz)<d*.44)h=Math.max(h,th+.17);
- if(i%3===0)lushPalm(x,z,h,.68+rand()*.5);
+ if(i%3===0){if(isCoastalPalmZone(x,z)&&!blocksCaveEntranceView(x,z)&&reserveTreeSite(x,z,4.8))lushPalm(x,z,h,.68+rand()*.5);}
  else bush(x,h,z,.4+rand()*.9);
 }
 for(let i=0;i<65;i++){
@@ -624,7 +823,7 @@ for(let i=0;i<65;i++){
 }
 // A small wood pile becomes a living campfire only after Hina learns to light it.
 const campfire=new THREE.Group();scene.add(campfire);
-campfire.position.set(-2.35,.34,-9.0);
+campfire.position.set(-2.35,.34,-6.45);
 const campLogMaterial=mat(0x5a3927),emberMaterial=new THREE.MeshBasicMaterial({color:0xff6b1c}),flameYellow=new THREE.MeshBasicMaterial({color:0xffd55a,transparent:true,opacity:.88,depthWrite:false,side:THREE.DoubleSide}),flameOrange=new THREE.MeshBasicMaterial({color:0xff672c,transparent:true,opacity:.85,depthWrite:false,side:THREE.DoubleSide});
 for(let i=0;i<5;i++){
  const logMesh=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,1.55,7),campLogMaterial);
@@ -638,7 +837,7 @@ for(let i=0;i<6;i++){
  campfire.add(flame);flames.push(flame);
 }
 const ember=new THREE.Mesh(new THREE.SphereGeometry(.30,8,6),emberMaterial);ember.position.y=.2;campfire.add(ember);
-const fireLight=new THREE.PointLight(0xff8538,0,10,2);fireLight.position.set(-2.35,1.4,-9);scene.add(fireLight);
+const fireLight=new THREE.PointLight(0xff8538,0,10,2);fireLight.position.set(-2.35,1.4,-6.45);scene.add(fireLight);
 campfire.visible=false;
 function updateCampfire(t){
  campfire.visible=fireSuccess;
@@ -839,7 +1038,7 @@ function animateWildlife(t,dt){
   const speed=f.swimSpeed*(.75+.25*Math.sin(t*.6+f.phase));
   f.g.position.x+=Math.sin(f.swimHeading)*speed*dt;
   f.g.position.z+=Math.cos(f.swimHeading)*speed*dt;
-  f.g.position.y=(f.pond?.19:-.34)+Math.sin(t*.75+f.phase)*.07;
+  f.g.position.y=(f.pond?.08:-.34)+Math.sin(t*.75+f.phase)*.055;
   f.g.rotation.y=f.swimHeading+Math.PI/2;
   f.g.rotation.z=Math.sin(t*1.6+f.phase)*.045;
   f.tail.rotation.y=Math.sin(t*5.5+f.phase)*.48;
@@ -899,9 +1098,9 @@ scene.add(torchLight);torchGroup.visible=false;
 let torchOuting=false,torchNightDay=0,torchOutingsToday=0,torchDecisionAt=-Infinity;
 // Torch is physical camp equipment: Hina must collect it at the cave before leaving.
 let torchCarried=false, outdoorTorchAttemptAt=-Infinity, outdoorTorchBurnoutAt=-Infinity;
-function atCaveForTorch(){return Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<4.0;}
+function atCaveForTorch(){return Math.hypot(hana.position.x-campfire.position.x,hana.position.z-campfire.position.z)<5.5;}
 function prepareCaveTorch(){
- if(!torchCarried&&fireEverLit&&fireSuccess&&fireKnowledge>0&&!raining()&&atCaveForTorch()){
+ if(!torchCarried&&fireEverLit&&fireSuccess&&fireKnowledge>0&&!raining()&&atCaveForTorch()&&!['rest','night','mentalRest'].includes(state)&&!sleepingPose){
   torchCarried=true;outdoorTorchBurnoutAt=-Infinity;log('동굴 모닥불에서 횃불을 챙김');
  }
 }
@@ -912,7 +1111,9 @@ function updateTorch(){
  // A depleted fire-maintenance gauge also burns out the outdoor torch.
  if(torchCarried&&fireKnowledge<=0){torchCarried=false;outdoorTorchBurnoutAt=elapsed;log('🔥 불 유지 0 · 횃불이 완전히 꺼짐');if(state==='fieldRest'&&darkHours()&&!atCaveForTorch()){changeWill(-12,'야외 취침 중 횃불 소화');say('어...? 횃불이 꺼졌어... 밤이 너무 무서워.');}}
  const nearCave=atCaveForTorch();
- const actuallyResting=nearCave&&(state==='rest'||state==='night'||state==='mentalRest');
+ const actuallyResting=nearCave&&(state==='rest'||state==='night'||state==='mentalRest'||sleepingPose);
+ // At the campfire, Hina puts the torch away throughout sleep, regardless of cave-Z thresholds.
+ // Keep torchCarried so she can use it again after waking and walking away.
  // Resting does not destroy a carried torch. Relight when departing the cave.
  // Outdoor sleep keeps the torch upright beside Hina instead of hiding its flame.
  const active=torchCarried&&darkHours()&&!raining()&&!actuallyResting;
@@ -1186,11 +1387,14 @@ function fireChance(){
  const wet=groundWet(), rain=raining();
  return Math.max(.01,Math.min(.83,.025+fireKnowledge*.013+fireAttempts*.017+fireDryStock*.07-(rain?.36:wet?.18:0)));
 }
+let rainVisualStrength=0;
 function weatherUpdate(step){
  const t=clockParts(),rain=raining(t.day),wet=groundWet(t.day);
+ // Smooth both arrival and clearing: 25 simulated seconds to full intensity.
+ rainVisualStrength=THREE.MathUtils.clamp(rainVisualStrength+(rain?1:-1)*step/25,0,1);
  for(let i=0;i<rainDrops.length;i++){
-  const d=rainDrops[i];d.visible=rain;
-  if(rain){
+  const d=rainDrops[i];d.visible=rainVisualStrength>.005 && i<Math.ceil(rainDrops.length*rainVisualStrength);
+  if(d.visible){
    // World-space volume centered on Hina. Drops recycle above her, not at the cave.
    d.userData.rainHeight-=step*(12+i%6);
    if(d.userData.rainHeight<0){
@@ -1203,7 +1407,7 @@ function weatherUpdate(step){
     hana.position.z+d.userData.rainOffsetZ);
   }
  }
- rainMaterial.opacity=.35+Math.sin(elapsed*2)*.12;
+ rainMaterial.opacity=(.35+Math.sin(elapsed*2)*.06)*rainVisualStrength;
  if(lastWeatherDay!==t.day){
   lastWeatherDay=t.day;
   if(rain){log('비가 내리기 시작함 · 야외 나뭇가지가 젖음');fireDryStock=0;
@@ -1212,12 +1416,12 @@ function weatherUpdate(step){
   else if(t.day>1){log('맑은 날 · 나뭇가지가 마르기 시작함');}
  }
  $('weather').textContent=rain?'🌧 비 · 나무가 젖음':wet?'☁ 비 갠 뒤 · 축축한 땅':'☀ 맑음 · 미지의 섬';
- sun.intensity*=rain?.47:wet?.78:1;
- scene.fog.far=rain?280:wet?330:380;
+ sun.intensity*=THREE.MathUtils.lerp(wet?.78:1,.47,rainVisualStrength);
+ scene.fog.far=THREE.MathUtils.lerp(wet?330:380,280,rainVisualStrength);
 }
 
 const sites={water:new THREE.Vector3(-8,.5,2),berries:new THREE.Vector3(-3,.5,10),
-shelter:new THREE.Vector3(-4,.5,-10),beach:new THREE.Vector3(9,.5,5),
+shelter:new THREE.Vector3(-3.25,.5,-6.5),beach:new THREE.Vector3(9,.5,5),
 trees:new THREE.Vector3(-1,.5,-5),wildlife:new THREE.Vector3(11,.5,7),
 outerNorth:new THREE.Vector3(-38,.5,39),outerEast:new THREE.Vector3(58,.5,6),outerSouth:new THREE.Vector3(40,.5,-43),
 farWest:new THREE.Vector3(-58,.5,-21),farNorth:new THREE.Vector3(6,.5,51),farSouth:new THREE.Vector3(-16,.5,-48)};
@@ -1339,6 +1543,7 @@ for(const radius of [22,37,52,68,84]){
   const z=Math.sin(a)*radius*.86+(rand()-.5)*8;
   if(!landAt(x,z)||inCaveWalkZone(x,z)||Math.hypot(x-sites.shelter.x,z-sites.shelter.z)<14)continue;
   if(berryTrees.some(t=>Math.hypot(t.group.position.x-x,t.group.position.z-z)<9))continue;
+  if(plantedTreeSites.some(t=>Math.hypot(t.x-x,t.z-z)<t.radius+3.5))continue;
   // Avoid inaccessible steep ridges: at least one nearby flat walking approach.
   if(!terrainPassable(x+1.8,z,x,z)&&!terrainPassable(x-1.8,z,x,z)&&!terrainPassable(x,z+1.8,x,z))continue;
   const ground=wildlifeGroundY(x,z);
@@ -1899,7 +2104,7 @@ function init(){
   r.caught=false;r.pet=false;r.panic=0;r.hopActive=false;r.hopClock=0;r.restUntil=0;r.g.visible=true;
   r.g.position.set(r.homeX,rabbitGroundY(r.homeX,r.homeZ)+.04,r.homeZ);r.g.rotation.set(0,0,0);
  });
- fishes.forEach(f=>{f.g.position.set(f.x,-.3,f.z);f.tail.rotation.y=0;});
+ fishes.forEach(f=>{f.g.position.set(f.x,f.pond?.08:-.3,f.z);f.tail.rotation.y=0;});
  campfire.visible=false;fireLight.intensity=0;
  rainDrops.forEach(d=>d.visible=false);
  resetBerryTrees();
@@ -2799,7 +3004,7 @@ function update(dt){
   if(day===1&&(state==='confused'||state==='orient'))updateIntroMovement(step);
   else {walkPose(step,false);head.rotation.y=0;}
  }
- if(darkHours()&&atCaveForTorch()&&!torchCarried)prepareCaveTorch();
+ if(darkHours()&&fireSuccess&&fireKnowledge>0&&!torchCarried&&atCaveForTorch()&&!sleepingPose&&!['rest','night','mentalRest'].includes(state))prepareCaveTorch();
  decide();
  updateCharacterPose();updateTorch();
  terrainSafetyWatch();
@@ -2841,11 +3046,11 @@ function update(dt){
  const lerp=(x,y)=>THREE.MathUtils.lerp(x,y,blend);
  const blendColor=(out,a,b)=>out.setHex(a).lerp(_todColor.setHex(b),blend);
  const _todColor=new THREE.Color();
- const weatherDim=raining()?.70:groundWet()?.88:1;
+ const weatherDim=THREE.MathUtils.lerp(groundWet()?.88:1,.70,rainVisualStrength);
  const nightBlack=hour<4; // Dim moonless blue ambient light remains for orientation.
  blendColor(scene.background,from.sky,to.sky);
  // Rain makes the palette slightly cooler and darker without flattening the sunset.
- if(raining())scene.background.lerp(_todColor.setHex(0x344f6c),.20);
+ if(rainVisualStrength>.001)scene.background.lerp(_todColor.setHex(0x344f6c),.20*rainVisualStrength);
  scene.fog.color.copy(scene.background).lerp(_todColor.setHex(from.fog).lerp(new THREE.Color(to.fog),blend),.30);
  blendColor(ambient.color,from.ambient,to.ambient);
  blendColor(sun.color,from.sun,to.sun);
@@ -2936,6 +3141,8 @@ $('mobileMenu').onclick=()=>{
  $('mobileMenu').textContent=open?'✕ 닫기':'☰ 메뉴';
 };
 function applyQuality(){
+ glowCanvas.style.display=(highQuality&&!ultraLowPower)?'block':'none';
+ if(highQuality&&!ultraLowPower)nextGlowAt=0;
  renderer.setPixelRatio(Math.min(devicePixelRatio,ultraLowPower?.65:highQuality?Math.min(isMobile?1.25:2,devicePixelRatio):(isMobile?.85:1.05)));
  mobileTargetFPS=ultraLowPower?20:30;
  renderer.setSize(innerWidth,innerHeight,false);
@@ -2968,6 +3175,25 @@ const occlusionAim=new THREE.Vector3(),occlusionFocusPx=new THREE.Vector2();
 const occlusionBufferSize=new THREE.Vector2(),occlusionWorldPos=new THREE.Vector3();
 const softMaterials=new Map();const fadedMeshes=new Map(),occlusionCandidates=new Set();
 const caveFadeMeshes=new Set(); // Rock walls, cliff face and overhead geometry that can hide Hina inside the cave.
+// v9.9: terrain outside the cave and props below half Hina's torso never fade.
+const occlusionBoundsScratch=new THREE.Box3();
+function canFadeScenery(mesh){
+ if(!mesh||!mesh.isMesh||mesh.userData.noOcclusion)return false;
+ if(mesh.userData.treePart||mesh.parent?.userData.treeOccluder)return true;
+ // The shared grass/rock material must not determine whether a mesh fades.
+ // Terrain is identified by its registered walkable geometry, not its material.
+ if(mesh.userData.walkableTerrain && !caveFadeMeshes.has(mesh))return false;
+ if(mesh.userData.walkableTerrain && !caveOcclusionActive)return false;
+ occlusionBoundsScratch.setFromObject(mesh);
+ const h=occlusionBoundsScratch.max.y-occlusionBoundsScratch.min.y;
+ const w=occlusionBoundsScratch.max.x-occlusionBoundsScratch.min.x;
+ const d=occlusionBoundsScratch.max.z-occlusionBoundsScratch.min.z;
+ // Half-body-height scenery stays fully visible; don't dissolve tiny rocks/props.
+ if(!mesh.userData.caveRoofFade && h<0.9 && Math.max(w,d)<1.8)return false;
+ // Non-walkable oversized cliffs also stay opaque outside the cave.
+ if(!caveOcclusionActive && (w>8||d>8||h>9))return false;
+ return true;
+}
 const occlusionUniforms={focus:{value:occlusionFocusPx},radius:{value:1},depth:{value:1}};
 const occlusionGroupMembers=new Map(),occlusionBounds=new Map();
 let caveOcclusionActive=false;
@@ -3003,6 +3229,7 @@ function collectCaveFadeMeshes(){
  for(const mesh of cameraOccluders){
   if(!mesh.isMesh||!mesh.geometry||mesh.userData.noOcclusion)continue;
   if(mesh.userData.caveOccluder){caveFadeMeshes.add(mesh);continue;}
+  if(mesh.userData.walkableTerrain)return;
   bounds.setFromObject(mesh);
   if(bounds.max.y<1.35||bounds.min.y>6.6||!bounds.intersectsBox(caveRoom))continue;
   // Do not dissolve the ground slab; only overhead and side geometry.
@@ -3064,23 +3291,23 @@ function updateCameraOcclusion(now){
   const projectedRadius=sphere.radius*perspectiveFactor/Math.max(1,depth);
   if(Math.hypot(px-occlusionFocusPx.x,py-occlusionFocusPx.y)>radius+projectedRadius+12)continue;
   // Every mesh in the same tree fades with exactly the same screen-space gradient.
-  for(const mesh of members)if(mesh.visible&&mesh.material&&!Array.isArray(mesh.material)&&!mesh.material.transparent)occlusionCandidates.add(mesh);
+  for(const mesh of members)if(canFadeScenery(mesh)&&mesh.visible&&mesh.material&&!Array.isArray(mesh.material)&&!mesh.material.transparent)occlusionCandidates.add(mesh);
   // Previously faded meshes must remain candidates even though their temporary material is transparent.
-  for(const mesh of members)if(mesh.visible&&fadedMeshes.has(mesh))occlusionCandidates.add(mesh);
+  for(const mesh of members)if(canFadeScenery(mesh)&&mesh.visible&&fadedMeshes.has(mesh))occlusionCandidates.add(mesh);
  }
  // Cave roof and surrounding mountain have very large bounds. A sphere-center
  // screen test can miss them even when their near face fills the whole view.
  // While Hina is inside, force these pieces into the SAME circular shader.
  if(caveOcclusionActive){
   for(const mesh of caveFadeMeshes){
-   if(mesh.visible&&mesh.material&&(!mesh.material.transparent||fadedMeshes.has(mesh)))occlusionCandidates.add(mesh);
+   if(canFadeScenery(mesh)&&mesh.visible&&mesh.material&&(!mesh.material.transparent||fadedMeshes.has(mesh)))occlusionCandidates.add(mesh);
   }
  }
  for(const mesh of occlusionCandidates){
   if(fadedMeshes.has(mesh))continue;
   const original=mesh.material;
   if(!original||Array.isArray(original)||original.transparent)continue;
- const terrain=Boolean(mesh.userData.walkableTerrain)&&!(caveOcclusionActive&&caveFadeMeshes.has(mesh));
+ const terrain=Boolean(mesh.userData.walkableTerrain)&&!mesh.userData.caveRoofFade;
   const cacheKey=original.uuid+(terrain?':terrain':':object');
   if(!softMaterials.has(cacheKey))softMaterials.set(cacheKey,makeSoftOcclusionMaterial(original,terrain));
   mesh.material=softMaterials.get(cacheKey);fadedMeshes.set(mesh,original);
@@ -3231,7 +3458,7 @@ window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camer
  const dn=$('dayNight');
  const dnText=nightNow?'🌙 밤':clockNow.h>=16?'🌆 저녁':'☀️ 낮';
  if(dn.textContent!==dnText){dn.textContent=dnText;dn.classList.toggle('night',nightNow);}
- const cpuStart=performance.now();renderer.render(scene,camera);
+ const cpuStart=performance.now();renderer.render(scene,camera);updateSubtleBloom(t);
  perfFrames++;perfCpu+=performance.now()-cpuStart;
  if(t>=perfNext){const seconds=Math.max(.001,(t-perfLast)/1000);perfFps=Math.round(perfFrames/seconds);perfDraw=renderer.info.render.calls;perfTris=renderer.info.render.triangles;perfRenderMs=(perfCpu/Math.max(1,perfFrames)).toFixed(1);perfFrames=0;perfCpu=0;perfLast=t;perfNext=t+1500;refreshPerfHud();}
 }requestAnimationFrame(animate);
