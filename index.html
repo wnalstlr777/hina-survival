@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v6.7</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v7.6</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileCategories{display:none}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media(max-width:700px){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
@@ -30,7 +30,7 @@
 #ambientBubble{position:fixed;pointer-events:none;z-index:3;opacity:0;transition:opacity .5s;transform:translate(-50%,-100%);padding:6px 11px;border-radius:15px;background:#172a30e8;color:#d3e7db;border:1px solid #668078;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 3px 12px #0007}
 #ambientBubble.show{opacity:1}
 @keyframes sleepFloat{0%,100%{margin-top:0}50%{margin-top:-6px}}
-</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ambientBubble" aria-hidden="true"></div><div id="ui"><nav id="mobileCategories"><button data-pane="vitals" class="selected">생존</button><button data-pane="skills">숙련도</button><button data-pane="mind">마음</button><button data-pane="logs">기록</button><button data-pane="settings">설정</button></nav><div id="vitalsPane"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div></div><details id="skillPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">📚 숙련도 · 탐험 기록</summary><div id="skillContent" style="font-size:12px;line-height:1.7;padding:8px 2px"></div></details><details id="mindPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🧠 히나의 마음 · 기억 일기</summary><div id="mindContent" style="font-size:12px;line-height:1.55;padding:8px 2px;white-space:pre-line"></div></details><details id="actionLogPanel" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">📋 AI 행동 기록 · 펼쳐보기</summary><div id="log" style="margin-top:8px"></div></details></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">발견도 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="speed">속도 ×1</button><button id="cameraMode" aria-pressed="false">카메라: 자유</button><div id="extraControls"><button id="reset">다시 시작</button><button id="devDay10" title="테스트용: DAY 10의 생존·탐험·학습·제작 상태를 한 번에 불러옵니다">🧪 10일 차</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 암막 ON</button><button id="qualityToggle">화질: 자동</button><button id="perfToggle" aria-pressed="false">성능 정보 OFF</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대(팔로우에서도 가능) · F: 히나 찾기 · C: 카메라 모드 · 검은 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
+</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ambientBubble" aria-hidden="true"></div><div id="ui"><nav id="mobileCategories"><button data-pane="vitals" class="selected">생존</button><button data-pane="skills">숙련도</button><button data-pane="mind">마음</button><button data-pane="logs">기록</button><button data-pane="settings">설정</button></nav><div id="vitalsPane"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div></div><details id="skillPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">📚 숙련도 · 탐험 기록</summary><div id="skillContent" style="font-size:12px;line-height:1.7;padding:8px 2px"></div></details><details id="mindPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🧠 히나의 마음 · 기억 일기</summary><div id="mindContent" style="font-size:12px;line-height:1.55;padding:8px 2px;white-space:pre-line"></div></details><details id="actionLogPanel" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">📋 AI 행동 기록 · 펼쳐보기</summary><div id="log" style="margin-top:8px"></div></details></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">발견도 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="cameraMode" aria-pressed="false">카메라: 자유</button><div id="extraControls"><button id="reset">다시 시작</button><button id="devDay10" title="테스트용: DAY 10의 추정 생존 상태">🧪 10일 차</button><button id="devDay20" title="테스트용: DAY 20의 추정 생존 상태">🧪 20일 차</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 안개 ON</button><button id="qualityToggle">화질: 자동</button><button id="perfToggle" aria-pressed="false">성능 정보 OFF</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대(팔로우에서도 가능) · F: 히나 찾기 · C: 카메라 모드 · 회색 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia('(max-width:700px)').matches;
@@ -38,10 +38,10 @@ let highQuality=!isMobile;
 let mobileTargetFPS=20;let lastRenderAt=0;let ultraLowPower=isMobile;let nextUiFrame=0;
 let followCamera=false;let followDistance=21.4;const followOffset=new THREE.Vector3(12,13,12);const followFocus=new THREE.Vector3();const followDesired=new THREE.Vector3();
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ad4e7);scene.fog=new THREE.Fog(0x9ad4e7,165,380);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,380);camera.position.set(32,35,49);const renderer=new THREE.WebGLRenderer({antialias:!isMobile,powerPreference:isMobile?"low-power":"high-performance"});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.15:2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('view').appendChild(renderer.domElement);const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(-4,1,-3);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI/2.08;orbit.minDistance=5;orbit.maxDistance=255;const ambient=new THREE.HemisphereLight(0xffffff,0x516d4b,2.2);scene.add(ambient);const sun=new THREE.DirectionalLight(0xffe4aa,2.4);sun.position.set(-12,25,14);sun.castShadow=true;sun.shadow.mapSize.set(isMobile?512:2048,isMobile?512:2048);sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.025;sun.shadow.camera.left=isMobile?-38:-155;sun.shadow.camera.right=isMobile?38:155;sun.shadow.camera.top=isMobile?38:155;sun.shadow.camera.bottom=isMobile?-38:-155;scene.add(sun);const fill=new THREE.DirectionalLight(0xa4d9ff,.65);fill.position.set(14,10,-18);scene.add(fill);
-let terrainGrid=null;const vegetationRoots=[];const groundPlatforms=[];const wildlifeSurfaces=[];const solidObstacles=[];const detailMeshes=[];const cameraOccluders=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x217db5),riverMat=mat(0x4aafd9),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);
+let terrainGrid=null;const vegetationRoots=[];const groundPlatforms=[];const wildlifeSurfaces=[];const solidObstacles=[];const detailMeshes=[];const cameraOccluders=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x217db5),riverMat=mat(0x4aafd9),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=(h>=1.5||w>=2.2||d>=2.2);o.receiveShadow=true;scene.add(o);
  // Keep the actual solid volume, including caps and cave ceiling underside.
  if((m===grass||m===dirt||m===dirt2||m===rock||m===rockDark||m===stone||m===moss)&&w>=.08&&d>=.08&&w<100&&d<100){
-  const surface={x,z,rx:w*.5,rz:d*.5,bottom:y-h*.5,top:y+h*.5};
+  const surface={x,z,rx:w*.5,rz:d*.5,bottom:y-h*.5,top:y+h*.5,minorDecoration:h<1.45&&w<2.2&&d<2.2};
   wildlifeSurfaces.push(surface);if(w>=.8&&d>=.8){surface.mesh=o;groundPlatforms.push(surface);o.userData.walkableTerrain=true;}
  }
  // v6.9: preserve walkable top faces, fade blocking vertical terrain and cave roof undersides.
@@ -52,7 +52,7 @@ let terrainGrid=null;const vegetationRoots=[];const groundPlatforms=[];const wil
     && !(m===dirt||m===dirt2||m===grass)
     && !(h>1.4 && w<=2.1 && d<=2.1))
   /* v4.3: scenery never creates navigation blockers */
- if(Math.max(w,h,d)<4&&Math.hypot(x,z)>23)detailMeshes.push(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
+ if(Math.max(w,h,d)<4&&Math.hypot(x,z)>23)detailMeshes.push(o);return o}function cylinder(r1,r2,h,m,x,y,z){let o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,6),m);o.position.set(x,y,z);o.castShadow=h>=1.5||Math.max(r1,r2)>=.9;scene.add(o);return o}// Voxel island: terraces, cliffs and an open-front natural cave (no buildings).
 grass.polygonOffset=true;grass.polygonOffsetFactor=-1;grass.polygonOffsetUnits=-1;
 const dirt=mat(0x9a7656),dirt2=mat(0x82654f),rockDark=mat(0x4d5356),rock=mat(0x777979),moss=mat(0x64885a),palmLeaf=mat(0x4d9664),foam=mat(0xa7e9dc);
 box(460,.25,460,sea,0,-.85,0);
@@ -587,6 +587,13 @@ function rabbit(x,z,seedPhase){
 }
 rabbit(11.7,8.3,.5);rabbit(27,17,2.2);rabbit(-30,21,4.5);
 // Random low-poly snakes: danger from proximity, not a permanent scripted penalty.
+// Wildlife keeps away from lit campfires and the moving torch.
+const CAMPFIRE_WILDLIFE_RADIUS=10, TORCH_WILDLIFE_RADIUS=6.5;
+function wildlifeFireAvoidance(x,z){
+ const camp=fireSuccess&&Math.hypot(x-campfire.position.x,z-campfire.position.z)<CAMPFIRE_WILDLIFE_RADIUS;
+ const torch=torchGroup.visible&&Math.hypot(x-hana.position.x,z-hana.position.z)<TORCH_WILDLIFE_RADIUS;
+ return camp||torch;
+}
 const snakes=[];
 const snakeMat=mat(0x7fa85a),snakeStripe=mat(0xc3d886),snakeEye=mat(0x181e16);
 function makeSnake(x,z){
@@ -610,11 +617,12 @@ function updateSnakes(step){
   nextSnakeSpawn=elapsed+randomBetween(85,145);
   const a=Math.random()*Math.PI*2,d=randomBetween(4,7);
   const x=hana.position.x+Math.cos(a)*d,z=hana.position.z+Math.sin(a)*d;
-  if(landAt(x,z)&&Math.hypot(x-sites.shelter.x,z-sites.shelter.z)>5){
+  if(landAt(x,z)&&Math.hypot(x-sites.shelter.x,z-sites.shelter.z)>5&&!wildlifeFireAvoidance(x,z)){
    makeSnake(x,z);log('🐍 주변 풀숲에 뱀이 나타남');
   }else nextSnakeSpawn=elapsed+20; // retry soon if location is invalid
  }
  for(const s of [...snakes]){
+  if(wildlifeFireAvoidance(s.g.position.x,s.g.position.z)){scene.remove(s.g);snakes.splice(snakes.indexOf(s),1);continue;}
   if(elapsed>=s.expiresAt||Math.hypot(s.g.position.x-hana.position.x,s.g.position.z-hana.position.z)>24){
    scene.remove(s.g);snakes.splice(snakes.indexOf(s),1);continue;
   }
@@ -673,6 +681,18 @@ function animateWildlife(t,dt){
    continue;
   }
   if(r.caught)continue;
+  if(wildlifeFireAvoidance(r.g.position.x,r.g.position.z)){
+   // Gradual flight instead of teleporting; fire keeps rabbits out of its radius.
+   const fromTorch=torchGroup.visible&&Math.hypot(r.g.position.x-hana.position.x,r.g.position.z-hana.position.z)<TORCH_WILDLIFE_RADIUS;
+   const fx=fromTorch?hana.position.x:campfire.position.x,fz=fromTorch?hana.position.z:campfire.position.z;
+   const dxFire=r.g.position.x-fx,dzFire=r.g.position.z-fz,dd=Math.max(.05,Math.hypot(dxFire,dzFire));
+   const stride=Math.min(3.6*dt,2.2);
+   const nx=r.g.position.x+dxFire/dd*stride,nz=r.g.position.z+dzFire/dd*stride;
+   if(landAt(nx,nz)){r.g.position.x=nx;r.g.position.z=nz;}
+   r.g.position.y=rabbitGroundY(r.g.position.x,r.g.position.z)+.06;
+   r.g.rotation.y=Math.atan2(dxFire,dzFire);
+   continue;
+  }
   const dx=r.g.position.x-hana.position.x,dz=r.g.position.z-hana.position.z;
   const near=Math.hypot(dx,dz)<4.1;
   r.panic=near?Math.min(1,r.panic+dt*2):Math.max(0,r.panic-dt*.65);
@@ -766,8 +786,8 @@ function updateTorch(){
  const active=torchCarried&&darkHours()&&!raining()&&!actuallyResting;
  torchGroup.visible=active;
  // A sleeping character lies sideways: compensate so the torch remains upright.
- if(state==='fieldRest'&&active){torchGroup.rotation.z=Math.PI/2;torchGroup.rotation.x=0;}
- else {torchGroup.rotation.z=0;}
+ if(sleepingPose&&active){torchGroup.rotation.z=0;torchGroup.rotation.x=Math.PI/2-arms[0].rotation.x;}
+ else {torchGroup.rotation.z=0;torchGroup.rotation.x=-arms[0].rotation.x;}
  torchLight.intensity=active?(isMobile?2.1:3.0)*(0.94+Math.sin(elapsed*9)*.06):0;
  if(active){torchGroup.updateWorldMatrix(true,false);torchGroup.localToWorld(torchLight.position.set(0,1.30,0));
  torchFlame.scale.y=.9+Math.sin(elapsed*10)*.11;}
@@ -779,7 +799,7 @@ for(const l of legs){
  limbCube(l,.29,.16,.43,shoe,0,-.675,.10);
 }
 const satchel=part(.23,.33,.15,dark,.44,1.02,-.12);
-part(.07,.60,.08,shoe,.25,1.53,-.20);
+// Removed dark diagonal accessory strip overlapping the arm silhouette.
 hana.position.set(9,.4,5);
 const closedEyes=[];
 for(const side of [-1,1]){
@@ -794,23 +814,30 @@ function updateCharacterPose(){
  const atShelter=Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<2.5;
  const sleep=((state==='rest'||state==='night')&&atShelter&&!target)||state==='fieldRest'||state==='mentalRest';
  sleepingPose=sleep;
- hana.rotation.z=sleep?-Math.PI/2:0;
+ hana.rotation.z=0;
+ // Face is on local +Z. Turn the model over its local Y axis before
+ // pitching it onto its back; otherwise the visible chest faces the floor.
+ hana.rotation.x=sleep?Math.PI/2:0;
+ // Do not reset yaw while awake: navigation controls the facing direction.
+ // Resetting yaw to zero here every frame caused sideways/crab walking.
+ // Sleep pose needs only the local pitch; preserve the current heading.
+
  // Walk on reachable terrain steps; never teleport to high cliffs.
  const floor=terrainTopAt(hana.position.x,hana.position.z,hana.position.y);
- const desiredY=floor+(sleep?.82:.10);
+ const desiredY=floor+(sleep?.42:.10);
  // Smooth the small cave/outside floor difference without sudden vertical snaps.
  hana.position.y=desiredY>hana.position.y?desiredY:Math.max(desiredY,hana.position.y-(hana.position.y-desiredY)*.35);
- head.rotation.x=sleep?-.10:0;
+ head.rotation.x=0;
  eyeMeshes.forEach(m=>m.visible=!sleep);
  closedEyes.forEach(m=>m.visible=sleep);
  if(sleep){legs.forEach(l=>l.rotation.x=0);arms.forEach(a=>a.rotation.x=0);head.rotation.z=0;}
 }
-let elapsed=0,speed=1,paused=false,prev=performance.now(),state='confused',
+let elapsed=0,speed=4,paused=false,prev=performance.now(),state='confused',
 target=null,goal='',lastLog='',phaseAt=0,water=false,food=false,shelter=false,
 failedFire=false,rested=false,seenRabbit=false,seenFish=false,
 knownWater=false,knownBerries=false,knownCave=false,
 stats={energy:92,thirst:85,hunger:83,will:85},actions=0,day=1;
-const DAY_SECONDS=300;
+const DAY_SECONDS=600; // v7.5: twice as long per in-game day
 // Mental resilience is a durable learned trait, while will is a recoverable mood.
 let resilienceXP=0,mentalRestCooldown=0,mentalRestStart=0;
 const willEventTimes=new Map();
@@ -838,6 +865,14 @@ function changeWill(amount,reason){
 }
 function moraleUpdate(step){
  const h=clockParts().h,night=h>=19||h<6;
+ // Fish familiarity also grows through real observation near the pond, even when
+ // urgent survival actions prevent a dedicated fishing trip (avoids 49% plateau).
+ if(day>=2&&fishSkill<100&&elapsed-lastFishStudyAt>85&&distanceTo('water')<7&&
+    clockParts().h>=7&&clockParts().h<19&&stats.energy>20){
+  lastFishStudyAt=elapsed;fishObservations++;
+  fishSkill=Math.min(100,fishSkill+randomBetween(5,9));
+  log(`🐟 물가에서 움직임 관찰 · 물고기 숙련도 ${Math.round(fishSkill)}%`);
+ }
  const away=distanceTo('shelter');
  const exploring=state==='wander'||state==='hesitate'||state==='returnHesitate';
  const resting=state==='rest'||state==='night'||state==='fieldRest'||state==='mentalRest';
@@ -911,12 +946,13 @@ function shouldAddressNeed(which){
 let lastWeatherDay=0, fireAttempts=0, fireSuccess=false, fireKnowledge=0;
 let sleepRestored=false,sleepStartEnergy=0,sleepQuality=0;
 let fieldRestEnd=0,fieldRestRecovery=0,fieldRestStarted=0,restCooldownUntil=0;
+let nightSleepChoiceDay=-1,nightSleepInCave=true;
 let rabbitObservations=0,rabbitAttempts=0,rabbitCaught=0,lastRabbitAttemptDay=0;
 let fireDay10Planned=false;
 let fireEverLit=false,fireSkill=0,lastFireOutDay=0,lastBranchDay=0;
 let fishObservations=0,fishAttempts=0,fishCaught=0,lastFishDay=0;
 // v5.2: learned survival systems. Timers use simulation seconds.
-let fishSkill=0,fishSpear=false,storedFish=[],carriedFish=[],rainWater=0,waterVessel=false,lastFoodCheckAt=0;
+let fishSkill=0,lastFishStudyAt=-999,fishSpear=false,storedFish=[],carriedFish=[],rainWater=0,waterVessel=false,lastFoodCheckAt=0;
 const MAX_CAVE_FISH=8,MAX_CARRY_FISH=2;
 let leafBed=false,leafStock=0,plantKnowledge=0,petBond=0,friendClue=0;
 let lastBuildDay=0,lastPlantDay=0,lastPetCareDay=0,lastClueDay=0,lastRainCollectionDay=0;
@@ -1112,16 +1148,17 @@ function caveTerrainPiece(p){return false;}
 function surfaceContains(p,x,z,pad=0){return Math.abs(x-p.x)<=p.rx+pad&&Math.abs(z-p.z)<=p.rz+pad;}
 function nearbySurfaces(x,z){return terrainGrid?.get(Math.floor(x/4)+':'+Math.floor(z/4))||(!terrainGrid?wildlifeSurfaces:[]);}
 function terrainTopAt(x,z,referenceY=0){
- const interior=inCaveWalkZone(x,z);
+ const interior=inCaveWalkZone(x,z)||caveEntrancePortal(x,z);
  let top=interior?.31:.30;
- for(const p of nearbySurfaces(x,z))if(p.rx>=.4&&p.rz>=.4&&(!interior||p.top<1.45)&&surfaceContains(p,x,z))top=Math.max(top,p.top);
+ for(const p of nearbySurfaces(x,z))if(!p.minorDecoration&&p.rx>=.4&&p.rz>=.4&&(!interior||p.top<1.45)&&surfaceContains(p,x,z))top=Math.max(top,p.top);
  return top;
 }
 function wildlifeGroundY(x,z){
  const interior=inCaveWalkZone(x,z);
- let top=interior?.31:.30;for(const p of nearbySurfaces(x,z))if((!interior||p.top<1.45)&&surfaceContains(p,x,z))top=Math.max(top,p.top);
+ let top=interior?.31:.30;for(const p of nearbySurfaces(x,z))if(!p.minorDecoration&&(!interior||p.top<1.45)&&surfaceContains(p,x,z))top=Math.max(top,p.top);
  return top;
 }
+function caveEntrancePortal(x,z){return Math.abs(x-caveX)<3.25&&z>caveZ+2.2&&z<caveZ+6.3;}
 function terrainPassable(fromX,fromZ,toX,toZ){
  if(!Number.isFinite(toX)||!Number.isFinite(toZ)||!landAt(toX,toZ))return false;
  // Each edge is sampled independently of Hina's current elevation (A* may be far away).
@@ -1130,11 +1167,11 @@ function terrainPassable(fromX,fromZ,toX,toZ){
  for(let i=1;i<=n;i++){
   const x=fromX+(toX-fromX)*i/n,z=fromZ+(toZ-fromZ)*i/n;
   const next=terrainTopAt(x,z);
-  if(Math.abs(next-current)>MAX_STEP_HEIGHT+.001)return false;
+  if(!caveEntrancePortal(x,z)&&!caveEntrancePortal(fromX,fromZ)&&Math.abs(next-current)>MAX_STEP_HEIGHT+.001)return false;
   // Body clearance: never overlap a cliff side or cave wall/ceiling.
   for(const p of nearbySurfaces(x,z)){
-   if(p.rx<.4||p.rz<.4)continue;
-   if(surfaceContains(p,x,z,.20)&&p.top>next+MAX_STEP_HEIGHT+.001&&p.bottom<next+1.95)return false;
+   if(p.minorDecoration||p.rx<.4||p.rz<.4)continue;
+   if(!caveEntrancePortal(x,z)&&surfaceContains(p,x,z,.20)&&p.top>next+MAX_STEP_HEIGHT+.001&&p.bottom<next+1.95)return false;
   }
   current=next;
  }
@@ -1292,7 +1329,7 @@ function walkPose(step,moving){
 // Dark semi-transparent (not solid black) so the coastline is still legible.
 const FOG_STEP=5.4,fogTiles=[],explored=new Set();
 const fogGeo=new THREE.PlaneGeometry(FOG_STEP+.12,FOG_STEP+.12);
-const fogMat=new THREE.MeshBasicMaterial({color:0x050b12,transparent:true,opacity:.88,
+const fogMat=new THREE.MeshBasicMaterial({color:0x747d86,transparent:true,opacity:.82,
  side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2});
 for(let x=-103;x<=103;x+=FOG_STEP)for(let z=-88;z<=88;z+=FOG_STEP){
  if(!landAt(x,z))continue;
@@ -1558,10 +1595,10 @@ function setState(s,g,p,words){
 function init(){
  for(const [mesh,original] of fadedMeshes){mesh.material=original;}fadedMeshes.clear();
  // Restore both simulation data and visuals. A reset must match a fresh page load.
- paused=false;speed=1;prev=0;elapsed=0;day=1;walkAnimationTime=0;torchCarried=false;outdoorTorchAttemptAt=-Infinity;resetSnakes();nextSnakeSpawn=DAY_SECONDS+randomBetween(15,45);lastSnakeWarning=-999;
+ paused=false;speed=4;prev=0;elapsed=0;day=1;walkAnimationTime=0;torchCarried=false;outdoorTorchAttemptAt=-Infinity;resetSnakes();nextSnakeSpawn=DAY_SECONDS+randomBetween(15,45);lastSnakeWarning=-999;
  branchPiles.forEach(p=>{p.available=true;p.respawnAt=0;p.group.visible=true;});
  carriedBerries=0;caveBerries=0;lastBerryStorageAt=-999;climbUntil=0;climbCooldownUntil=0;climbBlockedSince=0;navReset();routeFailures=0;blockedGoalUntil.clear();lastBlockedSpeechAt=-999;
- state='confused';phaseAt=0;target=null;goal='';lastLog='';actions=0;
+ lastWashDay=0;lastWashAttemptDay=0;state='confused';phaseAt=0;target=null;goal='';lastLog='';actions=0;
  water=food=shelter=failedFire=rested=false;
  knownWater=knownBerries=knownCave=seenRabbit=seenFish=false;
  stats={energy:92,thirst:85,hunger:83,will:85};redrawNeeds();
@@ -1570,21 +1607,21 @@ function init(){
  fireAttempts=0;fireSuccess=false;fireKnowledge=0;fireSkill=0;fireEverLit=false;lastFireOutDay=0;lastBranchDay=0;fireDryStock=0;
  torchOuting=false;torchNightDay=0;torchOutingsToday=0;torchDecisionAt=-Infinity;torchGroup.visible=false;torchLight.intensity=0;
  fishObservations=0;fishAttempts=0;fishCaught=0;lastFishDay=0;
- fishSkill=0;fishSpear=false;storedFish=[];carriedFish=[];rainWater=0;waterVessel=false;lastFoodCheckAt=0;
+ fishSkill=0;lastFishStudyAt=-999;fishSpear=false;storedFish=[];carriedFish=[];rainWater=0;waterVessel=false;lastFoodCheckAt=0;
  leafBed=false;leafStock=0;plantKnowledge=0;petBond=0;friendClue=0;
  lastBuildDay=lastPlantDay=lastPetCareDay=lastClueDay=lastRainCollectionDay=0;
  rabbitPattern=0;petRabbit=null;campfire.visible=false;fireLight.intensity=0;
  fireLearnedWet=false;nextFireAttempt=0;lastWeatherDay=0;fireDay10Planned=false;
  rabbitObservations=0;rabbitAttempts=0;rabbitCaught=0;lastRabbitAttemptDay=0;
  sleepRestored=false;sleepStartEnergy=0;sleepQuality=0;sleepingPose=false;
- fieldRestEnd=0;fieldRestRecovery=0;fieldRestStarted=0;restCooldownUntil=0;
+ fieldRestEnd=0;fieldRestRecovery=0;fieldRestStarted=0;restCooldownUntil=0;nightSleepChoiceDay=-1;nightSleepInCave=true;
  randomHesitationDuration=0;
  explorationExperience=0;previousExplorationCount=0;discoveryBoostAt=0;
  explorationNextUpdate=0;detailNextUpdate=0;uiNextUpdate=0;
  bubbleUntil=0;ambientTimer=0;
  mind={traits:{...BASE_TRAITS},memories:[],likes:{pond:0,cave:0,beach:0,forest:0},plan:[],planDay:0,planDone:[],lastReflectionDay:0,lastLeisureDay:0,lastChoiceAt:0,lastMindUI:0,rememberedRoutes:new Map(),lastRecallAt:0,discoveries:0,mistakes:0,regrets:0,keepsakes:0,identity:'처음에는 겁이 많지만 호기심 많은 졸업생'};renderMind();
  $('log').innerHTML='';$('actionLogPanel').open=false;$('thought').textContent='';$('bubble').textContent='';$('bubble').classList.remove('show','sleep-bubble');$('ambientBubble').classList.remove('show');nextNightSoundAt=0;nightSoundUntil=0;
- $('pause').textContent='일시정지';$('speed').textContent='속도 ×1';
+ $('pause').textContent='일시정지';
  $('dayLabel').textContent='· DAY 01';$('clock').textContent='06:00';
  $('elapsed').textContent='D1 00:00';
  $('phase').textContent='워프 직후 · 혼란';
@@ -1654,8 +1691,18 @@ function dayOneDecide(){
  }
  finishDayOne();
 }
+let lastWashDay=0,lastWashAttemptDay=0;
 function chooseNextDayAction(){
  dailyMindPlan();
+ const washClock=clockParts();
+ if(washClock.day>=2&&lastWashDay!==washClock.day&&lastWashAttemptDay!==washClock.day&&
+    washClock.h>=8&&washClock.h<17&&stats.energy>38&&stats.thirst>28&&stats.hunger>27&&
+    !raining()&&!darkHours()){
+  lastWashAttemptDay=washClock.day;
+  setState('washTravel','하루 한 번 · 물가에서 씻기','water',
+   ['오늘도 씻어야지. 바닷바람 때문에 온몸이 끈적해...','얼굴이랑 손이라도 깨끗하게 씻고 싶어.','오늘은 물가에서 잠깐 씻고 기분 전환하자.'][washClock.day%3]);
+  return;
+ }
  const h=clockParts().h;
  if(h>=19||h<6){
   const now=clockParts();
@@ -1669,12 +1716,13 @@ function chooseNextDayAction(){
    setState('torchExplore','횃불을 들고 짧은 심야 탐험',dest,'불을 다룰 수 있으니... 횃불을 들고 가까운 곳만 살펴보자.');
    torchOuting=true;return;
   }
-  // At night, favor shelter strongly. Only exhaustion or immediate survival need justifies sleeping outdoors.
+  // One stable nightly decision: ~65% cave, ~35% outdoor, unless exhaustion prevents travel.
+  if(nightSleepChoiceDay!==now.day){nightSleepChoiceDay=now.day;nightSleepInCave=Math.random()<.65;}
   const caveReachable=stats.energy>12 && stats.thirst>10 && stats.hunger>10;
-  if(caveReachable){
+  if(caveReachable&&nightSleepInCave){
    setState('sleepTravel',deepDark?'암흑 · 동굴로 귀환':'밤 · 동굴로 이동','shelter',torchCarried&&deepDark?'횃불을 조심히 들고 동굴로 돌아가자.':'밤에는 동굴에서 쉬는 게 안전해.');
   }else{
-   setState('fieldRest','기력 고갈 · 야외에서 취침',null,'동굴로 갈 힘이 없어... 잠깐이라도 쉬자.');
+   setState('fieldRest','야외에서 밤 보내기',null,'오늘은 여기서 쉬어볼까... 주변을 잘 살펴야겠어.');
   }
   return;
  }
@@ -1762,7 +1810,7 @@ function chooseNextDayAction(){
  if(stats.energy<39){
   // Prefer sleeping in the known cave. Very low energy / long distance can force field rest.
   const caveDistance=distanceTo('shelter');
-  const cavePreferred=(darkHours()&&stats.energy>=13)||elapsed>=restCooldownUntil&&stats.energy>=23&&caveDistance<48&&Math.random()<.88;
+  const cavePreferred=darkHours()?(nightSleepInCave&&stats.energy>=13):(elapsed>=restCooldownUntil&&stats.energy>=23&&caveDistance<48&&Math.random()<.65);
   if(cavePreferred){
    setState('sleepTravel','피로 회복 · 동굴로 이동','shelter','동굴에서 쉬는 게 더 안전하겠어. 돌아가자.');return;
   }
@@ -1787,6 +1835,8 @@ function chooseNextDayAction(){
     '지난번에 실패했지만... 다시 해보자.');return;
  }
  if(current.h>=19||current.h<6){
+  if(nightSleepChoiceDay!==current.day){nightSleepChoiceDay=current.day;nightSleepInCave=Math.random()<.65;}
+  if(!nightSleepInCave){setState('fieldRest','야외에서 밤 보내기',null,'여기서 밤을 보내도 괜찮을까...?');return;}
   if(Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)>1.5){
    setState('sleepTravel','밤 · 동굴로 돌아가기','shelter','어두워지기 전에 동굴로 돌아가자.');return;
   }
@@ -1882,6 +1932,22 @@ function attemptFire(){
 }
 function dayTwoPlusDecide(){
  if(clockParts().day<2)return;
+ if(state==='washTravel'&&!target){
+  if(distanceTo('water')<4.5){
+   setState('washing','물가에서 씻는 중',null,'시원하다... 이런 작은 일상이 정말 소중하네.');
+  }else setState('recover','씻을 장소를 찾지 못함',null,'여긴 물가가 아니네. 나중에 다시 찾아보자.');
+  return;
+ }
+ if(state==='washing'){
+  if(elapsed-phaseAt>15){
+   lastWashDay=clockParts().day;
+   stats.will=Math.min(100,stats.will+5);
+   stats.energy=Math.min(100,stats.energy+2);
+   log('🫧 오늘의 세안과 몸 씻기 완료 · 의지력 +5, 체력 +2');
+   setState('recover','씻고 상쾌해짐',null,'아, 살 것 같아! 깨끗해지니까 기분도 한결 좋아졌어.');
+  }
+  return;
+ }
  if(state==='personalTravel'&&!target){
   setState('personalMoment','잠깐 혼자만의 시간',null,goal.includes('조개')?'언젠가 다시 만나면 꼭 이걸 보여줘야지.':'파도 소리가 좋다... 잠깐만 더 있다 가자.');return;
  }
@@ -2282,13 +2348,13 @@ function update(dt){
  if(target){
   if(!progressAnchor){progressAnchor=hana.position.clone();progressAnchorAt=elapsed;}
   else if(hana.position.distanceToSquared(progressAnchor)>2.5*2.5){progressAnchor.copy(hana.position);progressAnchorAt=elapsed;}
-  else if(elapsed-progressAnchorAt>9&&beginBreadcrumbRetreat('같은 위치에서 반복 이동')){progressAnchor=null;}
+  else if(elapsed-progressAnchorAt>16&&navPath.length&&beginBreadcrumbRetreat('같은 위치에서 반복 이동')){progressAnchor=null;}
   if(!navLastPosition){navLastPosition=hana.position.clone();navLastProgressAt=elapsed;}
   else if(hana.position.distanceToSquared(navLastPosition)>.55*.55){
    navLastPosition.copy(hana.position);navLastProgressAt=elapsed;navNoPathSince=0;
   }
   
-  if(elapsed-navLastProgressAt>4.5&&beginBreadcrumbRetreat('진행 없음')){navLastProgressAt=elapsed;}
+  if(elapsed-navLastProgressAt>8&&navPath.length&&beginBreadcrumbRetreat('진행 없음')){navLastProgressAt=elapsed;}
   if(elapsed-navLastProgressAt>12){
    const oldGoal=goal;
    const failedKey=Math.round(target.x/4)+':'+Math.round(target.z/4);
@@ -2463,16 +2529,16 @@ function update(dt){
  const smoothstep=(a,b,x)=>{const q=THREE.MathUtils.clamp((x-a)/(b-a),0,1);return q*q*(3-2*q)};
  // All transitions are smooth. The final evening ramp reaches complete darkness at 00:00.
  const keys=[
-  {h:0,sky:0x070e20,fog:0x0b1527,ambient:0x425b88,sun:0x000000,fill:0x395077,hemi:.13,solar:0,bounce:.055,exposure:.82},
-  {h:4,sky:0x0b0b20,fog:0x101027,ambient:0x514077,sun:0x765784,fill:0x5c5188,hemi:.12,solar:.08,bounce:.04,exposure:.68},
+  {h:0,sky:0x102544,fog:0x172d50,ambient:0x799cda,sun:0x233b6b,fill:0x7196d2,hemi:.34,solar:.035,bounce:.17,exposure:.96},
+  {h:4,sky:0x162746,fog:0x1d3153,ambient:0x809cd0,sun:0x536b9a,fill:0x6c8cc8,hemi:.35,solar:.08,bounce:.17,exposure:.94},
   {h:6,sky:0x826caa,fog:0x9d83b9,ambient:0xb39bd5,sun:0xffb7d0,fill:0x9581d8,hemi:1.25,solar:1.0,bounce:.36,exposure:1.08},
   {h:8,sky:0x9acfe0,fog:0xaddbd7,ambient:0xe5f6ec,sun:0xfff3d5,fill:0xb6e5e2,hemi:2.1,solar:2.25,bounce:.60,exposure:1.24},
   {h:15.5,sky:0x9ad4e7,fog:0xb4d8d4,ambient:0xe4f7e9,sun:0xffefce,fill:0xb3dce5,hemi:2.15,solar:2.35,bounce:.60,exposure:1.23},
   {h:17.5,sky:0xf4a478,fog:0xf4b18c,ambient:0xffbdac,sun:0xffa16c,fill:0xeab4c1,hemi:1.6,solar:1.65,bounce:.40,exposure:1.10},
   {h:19,sky:0x41679d,fog:0x5374a2,ambient:0x8ca9d9,sun:0x9b9ad4,fill:0x6e93d5,hemi:.92,solar:.43,bounce:.23,exposure:.90},
   {h:21.5,sky:0x152a57,fog:0x203760,ambient:0x526a9b,sun:0x697ba8,fill:0x536eac,hemi:.35,solar:.12,bounce:.09,exposure:.72},
-  {h:23.99,sky:0x070e20,fog:0x0b1527,ambient:0x425b88,sun:0x000000,fill:0x395077,hemi:.13,solar:0,bounce:.055,exposure:.82},
-  {h:24,sky:0x070e20,fog:0x0b1527,ambient:0x425b88,sun:0x000000,fill:0x395077,hemi:.13,solar:0,bounce:.055,exposure:.82}
+  {h:23.99,sky:0x102544,fog:0x172d50,ambient:0x799cda,sun:0x233b6b,fill:0x7196d2,hemi:.34,solar:.035,bounce:.17,exposure:.96},
+  {h:24,sky:0x102544,fog:0x172d50,ambient:0x799cda,sun:0x233b6b,fill:0x7196d2,hemi:.34,solar:.035,bounce:.17,exposure:.96}
  ];
  let k=0;while(k<keys.length-2&&hour>keys[k+1].h)k++;
  const from=keys[k],to=keys[k+1],blend=smoothstep(from.h,to.h,hour);
@@ -2764,7 +2830,7 @@ window.addEventListener('keydown',e=>{
  if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;
  e.preventDefault();if(e.code==='KeyC')setCameraMode(!followCamera);else focusHina();
 });
-$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 암막 ON':'미탐험 암막 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration(true);updateDetailVisibility(true)};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};$('speed').onclick=()=>{speed=speed===1?2:speed===2?4:1;$('speed').textContent='속도 ×'+speed};// DAY 10 scenario: a representative, hand-tuned snapshot, NOT a measured statistical mean.
+$('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fogEnabled?'미탐험 안개 ON':'미탐험 안개 OFF';$('fogToggle').setAttribute('aria-pressed',String(fogEnabled));updateExploration(true);updateDetailVisibility(true)};$('bubbleToggle').onclick=()=>{bubbleEnabled=!bubbleEnabled;$('bubbleToggle').textContent=bubbleEnabled?'말풍선 ON':'말풍선 OFF';$('bubbleToggle').setAttribute('aria-pressed',String(bubbleEnabled));updateBubble()};$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시정지'};// DAY 10 scenario: a representative, hand-tuned snapshot, NOT a measured statistical mean.
 // A true mean requires recorded data from multiple full 10-day runs.
 function devJumpToDay10(){
  init();
@@ -2779,7 +2845,7 @@ function devJumpToDay10(){
  hana.position.set(sites.shelter.x+.85,.4,sites.shelter.z+.6);
  lastSafeSpot={x:hana.position.x,z:hana.position.z,y:hana.position.y};
  rabbitPattern=100;rabbitObservations=5;rabbitAttempts=0;lastRabbitAttemptDay=0;
- fishObservations=3;fishAttempts=2;fishSkill=49;fishSpear=false;lastFishDay=0;
+ fishObservations=3;fishAttempts=2;fishSkill=49;lastFishStudyAt=-999;fishSpear=false;lastFishDay=0;
  storedFish=[{at:elapsed,life:DAY_SECONDS*2.5,cooked:true}];carriedFish=[];rainWater=1;waterVessel=true;
  leafBed=false;leafStock=2;plantKnowledge=22;petBond=0;friendClue=12;
  resilienceXP=18;explorationExperience=20;
@@ -2799,7 +2865,36 @@ function devJumpToDay10(){
  redrawNeeds();
 }
 $('devDay10').onclick=()=>devJumpToDay10();
-$('reset').onclick=()=>{init();if(followCamera)setCameraMode(true)};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();function animate(t){requestAnimationFrame(animate);
+// DAY 20 is an intentionally hand-tuned test fixture, not a simulation result.
+function devJumpToDay20(){
+ devJumpToDay10();
+ elapsed=DAY_SECONDS*19+1;day=20;phaseAt=elapsed;
+ stats={energy:84,thirst:76,hunger:77,will:83};
+ fireSkill=100;fireKnowledge=100;fireDryStock=7;fireAttempts=6;
+ rabbitPattern=100;rabbitObservations=12;rabbitAttempts=7;lastRabbitAttemptDay=17;
+ fishObservations=14;fishAttempts=11;fishSkill=86;lastFishStudyAt=-999;fishSpear=true;lastFishDay=17;
+ carriedBerries=3;caveBerries=10;
+ storedFish=[{at:elapsed,life:DAY_SECONDS*2.5,cooked:true},{at:elapsed,life:DAY_SECONDS*2.5,cooked:true},{at:elapsed,life:DAY_SECONDS*2.5,cooked:true}];
+ carriedFish=[];rainWater=3;waterVessel=true;
+ leafBed=true;leafStock=5;plantKnowledge=68;petBond=24;friendClue=44;
+ resilienceXP=48;explorationExperience=54;
+ const revealCount=Math.floor(fogTiles.length*.41);
+ const cx=sites.shelter.x,cz=sites.shelter.z;
+ const ordered=[...fogTiles].sort((a,b)=>{
+  const da=Math.min(Math.hypot(a.x-9,a.z-5),Math.hypot(a.x-cx,a.z-cz));
+  const db=Math.min(Math.hypot(b.x-9,b.z-5),Math.hypot(b.x-cx,b.z-cz));
+  return da-db;
+ });
+ explored.clear();
+ for(let i=0;i<Math.min(revealCount,ordered.length);i++)explored.add(ordered[i].key);
+ updateExploration(true);updateDetailVisibility(true);
+ setState('recover','🧪 DAY 20 통합 테스트',null,'스무 날이나 버텼어. 이제 더 먼 곳을 탐험해 볼까?');
+ log('🧪 DAY 20 추정 테스트 상태 적용 · 발견도 약 41%, 물고기 숙련도 86, 식물 연구 68');
+ log('※ DAY 20 수치는 실제 20일 플레이 측정치가 아닌 개발 테스트용 예시입니다.');
+ redrawNeeds();
+}
+$('devDay20').onclick=()=>devJumpToDay20();
+$('reset').onclick=()=>{init();setCameraMode(true)};window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();setCameraMode(true);function animate(t){requestAnimationFrame(animate);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
  lastRenderAt=t;
  let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused)animateWildlife(t*.001,dt*speed);if(followCamera){
