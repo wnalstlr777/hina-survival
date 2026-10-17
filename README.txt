@@ -1,5 +1,8 @@
-HINA SURVIVAL v3.7
-- Terrain step collision with body footprint, prevents entering raised cliff sides.
-- Camera soft occlusion uses projected screen overlap instead of center ray alone; includes grass terrain caps.
-- Walk gait animation 200% speed, simulation time unaffected.
-- Safety spot validation strengthened.
+히나 서바이벌 v8.6 — 히나의 추억 웹툰 새 일러스트
+
+index.html을 실행하세요. memories 폴더를 같은 위치에 두어야 합니다.
+새로 제작한 웹툰 5컷: 씻기, 토끼, 뱀, 모닥불, 물고기.
+웹툰 컷에는 말풍선/대사 없음. 제목은 앨범 UI에 표시됩니다.
+기존 v8.5 추억 해금 기록을 유지합니다.
+갤러리 원본은 memories/gallery.webp에 포함.
+Three.js CDN 접속을 위해 인터넷 연결이 필요합니다.

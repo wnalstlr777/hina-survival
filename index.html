@@ -1,15 +1,15 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v7.6</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 살아 있는 섬 v8.5</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}#hint{position:fixed;right:18px;bottom:18px;color:#d0e0df;background:#13242bbd;padding:10px;border-radius:8px;font-size:12px}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}#hint{display:none}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileCategories{display:none}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media(max-width:700px){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
  #ui{display:none;position:fixed;z-index:11;top:61px;left:auto;right:8px;width:min(285px,calc(100vw - 38px));max-height:calc(100dvh - 160px);overflow:auto;padding:12px;background:#101d24f2}
  body.menu-open #ui{display:block}
- #mobileCategories{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:10px}
+ #mobileCategories{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:10px}
  #mobileCategories button{font-size:10px;padding:8px 1px;min-width:0;background:#29464e}
  #mobileCategories button.selected{background:#3e9a88}
- body.menu-open #ui #vitalsPane,body.menu-open #ui #skillPanel,body.menu-open #ui #mindPanel,body.menu-open #ui #actionLogPanel{display:none}
- body.menu-open #ui[data-pane="vitals"] #vitalsPane,body.menu-open #ui[data-pane="skills"] #skillPanel,body.menu-open #ui[data-pane="mind"] #mindPanel,body.menu-open #ui[data-pane="logs"] #actionLogPanel{display:block}
- body.menu-open #ui[data-pane="settings"] #vitalsPane,body.menu-open #ui[data-pane="settings"] #skillPanel,body.menu-open #ui[data-pane="settings"] #mindPanel,body.menu-open #ui[data-pane="settings"] #actionLogPanel{display:none}
+ body.menu-open #ui #vitalsPane,body.menu-open #ui #skillPanel,body.menu-open #ui #mindPanel,body.menu-open #ui #actionLogPanel,body.menu-open #ui #memoryPanel{display:none}
+ body.menu-open #ui[data-pane="vitals"] #vitalsPane,body.menu-open #ui[data-pane="skills"] #skillPanel,body.menu-open #ui[data-pane="mind"] #mindPanel,body.menu-open #ui[data-pane="logs"] #actionLogPanel,body.menu-open #ui[data-pane="memories"] #memoryPanel{display:block}
+ body.menu-open #ui[data-pane="settings"] #vitalsPane,body.menu-open #ui[data-pane="settings"] #skillPanel,body.menu-open #ui[data-pane="settings"] #mindPanel,body.menu-open #ui[data-pane="settings"] #actionLogPanel,body.menu-open #ui[data-pane="settings"] #memoryPanel{display:none}
  body.menu-open:has(#ui[data-pane="settings"]) #extraControls{display:flex}
  body.menu-open:not(:has(#ui[data-pane="settings"])) #extraControls{display:none}
  body.menu-open #ui[data-pane="settings"]~*{pointer-events:auto}
@@ -30,7 +30,19 @@
 #ambientBubble{position:fixed;pointer-events:none;z-index:3;opacity:0;transition:opacity .5s;transform:translate(-50%,-100%);padding:6px 11px;border-radius:15px;background:#172a30e8;color:#d3e7db;border:1px solid #668078;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 3px 12px #0007}
 #ambientBubble.show{opacity:1}
 @keyframes sleepFloat{0%,100%{margin-top:0}50%{margin-top:-6px}}
-</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ambientBubble" aria-hidden="true"></div><div id="ui"><nav id="mobileCategories"><button data-pane="vitals" class="selected">생존</button><button data-pane="skills">숙련도</button><button data-pane="mind">마음</button><button data-pane="logs">기록</button><button data-pane="settings">설정</button></nav><div id="vitalsPane"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div></div><details id="skillPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">📚 숙련도 · 탐험 기록</summary><div id="skillContent" style="font-size:12px;line-height:1.7;padding:8px 2px"></div></details><details id="mindPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🧠 히나의 마음 · 기억 일기</summary><div id="mindContent" style="font-size:12px;line-height:1.55;padding:8px 2px;white-space:pre-line"></div></details><details id="actionLogPanel" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">📋 AI 행동 기록 · 펼쳐보기</summary><div id="log" style="margin-top:8px"></div></details></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">발견도 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="cameraMode" aria-pressed="false">카메라: 자유</button><div id="extraControls"><button id="reset">다시 시작</button><button id="devDay10" title="테스트용: DAY 10의 추정 생존 상태">🧪 10일 차</button><button id="devDay20" title="테스트용: DAY 20의 추정 생존 상태">🧪 20일 차</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 안개 ON</button><button id="qualityToggle">화질: 자동</button><button id="perfToggle" aria-pressed="false">성능 정보 OFF</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대(팔로우에서도 가능) · F: 히나 찾기 · C: 카메라 모드 · 회색 영역은 미탐험</div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
+#collisionPanel{display:none;position:fixed;z-index:20;right:12px;top:105px;max-width:300px;padding:12px;background:#10252bea;border:1px solid #86bdc3;border-radius:10px;font-size:12px;line-height:1.7;pointer-events:none}#collisionPanel .ok{color:#7ef0a4}#collisionPanel .bad{color:#ff9e8c}@media(max-width:700px){#collisionPanel{max-width:205px;font-size:11px}}
+
+#memoryPanel{margin-top:10px}#memoryPanel summary{cursor:pointer;font-weight:750}
+#memoryContent{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.memoryTile{padding:0;background:#22373c;border:1px solid #42656b;border-radius:10px;overflow:hidden;text-align:left;min-width:0}
+.memoryTile img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.memoryTile span{display:block;padding:7px;font-size:12px}.memoryTile.locked{opacity:.58}
+#memoryViewer{display:none;position:fixed;inset:0;z-index:100;background:#061116d9;align-items:center;justify-content:center;padding:15px}
+#memoryViewer.open{display:flex}#memoryCard{width:min(540px,95vw);max-height:92dvh;overflow:auto;background:#17272d;border:1px solid #679097;border-radius:16px;padding:14px;box-sizing:border-box}
+#memoryCard img{display:block;width:100%;max-height:58dvh;object-fit:contain;border-radius:10px;background:#0d171c}
+#memoryCard p{line-height:1.6;white-space:pre-line}#memoryClose{float:right}
+@media(max-width:700px){#memoryContent{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style></head><body><div id="view"></div><div id="bubble" role="status" aria-live="off"></div><div id="ambientBubble" aria-hidden="true"></div><div id="collisionPanel"></div><div id="memoryToast" style="position:fixed;z-index:35;top:72px;left:50%;transform:translateX(-50%);pointer-events:none;background:#284a46;color:#fff;border:1px solid #83b9a8;border-radius:12px;padding:9px 13px;opacity:0;transition:opacity .4s"></div><div id="ui"><nav id="mobileCategories"><button data-pane="vitals" class="selected">생존</button><button data-pane="skills">숙련도</button><button data-pane="mind">마음</button><button data-pane="memories">추억</button><button data-pane="logs">기록</button><button data-pane="settings">설정</button></nav><div id="vitalsPane"><h2>히나 <span class="muted" id="dayLabel">· DAY 01</span></h2><div class="muted" id="phase">워프 직후 · 혼란</div><div class="thought" id="thought">“여긴... 어디지?”</div><div id="stats"></div></div><details id="skillPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">📚 숙련도 · 탐험 기록</summary><div id="skillContent" style="font-size:12px;line-height:1.7;padding:8px 2px"></div></details><details id="mindPanel" style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">🧠 히나의 마음 · 기억 일기</summary><div id="mindContent" style="font-size:12px;line-height:1.55;padding:8px 2px;white-space:pre-line"></div></details><details id="actionLogPanel" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">📋 AI 행동 기록 · 펼쳐보기</summary><div id="log" style="margin-top:8px"></div></details><details id="memoryPanel" style="margin-top:10px"><summary>📸 히나의 추억 · 웹툰 앨범 <span id="memoryCount">0/5</span></summary><div id="memoryContent"></div></details></div><div id="badge"><b id="clock">06:00</b> <span id="dayNight" aria-label="낮 또는 밤">☀️ 낮</span><div id="weather">맑음 · 해변</div><div id="status">관찰 모드 · 연속 생존</div><div id="exploration" style="color:#b9e3d6;font-size:12px;margin-top:5px">발견도 계산 중</div></div><button id="mobileMenu" aria-expanded="false" aria-controls="ui extraControls">☰ 메뉴</button><div id="controls"><button id="pause">일시정지</button><button id="cameraMode" aria-pressed="false">카메라: 자유</button><div id="extraControls"><button id="reset">다시 시작</button><button id="devDay10" title="테스트용: DAY 10의 추정 생존 상태">🧪 10일 차</button><button id="devDay20" title="테스트용: DAY 20의 추정 생존 상태">🧪 20일 차</button><button id="bubbleToggle" aria-pressed="true">말풍선 ON</button><button id="soundToggle" aria-pressed="true">환경음 ON</button><button id="fogToggle" aria-pressed="true">미탐험 안개 ON</button><button id="qualityToggle">화질: 자동</button><button id="perfToggle" aria-pressed="false">성능 정보 OFF</button><button id="collisionDebug" aria-pressed="false">🧱 충돌 검수 OFF</button></div><span class="muted" id="elapsed">00:00</span></div><div id="hint">드래그: 회전 · 휠: 확대(팔로우에서도 가능) · F: 히나 찾기 · C: 카메라 모드 · 회색 영역은 미탐험</div><script>window.addEventListener('error',e=>{const p=document.getElementById('runtimeError');if(p){p.style.display='block';p.textContent='실행 오류: '+e.message+' ('+e.lineno+'행)';}});window.addEventListener('unhandledrejection',e=>{const p=document.getElementById('runtimeError');if(p){p.style.display='block';p.textContent='실행 오류: '+String(e.reason);}});</script><div id="memoryViewer" role="dialog" aria-modal="true" aria-label="히나의 추억"><div id="memoryCard"><button id="memoryClose" type="button">닫기 ✕</button><h2 id="memoryTitle"></h2><img id="memoryImage" alt="대사 없는 추억 웹툰 일러스트"><p id="memoryDescription"></p></div></div><div id="runtimeError" style="display:none;position:fixed;bottom:80px;left:12px;z-index:9999;background:#521e27;color:#fff;padding:12px;border-radius:8px;max-width:90vw"></div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script><script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia('(max-width:700px)').matches;
@@ -583,7 +595,7 @@ function rabbit(x,z,seedPhase){
   groupCube(g,.21,.18,.28,critSkin,side*.22,.14,-.3);
  }
  g.position.set(x,wildlifeGroundY(x,z)+.04,z);
- critters.push({g,homeX:x,homeZ:z,phase:seedPhase,heading:seedPhase,panic:0,caught:false});
+ critters.push({g,homeX:x,homeZ:z,phase:seedPhase,heading:seedPhase,panic:0,hopClock:0,hopDuration:.44,hopFromX:x,hopFromZ:z,hopToX:x,hopToZ:z,hopActive:false,restUntil:0,caught:false});
 }
 rabbit(11.7,8.3,.5);rabbit(27,17,2.2);rabbit(-30,21,4.5);
 // Random low-poly snakes: danger from proximity, not a permanent scripted penalty.
@@ -666,45 +678,66 @@ for(let i=0;i<23;i++){
 }
 // A few fish in the freshwater pond make the first water discovery more legible.
 for(let i=0;i<6;i++)fish(-10.6+rand()*3.4,3+rand()*1.8,i*1.1,fishSilver);
+// Rabbit movement is hop-based: the body travels horizontally during each arc,
+// pauses between hops, and always flees away from nearby live snakes.
 function animateWildlife(t,dt){
  for(const r of critters){
-  if(r.pet){
-   // Pet rabbit follows Hina without navigation/collision calculations.
-   const backX=hana.position.x-Math.sin(hana.rotation.y)*1.65;
-   const backZ=hana.position.z-Math.cos(hana.rotation.y)*1.65;
-   const px=backX-r.g.position.x,pz=backZ-r.g.position.z;
-   const d=Math.hypot(px,pz);
-   if(d>13){r.g.position.x=backX;r.g.position.z=backZ;}
-   else if(d>.35){const stride=Math.min(d,dt*2.7);r.g.position.x+=px/d*stride;r.g.position.z+=pz/d*stride;}
-   r.g.position.y=rabbitGroundY(r.g.position.x,r.g.position.z)+.045+Math.max(0,Math.sin(t*8+r.phase))*.055;
-   r.g.rotation.y=Math.atan2(px,pz);
-   continue;
-  }
   if(r.caught)continue;
-  if(wildlifeFireAvoidance(r.g.position.x,r.g.position.z)){
-   // Gradual flight instead of teleporting; fire keeps rabbits out of its radius.
-   const fromTorch=torchGroup.visible&&Math.hypot(r.g.position.x-hana.position.x,r.g.position.z-hana.position.z)<TORCH_WILDLIFE_RADIUS;
-   const fx=fromTorch?hana.position.x:campfire.position.x,fz=fromTorch?hana.position.z:campfire.position.z;
-   const dxFire=r.g.position.x-fx,dzFire=r.g.position.z-fz,dd=Math.max(.05,Math.hypot(dxFire,dzFire));
-   const stride=Math.min(3.6*dt,2.2);
-   const nx=r.g.position.x+dxFire/dd*stride,nz=r.g.position.z+dzFire/dd*stride;
-   if(landAt(nx,nz)){r.g.position.x=nx;r.g.position.z=nz;}
-   r.g.position.y=rabbitGroundY(r.g.position.x,r.g.position.z)+.06;
-   r.g.rotation.y=Math.atan2(dxFire,dzFire);
-   continue;
+  const x=r.g.position.x,z=r.g.position.z;
+  let danger=null,dangerDistance=Infinity;
+  if(!r.pet){
+   for(const s of snakes){
+    if(!s.active||!s.g.visible)continue;
+    const d=Math.hypot(x-s.g.position.x,z-s.g.position.z);
+    if(d<9&&d<dangerDistance){danger=s;dangerDistance=d;}
+   }
   }
-  const dx=r.g.position.x-hana.position.x,dz=r.g.position.z-hana.position.z;
-  const near=Math.hypot(dx,dz)<4.1;
-  r.panic=near?Math.min(1,r.panic+dt*2):Math.max(0,r.panic-dt*.65);
-  let angle=near?Math.atan2(dx,dz):r.phase+Math.sin(t*.28+r.phase)*1.5;
-  const sp=near?2.1:.28;
-  r.g.position.x+=Math.sin(angle)*sp*dt;
-  r.g.position.z+=Math.cos(angle)*sp*dt;
-  // Keep roaming near its habitat and away from the water's edge.
-  const fromHome=Math.hypot(r.g.position.x-r.homeX,r.g.position.z-r.homeZ);
-  if(fromHome>4.6){r.g.position.x+=(r.homeX-r.g.position.x)*dt*.7;r.g.position.z+=(r.homeZ-r.g.position.z)*dt*.7}
-  r.g.rotation.y=angle;
-  r.g.position.y=rabbitGroundY(r.g.position.x,r.g.position.z)+.04+Math.max(0,Math.sin(t*(near?12:5)+r.phase))*.085;
+  const torchDanger=torchGroup.visible&&Math.hypot(x-hana.position.x,z-hana.position.z)<TORCH_WILDLIFE_RADIUS;
+  const campDanger=fireSuccess&&Math.hypot(x-campfire.position.x,z-campfire.position.z)<CAMPFIRE_WILDLIFE_RADIUS;
+  const humanDanger=!r.pet&&Math.hypot(x-hana.position.x,z-hana.position.z)<4.1;
+  const fleeing=!r.pet&&(Boolean(danger)||torchDanger||campDanger||humanDanger);
+  // Finish a jump before selecting a new direction, avoiding micro-jitter.
+  if(!r.hopActive&&t>=r.restUntil){
+   let dx=0,dz=0;
+   if(r.pet){
+    const tx=hana.position.x-Math.sin(hana.rotation.y)*1.65;
+    const tz=hana.position.z-Math.cos(hana.rotation.y)*1.65;
+    dx=tx-x;dz=tz-z;
+    if(Math.hypot(dx,dz)<.85){r.restUntil=t+.4;continue;}
+   }else if(danger){dx=x-danger.g.position.x;dz=z-danger.g.position.z;}
+   else if(torchDanger){dx=x-hana.position.x;dz=z-hana.position.z;}
+   else if(campDanger){dx=x-campfire.position.x;dz=z-campfire.position.z;}
+   else if(humanDanger){dx=x-hana.position.x;dz=z-hana.position.z;}
+   else{
+    // Short roaming hops with a gentle pull toward the habitat.
+    const wander=r.phase+Math.sin(t*.27+r.phase)*1.5;
+    dx=Math.sin(wander)+(r.homeX-x)*.16;
+    dz=Math.cos(wander)+(r.homeZ-z)*.16;
+   }
+   const d=Math.hypot(dx,dz)||1;dx/=d;dz/=d;
+   const length=r.pet?1.05:fleeing?1.6:.85;
+   let nx=x+dx*length,nz=z+dz*length;
+   if(!landAt(nx,nz)||(!r.pet&&!fleeing&&Math.hypot(nx-r.homeX,nz-r.homeZ)>7)){
+    const toward=Math.atan2(r.homeX-x,r.homeZ-z);
+    nx=x+Math.sin(toward)*.7;nz=z+Math.cos(toward)*.7;
+   }
+   if(landAt(nx,nz)){
+    r.hopFromX=x;r.hopFromZ=z;r.hopToX=nx;r.hopToZ=nz;
+    r.hopClock=0;r.hopDuration=fleeing?.32:r.pet?.39:.46;
+    r.hopActive=true;r.heading=Math.atan2(nx-x,nz-z);
+    r.g.rotation.y=r.heading;
+   }else r.restUntil=t+.35;
+  }
+  if(r.hopActive){
+   r.hopClock+=dt;
+   const p=Math.min(1,r.hopClock/r.hopDuration);
+   // Continuous forward displacement + one clean ballistic hop.
+   const smooth=p*p*(3-2*p);
+   r.g.position.x=r.hopFromX+(r.hopToX-r.hopFromX)*smooth;
+   r.g.position.z=r.hopFromZ+(r.hopToZ-r.hopFromZ)*smooth;
+   r.g.position.y=rabbitGroundY(r.g.position.x,r.g.position.z)+.04+Math.sin(p*Math.PI)*(fleeing?.39:.30);
+   if(p>=1){r.hopActive=false;r.restUntil=t+(fleeing?.07:r.pet?.20:.65+Math.random()*.95);}
+  }else r.g.position.y=rabbitGroundY(x,z)+.04;
  }
  for(const f of fishes){
   const a=t*.52+f.phase;
@@ -798,7 +831,7 @@ for(const l of legs){
  limbCube(l,.24,.19,.25,sock,0,-.56,0);
  limbCube(l,.29,.16,.43,shoe,0,-.675,.10);
 }
-const satchel=part(.23,.33,.15,dark,.44,1.02,-.12);
+// Removed the permanently visible dark hip/left-hand-side box (satchel mesh).
 // Removed dark diagonal accessory strip overlapping the arm silhouette.
 hana.position.set(9,.4,5);
 const closedEyes=[];
@@ -1252,6 +1285,57 @@ function navSegmentClear(ax,az,bx,bz){
  }
  return true;
 }
+// Developer-only terrain collision inspector: 2D passability samples over the local ground.
+let collisionDebugEnabled=false,collisionDebugGroup=null,collisionDebugLast=0;
+function setCollisionDebug(enabled){
+ collisionDebugEnabled=enabled;
+ $('collisionDebug').textContent=enabled?'🧱 충돌 검수 ON':'🧱 충돌 검수 OFF';
+ $('collisionDebug').setAttribute('aria-pressed',String(enabled));
+ $('collisionPanel').style.display=enabled?'block':'none';
+ if(!enabled&&collisionDebugGroup){scene.remove(collisionDebugGroup);collisionDebugGroup.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});collisionDebugGroup=null;}
+ if(enabled)refreshCollisionDebug(true);
+}
+// Collision debug helper: count traversable directions using the same terrain edge test as navigation.
+function openEscapeDirections(x,z){
+ let count=0;
+ for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){
+  const distance=Math.hypot(dx,dz),step=1.25;
+  if(terrainPassable(x,z,x+dx/distance*step,z+dz/distance*step))count++;
+ }
+ return count;
+}
+function refreshCollisionDebug(force=false){
+ if(!collisionDebugEnabled||(!force&&elapsed-collisionDebugLast<1.8))return;
+ collisionDebugLast=elapsed;
+ if(collisionDebugGroup){scene.remove(collisionDebugGroup);collisionDebugGroup.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});}
+ collisionDebugGroup=new THREE.Group();scene.add(collisionDebugGroup);
+ const okMat=new THREE.LineBasicMaterial({color:0x35ef9a,transparent:true,opacity:.8,depthTest:false});
+ const badMat=new THREE.LineBasicMaterial({color:0xff4054,transparent:true,opacity:.95,depthTest:false});
+ const caveMat=new THREE.LineBasicMaterial({color:0x47c7ff,transparent:true,opacity:.95,depthTest:false});
+ let blocked=0,clear=0;
+ const cx=Math.round(hana.position.x/1.5)*1.5,cz=Math.round(hana.position.z/1.5)*1.5;
+ for(let ix=-9;ix<=9;ix++)for(let iz=-9;iz<=9;iz++){
+  const x=cx+ix*1.5,z=cz+iz*1.5;
+  const pass=safeWalkingSpot(x,z),y=terrainTopAt(x,z)+.12;
+  const cave=inCaveWalkZone(x,z)||caveEntrancePortal(x,z);
+  const points=[new THREE.Vector3(x-.65,y,z-.65),new THREE.Vector3(x+.65,y,z-.65),new THREE.Vector3(x+.65,y,z+.65),new THREE.Vector3(x-.65,y,z+.65),new THREE.Vector3(x-.65,y,z-.65)];
+  const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),pass?(cave?caveMat:okMat):badMat);
+  line.renderOrder=999;collisionDebugGroup.add(line);if(pass)clear++;else blocked++;
+ }
+ const x=hana.position.x,z=hana.position.z;
+ const directions=openEscapeDirections(x,z),ground=terrainTopAt(x,z);
+ const blockedHere=!safeWalkingSpot(x,z);
+ $('collisionPanel').innerHTML='<strong>🧱 지형 충돌 검수</strong><div>🟩 이동 가능 · 🟥 이동 불가 · 🟦 동굴 통로</div>'+
+  '<div>히나 X '+x.toFixed(1)+' / Z '+z.toFixed(1)+' / 지면 '+ground.toFixed(2)+'m</div>'+
+  '<div>주변 이동 방향: <b class="'+(directions<3?'bad':'ok')+'">'+directions+'/8</b></div>'+
+  '<div>현재 위치: '+(blockedHere?'<span class="bad">충돌 판정 이상</span>':'<span class="ok">이동 가능</span>')+'</div>'+
+  '<div>목표: '+(target?target.x.toFixed(1)+', '+target.z.toFixed(1):'없음')+'</div>'+
+  '<div>경로점 '+navPath.length+' · 후퇴 '+retreatPoints.length+' · 실패 '+routeFailures+'</div>'+
+  '<div>격자 검사: 통과 '+clear+' / 차단 '+blocked+'</div>'+
+  '<div style="opacity:.8">※ 실제 충돌 판정 기준. 검수용 격자는 화면에서만 표시됩니다.</div>';
+}
+const $=id=>document.getElementById(id);
+$('collisionDebug').onclick=()=>setCollisionDebug(!collisionDebugEnabled);
 function navFindOpen(x,z){return {x,z};}
 function navBuild(from,to){
  if(navBlocked(to.x,to.z))return [];
@@ -1395,7 +1479,7 @@ function updateDetailVisibility(force=false){
   mesh.visible=known;
  }
 }
-const $=id=>document.getElementById(id);
+
 function pct(v){return Math.round(Math.max(0,Math.min(100,Number(v)||0)));}
 let bubbleEnabled=true,bubbleUntil=0;const bubbleAnchor=new THREE.Vector3();
 let nextNightSoundAt=0,nightSoundUntil=0,nightSoundText='',nightSoundPosition=new THREE.Vector3();
@@ -1534,10 +1618,66 @@ function renderMind(){
  `추억 · 조개 ${mind.keepsakes}개 / 발견 ${mind.discoveries}회 / 실수 ${mind.mistakes}회\n`+
  `최근 기억\n${rec.map(m=>`D${m.day} ${m.detail}`).join('\n')||'아직 기억이 많지 않아.'}`;
 }
+// Event-driven webtoon memory album. Only real play events unlock panels.
+const MEMORY_DEFS=[
+ {id:'snake',title:'뱀과 처음 마주친 날',image:'memories/snake.webp'},
+ {id:'rabbit',title:'처음 잡은 토끼',image:'memories/rabbit.webp'},
+ {id:'wash',title:'처음 씻었던 날',image:'memories/wash.webp'},
+ {id:'fire',title:'첫 모닥불',image:'memories/fire.webp'},
+ {id:'fish',title:'첫 물고기',image:'memories/fish.webp'}
+];
+const MEMORY_KEY='hina_survival_memory_v85';
+let unlockedMemories={};
+try{const saved=JSON.parse(localStorage.getItem(MEMORY_KEY)||'{}');if(saved&&typeof saved==='object')unlockedMemories=saved;}catch(e){}
+function renderMemoryAlbum(){
+ const area=document.getElementById('memoryContent');if(!area)return;
+ area.replaceChildren();
+ let count=0;
+ for(const m of MEMORY_DEFS){
+  const saved=unlockedMemories[m.id];if(saved)count++;
+  const button=document.createElement('button');button.type='button';button.className='memoryTile'+(saved?'':' locked');
+  if(saved){const img=document.createElement('img');img.src=m.image;img.alt=m.title;img.loading='lazy';button.appendChild(img);}
+  const label=document.createElement('span');label.textContent=saved?`${m.title} · DAY ${saved.day}`:'🔒 아직 경험하지 않은 추억';button.appendChild(label);
+  button.title=saved?m.title:'실제 사건을 경험하면 해금됩니다';button.disabled=!saved;
+  if(saved)button.onclick=()=>showMemory(m,saved);
+  area.appendChild(button);
+ }
+ document.getElementById('memoryCount').textContent=`${count}/${MEMORY_DEFS.length}`;
+}
+function showMemory(m,saved){
+ document.getElementById('memoryTitle').textContent=m.title;
+ document.getElementById('memoryImage').src=m.image;
+ document.getElementById('memoryDescription').textContent=`DAY ${saved.day} · ${saved.time}`;
+ document.getElementById('memoryViewer').classList.add('open');
+}
+function recordMemory(id){
+ if(unlockedMemories[id])return;
+ const m=MEMORY_DEFS.find(e=>e.id===id);if(!m)return;
+ const t=clockParts();
+ unlockedMemories[id]={day:t.day,time:`${String(t.h).padStart(2,'0')}:${String(t.m).padStart(2,'0')}`,x:Math.round(hana.position.x),z:Math.round(hana.position.z)};
+ try{localStorage.setItem(MEMORY_KEY,JSON.stringify(unlockedMemories));}catch(e){}
+ renderMemoryAlbum();
+ const toast=document.getElementById('memoryToast');toast.textContent='📸 새로운 추억 · '+m.title;toast.style.opacity='1';
+ memoryToastUntil=elapsed+12;
+}
+let memoryToastUntil=0;
+function inspectMemoryEvent(t){
+ if(t.includes('히나가 뱀을 발견하고 경계함'))recordMemory('snake');
+ else if(t.includes('토끼를 펫으로 맞이함')||t.includes('토끼를 식량으로 사용'))recordMemory('rabbit');
+ else if(t.includes('오늘의 세안과 몸 씻기 완료'))recordMemory('wash');
+ else if(t.includes('불씨 생성 성공'))recordMemory('fire');
+ else if(t.includes('🐟 포획 후')||t.includes('🐟 물고기 휴대'))recordMemory('fish');
+}
+const memoryClose=()=>document.getElementById('memoryViewer').classList.remove('open');
+document.getElementById('memoryClose').onclick=memoryClose;
+document.getElementById('memoryViewer').onclick=e=>{if(e.target.id==='memoryViewer')memoryClose();};
+renderMemoryAlbum();
+
 function log(t){
+ if(elapsed>memoryToastUntil)document.getElementById('memoryToast').style.opacity='0';
  const key=clockParts();let e=document.createElement('div');
  e.textContent=`D${key.day} ${String(key.h).padStart(2,'0')}:${String(key.m).padStart(2,'0')}  ${t}`;
- $('log').prepend(e);mindObserveEvent(t);
+ $('log').prepend(e);mindObserveEvent(t);inspectMemoryEvent(t);
  if($('log').children.length>90)$('log').lastChild.remove();
 }
 function say(t){
@@ -1592,7 +1732,9 @@ function setState(s,g,p,words){
  if(s==='returnHesitate')randomHesitationDuration=randomBetween(5,13);
  $('phase').textContent=g;if(words)say(words);log(g);actions++;
 }
+let memoryFirstInit=true;
 function init(){
+ if(memoryFirstInit){memoryFirstInit=false;}else{unlockedMemories={};try{localStorage.removeItem(MEMORY_KEY);}catch(e){}}renderMemoryAlbum();document.getElementById('memoryToast').style.opacity='0';
  for(const [mesh,original] of fadedMeshes){mesh.material=original;}fadedMeshes.clear();
  // Restore both simulation data and visuals. A reset must match a fresh page load.
  paused=false;speed=4;prev=0;elapsed=0;day=1;walkAnimationTime=0;torchCarried=false;outdoorTorchAttemptAt=-Infinity;resetSnakes();nextSnakeSpawn=DAY_SECONDS+randomBetween(15,45);lastSnakeWarning=-999;
@@ -1631,7 +1773,7 @@ function init(){
  legs.forEach(l=>l.rotation.set(0,0,0));arms.forEach(a=>a.rotation.set(0,0,0));
  eyeMeshes.forEach(m=>m.visible=true);closedEyes.forEach(m=>m.visible=false);
  critters.forEach(r=>{
-  r.caught=false;r.pet=false;r.panic=0;r.g.visible=true;
+  r.caught=false;r.pet=false;r.panic=0;r.hopActive=false;r.hopClock=0;r.restUntil=0;r.g.visible=true;
   r.g.position.set(r.homeX,rabbitGroundY(r.homeX,r.homeZ)+.04,r.homeZ);r.g.rotation.set(0,0,0);
  });
  fishes.forEach(f=>{f.g.position.set(f.x,-.3,f.z);f.tail.rotation.y=0;});
@@ -2508,6 +2650,7 @@ function update(dt){
  decide();
  updateCharacterPose();updateTorch();
  terrainSafetyWatch();
+ refreshCollisionDebug();
  updateExploration();
  updateDetailVisibility();
  updateBerryTrees();
@@ -2612,6 +2755,7 @@ $('soundToggle').onclick=async()=>{
 
 $('ui').dataset.pane='vitals';
 document.querySelectorAll('#mobileCategories [data-pane]').forEach(button=>button.onclick=()=>{
+ if(button.dataset.pane==='memories')document.getElementById('memoryPanel').open=true;
  const pane=button.dataset.pane;
  $('ui').dataset.pane=pane;
  document.querySelectorAll('#mobileCategories button').forEach(b=>b.classList.toggle('selected',b===button));
