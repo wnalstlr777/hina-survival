@@ -92,6 +92,7 @@ body.cinematic-mode #hideAllUI{opacity:.28}body.cinematic-mode #hideAllUI:hover,
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 // v15.1: two independent survivors in one connected world.
+const bearPass={x:-117,halfWidth:3.8,minZ:17.5,maxZ:26.5};
 const DAEUN_ZONE=Object.freeze({center:{x:-215,z:25},spawn:{x:-211,z:37},cave:{x:-228,z:11},pond:{x:-222,z:29},radius:37});
 const WORLD_BOUNDS=Object.freeze({minX:-286,maxX:112,minZ:-95,maxZ:99});
 const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia('(max-width:700px)').matches;
@@ -1886,7 +1887,9 @@ function updateBreadcrumbRetreat(step){
 }
 // Terrain-only step collision. Small scenery, trees, animals and decorations stay non-blocking.
 // Ground layers are voxel platforms; evaluate reachable top surfaces relative to current foot height.
-const MAX_STEP_HEIGHT=1.15; // approximately below Hina's chest
+const MAX_STEP_HEIGHT=1.15; // uphill: chest-height limit
+const MAX_SAFE_DROP=7.0; // downhill: permit leaving tall low-poly platforms (never climb back up)
+
 // v6.3: The cave is a hollow interior, NOT a climbable cliff top.
 // Right wall, roof and decorative ledges must never enter the walkable-height solver.
 function inCaveWalkZone(x,z){
@@ -1911,6 +1914,19 @@ function wildlifeGroundY(x,z){
 }
 function caveEntrancePortal(x,z){return (Math.abs(x-caveX)<4.45&&z>caveZ+1.5&&z<caveZ+7.4)||(Math.abs(x-DAEUN_ZONE.cave.x)<4.45&&z>DAEUN_ZONE.cave.z+1.5&&z<DAEUN_ZONE.cave.z+7.4);}
 function terrainPassable(fromX,fromZ,toX,toZ){
+ // A crossing through the central mountain pass must stay inside its open gap.
+ // Bear-pass data is declared later; this function is only called after initialization.
+ if(typeof bearPass!=='undefined'){
+  const wallX=bearPass.x,band=bearPass.halfWidth;
+  const intersectsBand=Math.min(fromX,toX)<wallX+band&&Math.max(fromX,toX)>wallX-band;
+  if(intersectsBand){
+   const nGate=Math.max(1,Math.ceil(Math.hypot(toX-fromX,toZ-fromZ)/.3));
+   for(let j=0;j<=nGate;j++){
+    const t=j/nGate,x=fromX+(toX-fromX)*t,z=fromZ+(toZ-fromZ)*t;
+    if(Math.abs(x-wallX)<band&&landAt(x,z)&&(z<bearPass.minZ||z>bearPass.maxZ))return false;
+   }
+  }
+ }
  if(!Number.isFinite(toX)||!Number.isFinite(toZ)||!landAt(toX,toZ)||deepPondAt(toX,toZ)&&!daeunPondAt(toX,toZ))return false;
  // Each edge is sampled independently of Hina's current elevation (A* may be far away).
  const length=Math.hypot(toX-fromX,toZ-fromZ),n=Math.max(1,Math.ceil(length/.18));
@@ -1922,11 +1938,11 @@ function terrainPassable(fromX,fromZ,toX,toZ){
   const dc=DAEUN_ZONE.cave;
   if(Math.abs(x-dc.x)<6.3&&z>dc.z-5.35&&z<dc.z+4.9&&!inCaveWalkZone(x,z)&&!caveEntrancePortal(x,z))return false;
   const next=terrainTopAt(x,z);
-  if(!caveEntrancePortal(x,z)&&!caveEntrancePortal(fromX,fromZ)&&Math.abs(next-current)>MAX_STEP_HEIGHT+.001)return false;
+  if(!caveEntrancePortal(x,z)&&!caveEntrancePortal(fromX,fromZ)&&(next-current>MAX_STEP_HEIGHT+.001||current-next>MAX_SAFE_DROP+.001))return false;
   // Body clearance: never overlap a cliff side or cave wall/ceiling.
   for(const p of nearbySurfaces(x,z)){
    if(p.minorDecoration||p.rx<.4||p.rz<.4)continue;
-   if(!caveEntrancePortal(x,z)&&!inCaveWalkZone(x,z)&&surfaceContains(p,x,z,.20)&&p.top>next+MAX_STEP_HEIGHT+.001&&p.bottom<next+1.95)return false;
+   if(!caveEntrancePortal(x,z)&&!inCaveWalkZone(x,z)&&surfaceContains(p,x,z,.20)&&p.top>next+MAX_STEP_HEIGHT+.001&&p.bottom<next+1.95&&p.top-current>MAX_STEP_HEIGHT+.001)return false;
   }
   current=next;
  }
@@ -1974,6 +1990,18 @@ function rabbitGroundY(x,z){
  return top;
 }
 function safeWalkingSpot(x,z){return Number.isFinite(x)&&Number.isFinite(z)&&landAt(x,z)&&terrainPassable(x,z,x,z);}
+// Platform recovery: prefer a true traversable edge, never teleport through a cliff.
+function findPlatformExit(x,z){
+ for(const radius of [1,2,3,4,6,8,11]){
+  for(let i=0;i<24;i++){
+   const angle=i*Math.PI/12,nx=x+Math.cos(angle)*radius,nz=z+Math.sin(angle)*radius;
+   if(safeWalkingSpot(nx,nz)&&navSegmentClear(x,z,nx,nz))
+    return new THREE.Vector3(nx,terrainTopAt(nx,nz)+.1,nz);
+  }
+ }
+ return null;
+}
+
 function rescueHina(reason){
  if(elapsed<rescueCooldownUntil)return;
  let candidate=null;
@@ -3460,6 +3488,28 @@ function update(dt){
    }
   }
  }
+ // Bear panic overrides ordinary errands while the threat is close.
+ const bearDistance=Math.hypot(hana.position.x-middleBear.position.x,hana.position.z-middleBear.position.z);
+ if(bearDistance<bearTerritory.detectRadius+1&&bearTerritoryDistance(hana.position.x,hana.position.z)<bearTerritory.chaseRadius){
+  const dx=hana.position.x-middleBear.position.x,dz=hana.position.z-middleBear.position.z;
+  const len=Math.max(.1,Math.hypot(dx,dz));
+  const awayX=dx/len,awayZ=dz/len;
+  let escape=null;
+  for(const distance of [14,10,7,4]){
+   for(const offset of [0,.55,-.55,1.05,-1.05,1.57,-1.57]){
+    const angle=Math.atan2(awayZ,awayX)+offset;
+    const x=hana.position.x+Math.cos(angle)*distance,z=hana.position.z+Math.sin(angle)*distance;
+    if(x<=-108||!safeWalkingSpot(x,z))continue;
+    if(navSegmentClear(hana.position.x,hana.position.z,x,z)){escape=new THREE.Vector3(x,.5,z);break;}
+   }
+   if(escape)break;
+  }
+  if(escape){
+   if(state!=='bearFlee'||!target||Math.hypot(target.x-escape.x,target.z-escape.z)>5){
+    state='bearFlee';goal='🐻 곰을 피해 도망가는 중';phaseAt=elapsed;target=escape;navReset();
+   }
+  }
+ }else if(state==='bearFlee'){state='recover';target=null;navReset();phaseAt=elapsed;}
  if(retreatPoints.length){updateBreadcrumbRetreat(step);}
  else if(target){
   const finalDistance=Math.hypot(target.x-hana.position.x,target.z-hana.position.z);
@@ -4172,15 +4222,32 @@ function buildDaeunWorld(){
  }
  rebuildWorldTerrainIndex();
  // v15.8: more forage within a short walk of the cave and spawn, but finite stock.
- const berrySites=[[-205,25],[-234,35],[-211,48],[-242,23],
-  [-216,39],[-205,42],[-218,20],[-236,18],[-209,17],[-224,44],[-201,32]];
- for(const [x,z] of berrySites){
-  if(!landAt(x,z)||deepPondAt(x,z))continue;
-  berryTree(x,z,terrainTopAt(x,z)+.015);const t=berryTrees.pop();
-  t.ownerId='daeun';t.group.userData.ownerId='daeun';daeunResources.berries.push(t);
+ // v17.2: deterministic, broadly scattered forage instead of a cave-side cluster.
+ // Reject water, cliff tops, cave mouth, and both approach paths.
+ let resourceSeed=1721107;
+ const resourceRand=()=>{resourceSeed=(Math.imul(resourceSeed,1664525)+1013904223)>>>0;return resourceSeed/4294967296;};
+ const resourceSites=[];
+ function validResourceSite(x,z,spacing){
+  if(x<-270||x>-167||z<-25||z>77||!landAt(x,z)||islandValue(x,z)<.09||deepPondAt(x,z))return false;
+  if(Math.hypot(x-p.x,z-p.z)<9||Math.hypot(x-c.x,z-c.z-5)<12)return false;
+  if(x>c.x-7&&x<c.x+7&&z>c.z-4&&z<c.z+17)return false;
+  if(terrainTopAt(x,z)>1.55||!safeWalkingSpot(x,z))return false;
+  if(resourceSites.some(q=>Math.hypot(q.x-x,q.z-z)<spacing))return false;
+  return true;
  }
- for(const [x,z] of [[-214,32],[-225,21],[-204,30],[-235,29],[-211,44],[-233,42]]){
-  createBranchPile(x,z);const b=branchPiles.pop();b.ownerId='daeun';b.group.position.y=terrainTopAt(x,z)+.03;daeunResources.branches.push(b);
+ for(let i=0;i<900&&daeunResources.berries.length<15;i++){
+  const x=-268+resourceRand()*99,z=-23+resourceRand()*98;
+  if(!validResourceSite(x,z,8))continue;
+  berryTree(x,z,terrainTopAt(x,z)+.015);
+  const t=berryTrees.pop();t.ownerId='daeun';t.group.userData.ownerId='daeun';
+  daeunResources.berries.push(t);resourceSites.push({x,z});
+ }
+ for(let i=0;i<900&&daeunResources.branches.length<13;i++){
+  const x=-268+resourceRand()*99,z=-23+resourceRand()*98;
+  if(!validResourceSite(x,z,5.5))continue;
+  createBranchPile(x,z);const b=branchPiles.pop();
+  b.ownerId='daeun';b.group.position.y=terrainTopAt(x,z)+.03;
+  daeunResources.branches.push(b);resourceSites.push({x,z});
  }
  // v16.8: organic seeded woodland distribution across the expanded Daeun landmass.
  // No golden-angle rings. Reject crowded trees, the cave portal, pond and main footpaths.
@@ -4231,7 +4298,7 @@ function buildDaeunWorld(){
  covers.count=count;covers.instanceMatrix.needsUpdate=true;covers.receiveShadow=true;
  covers.userData.minorDecoration=true;scene.add(covers);
  // Rabbits reuse Hina's autonomous rabbit animation and terrain-following logic.
- for(const [x,z,phase] of [[-207,34,1.1],[-239,39,3.4],[-217,51,5.2]]){
+ for(const [x,z,phase] of [[-184,46,1.1],[-255,53,3.4],[-213,70,5.2],[-249,-9,2.7],[-191,12,4.5]]){
   if(!landAt(x,z)||deepPondAt(x,z))continue;
   rabbit(x,z,phase);
   const r=critters[critters.length-1];r.originalHomeX=x;r.originalHomeZ=z;
@@ -4244,6 +4311,47 @@ function buildDaeunWorld(){
  seed=oldSeed;initializeOcclusionGroups();
 }
 buildDaeunWorld();
+// Daeun has her own snakes; Hina's snake encounter system is unchanged.
+const daeunSnakes=[];
+let nextDaeunSnakeAt=DAY_SECONDS*1.6;
+function updateDaeunSnakes(step){
+ if(!dualReady||clockParts().day<2)return;
+ if(elapsed>=nextDaeunSnakeAt&&daeunSnakes.length<2){
+  nextDaeunSnakeAt=elapsed+95+Math.random()*100;
+  for(let i=0;i<16;i++){
+   const x=-265+Math.random()*92,z=-19+Math.random()*91;
+   if(!landAt(x,z)||deepPondAt(x,z)||!safeWalkingSpot(x,z)||Math.hypot(x-DAEUN_ZONE.cave.x,z-DAEUN_ZONE.cave.z)<18||Math.hypot(x-DAEUN_ZONE.pond.x,z-DAEUN_ZONE.pond.z)<11)continue;
+   const snake=makeSnake(x,z);snakes.splice(snakes.indexOf(snake),1);
+   snake.expiresAt=elapsed+55+Math.random()*35;
+   daeunSnakes.push(snake);break;
+  }
+ }
+ for(const snake of [...daeunSnakes]){
+  const d=Math.hypot(snake.g.position.x-daeun.mesh.position.x,snake.g.position.z-daeun.mesh.position.z);
+  if(elapsed>=snake.expiresAt||d>65){
+   scene.remove(snake.g);daeunSnakes.splice(daeunSnakes.indexOf(snake),1);continue;
+  }
+  snake.phase+=step*.7;snake.g.rotation.y=Math.sin(snake.phase)*.48;
+  if(d<5&&!snake.noticed){snake.noticed=true;daeunSay('🐍 뱀이야! 가까이 가지 말자.');}
+  if(d<2.5&&elapsed-snake.lastScare>90){
+   snake.lastScare=elapsed;daeun.stats.will=Math.max(0,daeun.stats.will-5);
+   daeunSay('뱀이 너무 가까워! 무서워…');
+  }
+  if(d<2.5){
+   const dx=(snake.g.position.x-daeun.mesh.position.x)/Math.max(d,.1);
+   const dz=(snake.g.position.z-daeun.mesh.position.z)/Math.max(d,.1);
+   const nx=snake.g.position.x+dx*step*.5,nz=snake.g.position.z+dz*step*.5;
+   if(terrainPassable(snake.g.position.x,snake.g.position.z,nx,nz)){
+    snake.g.position.x=nx;snake.g.position.z=nz;
+   }
+  }
+  fitSnakeToGround(snake);
+ }
+}
+function resetDaeunSnakes(){
+ for(const snake of daeunSnakes)scene.remove(snake.g);
+ daeunSnakes.length=0;nextDaeunSnakeAt=elapsed+DAY_SECONDS*.6;
+}
 // v17.1: A low-poly mountain landmark between the two camps.
 // Its footprint is north of the shared walking corridor (z=16..32).
 // All mountain caps are registered as real terrain, so step navigation
@@ -4273,6 +4381,107 @@ function buildMiddleMountain(){
  rebuildWorldTerrainIndex();
 }
 buildMiddleMountain();
+// v17.6: narrow central pass; northern and southern rock shoulders form a visible chokepoint.
+// The corridor remains 9 world units wide, enough for both characters and the bear.
+// bearPass is initialized with the other world constants, before navigation helpers.
+const bearPassRocks=[];
+function buildBearPass(){
+ // Segments follow the shoreline, not a single invisible wall.
+ for(const [zStart,zEnd] of [[-23,17.5],[26.5,67]]){
+  for(let z=zStart;z<zEnd;z+=5.5){
+   const depth=Math.min(5.6,zEnd-z);
+   const cz=z+depth*.5;
+   if(!landAt(bearPass.x,cz))continue;
+   const h=3.3+(Math.sin(z*.43)+1)*.7;
+   const ground=terrainTopAt(bearPass.x,cz);
+   const wall=box(6.8,h,depth,Math.sin(z*.3)>0?rock:rockDark,bearPass.x,ground+h*.5-.15,cz);
+   wall.userData.bearPassWall=true;
+   bearPassRocks.push(wall);
+   const top=box(6.65,.18,Math.max(.3,depth-.2),moss,bearPass.x,ground+h-.07,cz);
+   top.userData.bearPassWall=true;bearPassRocks.push(top);
+  }
+ }
+ rebuildWorldTerrainIndex();
+}
+buildBearPass();
+// v17.3: mid-island bear is a soft narrative gate between the two survivors.
+// It patrols the crossing, pursues a spotted survivor only inside its territory,
+// and drains morale while visible. It cannot chase anyone back to their camp.
+const bearTerritory={x:-117,z:22,patrolRadius:6,chaseRadius:31,detectRadius:17,loseRadius:24,personalSpace:2.8,contactRange:3.2};
+const bearBodyMat=mat(0x795039),bearFurMat=mat(0x63412f),bearNoseMat=mat(0x28201c);
+const middleBear=new THREE.Group();middleBear.userData.noOcclusion=true;scene.add(middleBear);
+function bearPart(w,h,d,m,x,y,z){return groupCube(middleBear,w,h,d,m,x,y,z);}
+bearPart(2.65,1.9,3.35,bearBodyMat,0,1.8,0);
+bearPart(1.8,1.65,1.45,bearBodyMat,0,2.35,1.75);
+bearPart(1.0,.66,.8,bearFurMat,0,1.99,2.67);
+bearPart(.44,.3,.24,bearNoseMat,0,2.06,3.06);
+for(const side of [-1,1]){
+ bearPart(.53,.58,.42,bearFurMat,side*.7,3.26,1.75);
+ bearPart(.47,.16,.12,bearNoseMat,side*.42,2.54,2.51);
+ for(const front of [-1,1])bearPart(.65,1.35,.68,bearFurMat,side*.88,.74,front*1.12);
+}
+const bearState={home:new THREE.Vector3(bearTerritory.x,0,bearTerritory.z),phase:0,target:null,lastWarning:-999,lastHinaFleeSpeech:-999,patrolAngle:0,active:true};
+function resetMiddleBear(){
+ bearState.phase=0;bearState.target=null;bearState.lastWarning=-999;bearState.lastHinaFleeSpeech=-999;bearState.patrolAngle=0;
+ middleBear.position.set(bearTerritory.x,terrainTopAt(bearTerritory.x,bearTerritory.z)+.05,bearTerritory.z);
+}
+resetMiddleBear();
+function bearTerritoryDistance(x,z){return Math.hypot(x-bearTerritory.x,z-bearTerritory.z);}
+function bearNearRoute(x,z){return Math.hypot(x-middleBear.position.x,z-middleBear.position.z)<bearTerritory.detectRadius+5;}
+function updateMiddleBear(step){
+ if(!dualReady||!step)return;
+ const targets=[{id:'hina',mesh:hana,stats:stats},{id:'daeun',mesh:daeun.mesh,stats:daeun.stats}];
+ let spotted=null,nearest=Infinity;
+ for(const candidate of targets){
+  const p=candidate.mesh.position,dist=Math.hypot(p.x-middleBear.position.x,p.z-middleBear.position.z);
+  if(dist<bearTerritory.detectRadius&&bearTerritoryDistance(p.x,p.z)<bearTerritory.chaseRadius&&dist<nearest){nearest=dist;spotted=candidate;}
+ }
+ if(spotted){
+  bearState.target=spotted.id;
+  if(spotted.id==='hina'&&elapsed-bearState.lastHinaFleeSpeech>25){
+   bearState.lastHinaFleeSpeech=elapsed;
+   say('곰이다! 위험해, 빨리 도망가야 해!');
+   log('🐻 히나가 곰을 발견하고 반대 방향으로 도망침');
+  }
+ }
+ let tracked=targets.find(t=>t.id===bearState.target);
+ if(tracked){
+  const p=tracked.mesh.position,dist=Math.hypot(p.x-middleBear.position.x,p.z-middleBear.position.z);
+  if(dist>bearTerritory.loseRadius||bearTerritoryDistance(p.x,p.z)>bearTerritory.chaseRadius){bearState.target=null;tracked=null;}
+ }
+ let goalX,goalZ,moveSpeed;
+ if(tracked){
+  goalX=tracked.mesh.position.x;goalZ=tracked.mesh.position.z;moveSpeed=1.45;
+  // Continuous fear only while spotted and in the bear's pursuit zone.
+  // Fear doubles at near-contact, but the bear never physically overlaps a character.
+  const proximity=Math.hypot(tracked.mesh.position.x-middleBear.position.x,tracked.mesh.position.z-middleBear.position.z);
+  const fearRate=proximity<=bearTerritory.contactRange?.60:.30;
+  tracked.stats.will=Math.max(0,tracked.stats.will-step*fearRate);
+  if(elapsed-bearState.lastWarning>22){
+   bearState.lastWarning=elapsed;
+   if(tracked.id==='daeun')daeunSay('🐻 곰이 따라오고 있어! 이곳을 벗어나야 해!');
+   else log('🐻 중앙 산의 곰에게 발각됨 · 의지력 감소 중');
+  }
+ }else{
+  bearState.patrolAngle+=step*.09;
+  goalX=bearTerritory.x+Math.cos(bearState.patrolAngle)*bearTerritory.patrolRadius*.7;
+  goalZ=bearTerritory.z+Math.sin(bearState.patrolAngle)*bearTerritory.patrolRadius*.42;
+  moveSpeed=.65;
+ }
+ const dx=goalX-middleBear.position.x,dz=goalZ-middleBear.position.z,dist=Math.hypot(dx,dz);
+ if(dist>(tracked?bearTerritory.personalSpace:.9)){
+  const remaining=Math.max(0,dist-(tracked?bearTerritory.personalSpace:.6));
+  const amount=Math.min(step*moveSpeed,remaining),nx=middleBear.position.x+dx/dist*amount,nz=middleBear.position.z+dz/dist*amount;
+  // Leash and steep terrain collision prevent an inescapable chase or clipping.
+  const clearOfCharacters=targets.every(t=>Math.hypot(t.mesh.position.x-nx,t.mesh.position.z-nz)>=bearTerritory.personalSpace);
+  if(clearOfCharacters&&bearTerritoryDistance(nx,nz)<bearTerritory.chaseRadius&&terrainPassable(middleBear.position.x,middleBear.position.z,nx,nz)){
+   middleBear.position.x=nx;middleBear.position.z=nz;middleBear.rotation.y=Math.atan2(dx,dz);
+  }
+ }
+ middleBear.position.y=terrainTopAt(middleBear.position.x,middleBear.position.z)+.05;
+ bearState.phase+=step*(tracked?7:2.5);
+ middleBear.rotation.z=Math.sin(bearState.phase)*.035;
+}
 function createDaeunCharacter(){
  const mesh=hana.clone(true),sources=[],copies=[];hana.traverse(o=>sources.push(o));mesh.traverse(o=>copies.push(o));const refs=new Map(sources.map((o,i)=>[o,copies[i]]));
  const palette=new Map();for(const [from,color] of [[hair,0x49313b],[hairLight,0x66505b],[skirt,0x39333d],[ribbon,0x39333d],[seam,0x64525b]]){const m=from.clone();m.color.setHex(color);palette.set(from,m);}
@@ -4307,7 +4516,7 @@ function createDaeunCharacter(){
 
  for(const original of [torchGroup,wovenBasket,handCargo]){const o=refs.get(original);if(o)o.visible=false;}
  mesh.name='Daeun';scene.add(mesh);
- return {id:'daeun',name:'다은',mesh,arms:arms.map(a=>refs.get(a)),legs:legs.map(a=>refs.get(a)),head:refs.get(head),eyes:eyeMeshes.map(m=>refs.get(m)),closedEyes:closedEyes.map(m=>refs.get(m)),home:{...DAEUN_ZONE.center},sites:{water:new THREE.Vector3(DAEUN_ZONE.pond.x,.4,DAEUN_ZONE.pond.z+5.1),shelter:new THREE.Vector3(DAEUN_ZONE.cave.x,.4,DAEUN_ZONE.cave.z+1.7)},stats:{},inventory:{},auto:true,path:[],destination:null,action:'idle',actionAge:0,thought:'친구들은 어디에 있을까?',log:[],memory:[],timers:{},restLocked:false,walkTime:0,aiRandom:8713};
+ return {id:'daeun',name:'다은',mesh,arms:arms.map(a=>refs.get(a)),legs:legs.map(a=>refs.get(a)),head:refs.get(head),eyes:eyeMeshes.map(m=>refs.get(m)),closedEyes:closedEyes.map(m=>refs.get(m)),home:{...DAEUN_ZONE.center},sites:{water:new THREE.Vector3(DAEUN_ZONE.pond.x,.4,DAEUN_ZONE.pond.z),shelter:new THREE.Vector3(DAEUN_ZONE.cave.x,.4,DAEUN_ZONE.cave.z+1.7)},stats:{},inventory:{},auto:true,path:[],destination:null,action:'idle',actionAge:0,thought:'친구들은 어디에 있을까?',log:[],memory:[],timers:{},restLocked:false,walkTime:0,aiRandom:8713};
 }
 const daeun=createDaeunCharacter();
 const characters=new Map([['hina',{id:'hina',name:'히나',mesh:hana,get stats(){return stats;},get auto(){return true;}}],['daeun',daeun]]);
@@ -4316,7 +4525,7 @@ function dRandom(){daeun.aiRandom=(Math.imul(1664525,daeun.aiRandom)+1013904223)
 function daeunSay(text){daeun.thought=text;daeun.log.unshift({at:elapsed,text});if(daeun.log.length>28)daeun.log.length=28;}
 function resetDaeun(){
  daeun.mesh.position.set(DAEUN_ZONE.spawn.x,terrainTopAt(DAEUN_ZONE.spawn.x,DAEUN_ZONE.spawn.z)+.1,DAEUN_ZONE.spawn.z);daeun.mesh.rotation.set(0,0,0);
- daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,fuel:0,rabbits:0,fish:0};daeun.skills={fire:0,rabbit:0,fish:0};daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.log=[];daeun.memory=[];daeun.timers={nextThink:elapsed+46,stuck:0,introStart:elapsed,introStage:0};daeun.restLocked=false;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeunExplored.clear();
+ daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,fuel:0,rabbits:0,fish:0};daeun.skills={fire:0,rabbit:0,fish:0};daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.log=[];daeun.memory=[];daeun.timers={nextThink:elapsed+46,stuck:0,introStart:elapsed,introStage:0};daeun.restLocked=false;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeun.seatedEating=0;resetDaeunSnakes();resetMiddleBear();daeunExplored.clear();
  for(let i=0;i<daeunResources.berries.length;i++){
   const t=daeunResources.berries[i];t.stock=0;
   // First-day forage near spawn: a few stocked trees, never an infinite food source.
@@ -4348,6 +4557,10 @@ class DaeunAIController{
  think(){
   const d=daeun,s=d.stats,inv=d.inventory,pos=d.mesh.position;
   if(d.restLocked)return;
+  if(bearNearRoute(pos.x,pos.z)&&bearTerritoryDistance(pos.x,pos.z)<bearTerritory.chaseRadius){
+   if(setDaeunDestination(new THREE.Vector3(DAEUN_ZONE.center.x,.4,DAEUN_ZONE.center.z),'home'))daeunSay('곰이 있는 길은 위험해. 동굴 쪽으로 돌아가자.');
+   return;
+  }
   if((s.energy<25||s.will<45)&&s.thirst>=35&&s.hunger>=35){if(pos.distanceTo(d.sites.shelter)<4){d.action='rest';d.actionAge=0;daeunSay('여기서 몸과 마음을 좀 쉬자.');}else if(!setDaeunDestination(d.sites.shelter,'rest')){d.action='rest';d.actionAge=0;}return;}
   if(s.thirst<57){setDaeunDestination(d.sites.water,'drink');return;}
   if(s.hunger<57){
@@ -4367,7 +4580,9 @@ class DaeunAIController{
  }
  arrived(){
   const d=daeun,s=d.stats,inv=d.inventory;d.destination=null;d.path=[];
-  if(d.manualTask&&d.manualTask.phase==='approach'){d.manualTask.phase='perform';d.manualTask.age=0;d.action=d.manualTask.type==='berry'?'manualPick':d.manualTask.type==='water'?'manualDrink':d.manualTask.type==='branch'?'manualBranch':d.manualTask.type==='fire'?'manualFire':d.manualTask.type==='rabbit'?'manualRabbit':d.manualTask.type==='fish'?'manualFish':'manualRest';d.actionAge=0;return;}
+  if(d.manualTask&&d.manualTask.phase==='approach'){
+   if((d.manualTask.type==='water'||d.manualTask.type==='fish')&&Math.hypot(d.mesh.position.x-DAEUN_ZONE.pond.x,d.mesh.position.z-DAEUN_ZONE.pond.z)>.95){cancelManualTask();daeunSay('연못 중앙까지 이동하지 못했어. 다시 시도하자.');return;}
+   d.manualTask.phase='perform';d.manualTask.age=0;d.action=d.manualTask.type==='berry'?'manualPick':d.manualTask.type==='water'?'manualDrink':d.manualTask.type==='branch'?'manualBranch':d.manualTask.type==='fire'?'manualFire':d.manualTask.type==='rabbit'?'manualRabbit':d.manualTask.type==='fish'?'manualFish':'manualRest';d.actionAge=0;return;}
   if(d.action==='drink'){s.thirst=Math.min(100,s.thirst+65);daeunSay('물을 마셨더니 살 것 같아.');d.memory.push({kind:'water',at:elapsed});}
   if(d.action==='forage'){
    const t=daeunResources.berries[d.resourceId];if(t&&t.stock>0){const n=Math.min(3,t.stock);t.stock-=n;inv.berries+=n;t.fruits.forEach((f,i)=>f.visible=i<t.stock);if(s.hunger<70){inv.berries--;s.hunger=Math.min(100,s.hunger+34);}daeunSay('열매를 모았어. 조금은 나중을 위해 남겨 두자.');d.memory.push({kind:'forage',at:elapsed});}
@@ -4390,6 +4605,7 @@ function cancelManualTask(){daeun.manualTask=null;if(['manualPick','manualDrink'
 function interruptManualMovement(){cancelManualTask();daeun.path=[];daeun.destination=null;daeun.action='manual';}
 function isManualDaeun(){return observedId==='daeun'&&!daeun.auto;}
 function updateDaeun(step,realDt){
+ updateDaeunSnakes(step);
  const d=daeun,s=d.stats,inv=d.inventory;let moving=false;
  // v16.2: post-warp shock -> despair -> resolve. Dialogue remains observable even in manual mode.
  if(d.timers.introStage!==undefined&&d.timers.introStage<4){
@@ -4429,11 +4645,28 @@ function updateDaeun(step,realDt){
   if(movement&&movement.lengthSq()){
    const before=d.mesh.position.clone();moving=moveCharacterOnGround(d.mesh,before.x+movement.x,before.z+movement.z);
    if(moving){d.mesh.rotation.y=Math.atan2(movement.x,movement.z);d.timers.stuck=0;}
-   else{d.timers.stuck=(d.timers.stuck||0)+step;if(d.timers.stuck>2){cancelManualTask();d.path=[];d.destination=null;d.action='idle';d.timers.nextThink=elapsed+4;d.timers.stuck=0;daeunSay('막혀 있어. 안전한 다른 길을 찾아보자.');}}
+   else{d.timers.stuck=(d.timers.stuck||0)+step;if(d.timers.stuck>2){
+    d.timers.stuck=0;
+    const exit=findPlatformExit(d.mesh.position.x,d.mesh.position.z);
+    if(exit&&Math.hypot(exit.x-d.mesh.position.x,exit.z-d.mesh.position.z)>.35){
+     const preserved=d.destination;
+     d.path=preserved?navBuild(d.mesh.position,preserved):[];
+     if(!d.path.length)d.path=[exit];
+     daeunSay('낮은 쪽으로 내려갈 수 있는 길을 찾아볼게.');
+    }else{
+     cancelManualTask();d.path=[];d.destination=null;d.action='idle';d.timers.nextThink=elapsed+4;
+     daeunSay('막혀 있어. 안전한 다른 길을 찾아보자.');
+    }
+   }}
   }
   s.energy=Math.max(0,s.energy-step*(moving?.26+(s.thirst===0?.20:0)+(s.hunger===0?.10:0):.025));const distanceFromHome=Math.hypot(d.mesh.position.x-d.home.x,d.mesh.position.z-d.home.z);
   const drain=DAEUN_RULES.willBaseDrain+(moving?DAEUN_RULES.willMoveDrain:0)+(distanceFromHome>DAEUN_RULES.autoRadius*.75?DAEUN_RULES.willDistanceDrain:0)+(darkHours()?DAEUN_RULES.willNightDrain:0)+(s.hunger<25||s.thirst<25?DAEUN_RULES.willLowNeedsDrain:0);
   s.will=Math.max(0,Math.min(100,s.will+step*((!moving&&!darkHours()&&distanceFromHome<DAEUN_RULES.autoRadius*.5&&s.hunger>=40&&s.thirst>=40)?.018:0)-step*drain));
+ }
+ // Eating while seated does not interrupt rest, its recovery or seated animation.
+ if(d.seatedEating>0){
+  d.seatedEating=Math.max(0,d.seatedEating-step);
+  if(d.seatedEating===0&&inv.berries>0){inv.berries--;s.hunger=Math.min(100,s.hunger+12);daeunSay('앉아서 열매를 먹었어. 허기 +12');}
  }
  if(isManualDaeun()&&d.manualTask&&d.manualTask.phase==='perform'){
   const task=d.manualTask;task.age+=step;
@@ -4596,6 +4829,11 @@ function refreshDaeunDailyPractice(){
 }
 function manualAction(type,point,index=-1){
  if(!isManualDaeun()||daeun.restLocked)return false;
+ if(type==='eat'&&daeun.action==='manualRest'){
+  if(daeun.inventory.berries<=0){daeunSay('먹을 열매가 없어.');return false;}
+  if(daeun.seatedEating>0)return false;
+  daeun.seatedEating=2;daeunSay('앉아서 열매를 먹는 중…');return true;
+ }
  refreshDaeunDailyPractice();
  if((type==='rabbit'||type==='fish')&&activeWildlifeChance(type)<0){daeunSay('지금은 '+(type==='rabbit'?'토끼':'물고기')+'를 잡을 기회가 없어. 다음 기회를 기다리자.');return false;}
  if(DAEUN_DAILY_PRACTICE_LIMIT[type]&&daeun.dailyPractice[type]>=DAEUN_DAILY_PRACTICE_LIMIT[type]){
@@ -4626,6 +4864,14 @@ function safeRestPoint(p){
  return [[.65,0],[-.65,0],[0,.65],[0,-.65]].every(([dx,dz])=>Math.abs(terrainTopAt(p.x+dx,p.z+dz)-h)<.38&&safeWalkingSpot(p.x+dx,p.z+dz));
 }
 function findActionSpot(target,type){
+ // v17.3: both pond actions share a fixed, walkable center point. Never
+ // select a random bank point or allow the animation to begin from shore.
+ if(type==='water'||type==='fish'){
+  const center=new THREE.Vector3(DAEUN_ZONE.pond.x,terrainTopAt(DAEUN_ZONE.pond.x,DAEUN_ZONE.pond.z),DAEUN_ZONE.pond.z);
+  if(!safeWalkingSpot(center.x,center.z))return null;
+  if(Math.hypot(daeun.mesh.position.x-center.x,daeun.mesh.position.z-center.z)<.8)return center;
+  return navBuild(daeun.mesh.position,center).length?center:null;
+ }
  const from=daeun.mesh.position,preferred=Math.atan2(from.z-target.z,from.x-target.x);
  const radius=type==='berry'?2.05:type==='water'||type==='fish'?5.15:type==='branch'?1.15:type==='rabbit'?2.25:type==='fire'?1.75:1.4;
  const options=[];
@@ -4753,8 +4999,8 @@ function refreshManualActionUI(){
   positionEmojiMarker(btn,pt,()=>manualAction('branch',branch.group.position,o.i));
  }
  const task=daeun.manualTask,progress=task&&task.phase==='perform'?task:null;
- const cp=progress?projectToScreen(pos.clone().add(new THREE.Vector3(0,3.5,0))):null;
- taskProgress.style.display=cp?'block':'none';if(cp){const dur=progress.type==='fire'?5:progress.type==='rabbit'?3.5:progress.type==='fish'?4:progress.type==='water'?3:progress.type==='branch'?1.4:2;taskProgress.textContent=(progress.type==='berry'?'채집':progress.type==='branch'?'나뭇가지 줍기':progress.type==='water'?'물 마시기':progress.type==='eat'?'열매 먹기':progress.type==='fire'?'불 피우기 시도':progress.type==='rabbit'?'토끼잡기 시도':progress.type==='fish'?'물고기잡기 시도':'휴식')+' '+Math.round(Math.min(1,progress.age/dur)*100)+'%';taskProgress.style.left=cp.x+'px';taskProgress.style.top=cp.y+'px';}
+ const cp=(progress||daeun.action==='manualRest')?projectToScreen(pos.clone().add(new THREE.Vector3(0,3.5,0))):null;
+ taskProgress.style.display=cp?'block':'none';if(cp){const dur=progress?.type==='fire'?5:progress.type==='rabbit'?3.5:progress.type==='fish'?4:progress.type==='water'?3:progress.type==='branch'?1.4:2;taskProgress.textContent=daeun.action==='manualRest'?'💤 회복 중 · 체력 '+Math.round(daeun.stats.energy)+' · 의지력 '+Math.round(daeun.stats.will)+(daeun.seatedEating>0?' · 🍓 식사 중':''):(progress.type==='berry'?'채집':progress.type==='branch'?'나뭇가지 줍기':progress.type==='water'?'물 마시기':progress.type==='eat'?'열매 먹기':progress.type==='fire'?'불 피우기 시도':progress.type==='rabbit'?'토끼잡기 시도':progress.type==='fish'?'물고기잡기 시도':'행동')+' '+Math.round(Math.min(1,progress.age/dur)*100)+'%';taskProgress.style.left=cp.x+'px';taskProgress.style.top=cp.y+'px';}
 }
 const destinationMarker=new THREE.Mesh(new THREE.RingGeometry(.26,.36,24),new THREE.MeshBasicMaterial({color:0xc8fff2,side:THREE.DoubleSide,depthWrite:false}));destinationMarker.rotation.x=-Math.PI/2;destinationMarker.visible=false;scene.add(destinationMarker);
 const playerRay=new THREE.Raycaster();playerRay.layers.enable(31);const screenPoint=new THREE.Vector2();
@@ -4906,7 +5152,7 @@ window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camer
 function animate(t){requestAnimationFrame(animate);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
  lastRenderAt=t;
- let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused){updateDaeun(dt*speed,dt);updateDualExploration();}refreshCharacterUI(t);if(!paused){animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);}if(followCamera){
+ let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused){updateDaeun(dt*speed,dt);updateMiddleBear(dt*speed);updateDualExploration();}refreshCharacterUI(t);if(!paused){animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);}if(followCamera){
   followFocus.copy(observedCharacter().mesh.position).add(new THREE.Vector3(0,1.25,0));
   followDesired.copy(followFocus).add(followOffset);
   const lerp=1-Math.exp(-Math.min(dt,.08)*5);
