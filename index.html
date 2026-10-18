@@ -745,7 +745,7 @@ if(landAt(17,12)&&reserveTreeSite(17,12,5.3))mountainBroadleaf(17,12,groundHeigh
 // Dense cube bushes, ferns, flowering plants and cliff vines.
 function bush(x,y,z,s){
  // v11.5: preserve the 1.4x bush size while spreading its cube clusters horizontally.
- s *= 1.4;
+ s *= 1.4*(.88+rand()*.55); // v17.9: some bushes grow larger, others remain small
  const g=new THREE.Group();g.position.set(x,y,z);g.userData.renderBush=true;scene.add(g);
  for(let j=0;j<7;j++){
   const a=rand()*Math.PI*2,r=Math.sqrt(rand())*s*1.02;
@@ -4408,6 +4408,24 @@ buildBearPass();
 // It patrols the crossing, pursues a spotted survivor only inside its territory,
 // and drains morale while visible. It cannot chase anyone back to their camp.
 const bearTerritory={x:-117,z:22,patrolRadius:6,chaseRadius:31,detectRadius:17,loseRadius:24,personalSpace:2.8,contactRange:3.2};
+// v18.0: deterministic broadleaf woodland around the central bear's mountain.
+// Avoid the narrow crossing and the bear's immediate patrol circle.
+(function plantBearWoodland(){
+ let seed=180027;const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+ const sites=[];let placed=0;
+ for(let attempt=0;attempt<260&&placed<24;attempt++){
+  const angle=rnd()*Math.PI*2,radius=11+rnd()*21;
+  const x=bearTerritory.x+Math.cos(angle)*radius,z=bearTerritory.z+Math.sin(angle)*radius;
+  if(!landAt(x,z)||islandValue(x,z)<.08||deepPondAt(x,z))continue;
+  if(Math.abs(x-bearPass.x)<9&&z>13&&z<31)continue;
+  if(Math.hypot(x-bearTerritory.x,z-bearTerritory.z)<11)continue;
+  if(sites.some(p=>Math.hypot(x-p.x,z-p.z)<5.3))continue;
+  if(typeof safeWalkingSpot==='function'&&!safeWalkingSpot(x,z))continue;
+  sites.push({x,z});
+  mountainBroadleaf(x,z,terrainTopAt(x,z)+.025,.84+rnd()*.43,Math.floor(rnd()*3));
+  placed++;
+ }
+})();
 const bearBodyMat=mat(0x795039),bearFurMat=mat(0x63412f),bearNoseMat=mat(0x28201c);
 const middleBear=new THREE.Group();middleBear.userData.noOcclusion=true;scene.add(middleBear);
 function bearPart(w,h,d,m,x,y,z){return groupCube(middleBear,w,h,d,m,x,y,z);}
@@ -4519,13 +4537,39 @@ function createDaeunCharacter(){
  return {id:'daeun',name:'다은',mesh,arms:arms.map(a=>refs.get(a)),legs:legs.map(a=>refs.get(a)),head:refs.get(head),eyes:eyeMeshes.map(m=>refs.get(m)),closedEyes:closedEyes.map(m=>refs.get(m)),home:{...DAEUN_ZONE.center},sites:{water:new THREE.Vector3(DAEUN_ZONE.pond.x,.4,DAEUN_ZONE.pond.z),shelter:new THREE.Vector3(DAEUN_ZONE.cave.x,.4,DAEUN_ZONE.cave.z+1.7)},stats:{},inventory:{},auto:true,path:[],destination:null,action:'idle',actionAge:0,thought:'친구들은 어디에 있을까?',log:[],memory:[],timers:{},restLocked:false,walkTime:0,aiRandom:8713};
 }
 const daeun=createDaeunCharacter();
+const daeunWovenBag=wovenBasket.clone(true);
+daeunWovenBag.position.set(0,1.28,-.48);daeunWovenBag.visible=false;
+daeun.mesh.add(daeunWovenBag);
+const DAEUN_BAG_DAILY_MAX=3,DAEUN_BAG_REQUIRED_DAYS=3,DAEUN_BAG_BRANCH_COST=2;
+function daeunBagCap(){return daeun.bag?.crafted?10:5;}
+function daeunFishCap(){return daeun.bag?.crafted?2:1;}
+function refreshDaeunBagDay(){
+ const today=clockParts().day,b=daeun.bag;
+ if(!b)return;
+ if(b.practiceDay!==today){b.practiceDay=today;b.today=0;}
+}
+function updateDaeunBagVisual(){daeunWovenBag.visible=!!daeun.bag?.crafted;}
+function daeunNearCave(){return Math.hypot(daeun.mesh.position.x-daeun.sites.shelter.x,daeun.mesh.position.z-daeun.sites.shelter.z)<7;}
+function bagPracticeAtCave(){
+ if(!isManualDaeun()||daeun.bag.crafted||!daeunNearCave())return false;
+ refreshDaeunBagDay();
+ const b=daeun.bag;
+ if(b.today>=DAEUN_BAG_DAILY_MAX){daeunSay('오늘은 가방 제작을 충분히 연습했어. 내일 이어서 하자.');return false;}
+ if(daeun.inventory.caveBranches<DAEUN_BAG_BRANCH_COST){daeunSay('나뭇가지 최소 2개가 필요합니다.');return false;}
+ return manualAction('bag',daeun.sites.shelter);
+}
+function storeBranchesAtCave(){
+ if(!isManualDaeun()||daeun.inventory.branches<1||!daeunNearCave())return false;
+ return manualAction('storeBranches',daeun.sites.shelter);
+}
+
 const characters=new Map([['hina',{id:'hina',name:'히나',mesh:hana,get stats(){return stats;},get auto(){return true;}}],['daeun',daeun]]);
 function observedCharacter(){return characters.get(observedId)||characters.get('hina');}
 function dRandom(){daeun.aiRandom=(Math.imul(1664525,daeun.aiRandom)+1013904223)>>>0;return daeun.aiRandom/4294967296;}
 function daeunSay(text){daeun.thought=text;daeun.log.unshift({at:elapsed,text});if(daeun.log.length>28)daeun.log.length=28;}
 function resetDaeun(){
  daeun.mesh.position.set(DAEUN_ZONE.spawn.x,terrainTopAt(DAEUN_ZONE.spawn.x,DAEUN_ZONE.spawn.z)+.1,DAEUN_ZONE.spawn.z);daeun.mesh.rotation.set(0,0,0);
- daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,fuel:0,rabbits:0,fish:0};daeun.skills={fire:0,rabbit:0,fish:0};daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.log=[];daeun.memory=[];daeun.timers={nextThink:elapsed+46,stuck:0,introStart:elapsed,introStage:0};daeun.restLocked=false;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeun.seatedEating=0;resetDaeunSnakes();resetMiddleBear();daeunExplored.clear();
+ daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,caveBranches:0,fuel:0,rabbits:0,fish:0,cookedFish:0};daeun.bag={crafted:false,days:[],practiceDay:1,today:0,progress:0};updateDaeunBagVisual();daeun.skills={fire:0,rabbit:0,fish:0};daeun.firePracticeDays=[];daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.log=[];daeun.memory=[];daeun.timers={nextThink:elapsed+46,stuck:0,introStart:elapsed,introStage:0};daeun.restLocked=false;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeun.seatedEating=0;resetDaeunSnakes();resetMiddleBear();daeunExplored.clear();
  for(let i=0;i<daeunResources.berries.length;i++){
   const t=daeunResources.berries[i];t.stock=0;
   // First-day forage near spawn: a few stocked trees, never an infinite food source.
@@ -4572,6 +4616,34 @@ class DaeunAIController{
   }
   const hour=clockParts().h;if(hour>=20||hour<5){if(pos.distanceTo(d.sites.shelter)>2)setDaeunDestination(d.sites.shelter,'sleep');else{d.action='sleep';d.actionAge=0;}return;}
   if(Math.hypot(pos.x-d.home.x,pos.z-d.home.z)>DAEUN_RULES.autoRadius+3){setDaeunDestination(d.sites.shelter,'home');return;}
+  // v17.9: auto fire study is a real multi-day activity, never a free ignition.
+  refreshDaeunDailyPractice();
+  if(inv.fuel<=0&&d.dailyPractice.fire<DAEUN_DAILY_PRACTICE_LIMIT.fire){
+   if(inv.branches>0){
+    if(daeunNearCave()){d.action='autoFirePractice';d.actionAge=0;daeunSay('🔥 나뭇가지를 비벼 불 피우기를 연습해 보자.');}
+    else setDaeunDestination(d.sites.shelter,'home');
+    return;
+   }
+   const practiceBranch=daeunResources.branches.find(b=>b.available);
+   if(practiceBranch){d.branchId=daeunResources.branches.indexOf(practiceBranch);setDaeunDestination(practiceBranch.group.position,'branch');return;}
+  }
+  // Bag making is the next long-term goal after today's fire practice.
+  // Auto Daeun must collect and store two branches per attempt before weaving.
+  refreshDaeunBagDay();
+  if(!d.bag.crafted&&d.bag.today<DAEUN_BAG_DAILY_MAX){
+   if(inv.caveBranches>=DAEUN_BAG_BRANCH_COST){
+    if(daeunNearCave()){d.action='autoBagPractice';d.actionAge=0;daeunSay('🧶 동굴에서 가방을 엮어 보자.');}
+    else setDaeunDestination(d.sites.shelter,'home');
+    return;
+   }
+   if(inv.branches>0){
+    if(daeunNearCave()){d.action='autoStoreBranches';d.actionAge=0;daeunSay('🌿 나뭇가지를 동굴에 보관하자.');}
+    else setDaeunDestination(d.sites.shelter,'home');
+    return;
+   }
+   const bagBranch=daeunResources.branches.find(b=>b.available);
+   if(bagBranch){d.branchId=daeunResources.branches.indexOf(bagBranch);setDaeunDestination(bagBranch.group.position,'branch');return;}
+  }
   if(inv.branches<3){const b=daeunResources.branches.find(b=>b.available);if(b){d.branchId=daeunResources.branches.indexOf(b);setDaeunDestination(b.group.position,'branch');return;}}
   if(inv.berries>1&&inv.caveBerries<8&&pos.distanceTo(d.sites.shelter)<4){inv.berries--;inv.caveBerries++;}
   if((s.energy<70||s.will<68)&&dRandom()<.65){d.action='rest';d.actionAge=0;return;}
@@ -4582,14 +4654,14 @@ class DaeunAIController{
   const d=daeun,s=d.stats,inv=d.inventory;d.destination=null;d.path=[];
   if(d.manualTask&&d.manualTask.phase==='approach'){
    if((d.manualTask.type==='water'||d.manualTask.type==='fish')&&Math.hypot(d.mesh.position.x-DAEUN_ZONE.pond.x,d.mesh.position.z-DAEUN_ZONE.pond.z)>.95){cancelManualTask();daeunSay('연못 중앙까지 이동하지 못했어. 다시 시도하자.');return;}
-   d.manualTask.phase='perform';d.manualTask.age=0;d.action=d.manualTask.type==='berry'?'manualPick':d.manualTask.type==='water'?'manualDrink':d.manualTask.type==='branch'?'manualBranch':d.manualTask.type==='fire'?'manualFire':d.manualTask.type==='rabbit'?'manualRabbit':d.manualTask.type==='fish'?'manualFish':'manualRest';d.actionAge=0;return;}
+   d.manualTask.phase='perform';d.manualTask.age=0;d.action=d.manualTask.type==='cookFish'?'manualFire':d.manualTask.type==='bag'?'manualBag':d.manualTask.type==='storeBranches'?'manualStore':d.manualTask.type==='berry'?'manualPick':d.manualTask.type==='water'?'manualDrink':d.manualTask.type==='branch'?'manualBranch':d.manualTask.type==='fire'?'manualFire':d.manualTask.type==='rabbit'?'manualRabbit':d.manualTask.type==='fish'?'manualFish':'manualRest';d.actionAge=0;return;}
   if(d.action==='drink'){s.thirst=Math.min(100,s.thirst+65);daeunSay('물을 마셨더니 살 것 같아.');d.memory.push({kind:'water',at:elapsed});}
   if(d.action==='forage'){
-   const t=daeunResources.berries[d.resourceId];if(t&&t.stock>0){const n=Math.min(3,t.stock);t.stock-=n;inv.berries+=n;t.fruits.forEach((f,i)=>f.visible=i<t.stock);if(s.hunger<70){inv.berries--;s.hunger=Math.min(100,s.hunger+34);}daeunSay('열매를 모았어. 조금은 나중을 위해 남겨 두자.');d.memory.push({kind:'forage',at:elapsed});}
+   const t=daeunResources.berries[d.resourceId];if(t&&t.stock>0&&inv.berries<daeunBagCap()){const n=Math.min(3,t.stock);const picked=Math.min(n,daeunBagCap()-inv.berries);t.stock-=picked;inv.berries+=picked;t.fruits.forEach((f,i)=>f.visible=i<t.stock);if(s.hunger<70){inv.berries--;s.hunger=Math.min(100,s.hunger+34);}daeunSay('열매를 모았어. 조금은 나중을 위해 남겨 두자.');d.memory.push({kind:'forage',at:elapsed});}
   }
   if(d.action==='branch'){const b=daeunResources.branches[d.branchId];if(b&&b.available){b.available=false;b.group.visible=false;b.respawnAt=elapsed+1000;inv.branches++;daeunSay('마른 나뭇가지를 주웠어.');}}
   if(['sleep','rest'].includes(d.action)){d.actionAge=0;return;}
-  if(d.mesh.position.distanceTo(d.sites.shelter)<4){while(inv.berries>1&&inv.caveBerries<8){inv.berries--;inv.caveBerries++;}if(inv.branches&&inv.fuel<80){inv.branches--;inv.fuel+=65;}}
+  if(d.mesh.position.distanceTo(d.sites.shelter)<4){while(inv.berries>1&&inv.caveBerries<8){inv.berries--;inv.caveBerries++;}if(inv.branches&&inv.fuel>0&&inv.fuel<80){inv.branches--;inv.fuel=Math.min(100,inv.fuel+65);daeunSay('이미 붙은 모닥불에 나뭇가지를 더 넣었어.');}}
   d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+2;
  }
 }
@@ -4601,7 +4673,7 @@ function resetJoystick(){joystick.pointerId=null;joystick.x=0;joystick.y=0;const
 function updateJoystickVisibility(){const el=document.getElementById('daeunJoystick');if(el)el.hidden=!isManualDaeun();}
 
 function clearPlayerInput(){playerKeys.clear();playerPointers.clear();resetJoystick();}
-function cancelManualTask(){daeun.manualTask=null;if(['manualPick','manualDrink','manualEat','manualRest','manualBranch','manualFire','manualRabbit','manualFish'].includes(daeun.action)){daeun.action='idle';daeun.actionAge=0;}}
+function cancelManualTask(){daeun.manualTask=null;if(['manualPick','manualDrink','manualEat','manualRest','manualBranch','manualFire','manualRabbit','manualFish','manualBag','manualStore'].includes(daeun.action)){daeun.action='idle';daeun.actionAge=0;}}
 function interruptManualMovement(){cancelManualTask();daeun.path=[];daeun.destination=null;daeun.action='manual';}
 function isManualDaeun(){return observedId==='daeun'&&!daeun.auto;}
 function updateDaeun(step,realDt){
@@ -4644,18 +4716,40 @@ function updateDaeun(step,realDt){
   }
   if(movement&&movement.lengthSq()){
    const before=d.mesh.position.clone();moving=moveCharacterOnGround(d.mesh,before.x+movement.x,before.z+movement.z);
-   if(moving){d.mesh.rotation.y=Math.atan2(movement.x,movement.z);d.timers.stuck=0;}
+   if(moving){d.mesh.rotation.y=Math.atan2(movement.x,movement.z);d.timers.stuck=0;d.timers.stuckRetries=0;}
    else{d.timers.stuck=(d.timers.stuck||0)+step;if(d.timers.stuck>2){
     d.timers.stuck=0;
-    const exit=findPlatformExit(d.mesh.position.x,d.mesh.position.z);
-    if(exit&&Math.hypot(exit.x-d.mesh.position.x,exit.z-d.mesh.position.z)>.35){
-     const preserved=d.destination;
-     d.path=preserved?navBuild(d.mesh.position,preserved):[];
-     if(!d.path.length)d.path=[exit];
-     daeunSay('낮은 쪽으로 내려갈 수 있는 길을 찾아볼게.');
+    // Repeating navBuild() to the same destination caused an endless cliff-edge loop.
+    // First use a genuinely reachable escape point, then plan a fresh route from there.
+    d.timers.stuckRetries=(d.timers.stuckRetries||0)+1;
+    const cx=d.mesh.position.x,cz=d.mesh.position.z;
+    let exit=null;
+    for(const radius of [.8,1.5,2.5,4,6,8,11]){
+     for(let j=0;j<32;j++){
+      const a=j*Math.PI/16,nx=cx+Math.cos(a)*radius,nz=cz+Math.sin(a)*radius;
+      if(!safeWalkingSpot(nx,nz)||!navSegmentClear(cx,cz,nx,nz))continue;
+      // Favor level or downhill escape, especially around the cave entrance.
+      if(terrainTopAt(nx,nz)>terrainTopAt(cx,cz)+.5)continue;
+      exit=new THREE.Vector3(nx,terrainTopAt(nx,nz)+.1,nz);break;
+     }
+     if(exit)break;
+    }
+    if(exit&&d.timers.stuckRetries<=3){
+     d.path=[exit];d.destination=exit.clone();d.action='travel';d.actionAge=0;
+     daeunSay('발밑이 험하네. 가까운 안전한 길로 이동할게.');
     }else{
-     cancelManualTask();d.path=[];d.destination=null;d.action='idle';d.timers.nextThink=elapsed+4;
-     daeunSay('막혀 있어. 안전한 다른 길을 찾아보자.');
+     // Avoid trapping the autonomous character forever in a failed destination.
+     cancelManualTask();d.path=[];d.destination=null;d.action='idle';d.timers.nextThink=elapsed+3;
+     if(d.auto&&d.timers.stuckRetries>=4){
+      const anchors=[d.sites.shelter,{x:DAEUN_ZONE.cave.x,z:DAEUN_ZONE.cave.z+8},d.home,DAEUN_ZONE.spawn];
+      let rescue=null;
+      outer:for(const anchor of anchors)for(const radius of [0,1.5,3,5,8,12])for(let j=0;j<24;j++){
+       const a=j*Math.PI/12,x=anchor.x+Math.cos(a)*radius,z=anchor.z+Math.sin(a)*radius;
+       if(safeWalkingSpot(x,z)&&Math.abs(terrainTopAt(x,z)-.31)<1.2){rescue={x,z};break outer;}
+      }
+      if(rescue){d.mesh.position.set(rescue.x,terrainTopAt(rescue.x,rescue.z)+.1,rescue.z);d.timers.stuckRetries=0;daeunSay('동굴 입구에서 벗어나 안전한 길로 돌아왔어.');}
+      else daeunSay('막혀 있어. 안전한 다른 길을 찾아보자.');
+     }else daeunSay('막혀 있어. 안전한 다른 길을 찾아보자.');
     }
    }}
   }
@@ -4668,11 +4762,64 @@ function updateDaeun(step,realDt){
   d.seatedEating=Math.max(0,d.seatedEating-step);
   if(d.seatedEating===0&&inv.berries>0){inv.berries--;s.hunger=Math.min(100,s.hunger+12);daeunSay('앉아서 열매를 먹었어. 허기 +12');}
  }
+ // Autonomous Daeun uses the same skill and daily limit as manual practice.
+ if(d.auto&&d.action==='autoFirePractice'&&!d.path.length&&d.actionAge>=5){
+  refreshDaeunDailyPractice();
+  if(!daeunNearCave()||inv.branches<1||d.dailyPractice.fire>=DAEUN_DAILY_PRACTICE_LIMIT.fire){
+   d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+2;
+  }else{
+   inv.branches--;d.attempts.fire++;d.dailyPractice.fire++;const fireDay=clockParts().day;if(!d.firePracticeDays.includes(fireDay))d.firePracticeDays.push(fireDay);
+   const gain=8+Math.floor(dRandom()*9);
+   d.skills.fire=Math.min(100,d.skills.fire+gain);
+   const firstReady=d.skills.fire>=100&&d.firePracticeDays.length>=3;
+   const success=firstReady&&dRandom()<(raining()?.24:.75);
+   if(success){inv.fuel=Math.max(inv.fuel,65);daeunSay('🔥 드디어 불이 붙었어! 연습한 보람이 있어!');}
+   else daeunSay('🔥 불 피우기 연습 '+d.skills.fire+'% · 오늘 '+d.dailyPractice.fire+'/3회'+(firstReady?' · 이번에는 실패했어.':' · 아직 연습이 필요해.'));
+   d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+2;
+  }
+ }
+ // Auto storage and weaving share the same material cost, daily cap and progress as manual mode.
+ if(d.auto&&d.action==='autoStoreBranches'&&!d.path.length&&d.actionAge>=1.8){
+  if(daeunNearCave()&&inv.branches>0){const n=inv.branches;inv.branches=0;inv.caveBranches+=n;daeunSay('🌿 나뭇가지 '+n+'개를 동굴에 보관했어.');}
+  d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+2;
+ }
+ if(d.auto&&d.action==='autoBagPractice'&&!d.path.length&&d.actionAge>=4){
+  refreshDaeunBagDay();const b=d.bag,day=clockParts().day;
+  if(daeunNearCave()&&!b.crafted&&b.today<DAEUN_BAG_DAILY_MAX&&inv.caveBranches>=DAEUN_BAG_BRANCH_COST){
+   inv.caveBranches-=DAEUN_BAG_BRANCH_COST;b.today++;b.progress=Math.min(100,b.progress+100/9);
+   if(!b.days.includes(day))b.days.push(day);
+   if(b.days.length>=DAEUN_BAG_REQUIRED_DAYS&&b.progress>=99.9){b.crafted=true;b.progress=100;updateDaeunBagVisual();daeunSay('🎒 드디어 가방이 완성됐어!');}
+   else daeunSay('🧶 가방 엮기 '+Math.round(b.progress)+'% · '+b.days.length+'/3일 · 오늘 '+b.today+'/3회');
+  }else if(inv.caveBranches<DAEUN_BAG_BRANCH_COST)daeunSay('나뭇가지 최소 2개가 필요합니다.');
+  d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+2;
+ }
  if(isManualDaeun()&&d.manualTask&&d.manualTask.phase==='perform'){
   const task=d.manualTask;task.age+=step;
-  if(task.type==='berry'&&task.age>=2){const t=daeunResources.berries[task.index];if(t&&t.stock>0){const roll=Math.random(),n=Math.min(t.stock,roll<.4?1:roll<.8?2:3);t.stock-=n;inv.berries+=n;t.fruits.forEach((f,i)=>f.visible=i<t.stock);daeunSay('열매 +'+n+'개 · 소지품에 보관했어.');}else daeunSay('열매가 남아 있지 않아.');cancelManualTask();}
+  if(task.type==='storeBranches'&&task.age>=1.8){
+   const n=inv.branches;inv.branches=0;inv.caveBranches+=n;
+   daeunSay('동굴에 나뭇가지 '+n+'개를 보관했어.');cancelManualTask();
+  }
+  else if(task.type==='bag'&&task.age>=4){
+   refreshDaeunBagDay();const b=d.bag,day=clockParts().day;
+   if(!b.crafted&&b.today<DAEUN_BAG_DAILY_MAX&&inv.caveBranches>=DAEUN_BAG_BRANCH_COST){
+    inv.caveBranches-=DAEUN_BAG_BRANCH_COST;b.today++;b.progress=Math.min(100,b.progress+100/9);
+    if(!b.days.includes(day))b.days.push(day);
+    if(b.days.length>=3&&b.progress>=99.9){b.crafted=true;b.progress=100;updateDaeunBagVisual();daeunSay('🎒 드디어 가방을 완성했어! 열매와 구운 물고기를 두 배로 담을 수 있어!');}
+    else daeunSay('🧶 가방 엮기 연습 '+Math.round(b.progress)+'% · '+b.days.length+'/3일 · 오늘 '+b.today+'/3회');
+   }else daeunSay(inv.caveBranches<DAEUN_BAG_BRANCH_COST?'나뭇가지 최소 2개가 필요합니다.':'오늘은 더 제작할 수 없어.');
+   cancelManualTask();
+  }
+  else if(task.type==='berry'&&task.age>=2){const t=daeunResources.berries[task.index];if(t&&t.stock>0&&inv.berries<daeunBagCap()){const roll=Math.random(),n=Math.min(t.stock,roll<.4?1:roll<.8?2:3);const picked=Math.min(n,daeunBagCap()-inv.berries);t.stock-=picked;inv.berries+=picked;t.fruits.forEach((f,i)=>f.visible=i<t.stock);daeunSay('열매 +'+n+'개 · 소지품에 보관했어.');}else daeunSay('열매가 남아 있지 않아.');cancelManualTask();}
   else if(task.type==='branch'&&task.age>=1.4){const b=daeunResources.branches[task.index];if(b&&b.available){b.available=false;b.group.visible=false;b.respawnAt=elapsed+DAY_SECONDS*(1.5+dRandom()*1.5);inv.branches++;daeunSay('나뭇가지 +1개 · 소지품에 보관했어.');}else daeunSay('이미 주운 나뭇가지야.');cancelManualTask();}
   else if(task.type==='water'&&task.age>=3){s.thirst=Math.min(100,s.thirst+25);daeunSay('물을 마셨어. 갈증 +25');cancelManualTask();}
+  else if(task.type==='cookFish'&&task.age>=4){
+   if(inv.fish>0&&inv.cookedFish<daeunFishCap()&&inv.fuel>0){inv.fish--;inv.cookedFish++;inv.fuel=Math.max(0,inv.fuel-8);daeunSay('🐟 구운 물고기 +1 · 휴대 '+inv.cookedFish+'/'+daeunFishCap());}
+   else daeunSay('물고기, 모닥불 연료 또는 소지품 공간이 부족해.');
+   cancelManualTask();
+  }
+  else if(task.type==='eatFish'&&task.age>=2){
+   if(inv.cookedFish>0){inv.cookedFish--;s.hunger=Math.min(100,s.hunger+45);daeunSay('구운 물고기를 먹었어. 허기 +45');}cancelManualTask();
+  }
   else if(task.type==='eat'&&task.age>=2){if(inv.berries>0){inv.berries--;s.hunger=Math.min(100,s.hunger+12);daeunSay('열매를 먹었어. 허기 +12');}cancelManualTask();}
   else if(['fire','rabbit','fish'].includes(task.type)&&task.age>=(task.type==='fire'?5:task.type==='rabbit'?3.5:4)){
    refreshDaeunDailyPractice();
@@ -4681,8 +4828,8 @@ function updateDaeun(step,realDt){
    else if(kind==='fire'&&inv.branches<=0){daeunSay('불을 피울 나뭇가지가 없어.');cancelManualTask();}
    else{
     if(kind==='fire')inv.branches--;
-    d.attempts[kind]++;d.dailyPractice[kind]++;d.skills[kind]=Math.min(100,skill+gain);
-    const mastered=d.skills[kind]>=100;
+    d.attempts[kind]++;d.dailyPractice[kind]++;if(kind==='fire'&&!d.firePracticeDays.includes(clockParts().day))d.firePracticeDays.push(clockParts().day);d.skills[kind]=Math.min(100,skill+gain);
+    const mastered=d.skills[kind]>=100&&(kind!=='fire'||d.firePracticeDays.length>=3);
     const success=mastered&&dRandom()<(kind==='fire'?(raining()?.24:.75):kind==='rabbit'?.32:.48);
     if(success&&kind==='fire'){inv.fuel=Math.max(inv.fuel,65);daeunSay('🔥 모닥불 점화 성공! 나뭇가지를 더 모아 유지하자.');}
     else if(success&&kind==='rabbit'){const r=critters[task.index];if(r&&r.g.visible&&!r.caught){r.caught=true;r.g.visible=false;r.respawnDaeunAt=elapsed+DAY_SECONDS*2;inv.rabbits++;daeunSay('🐇 토끼를 잡았어! 소지품 +1');}else daeunSay('토끼가 도망쳤어.');}
@@ -4704,7 +4851,7 @@ function updateDaeun(step,realDt){
  if(d.auto&&!d.path.length&&!d.restLocked&&d.action==='idle'&&elapsed>=d.timers.nextThink){d.timers.nextThink=elapsed+3;daeunAI.think();}
  const sleep=d.action==='sleep'&&!d.path.length,seat=resting&&!sleep;const acting=d.manualTask&&d.manualTask.phase==='perform';d.mesh.rotation.x=sleep?Math.PI/2:0;d.mesh.position.y=terrainTopAt(d.mesh.position.x,d.mesh.position.z)+(sleep?.42:seat?-.27:.10);
  d.walkTime+=moving?realDt:0;const stride=moving?Math.sin(d.walkTime*16.8)*.34:0;
- d.legs.forEach((l,i)=>l.rotation.x=seat?-Math.PI/2:(i?-stride:stride));d.arms.forEach((a,i)=>a.rotation.x=seat?-.24:acting?(d.manualTask.type==='water'?-1.05:d.manualTask.type==='berry'?-1.2:d.manualTask.type==='branch'?-1.15:d.manualTask.type==='eat'?-1.6:d.manualTask.type==='fire'?-1.2:d.manualTask.type==='rabbit'?-1.5:d.manualTask.type==='fish'?-1.4:0):(i?stride:-stride)*1.5);d.eyes.forEach(e=>e.visible=!sleep);d.closedEyes.forEach(e=>e.visible=sleep);
+ d.legs.forEach((l,i)=>l.rotation.x=seat?-Math.PI/2:(i?-stride:stride));d.arms.forEach((a,i)=>a.rotation.x=d.action==='autoFirePractice'?(-.85+Math.sin(elapsed*12+i*1.8)*.28):seat?-.24:acting?(d.manualTask.type==='water'?-1.05:d.manualTask.type==='berry'?-1.2:d.manualTask.type==='branch'?-1.15:d.manualTask.type==='eat'?-1.6:d.manualTask.type==='fire'?-1.2:d.manualTask.type==='rabbit'?-1.5:d.manualTask.type==='fish'?-1.4:0):(i?stride:-stride)*1.5);d.eyes.forEach(e=>e.visible=!sleep);d.closedEyes.forEach(e=>e.visible=sleep);
  if(d.memory.length>30)d.memory.splice(0,d.memory.length-30);
 }
 function updateDualExploration(){
@@ -4773,7 +4920,7 @@ $('daeunProfileClose').addEventListener('click',()=>daeunProfileViewer.classList
 daeunProfileViewer.addEventListener('click',e=>{if(e.target===daeunProfileViewer)daeunProfileViewer.classList.remove('open')});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')daeunProfileViewer.classList.remove('open')});
 $('observeHina').onclick=()=>selectCharacter('hina');$('observeDaeun').onclick=()=>selectCharacter('daeun');$('daeunAuto').onclick=()=>setDaeunAuto(!daeun.auto);
-const actionNames={manualBranch:'나뭇가지 줍는 중',manualPick:'열매 채집 중',manualDrink:'물 마시는 중',manualEat:'열매 먹는 중',manualRest:'앉아서 쉬는 중',manualApproach:'상호작용 지점으로 이동',idle:'주변 살피기',travel:'목적지로 이동',manual:'직접 이동',drink:'물 마시러 이동',forage:'열매 채집',branch:'나뭇가지 모으기',explore:'근처 탐험',home:'자기 동굴로 귀환',rest:'휴식',sleep:'동굴에서 수면',exhausted:'제자리 회복 중'};
+const actionNames={autoFirePractice:'🔥 불 피우기 연습 중',autoBagPractice:'🧶 가방 엮는 중',autoStoreBranches:'🌿 동굴에 가지 보관 중',manualBag:'가방 엮는 중',manualStore:'동굴에 나뭇가지 보관 중',manualBranch:'나뭇가지 줍는 중',manualPick:'열매 채집 중',manualDrink:'물 마시는 중',manualEat:'열매 먹는 중',manualRest:'앉아서 쉬는 중',manualApproach:'상호작용 지점으로 이동',idle:'주변 살피기',travel:'목적지로 이동',manual:'직접 이동',drink:'물 마시러 이동',forage:'열매 채집',branch:'나뭇가지 모으기',explore:'근처 탐험',home:'자기 동굴로 귀환',rest:'휴식',sleep:'동굴에서 수면',exhausted:'제자리 회복 중'};
 function layoutCharacterBar(){
  if(innerWidth<=1000){characterBar.style.top='auto';characterBar.style.bottom=Math.max(62,innerHeight-$('controls').getBoundingClientRect().top+10)+'px';}
  else{characterBar.style.top='12px';characterBar.style.bottom='auto';}
@@ -4787,7 +4934,7 @@ function refreshCharacterUI(now,force=false){
  if(observedId==='daeun'){
   $('daeunDay').textContent='· DAY '+String(clockParts().day).padStart(2,'0');$('daeunAction').textContent=(d.auto?'자동 생존 · ':'수동 이동 · ')+(actionNames[d.action]||d.action);$('daeunThought').textContent='“'+d.thought+'”';
   updateStableStatBars($('daeunStats'),{체력:d.stats.energy,갈증:d.stats.thirst,허기:d.stats.hunger,의지력:d.stats.will});
-  $('daeunInventory').textContent=`휴대 열매 ${d.inventory.berries} · 자기 동굴 열매 ${d.inventory.caveBerries} · 나뭇가지 ${d.inventory.branches} · 불 연료 ${Math.round(d.inventory.fuel)}`;
+  $('daeunInventory').textContent=`🎒 ${d.bag.crafted?'가방 완성':'가방 제작 '+Math.round(d.bag.progress)+'% · '+d.bag.days.length+'/3일'} · 🍓 ${d.inventory.berries}/${daeunBagCap()} · 🐟 구운 물고기 ${d.inventory.cookedFish}/${daeunFishCap()} · 🌿 휴대 ${d.inventory.branches} · 동굴 ${d.inventory.caveBranches}`;
   $('daeunLog').replaceChildren(...d.log.slice(0,12).map(v=>{const el=document.createElement('div');el.textContent=v.text;return el;}));
  }
 
@@ -4840,7 +4987,14 @@ function manualAction(type,point,index=-1){
   daeunSay('오늘 '+(type==='fire'?'불 피우기':type==='rabbit'?'토끼잡기':'물고기잡기')+' 연습은 충분히 했어. 내일 다시 해보자.');return false;
  }
  cancelManualTask();daeun.path=[];daeun.destination=null;
+ if(type==='cookFish'&&(daeun.inventory.fish<1||daeun.inventory.cookedFish>=daeunFishCap()||daeun.inventory.fuel<=0)){daeunSay('구울 물고기나 연료가 부족하거나 가방이 가득 찼어.');return false;}
+ if(type==='bag'){
+  refreshDaeunBagDay();
+  if(daeun.bag.crafted||daeun.bag.today>=DAEUN_BAG_DAILY_MAX){daeunSay('오늘 가방 제작 연습은 끝났어. 내일 다시 하자.');return false;}
+ }
+ if(type==='bag'&&daeun.inventory.caveBranches<DAEUN_BAG_BRANCH_COST){daeunSay('나뭇가지 최소 2개가 필요합니다.');return false;}
  if(type==='fire'&&daeun.inventory.branches<1){daeunSay('불을 피우려면 나뭇가지가 필요해.');return false;}
+ if(type==='eatFish'){if(daeun.inventory.cookedFish<1)return false;daeun.manualTask={type,phase:'perform',age:0};daeun.action='manualEat';return true;}
  if(type==='eat'){
   if(daeun.inventory.berries<=0){daeunSay('먹을 열매가 없어.');return false;}
   daeun.manualTask={type,phase:'perform',age:0};daeun.action='manualEat';daeun.actionAge=0;return true;
@@ -4853,7 +5007,7 @@ function manualAction(type,point,index=-1){
  const stop=findActionSpot(pos,type);
  if(!stop){daeunSay('안전하게 접근할 장소를 찾지 못했어.');return false;}
  daeun.manualTask={type,index,phase:'approach',age:0};
- if(Math.hypot(daeun.mesh.position.x-stop.x,daeun.mesh.position.z-stop.z)<.8){daeun.manualTask.phase='perform';daeun.action=type==='berry'?'manualPick':type==='water'?'manualDrink':type==='branch'?'manualBranch':type==='fire'?'manualFire':type==='rabbit'?'manualRabbit':type==='fish'?'manualFish':'manualRest';if(type==='rabbit'||type==='fish')consumeWildlifeChance(type);return true;}
+ if(Math.hypot(daeun.mesh.position.x-stop.x,daeun.mesh.position.z-stop.z)<.8){daeun.manualTask.phase='perform';daeun.action=type==='bag'?'manualBag':type==='storeBranches'?'manualStore':type==='berry'?'manualPick':type==='water'?'manualDrink':type==='branch'?'manualBranch':type==='fire'?'manualFire':type==='rabbit'?'manualRabbit':type==='fish'?'manualFish':'manualRest';if(type==='rabbit'||type==='fish')consumeWildlifeChance(type);return true;}
  if(!setDaeunDestination(stop,'manualApproach')){cancelManualTask();return false;}
  if(type==='rabbit'||type==='fish')consumeWildlifeChance(type);
  return true;
@@ -4873,7 +5027,7 @@ function findActionSpot(target,type){
   return navBuild(daeun.mesh.position,center).length?center:null;
  }
  const from=daeun.mesh.position,preferred=Math.atan2(from.z-target.z,from.x-target.x);
- const radius=type==='berry'?2.05:type==='water'||type==='fish'?5.15:type==='branch'?1.15:type==='rabbit'?2.25:type==='fire'?1.75:1.4;
+ const radius=type==='bag'||type==='storeBranches'||type==='cookFish'?1.8:type==='berry'?2.05:type==='water'||type==='fish'?5.15:type==='branch'?1.15:type==='rabbit'?2.25:type==='fire'?1.75:1.4;
  const options=[];
  for(const r of (type==='rest'?[0,1,2,3]:[radius,radius+.6,radius+1.1])){
   for(let i=0;i<16;i++){
@@ -4928,6 +5082,8 @@ const fireEmojiMarker=makeResourceMarker('🔥','모닥불 피우기 시도');
 const rabbitEmojiMarkers=Array.from({length:3},()=>makeResourceMarker('🐰','토끼잡기 시도'));
 const fishEmojiMarker=makeResourceMarker('🐟','물고기잡기 시도');
 const pondEmojiMarker=makeResourceMarker('💧','물 마시기');
+const bagEmojiMarker=makeResourceMarker('🧶','동굴에서 가방 제작 · 나뭇가지 2개');
+const storeEmojiMarker=makeResourceMarker('🌿','동굴에 나뭇가지 보관');
 function positionEmojiMarker(btn,point,click){
  const xy=projectToScreen(point);
  if(!xy){btn.style.display='none';btn.onclick=null;return;}
@@ -4951,13 +5107,17 @@ body.cinematic-mode .daeunResourceEmoji{display:none!important}
 @media(max-width:700px){#daeunActionButtons{bottom:160px;right:8px}#daeunActionButtons button{padding:9px 11px;font-size:12px}}
 body.cinematic-mode #daeunActionButtons,body.cinematic-mode #daeunWaterAction,body.cinematic-mode #daeunTaskProgress,body.cinematic-mode #daeunBranchAction{display:none!important}
 `;document.head.appendChild(manualUIStyle);
-const manualButtons=document.createElement('div');manualButtons.id='daeunActionButtons';manualButtons.innerHTML='<div class="invPanel" id="daeunItemPanel"><div id="daeunBerryCount">열매 0개</div><div id="daeunSkills" style="font-size:12px;line-height:1.7;margin:6px 0"></div><button type="button" id="daeunEatButton">🍒 열매 1개 먹기</button></div><button type="button" id="daeunItemToggle">▣ 소지품</button><button type="button" id="daeunRestButton">♧ 앉아서 쉬기</button>';document.body.appendChild(manualButtons);
+const manualButtons=document.createElement('div');manualButtons.id='daeunActionButtons';manualButtons.innerHTML='<div class="invPanel" id="daeunItemPanel"><div id="daeunBerryCount">열매 0개</div><div id="daeunSkills" style="font-size:12px;line-height:1.7;margin:6px 0"></div><button type="button" id="daeunEatButton">🍓 열매 먹기</button><button type="button" id="daeunFishEatButton">🐟 구운 물고기 먹기</button><button type="button" id="daeunStoreBranchButton">🌿 동굴에 가지 보관</button><button type="button" id="daeunBagCraftButton">🧶 가방 엮기</button><button type="button" id="daeunCookFishButton">🔥 물고기 굽기</button></div><button type="button" id="daeunItemToggle">▣ 소지품</button><button type="button" id="daeunRestButton">♧ 앉아서 쉬기</button>';document.body.appendChild(manualButtons);
 const waterButton=document.createElement('button');waterButton.id='daeunWaterAction';waterButton.textContent='💧';waterButton.title='물 마시기';document.body.appendChild(waterButton);
 const taskProgress=document.createElement('div');taskProgress.id='daeunTaskProgress';document.body.appendChild(taskProgress);
 const branchButton=document.createElement('button');branchButton.id='daeunBranchAction';branchButton.textContent='🪵';branchButton.title='나뭇가지 줍기';document.body.appendChild(branchButton);let nearbyBranchIndex=-1;branchButton.onclick=()=>{if(nearbyBranchIndex>=0){const b=daeunResources.branches[nearbyBranchIndex];if(b?.available)manualAction('branch',b.group.position,nearbyBranchIndex);}};
 function toggleManualPanel(){manualButtons.classList.toggle('open');}
 document.getElementById('daeunItemToggle').onclick=toggleManualPanel;
 document.getElementById('daeunEatButton').onclick=()=>{manualAction('eat');manualButtons.classList.remove('open');};
+document.getElementById('daeunFishEatButton').onclick=()=>manualAction('eatFish');
+document.getElementById('daeunStoreBranchButton').onclick=storeBranchesAtCave;
+document.getElementById('daeunBagCraftButton').onclick=bagPracticeAtCave;
+document.getElementById('daeunCookFishButton').onclick=()=>manualAction('cookFish',daeunResources.fire.group.position);
 document.getElementById('daeunRestButton').onclick=()=>{
  if(!isManualDaeun())return;
  if(daeun.action==='manualRest'){cancelManualTask();return;}
@@ -4967,9 +5127,18 @@ waterButton.onclick=()=>manualAction('water',new THREE.Vector3(DAEUN_ZONE.pond.x
 function projectToScreen(point){const p=point.clone().project(camera);if(p.z< -1||p.z>1||Math.abs(p.x)>1.1||Math.abs(p.y)>1.1)return null;return {x:(p.x*.5+.5)*innerWidth,y:(-p.y*.5+.5)*innerHeight};}
 function refreshManualActionUI(){
  const visible=isManualDaeun()&&!document.body.classList.contains('cinematic-mode');
+ if(visible){refreshDaeunDailyPractice();refreshDaeunBagDay();}
  manualButtons.style.display=visible?'flex':'none';if(!visible){waterButton.style.display='none';taskProgress.style.display='none';branchButton.style.display='none';hideResourceEmojis();return;}
- document.getElementById('daeunBerryCount').textContent='🍒 열매 '+daeun.inventory.berries+'개 · 🌿 나뭇가지 '+daeun.inventory.branches+'개 · 🐰 토끼 '+daeun.inventory.rabbits+' · 🐟 물고기 '+daeun.inventory.fish;
+ document.getElementById('daeunBerryCount').textContent='🎒 '+(daeun.bag.crafted?'가방 완성':'제작 '+Math.round(daeun.bag.progress)+'% · '+daeun.bag.days.length+'/3일')+' · 🍓 '+daeun.inventory.berries+'/'+daeunBagCap()+' · 🐟 구운 '+daeun.inventory.cookedFish+'/'+daeunFishCap()+' · 🌿 휴대 '+daeun.inventory.branches+' · 동굴 '+daeun.inventory.caveBranches;
  document.getElementById('daeunEatButton').disabled=daeun.inventory.berries===0;
+ const nearCave=Math.hypot(daeun.mesh.position.x-daeun.sites.shelter.x,daeun.mesh.position.z-daeun.sites.shelter.z)<7;
+ refreshDaeunBagDay();
+ document.getElementById('daeunFishEatButton').disabled=daeun.inventory.cookedFish===0;
+ document.getElementById('daeunStoreBranchButton').disabled=!nearCave||daeun.inventory.branches===0;
+ document.getElementById('daeunBagCraftButton').disabled=!nearCave||daeun.bag.crafted||daeun.bag.today>=DAEUN_BAG_DAILY_MAX;
+ document.getElementById('daeunBagCraftButton').style.display=daeun.bag.crafted||daeun.bag.today>=DAEUN_BAG_DAILY_MAX?'none':'';
+ document.getElementById('daeunBagCraftButton').textContent=daeun.bag.crafted?'🎒 가방 완성':`🧶 가방 제작 ${Math.round(daeun.bag.progress)}% (${daeun.bag.today}/3회)`;
+ document.getElementById('daeunCookFishButton').disabled=!nearCave||daeun.inventory.fish===0||daeun.inventory.fuel<=0||daeun.inventory.cookedFish>=daeunFishCap();
  refreshDaeunDailyPractice();document.getElementById('daeunSkills').textContent='숙련도 · 🔥 불 '+daeun.skills.fire+'% ('+daeun.dailyPractice.fire+'/3) · 🐰 토끼 '+daeun.skills.rabbit+'% ('+daeun.dailyPractice.rabbit+'/3) · 🐟 물고기 '+daeun.skills.fish+'% ('+daeun.dailyPractice.fish+'/4)'+' · 🐰🐟 기회는 하루 중 랜덤 등장';
  document.getElementById('daeunRestButton').textContent=daeun.action==='manualRest'?'↥ 일어나기':'♧ 앉아서 쉬기';
  const pos=daeun.mesh.position,nearWater=Math.hypot(pos.x-DAEUN_ZONE.pond.x,pos.z-DAEUN_ZONE.pond.z)<10;
@@ -4980,7 +5149,17 @@ function refreshManualActionUI(){
   positionEmojiMarker(pondEmojiMarker,wp,()=>manualAction('water',new THREE.Vector3(DAEUN_ZONE.pond.x,0,DAEUN_ZONE.pond.z)));
  }else pondEmojiMarker.style.display='none';
  if(nearWater&&activeWildlifeChance('fish')>=0&&daeun.dailyPractice.fish<DAEUN_DAILY_PRACTICE_LIMIT.fish){const pt=daeunResources.pondMesh.getWorldPosition(new THREE.Vector3());pt.x+=5.7;pt.z+=1.3;pt.y+=1.15;positionEmojiMarker(fishEmojiMarker,pt,()=>manualAction('fish',new THREE.Vector3(DAEUN_ZONE.pond.x,0,DAEUN_ZONE.pond.z)));}else fishEmojiMarker.style.display='none';
- const firePos=daeunResources.fire.group.position;if(Math.hypot(pos.x-firePos.x,pos.z-firePos.z)<7){positionEmojiMarker(fireEmojiMarker,firePos.clone().add(new THREE.Vector3(0,1.8,0)),()=>manualAction('fire',firePos));}else fireEmojiMarker.style.display='none';
+ const cavePos=daeun.sites.shelter;
+ if(Math.hypot(pos.x-cavePos.x,pos.z-cavePos.z)<9){
+  const caveGround=terrainTopAt(cavePos.x,cavePos.z);
+  if(!daeun.bag.crafted&&daeun.bag.today<DAEUN_BAG_DAILY_MAX){
+   positionEmojiMarker(bagEmojiMarker,new THREE.Vector3(cavePos.x-4.8,caveGround+2.4,cavePos.z+1.2),()=>bagPracticeAtCave());
+  }else bagEmojiMarker.style.display='none';
+  if(daeun.inventory.branches>0){
+   positionEmojiMarker(storeEmojiMarker,new THREE.Vector3(cavePos.x-2.2,caveGround+2.4,cavePos.z+1.2),()=>storeBranchesAtCave());
+  }else storeEmojiMarker.style.display='none';
+ }else{bagEmojiMarker.style.display='none';storeEmojiMarker.style.display='none';}
+ const firePos=daeunResources.fire.group.position;if(Math.hypot(pos.x-firePos.x,pos.z-firePos.z)<7&&daeun.dailyPractice.fire<DAEUN_DAILY_PRACTICE_LIMIT.fire){positionEmojiMarker(fireEmojiMarker,firePos.clone().add(new THREE.Vector3(0,1.8,0)),()=>manualAction('fire',firePos));}else fireEmojiMarker.style.display='none';
  const rabbits=critters.map((r,i)=>({r,i,d:Math.hypot(pos.x-r.g.position.x,pos.z-r.g.position.z)})).filter(o=>o.r.originalHomeX!==undefined&&!o.r.caught&&o.r.g.visible&&o.d<6).sort((a,b)=>a.d-b.d);
  for(let j=0;j<rabbitEmojiMarkers.length;j++){const b=rabbitEmojiMarkers[j],o=j===0?rabbits[0]:null;if(!o||activeWildlifeChance('rabbit')<0||daeun.dailyPractice.rabbit>=DAEUN_DAILY_PRACTICE_LIMIT.rabbit){b.style.display='none';continue;}positionEmojiMarker(b,o.r.g.position.clone().add(new THREE.Vector3(0,2.0,0)),()=>manualAction('rabbit',o.r.g.position,o.i));}
  const nearTrees=daeunResources.berries.map((t,i)=>({t,i,d:Math.hypot(t.group.position.x-pos.x,t.group.position.z-pos.z)}))
