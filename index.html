@@ -762,12 +762,7 @@ for(let i=0;i<95;i++){
  for(const [tx,tz,w,d,th] of terraces)if(Math.abs(x-tx)<w*.45&&Math.abs(z-tz)<d*.45)h=Math.max(h,th+.16);
  bush(x,h,z,.38+rand()*.85);
 }
-for(let i=0;i<32;i++){
- const x=rand()>.5?-9.6+rand()*2:-.2+rand()*2;
- const z=-15+rand()*9;
- const y=1.2+rand()*4.1;
- box(.12,.4+rand()*.8,.16,vine,x,y,z);
-}
+// v21.1: Removed 32 floating green vine spikes from Hina's cave walls and interior.
 // Warm sky clouds, stylized distant rock spires and sea foam streaks.
 const cloudMat=new THREE.MeshBasicMaterial({color:0xfff3de,transparent:true,opacity:.72,depthWrite:false});
 const clouds=[];
@@ -1498,7 +1493,7 @@ function updateCharacterPose(){
  const t=clockParts();
  const night=t.h>=19||t.h<6;
  const atShelter=Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<2.5;
- const sleep=((state==='rest'||state==='night')&&atShelter&&!target)||state==='outdoorSleep';
+ const sleep=(((state==='rest'||state==='night')&&atShelter&&!target)||state==='outdoorSleep')&&(day>1||darkHours());
  const sitting=!sleep&&(state==='fieldRest'||state==='mentalRest'||state==='rest'||state==='night');
  sleepingPose=sleep;
  hana.rotation.z=0;
@@ -2329,7 +2324,7 @@ function updateBubble(){
  const el=$('bubble');
  // Sleep has its own persistent bubble; it does not overwrite the AI's thoughts.
  if(!bubbleEnabled){el.classList.remove('show');return;}
- const showSleep=survivorIsVisiblySleeping({sleepRequested:state==='rest'||state==='night'||state==='outdoorSleep',lyingPose:sleepingPose,moving:!!target,hasPath:!!target});
+ const showSleep=(day>1||darkHours())&&survivorIsVisiblySleeping({sleepRequested:state==='rest'||state==='night'||state==='outdoorSleep',lyingPose:sleepingPose,moving:!!target,hasPath:!!target});
  if(showSleep){
   applySurvivorSleepBubble(el,true,'Zzz...');
  }else{
@@ -2658,7 +2653,7 @@ function init(){
  explorationNextUpdate=0;detailNextUpdate=0;uiNextUpdate=0;
  bubbleUntil=0;ambientTimer=0;
  mind={traits:{...BASE_TRAITS},memories:[],likes:{pond:0,cave:0,beach:0,forest:0},plan:[],planDay:0,planDone:[],lastReflectionDay:0,lastLeisureDay:0,lastChoiceAt:0,lastMindUI:0,rememberedRoutes:new Map(),lastRecallAt:0,discoveries:0,mistakes:0,regrets:0,keepsakes:0,identity:'처음에는 겁이 많지만 호기심 많은 졸업생'};renderMind();
- $('log').innerHTML='';$('actionLogPanel').open=false;$('thought').textContent='';$('bubble').textContent='';$('bubble').classList.remove('show','sleep-bubble');$('ambientBubble').classList.remove('show');nextNightSoundAt=0;nightSoundUntil=0;
+ $('log').innerHTML='';$('actionLogPanel').open=true;nextHinaDiagnosticAt=25;lastHinaDiagnosticState='';lastDayOneCaveWalkAt=-999;dayOneCaveScoutCount=0;lastDayOneRemarkAt=-999;dayOneRemarkIndex=0;$('thought').textContent='';$('bubble').textContent='';$('bubble').classList.remove('show','sleep-bubble');$('ambientBubble').classList.remove('show');nextNightSoundAt=0;nightSoundUntil=0;
  
  $('dayLabel').textContent='· DAY 01';$('clock').textContent='06:00';
  $('elapsed').textContent='D1 00:00';
@@ -2690,11 +2685,54 @@ function init(){
 function finishDayOne(){
  // Enter sleep only ONCE. Previously 'rest' re-entered itself every 18 seconds,
  // resetting phaseAt and repeatedly flashing the same dialogue over Zzz.
- if(state!=='night')return;
+ if(state!=='night'||!darkHours())return;
  if(elapsed-phaseAt>18){
   setState('rest','첫날 밤 · 동굴에서 휴식',null,'오늘은 아무것도 모르겠어... 내일 다시 해보자.');
  }
 }
+// v20.7: lightweight AI diagnostics, visible in the existing action log.
+let nextHinaDiagnosticAt=0,lastHinaDiagnosticState='',lastDayOneCaveWalkAt=-999,dayOneCaveScoutCount=0,lastDayOneRemarkAt=-999,dayOneRemarkIndex=0;
+function hinaDiagnostic(){
+ if(elapsed<nextHinaDiagnosticAt&&state===lastHinaDiagnosticState)return;
+ nextHinaDiagnosticAt=elapsed+180;
+ lastHinaDiagnosticState=state;
+ const t=target?`(${target.x.toFixed(1)}, ${target.z.toFixed(1)})`:'없음';
+ const detail=`[HINA_AI] 상태=${state} 행동=${goal} 위치=(${hana.position.x.toFixed(1)},${hana.position.z.toFixed(1)}) 목적지=${t} 경로=${navPath.length} 정체=${navStuck.toFixed(1)}초 상태유지=${(elapsed-phaseAt).toFixed(0)}초 탐색대기=${Math.max(0,elapsed-lastDayOneCaveWalkAt).toFixed(1)}초`;
+ log('🔎 '+detail);
+ console.info(detail);
+}
+// DAY 1: non-collecting observation walk. Never spam new short destinations.
+function dayOneCaveScout(){
+ if(darkHours()||target)return;
+ if(elapsed-lastDayOneCaveWalkAt<38)return;
+ lastDayOneCaveWalkAt=elapsed;
+ const ox=hana.position.x,oz=hana.position.z;
+ let picked=null;
+ for(let i=0;i<60;i++){
+  const a=rand()*Math.PI*2,r=7+rand()*8;
+  const x=ox+Math.cos(a)*r,z=oz+Math.sin(a)*r;
+  if(!safeWalkingSpot(x,z)||!navSegmentClear(ox,oz,x,z))continue;
+  picked={x,z};break;
+ }
+ if(picked){
+  target=new THREE.Vector3(picked.x,.5,picked.z);navReset();
+  goal='첫날 · 섬을 돌아다니며 주변을 관찰';
+ }else goal='첫날 · 주변을 살피며 잠시 생각 중';
+}
+function dayOneObservationRemark(){
+ if(darkHours()||elapsed-lastDayOneRemarkAt<70)return;
+ lastDayOneRemarkAt=elapsed;
+ const lines=[
+  '이 섬은 얼마나 큰 걸까? 다른 애들도 여기 있을까?',
+  '저 나무들은 처음 보는 것 같아... 길을 기억해 두자.',
+  '열매가 보이네. 먹어도 되는지는 아직 모르겠어.',
+  '물이 있는 곳은 기억해 둬야겠어.',
+  '혼자라고 생각하니까 무섭네... 그래도 움직여 보자.',
+  '해가 지기 전에는 동굴로 돌아가는 게 좋겠어.'
+ ];
+ say(lines[dayOneRemarkIndex++%lines.length]);
+}
+
 function dayOneDecide(){
  const d=elapsed;
  if(state==='confused'&&introSpeechStage===0&&d>5){
@@ -2730,10 +2768,19 @@ function dayOneDecide(){
  }
  if(state==='caveScout'&&!target){
   knownCave=true;shelter=true;
-  setState('fireTry','불 피우기 고민',null,'불이 있으면 좋겠는데... 어떻게 피우는 거지?');return;
+  setState('dayOneExplore','첫날 · 동굴 발견 후 섬 관찰',null,'쉴 곳은 찾았어. 해가 지기 전까지 주변을 조금 더 살펴보자.');return;
  }
- if(state==='fireTry'&&elapsed-phaseAt>18){
-  failedFire=true;setState('night','불 없이 동굴에서 첫날 밤',null,'불은 못 피우겠어... 오늘은 여기서 버텨야지.');return;
+ if(state==='dayOneExplore'){
+  if(darkHours()){
+   target=null;navReset();
+   failedFire=false;
+   setState('night','첫날 밤 · 동굴에서 휴식',null,'오늘은 여기까지... 내일은 먹을 것과 물을 구해 보자.');return;
+  }
+  dayOneCaveScout();dayOneObservationRemark();return;
+ }
+ // Compatibility with older first-day fireTry state.
+ if(state==='fireTry'){
+  setState('dayOneExplore','첫날 · 주변 관찰',null,'불은 내일 생각하자. 오늘은 이곳부터 알아보자.');return;
  }
  finishDayOne();
 }
@@ -3209,7 +3256,7 @@ function dayTwoPlusDecide(){
 
  if(state==='confused'||state==='orient'||state==='waterScout'||state==='waterObserve'||
  state==='berryScout'||state==='berryObserve'||state==='wildlifeScout'||state==='wildlifeObserve'||
- state==='caveScout'||state==='fireTry'||state==='night'){
+ state==='caveScout'||state==='fireTry'||state==='dayOneExplore'||state==='night'){
   setState('wake','둘째 날 · 행동 시작',null,'어제 물이랑 열매를 봤지. 오늘은 직접 해보자.');return;
  }
  if(state==='drinkTravel'&&!target){
@@ -3347,7 +3394,7 @@ function decide(){
  const current=clockParts();
  if(current.day===1 && ![
   'confused','orient','waterScout','waterObserve','berryScout','berryObserve',
-  'wildlifeScout','wildlifeObserve','caveScout','fireTry','night','rest','mentalRest'
+  'wildlifeScout','wildlifeObserve','caveScout','fireTry','dayOneExplore','night','rest','mentalRest'
  ].includes(state)){
   // Recover a corrupted first-day state rather than playing Day 2 dialogue.
   state='confused';target=null;phaseAt=elapsed;introSpeechStage=0;
@@ -3632,6 +3679,7 @@ function update(dt){
  }
  if(darkHours()&&fireSuccess&&fireKnowledge>0&&!torchCarried&&atCaveForTorch()&&!sleepingPose&&!['rest','night','mentalRest'].includes(state))prepareCaveTorch();
  decide();
+ hinaDiagnostic();
  updateCharacterPose();updateTorch();
  terrainSafetyWatch();
  refreshCollisionDebug();
@@ -4375,9 +4423,9 @@ function buildDaeunWorld(){
  // instead of building two solid walls of trees and shrubs on the shoulders.
  // Visual-only objects; preserve a narrow walkable path to the cave mouth.
  const frontTreeSites=[
-  [-11.7,6.4,1.85,1], [10.9,8.6,1.95,2],
-  [-8.4,17.0,1.75,0], [7.6,19.4,1.90,1],
-  [1.5,22.8,1.70,2]
+  [-11.7,6.4,1.25,1], [10.9,8.6,1.35,2],
+  [-8.4,17.0,1.20,0], [7.6,19.4,1.30,1],
+  [1.5,22.8,1.15,2]
  ];
  for(const [dx,dz,scale,variant] of frontTreeSites){
   const x=c.x+dx,z=c.z+dz;
@@ -4486,6 +4534,27 @@ function buildDaeunWorld(){
  seed=oldSeed;initializeOcclusionGroups();
 }
 buildDaeunWorld();
+// v20.10: Clear stray green plant props poking through Hina's stone cave.
+// Restrict cleanup to the hollow interior; keep roof turf, terrain and outer forest.
+function clearHinaCaveStrayPlants(){
+ const removed=[];
+ for(const obj of [...scene.children]){
+  if(!obj.isGroup||!obj.userData.renderBush)continue;
+  const x=obj.position.x,z=obj.position.z;
+  if(x>caveX-4.5&&x<caveX+4.5&&z>caveZ-4.4&&z<caveZ+3.4)removed.push(obj);
+ }
+ for(const obj of [...scene.children]){
+  if(!obj.isMesh||!obj.geometry?.parameters)continue;
+  const {width:w,height:h,depth:d}=obj.geometry.parameters;
+  if(!(w>0&&h>0&&d>0&&w<1.5&&d<1.5&&h<3.2))continue;
+  const x=obj.position.x,z=obj.position.z;
+  if(!(x>caveX-4.5&&x<caveX+4.5&&z>caveZ-4.4&&z<caveZ+3.4))continue;
+  if(obj.position.y>3.0)continue; // roof vegetation is intentional
+  if([leaf,fernGreen,fernLight,grassBright,grassDeep,vine].includes(obj.material))removed.push(obj);
+ }
+ for(const obj of removed){scene.remove(obj);obj.traverse(o=>{if(o.isMesh)o.geometry?.dispose?.()});}
+}
+clearHinaCaveStrayPlants();
 // Daeun has her own snakes; Hina's snake encounter system is unchanged.
 const daeunSnakes=[];
 let nextDaeunSnakeAt=DAY_SECONDS*1.6;
