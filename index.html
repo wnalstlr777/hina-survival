@@ -5857,7 +5857,7 @@ function updateJoystickVisibility(){const el=document.getElementById('daeunJoyst
 
 function clearPlayerInput(){playerKeys.clear();playerPointers.clear();resetJoystick();}
 function cancelManualTask(){daeun.manualTask=null;if(['manualPick','manualDrink','manualEat','manualRest','manualBranch','manualFire','manualRabbit','manualFish','manualBag','manualStore'].includes(daeun.action)){daeun.action='idle';daeun.actionAge=0;}}
-function interruptManualMovement(){cancelManualTask();daeun.path=[];daeun.destination=null;daeun.action='manual';}
+function interruptManualMovement(){if(daeun.manualTask)return;cancelManualTask();daeun.path=[];daeun.destination=null;daeun.action='manual';}
 function isManualDaeun(){return observedId==='daeun'&&!daeun.auto;}
 function updateDaeun(step,realDt){
  updateDaeunSnakes(step);
@@ -5932,7 +5932,7 @@ function updateDaeun(step,realDt){
  }else{
   const penalty=(s.energy<=20?DAEUN_RULES.lowEnergySpeed:1)*(s.hunger===0?DAEUN_RULES.hungerEmptySpeed:1)*(s.thirst===0?DAEUN_RULES.thirstEmptySpeed:1);
   const distance=step*DAEUN_RULES.walkSpeed*Math.max(DAEUN_RULES.minSpeed,penalty);let movement=null;
-  if(isManualDaeun()&&(playerKeys.size||Math.hypot(joystick.x,joystick.y)>.12)){
+  if(isManualDaeun()&&!d.manualTask&&(playerKeys.size||Math.hypot(joystick.x,joystick.y)>.12)){
    interruptManualMovement();const forward=new THREE.Vector3();camera.getWorldDirection(forward);forward.y=0;forward.normalize();const right=new THREE.Vector3(-forward.z,0,forward.x);movement=new THREE.Vector3();
    if(playerKeys.has('KeyW'))movement.add(forward);if(playerKeys.has('KeyS'))movement.sub(forward);if(playerKeys.has('KeyD'))movement.add(right);if(playerKeys.has('KeyA'))movement.sub(right);if(Math.hypot(joystick.x,joystick.y)>.12){movement.addScaledVector(forward,-joystick.y).addScaledVector(right,joystick.x);}if(movement.lengthSq())movement.normalize().multiplyScalar(distance);
   }else if(d.path.length){
