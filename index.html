@@ -1320,6 +1320,23 @@ function updateSnakes(step){
   fitSnakeToGround(snake);
  }
 }
+// Fish schools periodically surface for observation (2-4 in-game hours between visits).
+// Visibility and skill gains share the same real, timed encounter.
+const FISH_VISIT_MIN=2,FISH_VISIT_SPAN=2;
+let fishVisitEnd=-1,fishNextVisit=0,fishVisitId=0;
+function fishVisitActive(){return elapsed<fishVisitEnd;}
+function updateFishVisit(){
+ const hour=DAY_SECONDS/24;
+ if(elapsed>=fishNextVisit){
+  fishVisitId++;
+  fishVisitEnd=elapsed+hour*(.8+Math.random()*.45);
+  fishNextVisit=fishVisitEnd+hour*(FISH_VISIT_MIN+Math.random()*FISH_VISIT_SPAN);
+ }
+ for(const f of fishes)f.g.visible=fishVisitActive();
+}
+function fishNearby(x,z,radius=8){
+ return fishVisitActive()&&fishes.some(f=>f.g.visible&&Math.hypot(f.g.position.x-x,f.g.position.z-z)<radius);
+}
 const fishes=[],fishOrange=mat(0xffb85e),fishBlue=mat(0x3b819a),fishSilver=mat(0xb8d2ce),fishDark=mat(0x466f86);
 function fish(x,z,phase,color){
  const g=new THREE.Group();scene.add(g);
@@ -1412,6 +1429,7 @@ function animateWildlife(t,dt){
    if(p>=1){r.hopActive=false;r.restUntil=elapsed+(fleeing?.07:r.pet?.20:.65+Math.random()*.95);}
   }else r.g.position.y=rabbitGroundY(x,z)+.04;
  }
+ updateFishVisit();
  // Swimming fish: slow wandering, smooth turns, tail propulsion and subtle depth changes.
  // No emissive materials or dynamic lights; keep fish within their water habitat.
  for(const f of fishes){
@@ -1730,9 +1748,9 @@ function moraleUpdate(step){
  // Fish familiarity also grows through real observation near the pond, even when
  // urgent survival actions prevent a dedicated fishing trip (avoids 49% plateau).
  if(day>=2&&fishSkill<100&&elapsed-lastFishStudyAt>85&&distanceTo('water')<7&&
-    clockParts().h>=7&&clockParts().h<19&&stats.energy>20){
+    clockParts().h>=7&&clockParts().h<19&&stats.energy>20&&fishNearby(hana.position.x,hana.position.z,8)){
   lastFishStudyAt=elapsed;fishObservations++;
-  fishSkill=Math.min(100,fishSkill+randomBetween(8,12));
+  fishSkill=Math.min(100,fishSkill+randomBetween(3,5));
   log(`🐟 물가에서 움직임 관찰 · 물고기 숙련도 ${Math.round(fishSkill)}%`);
  }
  const away=distanceTo('shelter');
@@ -3103,7 +3121,7 @@ function init(){
   r.caught=false;r.pet=false;r.panic=0;r.hopActive=false;r.hopClock=0;r.restUntil=0;r.g.visible=true;
   r.g.position.set(r.homeX,rabbitGroundY(r.homeX,r.homeZ)+.04,r.homeZ);r.g.rotation.set(0,0,0);r.habitatLeaveAt=elapsed+80+Math.random()*130;r.habitatReturnAt=0;
  });
- fishes.forEach(f=>{f.g.position.set(f.x,f.pond?.08:-.3,f.z);f.tail.rotation.y=0;});
+ fishVisitEnd=-1;fishNextVisit=0;fishVisitId=0;fishes.forEach(f=>{f.g.position.set(f.x,f.pond?.08:-.3,f.z);f.tail.rotation.y=0;});
  campfire.visible=false;fireLight.intensity=0;
  rainDrops.forEach(d=>d.visible=false);
  resetBerryTrees();
@@ -3324,7 +3342,7 @@ function chooseNextDayAction(){
   const now=clockParts();
   // Hungry Hina actively uses learned hunting/fishing rather than relying solely on fruit.
   if(now.h>=7&&now.h<18&&stats.energy>27&&stats.thirst>18){
-   const live=critters.find(r=>!r.caught);
+   const live=critters.find(r=>!r.caught&&r.g.visible);
    if(live&&!petRabbit&&rabbitPattern>=100&&lastRabbitAttemptDay!==now.day&&stats.hunger<48){
     lastRabbitAttemptDay=now.day;
     sites.wildlife.set(live.g.position.x,.5,live.g.position.z);
@@ -3389,7 +3407,8 @@ function chooseNextDayAction(){
  }
  // Observe fish movement first, then try fishing in the shallow pond.
  if(current.day>=3&&current.h>=8&&current.h<18&&
-    lastFishDay!==current.day&&stats.energy>38&&stats.thirst>23&&stats.hunger>20){
+    lastFishDay!==current.day&&stats.energy>38&&stats.thirst>23&&stats.hunger>20&&
+    (fishSkill>=100||fishNearby(hana.position.x,hana.position.z,10))){
   lastFishDay=current.day;
   setState(fishSkill>=45&&!fishSpear?'spearBuildTravel':fishSkill>=100?'fishTravel':'fishObserveTravel',
    fishSkill>=45&&!fishSpear?'나뭇가지 작살 만들기':fishSkill>=100?'물고기 잡기 시도':'물고기 움직임 관찰','water',
@@ -3397,7 +3416,7 @@ function chooseNextDayAction(){
    '물고기들이 어느 쪽으로 헤엄치는지 살펴보자.');return;
  }
  // Watching rabbits repeatedly teaches timing; hunting starts around Day 8.
- if(!petRabbit&&current.day>=3&&current.h>=8&&current.h<18&&critters.some(r=>!r.caught)&&
+ if(!petRabbit&&current.day>=3&&current.h>=8&&current.h<18&&critters.some(r=>!r.caught&&r.g.visible)&&
     stats.energy>35&&stats.thirst>22&&stats.hunger>15&&
     lastRabbitAttemptDay!==current.day&&
     (rabbitPattern<100||stats.hunger<55)){
@@ -3614,11 +3633,12 @@ function dayTwoPlusDecide(){
   setState('recover','작살 완성',null,'이제 물고기를 좀 더 쉽게 잡을 수 있겠어.');return;
  }
  if(state==='fishObserveTravel'&&!target){
-  fishObservations++;fishSkill=Math.min(100,fishSkill+21);
+  if(!fishNearby(hana.position.x,hana.position.z,9)){setState('recover','물고기를 기다리는 중',null,'물고기가 아직 안 보여. 다음에 다시 와야겠어.');return;}
   setState('fishObserve','물고기 이동 경로 관찰',null,
    fishObservations===1?'가까이 가니까 깊은 곳으로 도망가네...':'얕은 물로 돌아오는 주기가 있구나.');return;
  }
  if(state==='fishObserve'&&elapsed-phaseAt>12){
+  if(fishNearby(hana.position.x,hana.position.z,9)){fishObservations++;fishSkill=Math.min(100,fishSkill+randomBetween(3,5));log('🐟 물고기 이동 패턴 학습 · 숙련도 '+Math.round(fishSkill)+'%');}
   setState('recover','물고기 관찰 마침',null,'물고기 움직임을 조금 기억해 뒀어.');return;
  }
  if(state==='fishTravel'&&!target){
@@ -3656,6 +3676,8 @@ function dayTwoPlusDecide(){
  }
  if(state==='fireResult'&&elapsed-phaseAt<7.5)return;
  if(state==='rabbitObserveTravel'&&!target){
+  const visibleRabbit=critters.some(r=>!r.caught&&r.g.visible&&Math.hypot(r.g.position.x-hana.position.x,r.g.position.z-hana.position.z)<9);
+  if(!visibleRabbit){setState('recover','토끼가 보이지 않아',null,'토끼가 없네. 다음에 다시 찾아보자.');return;}
   rabbitObservations++;rabbitPattern=Math.min(100,rabbitPattern+30);
   setState('rabbitObserve','토끼 행동 관찰',null,
    rabbitObservations<2?'가까이 가면 바로 달아나는구나...':
@@ -3671,6 +3693,9 @@ function dayTwoPlusDecide(){
     rabbitAttempts===0?'패턴은 알겠어... 하지만 실제로 잡는 건 처음이잖아. 떨린다.':rabbitAttempts<4?'이번엔 조금 더 가까이... 앗, 너무 빨리 움직이면 안 돼.':'몇 번 놓쳤지만, 이제 도망가는 순간이 조금 보여.');return;
  }
  if(state==='rabbitHunt'&&elapsed-phaseAt>11){
+  if(!critters.some(r=>!r.caught&&r.g.visible&&Math.hypot(r.g.position.x-hana.position.x,r.g.position.z-hana.position.z)<9)){
+   setState('recover','토끼가 사라졌어',null,'토끼가 멀리 도망갔네.');return;
+  }
   // Chasing a rabbit costs stamina and increases hunger, whether caught or missed.
   const chaseEnergyCost=randomBetween(2,4);
   const chaseHungerCost=randomBetween(1,3);
@@ -5805,7 +5830,7 @@ class DaeunAIController{
     const rabbit=critters.find(r=>r.originalHomeX!==undefined&&!r.caught&&r.g.visible&&Math.hypot(pos.x-r.g.position.x,pos.z-r.g.position.z)<7);
     if(rabbit){d.action='autoRabbitObserve';d.actionAge=0;daeunSay('🐰 토끼가 어떻게 움직이는지 살펴보자.');return;}
    }
-   if(d.skills.fish<100&&d.dailyPractice.fish<DAEUN_DAILY_PRACTICE_LIMIT.fish&&Math.hypot(pos.x-d.sites.water.x,pos.z-d.sites.water.z)<8){
+   if(d.skills.fish<100&&d.dailyPractice.fish<DAEUN_DAILY_PRACTICE_LIMIT.fish&&Math.hypot(pos.x-d.sites.water.x,pos.z-d.sites.water.z)<8&&fishNearby(pos.x,pos.z,9)){
     d.action='autoFishObserve';d.actionAge=0;daeunSay('🐟 물고기 움직임을 관찰해 보자.');return;
    }
   }
@@ -6035,8 +6060,9 @@ function updateDaeun(step,realDt){
  if(d.auto&&(d.action==='autoRabbitObserve'||d.action==='autoFishObserve')&&d.actionAge>=7){
   const kind=d.action==='autoRabbitObserve'?'rabbit':'fish';
   refreshDaeunDailyPractice();
-  if(d.dailyPractice[kind]<DAEUN_DAILY_PRACTICE_LIMIT[kind]&&d.skills[kind]<100){
-   d.dailyPractice[kind]++;d.skills[kind]=Math.min(100,d.skills[kind]+8+Math.floor(dRandom()*8));
+  const animalVisible=kind==='fish'?fishNearby(d.mesh.position.x,d.mesh.position.z,9):critters.some(r=>!r.caught&&r.g.visible&&Math.hypot(r.g.position.x-d.mesh.position.x,r.g.position.z-d.mesh.position.z)<9);
+  if(animalVisible&&d.dailyPractice[kind]<DAEUN_DAILY_PRACTICE_LIMIT[kind]&&d.skills[kind]<100){
+   d.dailyPractice[kind]++;d.skills[kind]=Math.min(100,d.skills[kind]+(kind==='fish'?3+Math.floor(dRandom()*3):8+Math.floor(dRandom()*8)));
    daeunSay((kind==='rabbit'?'🐰 토끼':'🐟 물고기')+' 관찰 숙련도 '+d.skills[kind]+'%');
   }
   d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+8;
@@ -6269,7 +6295,7 @@ function watchSkillGains(character,values){
  const previous=skillFloatPrevious[character];
  if(previous){for(const [key,entry] of Object.entries(values)){
   const old=previous[key]?.value,now=Number(entry.value);
-  if(Number.isFinite(old)&&Number.isFinite(now)&&now>old+.001&&now-old<40)skillFloatNotice(character,key,entry.label,now-old);
+  if(character===observedId&&Number.isFinite(old)&&Number.isFinite(now)&&now>old+.001&&now-old<40)skillFloatNotice(character,key,entry.label,now-old);
  }}
  skillFloatPrevious[character]=Object.fromEntries(Object.entries(values).map(([k,v])=>[k,{value:Number(v.value)}]));
 }
