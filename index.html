@@ -2042,7 +2042,7 @@ petBenefitStyle.textContent=`
 #petRabbitHud:hover,#petRabbitHud:focus-visible{background:#35594e;outline:2px solid #d5e6cb;outline-offset:2px}
 #petRabbitHud .petTooltip{display:none;position:absolute;top:calc(100% + 9px);right:0;left:auto;width:max-content;max-width:min(250px,80vw);padding:9px 11px;border:2px solid #cba7ff;border-radius:12px;background:rgba(36,25,55,.96);color:#f0dcff;font-size:12px;font-weight:700;line-height:1.6;text-align:left;white-space:normal;box-shadow:0 4px 15px #0009;pointer-events:none}
 #petRabbitHud:hover .petTooltip,#petRabbitHud:focus-visible .petTooltip{display:block}
-@media(max-width:700px){#petRabbitHud{left:auto;right:8px;top:105px;width:37px;height:37px;font-size:22px}#petRabbitHud .petTooltip{left:auto;right:0}}
+@media(max-width:700px){#petRabbitHud{left:auto;right:9px;top:60px;width:37px;height:37px;font-size:22px}#petRabbitHud .petTooltip{left:auto;right:0}}
 `;
 document.head.appendChild(petBenefitStyle);
 const petRabbitHud=document.createElement('button');
@@ -2055,12 +2055,15 @@ function updatePetBenefitFeedback(){
  const active=!!((petRabbit?.g?.visible)||(daeunPetRabbit?.g?.visible));
  petRabbitHud.style.display=active?'flex':'none';
  if(active){
-  const badge=document.getElementById('badge');
-  if(badge){
-   const rect=badge.getBoundingClientRect();
+  const mobile=window.matchMedia('(max-width:700px)').matches;
+  const anchor=mobile?document.getElementById('mobileMenu'):document.getElementById('badge');
+  if(anchor){
+   const rect=anchor.getBoundingClientRect();
    petRabbitHud.style.top=Math.round(rect.bottom+9)+'px';
-   petRabbitHud.style.right=Math.round(Math.max(8,window.innerWidth-rect.right))+'px';
+   petRabbitHud.style.right=Math.round(Math.max(mobile?9:8,window.innerWidth-rect.right))+'px';
   }
+  // The mobile menu opens over the companion icon; keep the icon out of its way.
+  petRabbitHud.style.visibility=(mobile&&document.body.classList.contains('menu-open'))?'hidden':'visible';
  }
 }
 const rabbitCompanionTalk=[
@@ -4722,6 +4725,11 @@ $('rainTest').onclick=()=>{
  $('weather').textContent=raining()?'🌧 비 · 나무가 젖음':groundWet()?'☁ 비 갠 뒤 · 축축한 땅':'☀ 맑음 · 미지의 섬';
 };
 // ---- v15.1 independent Character / AIController / PlayerController ----
+function daeunNearestAutoBranch(pos){
+ return daeunResources.branches.filter(b=>b.available&&Math.hypot(b.x-pos.x,b.z-pos.z)<DAEUN_RULES.autoRadius+8)
+  .sort((a,b)=>a.group.position.distanceToSquared(pos)-b.group.position.distanceToSquared(pos))
+  .find(b=>safeWalkingSpot(b.x,b.z)&&!bearNearRoute(b.x,b.z));
+}
 const daeunResources={berries:[],branches:[],caveMeshes:[]};
 const daeunExplored=new Set();let observedId='hina',dualReady=false,dualLastUI=-1,dualLastSave=0;
 // v15.2: Do not merge legacy album-only storage into a fresh dual-survivor game.
@@ -5767,6 +5775,12 @@ class DaeunAIController{
    d.nextWashRetryAt=elapsed+75;
   }
   if(Math.hypot(pos.x-d.home.x,pos.z-d.home.z)>DAEUN_RULES.autoRadius+3){setDaeunDestination(d.sites.shelter,'home');return;}
+  // Keep a small wood reserve before optional crafting or exploration.
+  // Do not chase unreachable branches or repeatedly select a distant first entry.
+  if(inv.branches<4 && (inv.fuel<65||inv.branches<2)){
+   const wood=daeunNearestAutoBranch(pos);
+   if(wood){d.branchId=daeunResources.branches.indexOf(wood);if(setDaeunDestination(wood.group.position,'branch'))return;}
+  }
   // Keep a lit fire alive with branches from the bag; no cave stockpile.
   if(inv.fuel>0&&inv.fuel<40&&inv.branches>=2){
    if(daeunNearCave()){inv.branches-=2;inv.fuel=Math.min(100,inv.fuel+40);d.timers.fuelFlutterUntil=elapsed+2.4;d.lastCraftActiveAt=elapsed;daeunSay('🪵 모닥불에 나뭇가지를 넣어 불을 유지했어.');}
@@ -5783,20 +5797,32 @@ class DaeunAIController{
    const practiceBranch=daeunResources.branches.filter(b=>b.available).sort((a,b)=>{const score=t=>t.group.position.distanceTo(pos)+Math.max(0,100-(elapsed-(daeunResourceVisited.get(t)||-9999)))*.5;return score(a)-score(b);})[0];
    if(practiceBranch){d.branchId=daeunResources.branches.indexOf(practiceBranch);setDaeunDestination(practiceBranch.group.position,'branch');return;}
   }
+  // Observe wildlife during safe daylight gaps. Practice consumes no animal and
+  // shares the manual daily limits; food, water, rest and fire have already won priority.
+  if(clockParts().day>=3&&clockParts().h>=8&&clockParts().h<18&&s.energy>=48&&s.thirst>=58&&s.hunger>=58){
+   refreshDaeunDailyPractice();
+   if(d.skills.rabbit<100&&d.dailyPractice.rabbit<DAEUN_DAILY_PRACTICE_LIMIT.rabbit){
+    const rabbit=critters.find(r=>r.originalHomeX!==undefined&&!r.caught&&r.g.visible&&Math.hypot(pos.x-r.g.position.x,pos.z-r.g.position.z)<7);
+    if(rabbit){d.action='autoRabbitObserve';d.actionAge=0;daeunSay('🐰 토끼가 어떻게 움직이는지 살펴보자.');return;}
+   }
+   if(d.skills.fish<100&&d.dailyPractice.fish<DAEUN_DAILY_PRACTICE_LIMIT.fish&&Math.hypot(pos.x-d.sites.water.x,pos.z-d.sites.water.z)<8){
+    d.action='autoFishObserve';d.actionAge=0;daeunSay('🐟 물고기 움직임을 관찰해 보자.');return;
+   }
+  }
   // Bag making is the next long-term goal after today's fire practice.
   // Auto Daeun must collect and store two branches per attempt before weaving.
   refreshDaeunBagDay();
-  if(!d.bag.crafted&&d.bag.today<DAEUN_BAG_DAILY_MAX){
+  if(!d.bag.crafted&&d.bag.today<DAEUN_BAG_DAILY_MAX&&(inv.fuel>=55||inv.branches>=5)){
    if(inv.branches>=DAEUN_BAG_BRANCH_COST){
     if(daeunNearCave()){d.action='autoBagPractice';d.actionAge=0;daeunSay('🧶 동굴에서 가방을 엮어 보자.');}
     else setDaeunDestination(d.sites.shelter,'home');
     return;
    }
    
-   const bagBranch=daeunResources.branches.find(b=>b.available);
+   const bagBranch=daeunNearestAutoBranch(pos);
    if(bagBranch){d.branchId=daeunResources.branches.indexOf(bagBranch);setDaeunDestination(bagBranch.group.position,'branch');return;}
   }
-  if(inv.branches<3){const b=daeunResources.branches.find(b=>b.available);if(b){d.branchId=daeunResources.branches.indexOf(b);setDaeunDestination(b.group.position,'branch');return;}}
+  if(inv.branches<6){const b=daeunNearestAutoBranch(pos);if(b){d.branchId=daeunResources.branches.indexOf(b);setDaeunDestination(b.group.position,'branch');return;}}
   if(inv.berries>1&&inv.caveBerries<8&&pos.distanceTo(d.sites.shelter)<4){inv.berries--;inv.caveBerries++;}
   if((s.energy<70||s.will<68)&&dRandom()<.65){d.action='rest';d.actionAge=0;return;}
   for(let tries=0;tries<7;tries++){const a=dRandom()*Math.PI*2,r=8+dRandom()*(DAEUN_RULES.autoRadius-8),p=new THREE.Vector3(d.home.x+Math.cos(a)*r,.4,d.home.z+Math.sin(a)*r);if(setDaeunDestination(p,'explore')){daeunSay('이 근처를 조금 더 살펴보자.');return;}}
@@ -6004,6 +6030,16 @@ function updateDaeun(step,realDt){
  if(d.seatedEating>0){
   d.seatedEating=Math.max(0,d.seatedEating-step);
   if(d.seatedEating===0&&inv.berries>0&&s.hunger<95){inv.berries--;s.hunger=Math.min(100,s.hunger+12);daeunSay('앉아서 열매를 먹었어. 허기 +12');}
+ }
+ // Finish autonomous wildlife observation without inventing caught animals.
+ if(d.auto&&(d.action==='autoRabbitObserve'||d.action==='autoFishObserve')&&d.actionAge>=7){
+  const kind=d.action==='autoRabbitObserve'?'rabbit':'fish';
+  refreshDaeunDailyPractice();
+  if(d.dailyPractice[kind]<DAEUN_DAILY_PRACTICE_LIMIT[kind]&&d.skills[kind]<100){
+   d.dailyPractice[kind]++;d.skills[kind]=Math.min(100,d.skills[kind]+8+Math.floor(dRandom()*8));
+   daeunSay((kind==='rabbit'?'🐰 토끼':'🐟 물고기')+' 관찰 숙련도 '+d.skills[kind]+'%');
+  }
+  d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+8;
  }
  // Autonomous Daeun uses the same skill and daily limit as manual practice.
  if(d.auto&&d.action==='autoFirePractice'&&!d.path.length&&d.actionAge>=10){
