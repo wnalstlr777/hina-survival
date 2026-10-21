@@ -125,6 +125,31 @@ const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia
 let highQuality=!isMobile;
 let mobileTargetFPS=20;let lastRenderAt=0;let ultraLowPower=isMobile;let nextUiFrame=0;
 let followCamera=false;let followDistance=21.4;const followOffset=new THREE.Vector3(12,13,12);const followFocus=new THREE.Vector3();const followDesired=new THREE.Vector3();
+// World-space follow-camera dead zone: applies to both characters, AI and manual control.
+const deadZoneRight=new THREE.Vector3(),deadZoneForward=new THREE.Vector3(),deadZoneDelta=new THREE.Vector3();
+const deadZoneAnchor=new THREE.Vector3();
+function updateFollowDeadZone(dt){
+ const character=observedCharacter().mesh.position;
+ const fov=THREE.MathUtils.degToRad(camera.fov);
+ const viewHeight=2*Math.tan(fov*.5)*followDistance;
+ const viewWidth=viewHeight*camera.aspect;
+ // Dead zone occupies about 24% of screen width and 19% of height.
+ const halfWidth=viewWidth*.12,halfHeight=viewHeight*.095;
+ deadZoneRight.set(followOffset.z,0,-followOffset.x).normalize();
+ deadZoneForward.set(-followOffset.x,0,-followOffset.z).normalize();
+ deadZoneDelta.copy(character).sub(deadZoneAnchor);
+ const x=deadZoneDelta.dot(deadZoneRight),z=deadZoneDelta.dot(deadZoneForward);
+ const excessX=Math.sign(x)*Math.max(0,Math.abs(x)-halfWidth);
+ const excessZ=Math.sign(z)*Math.max(0,Math.abs(z)-halfHeight);
+ if(excessX||excessZ){
+  const followFactor=1-Math.exp(-Math.max(0,dt)*11);
+  deadZoneAnchor.addScaledVector(deadZoneRight,excessX*followFactor);
+  deadZoneAnchor.addScaledVector(deadZoneForward,excessZ*followFactor);
+ }
+ // Follow vertical terrain changes without snapping the horizontal camera.
+ deadZoneAnchor.y=THREE.MathUtils.lerp(deadZoneAnchor.y,character.y,1-Math.exp(-Math.max(0,dt)*5));
+ followFocus.copy(deadZoneAnchor).add(new THREE.Vector3(0,1.25,0));
+}
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9ad4e7);scene.fog=new THREE.Fog(0x9ad4e7,165,380);const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,750);camera.position.set(32,35,49);const renderer=new THREE.WebGLRenderer({antialias:!isMobile,powerPreference:isMobile?"low-power":"high-performance"});renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.15:2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;document.getElementById('view').appendChild(renderer.domElement);// v10.9: subtle downsampled screen glow; no second Three.js scene render.
 const glowCanvas=document.createElement('canvas');
 glowCanvas.setAttribute('aria-hidden','true');
@@ -4082,12 +4107,19 @@ function update(dt){
   updateCharacterPose();
   updateHinaManualActionPose();
   updateTorch();
+  // Manual mode advances the same clock, lighting and HUD as autonomous mode.
+  stats.thirst=Math.max(0,stats.thirst-step*thirstRate);
+  stats.hunger=Math.max(0,stats.hunger-step*hungerRate);
+  if(state==='rest')stats.energy=Math.min(100,stats.energy+step*.45);
+  if(state==='sleep')stats.energy=Math.min(100,stats.energy+step*.85);
+  updateHinaWorldUIAndLighting(step,dt);
   return;
  }
  // During the first reunion, the manually controlled survivor leads.
  // The follower is animated only by updateMeetingFollow, not the resting/sleeping AI.
  if(meetingFollowUntil>performance.now()&&isManualDaeun()){
   updateTorch();
+  updateHinaWorldUIAndLighting(step,dt);
   return;
  }
  // Detect stationary isolation even when no new blocked speech is emitted.
@@ -4330,6 +4362,10 @@ function update(dt){
   previousExplorationCount=visited;discoveryBoostAt=elapsed;
   changeWill(randomBetween(3,5),'새로운 지역 발견');
  }
+ updateHinaWorldUIAndLighting(step,dt);
+}
+
+function updateHinaWorldUIAndLighting(step,dt){
  const t=clockParts();
  $('dayLabel').textContent=`· DAY ${String(t.day).padStart(2,'0')}`;
  $('mobileSurvivalDay').textContent=`DAY ${String(t.day).padStart(2,'0')}`;
@@ -4804,7 +4840,7 @@ function setCameraMode(on){
  followCamera=on;orbit.enabled=!on;
  $('cameraMode').textContent=on?'카메라: 팔로우':'카메라: 자유';
  $('cameraMode').setAttribute('aria-pressed',String(on));
- if(on){followOffset.set(12,13,12).normalize().multiplyScalar(followDistance);followFocus.copy(observedCharacter().mesh.position).add(new THREE.Vector3(0,1.25,0));
+ if(on){followOffset.set(12,13,12).normalize().multiplyScalar(followDistance);deadZoneAnchor.copy(observedCharacter().mesh.position);followFocus.copy(deadZoneAnchor).add(new THREE.Vector3(0,1.25,0));
    orbit.target.copy(followFocus);camera.position.copy(followFocus).add(followOffset);camera.lookAt(followFocus);}
  else{orbit.target.copy(observedCharacter().mesh.position).add(new THREE.Vector3(0,1.25,0));orbit.update();}
 }
@@ -7111,7 +7147,7 @@ Object.values(hinaManualMarkers).flat().forEach(marker=>{marker._hinaOwned=true;
 function hideHinaManualMarkers(){Object.values(hinaManualMarkers).flat().forEach(m=>{m.style.display='none';m.onclick=null;m.classList.remove('interacting');clearCleanProgressRing(m);});}
 function hinaManualInteract(type,item){
  if(!isManualHina())return;
- if(hinaManualTask){say('지금 하던 일을 마치고 할게.');return;}
+ if(type!=='eat'&&hinaManualTask){say('지금 하던 일을 마치고 할게.');return;}
  const pos=hana.position,p=item?.group?.position||item?.g?.position||item?.position||new THREE.Vector3(-9,0,4);
  if(type==='eat'){
   if(carriedBerries<=0){say('먹을 열매가 없어.');return;}
@@ -7283,8 +7319,16 @@ const manualButtons=document.createElement('div');manualButtons.id='daeunActionB
 // Hina's own manual HUD. Daeun's HUD was previously hidden when switching to Hina.
 const hinaActions=document.createElement('div');
 hinaActions.id='hinaActionButtons';
-hinaActions.innerHTML='<button type="button" id="hinaRestAction">♧ 앉아서 쉬기</button><button type="button" id="hinaSleepAction">☾ 잠자기</button>';
+hinaActions.innerHTML='<button type="button" id="hinaEatAction">🍓 열매 먹기</button><button type="button" id="hinaRestAction">♧ 앉아서 쉬기</button><button type="button" id="hinaSleepAction">☾ 잠자기</button>';
 document.body.appendChild(hinaActions);
+document.getElementById('hinaEatAction').addEventListener('pointerdown',e=>{
+ if(!isManualHina())return;
+ e.preventDefault();e.stopPropagation();
+ hinaManualInteract('eat',null);
+});
+document.getElementById('hinaEatAction').addEventListener('click',e=>{
+ if(e.detail===0&&isManualHina())hinaManualInteract('eat',null);
+});
 document.getElementById('hinaRestAction').addEventListener('click',()=>{
  if(!isManualHina())return;
  if(state==='rest'||state==='resting'){state='recover';goal='플레이어 직접 이동';}
@@ -7360,6 +7404,9 @@ function refreshManualActionUI(){
  const hinaVisible=isManualHina()&&!document.body.classList.contains('cinematic-mode');
  hinaActions.style.display=hinaVisible?'flex':'none';
  if(hinaVisible){
+  const eat=document.getElementById('hinaEatAction');
+  eat.textContent='🍓 열매 먹기 ('+carriedBerries+')';
+  eat.disabled=carriedBerries<=0||stats.hunger>=95;
   document.getElementById('hinaRestAction').textContent=state==='rest'||state==='resting'?'↥ 일어나기':'♧ 앉아서 쉬기';
   document.getElementById('hinaSleepAction').textContent=state==='sleep'?'☀ 일어나기':'☾ 잠자기';
  }
@@ -7752,7 +7799,7 @@ function animate(t){requestAnimationFrame(animate);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
  lastRenderAt=t;
  let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused){updateDaeun(dt*speed,dt);updateSharedDaeunResourceTask(dt*speed);updateSharedCampfireBonus();checkHinaDaeunMeeting();updateMeetingFollow(dt*speed);trackDailySleep(dt*speed);updateMiddleBear(dt*speed);updateDualExploration();updateRainSpeech();updateDaeunFriendThoughts();}refreshCharacterUI(t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina')$('bubble').textContent=meetingHinaLine;}if(!paused){animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);}if(followCamera){
-  followFocus.copy(observedCharacter().mesh.position).add(new THREE.Vector3(0,1.25,0));
+  updateFollowDeadZone(dt);
   followDesired.copy(followFocus).add(followOffset);
   const lerp=1-Math.exp(-Math.min(dt,.08)*5);
   orbit.target.lerp(followFocus,lerp);
