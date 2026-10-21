@@ -409,7 +409,9 @@ box(10,.22,7.5,stone,caveX,.13,caveZ-1.1); // dry cave floor
 for(const [x,y,z,w,h,d] of [[-9.4,2.4,-12,2.2,4.8,3],[1.4,2.3,-12,2.2,4.6,3]])box(w,h,d,rock,x,y,z);
 // A darker interior, entrance pebbles, cliff ledges and moss.
 box(9,.05,6,rock,caveX,.285,caveZ-1.0);
-for(const [x,y,z,w,d] of [[-9.2,5.6,-10,3,3],[-4,5.6,-12,4,3],[.6,5.6,-9.5,3,4],[-12,2.4,-14,4,4],[4,1.4,-12,3,4]]){box(w,.7,d,dirt,x,y,z);box(w,.15,d,grass,x,y+.44,z)}
+// v3.72: Remove decorative dirt/green ledges around the cave roof and mouth.
+// These overlapping blocks could appear inside the cave and contribute walkable/collision surfaces.
+// Keep only structural cave walls, ceiling and the flat floor.
 // Freshwater pond near the lower forest; the character does not automatically know it is safe.
 // The pond is a genuine opening in the sand voxel field, not a coplanar blue box.
 // Deep basin, translucent water, terraced sandy banks and stones.
@@ -536,7 +538,10 @@ const branchPiles=[];
 const branchMat=new THREE.MeshLambertMaterial({color:0x79522f});
 const branchTipMat=new THREE.MeshLambertMaterial({color:0xa27c4b});
 const branchGeo=new THREE.CylinderGeometry(.055,.085,1,5);
+// Keep collectible sticks off Hina cave roof and the steep rim above it.
+function onHinaCaveRoof(x,z){return Math.abs(x-caveX)<10 && Math.abs(z-caveZ)<10;}
 function createBranchPile(x,z){
+  if(onHinaCaveRoof(x,z))return;
  const group=new THREE.Group();
  // Two loosely overlapping sticks, offset rather than a three-spoke star.
  for(let k=0;k<2;k++){
@@ -561,7 +566,7 @@ let wildBranchSeed=229107;
 const wildBranchRand=()=>{wildBranchSeed=(Math.imul(wildBranchSeed,1664525)+1013904223)>>>0;return wildBranchSeed/4294967296;};
 for(let i=0;i<1400&&branchPiles.length<42;i++){
  const x=-34+wildBranchRand()*71,z=-32+wildBranchRand()*72;
- if(!landAt(x,z)||deepPondAt(x,z)||islandValue(x,z)<.08||Math.abs(x-caveX)<10&&Math.abs(z-caveZ)<9)continue;
+ if(!landAt(x,z)||deepPondAt(x,z)||islandValue(x,z)<.08||onHinaCaveRoof(x,z))continue;
  if(Math.hypot(x-(-3.25),z-(-4.3))<7)continue;
  if(branchPiles.some(b=>Math.hypot(b.x-x,b.z-z)<3.2))continue;
  createBranchPile(x,z);
@@ -580,7 +585,7 @@ function relocateBranchPile(p){
  for(let attempt=0;attempt<65;attempt++){
   const a=rand()*Math.PI*2,r=3+rand()*15;
   const x=p.homeX+Math.cos(a)*r,z=p.homeZ+Math.sin(a)*r;
-  if(!landAt(x,z)||blocksCaveEntranceView(x,z)||Math.abs(x-caveX)<10&&Math.abs(z-caveZ)<9)continue;
+  if(!landAt(x,z)||blocksCaveEntranceView(x,z)||onHinaCaveRoof(x,z))continue;
   if(typeof inCaveWalkZone==='function'&&inCaveWalkZone(x,z))continue;
   if(typeof terrainPassable==='function'&&!terrainPassable(x+1,z,x,z)&&!terrainPassable(x-1,z,x,z)&&!terrainPassable(x,z+1,x,z))continue;
   if(branchPiles.some(other=>other!==p&&other.available&&Math.hypot(other.x-x,other.z-z)<3.3))continue;
@@ -598,6 +603,16 @@ function refreshBranches(){
   }
  }
 }
+// Also guard against piles restored or moved onto the cave roof later.
+function clearHinaCaveRoofBranches(){
+ for(const p of branchPiles){
+  if(!onHinaCaveRoof(p.x,p.z))continue;
+  if(!relocateBranchPile(p)){
+   p.available=false;p.group.visible=false;p.respawnAt=elapsed+45;
+  }
+ }
+}
+clearHinaCaveRoofBranches();
 // === PROCEDURAL ART PASS: layered coast, cliff details, foliage, cave ===
 const clay=mat(0xb58a67), paleStone=mat(0xa7a59a), warmRock=mat(0x9b8c7a),
     grassBright=mat(0x83b65c),grassDeep=mat(0x4d854c),sandLight=mat(0xf4dc9e),
@@ -1023,7 +1038,7 @@ function berryTree(x,z,ground=0){
  berryTrees.push({group:g,fruits,stock:0,regrowAt:0});return g;
 }
 // The first berry tree is deliberately close to Hina's existing berry-search destination.
-berryTree(-3.6,10.7,0);berryTree(-1.6,12.4,.15);berryTree(13.7,-1.2,0);
+berryTree(-3.6,10.7,0);berryTree(-1.6,12.4,.15);berryTree(13.7,-1.2,0);berryTree(5.8,9.6,0); // v3.63: one extra berry tree near Hina's cave
 // Fruits are finite physical objects: harvest hides individual fruit meshes.
 // Regrowth is stochastic and slow; no guaranteed fruit on a given day.
 function randomizeBerryDay(trees,day,randomFn,firstDayBoost=false){
@@ -1678,7 +1693,7 @@ for(let i=0;i<6;i++){
  fruit.visible=false;wovenBasket.add(fruit);basketBerryModels.push(fruit);
 }
 let lastTrailBerryAt=-999;
-function berryCarryCapacity(){return basketCrafted?8:2;}
+function berryCarryCapacity(){return basketCrafted?8:5;}
 function updateBasketBerries(){
  const count=basketCrafted?Math.ceil(carriedBerries/8*basketBerryModels.length):0;
  basketBerryModels.forEach((f,i)=>f.visible=i<count);
@@ -1723,10 +1738,10 @@ function updateCharacterPose(){
  const night=t.h>=19||t.h<6;
  const atShelter=Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<2.5;
  const meetingWalking=meetingFollowUntil>performance.now()&&isManualDaeun()&&!isManualHina();
- const sleep=!meetingWalking&&((((state==='rest'||state==='night')&&atShelter&&!target)||state==='outdoorSleep')&&(day>1||darkHours()));
+ const sleep=!meetingWalking&&!outdoorSleepBlocked('hina')&&(isManualHina()?state==='sleep':((((state==='rest'||state==='night')&&atShelter&&!target)||state==='outdoorSleep')&&(day>1||darkHours())));
  // In the cave, a stationary survivor should not stand motionless through the night.
  const caveQuiet=atShelter&&!target&&darkHours()&&['fireTry','recover','wake','idle','caveScout'].includes(state);
- const sitting=!meetingWalking&&!isManualHina()&&!sleep&&(state==='fieldRest'||state==='mentalRest'||state==='rest'||state==='night'||(caveQuiet&&state!=='fireTry'));
+ const sitting=!meetingWalking&&!sleep&&(isManualHina()?state==='rest':(state==='fieldRest'||state==='mentalRest'||state==='rest'||state==='night'||(caveQuiet&&state!=='fireTry')));
  // Face the campfire during stationary cave rest; never override navigation heading while moving.
  if(sitting&&fireSuccess&&campfire.visible&&Math.hypot(hana.position.x-campfire.position.x,hana.position.z-campfire.position.z)<6){
   hana.rotation.y=Math.atan2(campfire.position.x-hana.position.x,campfire.position.z-hana.position.z);
@@ -1830,14 +1845,14 @@ function moraleUpdate(step){
  const deepDark=h>=0&&h<4;
  const unlitOutdoorSleep=state==='fieldRest'&&deepDark&&!torchCarried; // Night outdoors is seated rest, not sleep.
  const torchBurnoutFear=unlitOutdoorSleep&&elapsed-outdoorTorchBurnoutAt<DAY_SECONDS*.5;
- if(unlitOutdoorSleep){
+ if(unlitOutdoorSleep||outdoorSleepBlocked('hina')){
   // Stronger night exposure: ~11 will over four in-game hours, instead of ~5.5.
-  stats.will=Math.max(0,stats.will-step*(torchBurnoutFear?.42:.22));
+  stats.will=Math.max(0,stats.will-step*(torchBurnoutFear?.42:.30));
  }
  if(inCaveWalkZone(hana.position.x,hana.position.z)||caveEntrancePortal(hana.position.x,hana.position.z))drain=0;
  if(resting){
   const safe=distanceTo('shelter')<7;
-  const recovery=unlitOutdoorSleep?0:state==='mentalRest'?.11:safe?(leafBed?.088:.065):.032;
+  const recovery=outdoorSleepBlocked('hina')?0:unlitOutdoorSleep?0:state==='mentalRest'?.11:safe?(leafBed?.088:.065):.032;
   // Leadership = resilience, not permanently perfect morale.
   const diminishing=stats.will>=85?.10:stats.will>=75?.32:stats.will>=60?.65:1;
   stats.will=Math.min(92,stats.will+step*recovery*diminishing);
@@ -2365,12 +2380,12 @@ function terrainTopAt(x,z,referenceY=0){
  let top=interior?.31:.30;
  // Daeun's roof is an overhead occluder, never walkable ground.
  const underDaeunRoof=Math.abs(x-DAEUN_ZONE.cave.x)<6.25&&Math.abs(z-(DAEUN_ZONE.cave.z-.2))<5.25;
- for(const p of nearbySurfaces(x,z))if(!p.minorDecoration&&p.rx>=.4&&p.rz>=.4&&(!interior||p.top<1.45)&&!(underDaeunRoof&&p.top>4.6)&&surfaceContains(p,x,z))top=Math.max(top,p.top);
+ for(const p of nearbySurfaces(x,z))if(!interior&&!p.minorDecoration&&p.rx>=.4&&p.rz>=.4&&!(underDaeunRoof&&p.top>4.6)&&surfaceContains(p,x,z))top=Math.max(top,p.top);
  return top;
 }
 function wildlifeGroundY(x,z){
  const interior=inCaveWalkZone(x,z);
- let top=interior?.31:.30;for(const p of nearbySurfaces(x,z))if(!p.minorDecoration&&(!interior||p.top<1.45)&&surfaceContains(p,x,z))top=Math.max(top,p.top);
+ let top=interior?.31:.30;for(const p of nearbySurfaces(x,z))if(!interior&&!p.minorDecoration&&surfaceContains(p,x,z))top=Math.max(top,p.top);
  return top;
 }
 function caveEntrancePortal(x,z){return (Math.abs(x-caveX)<4.45&&z>caveZ+1.5&&z<caveZ+7.4)||(Math.abs(x-DAEUN_ZONE.cave.x)<4.45&&z>DAEUN_ZONE.cave.z+1.5&&z<DAEUN_ZONE.cave.z+7.4);}
@@ -2736,13 +2751,15 @@ const bubbleEnabled=true;let bubbleUntil=0;const bubbleAnchor=new THREE.Vector3(
 let nextNightSoundAt=0,nightSoundUntil=0,nightSoundText='',nightSoundPosition=new THREE.Vector3();
 const nightSoundPool=[['찌르르... 🦗',7],['사각... 🍃',8],['졸졸... 💧',10]];
 function updateNightSoundBubble(){
- if(observedId==='daeun'){$('ambientBubble').classList.remove('show');return;}
  const el=$('ambientBubble'),t=clockParts(),isNight=t.h>=19||t.h<6;
- if(!bubbleEnabled||!isNight){el.classList.remove('show');return;}
+ const observer=observedId==='daeun'?daeun.mesh.position:hana.position;
+ const inForest=landAt(observer.x,observer.z)||Math.hypot(observer.x-DAEUN_ZONE.center.x,observer.z-DAEUN_ZONE.center.z)<DAEUN_ZONE.radius+18;
+ if(!inForest){el.classList.remove('show');return;}
+ if(!bubbleEnabled){el.classList.remove('show');return;}
  if(elapsed>=nextNightSoundAt){
   nextNightSoundAt=elapsed+5+Math.random()*7;
-  const rabbit=critters.filter(r=>!r.caught&&r.g.visible&&r.g.position.distanceTo(hana.position)<9);
-  const pondDist=Math.hypot(hana.position.x+9,hana.position.z-4);
+  const rabbit=critters.filter(r=>!r.caught&&r.g.visible&&r.g.position.distanceTo(observer)<9);
+  const pondDist=Math.hypot(observer.x+9,observer.z-4);
   let chosen=null;
   if(rabbit.length&&Math.random()<.75){
    const r=rabbit[Math.floor(Math.random()*rabbit.length)];
@@ -2752,14 +2769,14 @@ function updateNightSoundBubble(){
   }else if(Math.random()<.38){
    // A nearby bush/insect, never a sound from across the island.
    const a=Math.random()*Math.PI*2,r=2+Math.random()*4;
-   chosen={text:Math.random()<.5?'찌르르... 🦗':'사각... 🍃',
-    position:hana.position.clone().add(new THREE.Vector3(Math.cos(a)*r,1.3,Math.sin(a)*r))};
+   chosen={text:isNight?(Math.random()<.65?'찌르르... 🦗':'사각... 🍃'):'사각... 🍃',
+    position:observer.clone().add(new THREE.Vector3(Math.cos(a)*r,1.3,Math.sin(a)*r))};
   }
-  if(chosen&&chosen.position.distanceTo(hana.position)<10){
+  if(chosen&&chosen.position.distanceTo(observer)<10){
    nightSoundText=chosen.text;nightSoundPosition.copy(chosen.position);nightSoundUntil=elapsed+2.8;
   }else nightSoundUntil=0;
  }
- if(elapsed>nightSoundUntil||nightSoundPosition.distanceTo(hana.position)>11){el.classList.remove('show');return;}
+ if(elapsed>nightSoundUntil||nightSoundPosition.distanceTo(observer)>11){el.classList.remove('show');return;}
  const screen=nightSoundPosition.clone().project(camera);
  if(screen.z< -1||screen.z>1){el.classList.remove('show');return;}
  const x=(screen.x*.5+.5)*innerWidth,y=(-screen.y*.5+.5)*innerHeight;
@@ -2780,7 +2797,7 @@ function updateBubble(){
  const el=$('bubble');
  // Sleep has its own persistent bubble; it does not overwrite the AI's thoughts.
  if(!bubbleEnabled){el.classList.remove('show');return;}
- const showSleep=!(meetingFollowUntil>performance.now())&&(day>1||darkHours())&&survivorIsVisiblySleeping({sleepRequested:state==='rest'||state==='night'||state==='outdoorSleep',lyingPose:sleepingPose,moving:!!target,hasPath:!!target});  const showOutdoorCharge=false; // Rest charge is displayed on the existing action icon, not in a second speech bubble.
+ const showSleep=!(meetingFollowUntil>performance.now())&&(day>1||darkHours())&&survivorIsVisiblySleeping({sleepRequested:isManualHina()?state==='sleep':(state==='rest'||state==='night'||state==='outdoorSleep'),lyingPose:sleepingPose,moving:!!target,hasPath:!!target});  const showOutdoorCharge=false; // Rest charge is displayed on the existing action icon, not in a second speech bubble.
   if(showSleep){   applySurvivorSleepBubble(el,true,'Zzz...');  }else if(showOutdoorCharge){el.classList.remove('sleep-bubble');el.textContent='🔋⚡';}else{
   applySurvivorSleepBubble(el,false);
   if(el.textContent==='Zzz...'||el.textContent==='🔋⚡')el.textContent=$('thought').textContent.replace(/^[“"]|[”"]$/g,'');   if(elapsed>bubbleUntil||performance.now()>hinaSpeechExpiresAt){el.classList.remove('show');return;}
@@ -2815,8 +2832,8 @@ function trackDailySleep(step){
   const dayIndex=Math.floor((from+1e-7)/DAY_SECONDS)+1;
   const tillBoundary=dayIndex*DAY_SECONDS-from;
   const portion=Math.min(remain,Math.max(0.000001,tillBoundary));
-  if(['night','rest','outdoorSleep'].includes(state)&&!target)sleepLedger.hina+=portion;
-  if(['sleep','manualSleep'].includes(daeun.action)&&daeun.path.length===0)sleepLedger.daeun+=portion;
+  if(['night','rest','outdoorSleep','sleep'].includes(state)&&!target&&!outdoorSleepBlocked('hina'))sleepLedger.hina+=portion;
+  if(['sleep','manualSleep'].includes(daeun.action)&&daeun.path.length===0&&!outdoorSleepBlocked('daeun'))sleepLedger.daeun+=portion;
   from+=portion;remain-=portion;
   if(from>=dayIndex*DAY_SECONDS-1e-6){
    applySleepAssessment('hina',sleepLedger.hina/DAY_SECONDS*24,dayIndex);
@@ -3142,6 +3159,11 @@ function setState(s,g,p,words){
  // A cave is a shelter even if its fire is out. Sleeping does not require fire.
 
  if(p&&sites[p]&&sites[p].x< -108){s='recover';g='익숙한 구역에서 휴식';p=null;}
+ // Guard against stale/unknown AI destination keys after world or shelter changes.
+ if(p && (!sites[p] || typeof sites[p].clone !== 'function')){
+  console.warn('[HINA_NAV] Invalid destination key; falling back to idle',p,s,g);
+  p=null;s='idle';g='목적지 재탐색';
+ }
  state=s;goal=g;phaseAt=elapsed;target=p?sites[p].clone():null;
  if(s!=='torchExplore')torchOuting=false;
  if(target&&!safeWalkingSpot(target.x,target.z)){
@@ -3156,7 +3178,7 @@ function setState(s,g,p,words){
  if(s==='branchTravel'){
   const pile=nearestBranchPile();
   if(pile){target=new THREE.Vector3(pile.x,.5,pile.z);goal+=' · 실제 나뭇가지 위치';}
-  else{target=sites.shelter.clone();}
+  else{target=sites.shelter?.clone?.() || hana.position.clone();}
  }
  navReset();
  if(target&&darkHours()&&distanceTo('shelter')<4)prepareCaveTorch();
@@ -3404,7 +3426,7 @@ function chooseNextDayAction(){
    '마른 나뭇가지를 찾아서 다시 연습해 보자.');return;
  }
  // Collect branches whenever the fire is getting low; wet days are harder.
- if(fireEverLit&&fireSuccess&&fireKnowledge<(raining()?92:86)&&stats.energy>20&&stats.thirst>14&&
+ if(fireEverLit&&fireSuccess&&(fireKnowledge<(raining()?92:86)||fireDryStock===1)&&stats.energy>20&&stats.thirst>14&&
     stats.hunger>14&&elapsed>=nextFireAttempt){
   setState('branchTravel','모닥불 연료 · 나뭇가지 줍기',null,
    '불이 약해졌어. 근처에 떨어진 나뭇가지를 주워 와야겠어.');return;
@@ -3659,6 +3681,16 @@ function dayTwoPlusDecide(){
   }
   return;
  }
+ if(state==='branchReturn'&&!target){
+  if(distanceTo('shelter')>4){setState('branchReturn','모닥불로 돌아가기',sites.shelter.clone(),'동굴로 돌아가서 나뭇가지를 넣자.');return;}
+  if(fireSuccess&&fireDryStock>=2){
+   fireDryStock-=2;
+   fireKnowledge=Math.min(100,fireKnowledge+40);
+   log(`🔥 히나 자동 생존 · 나뭇가지 2개 투입 · 불유지 +40 (${Math.round(fireKnowledge)})`);
+   say('🔥 나뭇가지 2개를 넣었어.');
+  }
+  setState('recover','모닥불 연료 관리 완료',null,'이제 다른 일을 해보자.');return;
+ }
  if(state==='branchTravel'&&!target){
   const pile=nearestBranchPile();
   if(pile&&Math.hypot(hana.position.x-pile.x,hana.position.z-pile.z)<2.6){
@@ -3670,14 +3702,16 @@ function dayTwoPlusDecide(){
  }
  if(state==='branchGather'){
   if(elapsed-phaseAt<6.5)return;
-  const gained=raining()?randomBetween(13,23):randomBetween(34,48);
-  const branchLoot=Math.random()<.2?2:1;fireDryStock=Math.min(8,fireDryStock+branchLoot);if(branchLoot===2)log('🍀 운 좋게 나뭇가지 2개 발견!');
+  const branchLoot=Math.random()<.2?2:1;
+  fireDryStock=Math.min(8,fireDryStock+branchLoot);
+  if(branchLoot===2)log('🍀 운 좋게 나뭇가지 2개 발견!');
   noticeBasketIdea();
+  // Gathering only adds inventory. Never refuel or relight at the pickup site.
+  nextFireAttempt=elapsed+12;
   if(fireSuccess){
-   fireKnowledge=Math.min(100,fireKnowledge+gained);
-   log(`나뭇가지 보충 · 불 유지력 +${Math.round(gained)} (${Math.round(fireKnowledge)})`);
-   nextFireAttempt=elapsed+(raining()?10:16);
-   setState('recover','모닥불 연료 보충',null,'이제 불이 조금 더 오래 가겠어.');return;
+   if(fireDryStock>=2){setState('branchReturn','나뭇가지 2개 · 동굴 모닥불로 돌아가기',sites.shelter.clone(),'모닥불에 나뭇가지 2개를 넣으러 돌아가자.');}
+   else setState('recover','나뭇가지 보관 · 2개 필요',null,'한 개 더 모아서 모닥불에 넣어야겠어.');
+   return;
   }
   // Branch gathering must never ignite a fire before learning reaches 100%.
   if(!fireEverLit||fireSkill<100){
@@ -4075,6 +4109,9 @@ function update(dt){
   let moved=false;
   if(hinaManualTask?.phase==='approach'){movement.set(0,0,0);}
   if(movement.lengthSq()>.01){
+   if(state==='rest'||state==='resting'||state==='sleep'){
+    state='recover';goal='플레이어 직접 이동';sleepingPose=false;
+   }
    movement.normalize().multiplyScalar(step*DAEUN_RULES.walkSpeed);
    moved=moveManualWithAssist(hana,movement.x,movement.z,step);
    if(moved){
@@ -4084,9 +4121,10 @@ function update(dt){
   }
   if(moved&&hinaManualTask){hinaManualTask=null;}
   updateHinaManualTask(step);
+  const hinaTaskWalking=!!(hinaManualTask?.phase==='approach'&&hinaManualTask.walking);
   updateExploration(); // Reveal Hina-region tiles even when the AI update returns early.
   // Same 16.8Hz alternating-leg gait used by Daeun, with Hina's torch/held-item pose preserved.
-  walkPose(step,moved);
+  walkPose(step,moved||hinaTaskWalking);
   updateCharacterPose();
   updateHinaManualActionPose();
   updateTorch();
@@ -4399,7 +4437,7 @@ function updateHinaWorldUIAndLighting(step,dt){
  pondRippleMat.opacity=.025+.49*lightLevel;
  waterSurface.material.opacity=.77;
  animateFireflies();
- weatherUpdate(step);updatePanningCloudShadows(step,hour);updateLightning(step);updateSound(dt,lightLevel<.25);updateRainAudio(dt);updateNightAudio(dt,lightLevel<.25);updateCampfire(elapsed);
+ weatherUpdate(step);updatePanningCloudShadows(step,hour);updateLightning(step);updateSound(dt,lightLevel<.25);updateBonfireAmbience(dt);updateRainAudio(dt);updateNightAudio(dt,lightLevel<.25);updateCampfire(elapsed);
  // WeatherUpdate modifies sunlight for rain and wet ground; keep its existing behavior.
  if(elapsed>=uiNextUpdate){uiNextUpdate=elapsed+.3;
  updateStableStatBars($('stats'),{체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불유지:fireEverLit&&fireSuccess?Math.min(100,fireKnowledge):0},true);
@@ -4549,6 +4587,7 @@ async function unlockAmbient(){
  // HTMLMediaElement.play() must be invoked synchronously inside the user gesture.
  unlockRainAudio();
  unlockNightAudio();
+ if(bonfireAmbience.paused&&bonfireAmbience.volume>0)bonfireAmbience.play().catch(()=>{});
  if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C();}
  if(!audioCtx)return;
  if(audioCtx.state!=='running'){
@@ -4613,6 +4652,27 @@ function forestRustle(){
 function forestFrog(){
  tone(230,.17,'sine',.013);tone(195,.19,'sine',.011,.19);
 }
+// v3.74: one quiet, distance-attenuated bonfire ambience for every lit fire.
+const bonfireAmbience=new Audio('bonfire_loop.ogg');
+bonfireAmbience.loop=true;bonfireAmbience.preload='auto';bonfireAmbience.volume=0;
+let bonfireGain=0;
+function updateBonfireAmbience(dt){
+ const listener=observedId==='daeun'?daeun.mesh.position:hana.position;
+ const fires=[];
+ if(fireSuccess&&campfire.visible)fires.push(campfire.position);
+ if(daeunResources.fire.group.visible&&daeun.inventory.fuel>0&&!sharedHomeActive)fires.push(daeunResources.fire.group.position);
+ let proximity=0;
+ for(const pos of fires){
+  const d=Math.hypot(listener.x-pos.x,listener.z-pos.z);
+  const a=Math.max(0,Math.min(1,(17-d)/14));
+  proximity=Math.max(proximity,a*a*(3-2*a));
+ }
+ const target=soundEnabled&&!paused&&!document.hidden?0.13*proximity:0;
+ bonfireGain+=(target-bonfireGain)*Math.min(1,dt*2.8);
+ bonfireAmbience.volume=Math.max(0,Math.min(.15,bonfireGain));
+ if(target>.003&&bonfireAmbience.paused){bonfireAmbience.play().catch(()=>{});}
+ if(target===0&&bonfireGain<.001&&!bonfireAmbience.paused)bonfireAmbience.pause();
+}
 function updateSound(dt,isNight){
  if(!soundEnabled||!audioCtx||audioCtx.state!=='running'||paused)return;
  ambientTimer-=dt;
@@ -4624,8 +4684,8 @@ function updateSound(dt,isNight){
   const inDaeunForest=Math.hypot(observer.x-DAEUN_ZONE.center.x,observer.z-DAEUN_ZONE.center.z)<DAEUN_ZONE.radius+18;
   const inHinaForest=landAt(observer.x,observer.z);
   if(inDaeunForest||inHinaForest){
-   if(isNight){if(Math.random()<.35)forestFrog();}
-   else if(Math.random()<.58)forestRustle();
+   if(isNight){if(Math.random()<.7)forestCricket();if(Math.random()<.25)forestFrog();}
+   else if(Math.random()<.7)forestRustle();
   }
   forestTextureTimer=isNight?randomBetween(5,10):randomBetween(8,16);
  }
@@ -5012,7 +5072,9 @@ function activateSharedHome(){
  daeunSay('이제 히나 동굴을 우리 집으로 삼자!');
 }
 function daeunActiveFire(){return sharedHomeActive?campfire:daeunResources.fire.group;}
-function daeunFireIsLit(){return sharedHomeActive?fireSuccess:daeun.inventory.fuel>0;}
+function daeunFireIsLit(){return sharedHomeActive?(fireSuccess&&fireKnowledge>0):daeun.inventory.fuel>0;}
+function daeunDisplayedFuel(){return sharedHomeActive?(fireSuccess?Math.max(0,fireKnowledge):0):daeun.inventory.fuel;}
+function daeunDisplayedFirePosition(){return sharedHomeActive?campfire.position:daeunResources.fire.group.position;}
 
 let meetingFollowUntil=0,meetingNextTalk=0,meetingTalkIndex=0,meetingHinaLine='',meetingHinaLineUntil=0;
 const meetingTalk=[
@@ -6401,6 +6463,24 @@ function daeunSleepWake(){
  }
  return false;
 }
+// v3.75: Nighttime outdoor sleep is a single stable roll per day/character.
+// A torch or companion rabbit improves safety, but a cave remains best.
+function outdoorSleepAllowed(who){
+ const c=clockParts(),h=c.h;
+ if(!(h>=22||h<4))return true;
+ const pos=who==='hina'?hana.position:daeun.mesh.position;
+ if(inCaveWalkZone(pos.x,pos.z)||caveEntrancePortal(pos.x,pos.z))return true;
+ const torch=who==='hina'?(torchCarried&&!raining()&&fireKnowledge>0):((daeun.torchExpiresAt||0)>elapsed&&!raining());
+ const rabbit=who==='hina'?!!petRabbit:!!daeunPetRabbit;
+ const chance=torch&&rabbit?.70:torch||rabbit?.40:.05;
+ const seed=(c.day*7193+(who==='hina'?163:947))%997;
+ return seed/997<chance;
+}
+function outdoorSleepBlocked(who){
+ const c=clockParts();if(!(c.h>=22||c.h<4))return false;
+ const p=who==='hina'?hana.position:daeun.mesh.position;
+ return !(inCaveWalkZone(p.x,p.z)||caveEntrancePortal(p.x,p.z))&&!outdoorSleepAllowed(who);
+}
 function daeunSleepStart(manual=false){
  if(!manual&&elapsed<(daeun.timers.sleepCooldownUntil||0))return false;
  cancelManualTask();daeun.path=[];daeun.destination=null;
@@ -6479,7 +6559,7 @@ function updateDaeun(step,realDt){
  daeunNightNeedsTalk();
  if(s.energy<=0&&!d.restLocked){cancelManualTask();d.restLocked=true;d.path=[];d.destination=null;d.action='exhausted';d.actionAge=0;}
  const resting=d.restLocked||['rest','sleep','sleepPrepare','manualRest','manualSleep'].includes(d.action)&&!d.path.length;
- if(resting){const efficiency=(s.hunger===0?.32:1)*(s.thirst===0?.45:1);s.energy=Math.min(100,s.energy+step*DAEUN_RULES.restRecovery*(d.action==='sleep'||d.action==='manualSleep'?.42:1)*Math.max(d.restLocked?DAEUN_RULES.exhaustionMinRecovery:.22,efficiency));
+ if(resting){const efficiency=(s.hunger===0?.32:1)*(s.thirst===0?.45:1);s.energy=Math.min(100,s.energy+step*DAEUN_RULES.restRecovery*(outdoorSleepBlocked('daeun')?.08:(d.action==='sleep'||d.action==='manualSleep'?.42:1))*Math.max(d.restLocked?DAEUN_RULES.exhaustionMinRecovery:.22,efficiency));
   // Rest helps morale, but does not instantly erase prolonged isolation or hunger.
   const sheltered=inCaveWalkZone(d.mesh.position.x,d.mesh.position.z)||caveEntrancePortal(d.mesh.position.x,d.mesh.position.z);
   const moraleRecovery=DAEUN_RULES.willRestRecovery*(s.will>=85?.12:s.will>=70?.45:1)*(s.hunger<20||s.thirst<20?.38:1)*(sheltered?1:.45);
@@ -6487,7 +6567,7 @@ function updateDaeun(step,realDt){
   // adaptation reduces the loss over subsequent days, but never removes it.
   const exposedSleep=!sheltered&&nightFearIntensity()>.05;
   const sleepFear=exposedSleep?nightFearAdaptation(clockParts().day)*nightFearIntensity():0;
-  s.will=Math.max(0,Math.min(100,s.will+step*(exposedSleep?0:moraleRecovery)-step*sleepFear*.095));
+  s.will=Math.max(0,Math.min(100,s.will+step*(exposedSleep?0:moraleRecovery)-step*sleepFear*(outdoorSleepBlocked('daeun')?.36:.095)));
   if((d.action==='sleep'||d.action==='manualSleep')&&daeunSleepWake()){d.action='idle';d.actionAge=0;d.timers.sleepCooldownUntil=elapsed+DAEUN_SLEEP_COOLDOWN;d.timers.nextThink=elapsed;if(!daeunNightNeedsTalk())daeunSay(nightFearIntensity()>.05?'아직 어둡네… 조금 더 안전하게 기다리자.':'아침이네… 오늘도 무사해야 할 텐데. 천천히 시작하자.');}
   if(d.restLocked&&s.energy>=DAEUN_RULES.exhaustionResume){d.restLocked=false;d.action='idle';d.timers.nextThink=elapsed;daeunSay('조금 회복했어. 천천히 움직일 수 있겠어.');}
   else if(!d.restLocked&&d.action!=='manualRest'&&d.action!=='manualSleep'&&d.action!=='sleep'&&d.actionAge>12&&((s.energy>86&&s.will>=75)||s.thirst<35||s.hunger<35)){d.action='idle';d.timers.nextThink=elapsed;}
@@ -6715,7 +6795,7 @@ function updateDaeun(step,realDt){
   }
  }
  daeunCraftHint();
- const sleep=survivorIsVisiblySleeping({sleepRequested:d.action==='sleep'||d.action==='manualSleep',lyingPose:!moving&&!d.path.length,moving,hasPath:d.path.length>0});
+ const sleep=!outdoorSleepBlocked('daeun')&&survivorIsVisiblySleeping({sleepRequested:d.action==='sleep'||d.action==='manualSleep',lyingPose:!moving&&!d.path.length,moving,hasPath:d.path.length>0});
  // Visual-only cave rest pose: idle waiting at night is seated, never mistaken for actual sleep.
  const caveDistance=Math.hypot(d.mesh.position.x-d.sites.shelter.x,d.mesh.position.z-d.sites.shelter.z);
  const caveQuiet=!moving&&!d.path.length&&caveDistance<7&&darkHours()&&['idle','sleepPrepare','recover','wake','exhausted'].includes(d.action);
@@ -6829,7 +6909,7 @@ function refreshMobileVitals(){
  const values=observedId==='daeun'?daeun.stats:stats;
  const labels=[['체력','energy'],['갈증','thirst'],['허기','hunger'],['의지력','will'],['불유지','fireFuel']];
  mobileVitals.innerHTML='<div class="mv-name">'+(observedId==='daeun'?'다은':'히나')+' · 생존 상태</div>'+labels.map(([label,key])=>{
- const n=Math.max(0,Math.min(100,Math.round(Number(key==='fireFuel'?(observedId==='daeun'?daeun.inventory.fuel:(fireEverLit&&fireSuccess?fireKnowledge:0)):values[key])||0)));
+ const n=Math.max(0,Math.min(100,Math.round(Number(key==='fireFuel'?(observedId==='daeun'?daeunDisplayedFuel():(fireEverLit&&fireSuccess?fireKnowledge:0)):values[key])||0)));
  return '<div class="mv-row"><span>'+label+'</span><div class="mv-track"><div class="mv-fill" style="width:'+n+'%;background:'+(key==='fireFuel'?'#ed9343':VITAL_BAR_COLORS[label]||'#75b8a6')+'"></div></div><span class="mv-num">'+n+'</span></div>';
  }).join('');
 }
@@ -6863,7 +6943,7 @@ function refreshCharacterUI(now,force=false){
  $('observeHina').setAttribute('aria-pressed',String(observedId==='hina'));$('observeDaeun').setAttribute('aria-pressed',String(observedId==='daeun'));$('daeunAuto').hidden=observedId!=='daeun';$('daeunAuto').setAttribute('aria-pressed',String(d.auto));$('daeunAuto').textContent='자동 생존 '+(d.auto?'ON':'OFF');
  if(observedId==='daeun'){
   $('daeunDay').textContent='· DAY '+String(clockParts().day).padStart(2,'0');$('daeunAction').textContent=(d.auto?'자동 생존 · ':'수동 이동 · ')+(actionNames[d.action]||d.action);$('daeunThought').textContent=daeunVisibleSpeech()?'“'+daeunVisibleSpeech()+'”':'';
-  updateStableStatBars($('daeunStats'),{체력:d.stats.energy,갈증:d.stats.thirst,허기:d.stats.hunger,의지력:d.stats.will,불유지:d.inventory.fuel});
+  updateStableStatBars($('daeunStats'),{체력:d.stats.energy,갈증:d.stats.thirst,허기:d.stats.hunger,의지력:d.stats.will,불유지:daeunDisplayedFuel()});
   $('daeunInventory').textContent=`🎒 ${d.bag.crafted?'가방 완성':'가방 제작 '+Math.round(d.bag.progress)+'% · '+d.bag.days.length+'/3일'} · 🍓 ${d.inventory.berries}/${daeunBagCap()} · 🐟 생물고기 ${d.inventory.fish} · 🍽️ 구운 물고기 ${d.inventory.cookedFish}/${daeunFishCap()} · 🌿 가방 ${d.inventory.branches}`;
   // v28.10: Daeun's independent survival proficiency and exploration panel.
   const skillMeter=([label,value])=>{const v=Math.max(0,Math.min(100,Number(value)||0));return `<div class="skillMeter"><div class="skillMeterHead"><span>${label}</span><b>${Math.round(v)}%</b></div><div class="skillMeterTrack"><div class="skillMeterFill ${v>=100?'completed':''}" style="width:${v}%"></div></div></div>`;};
@@ -6952,7 +7032,11 @@ function manualAction(type,point,index=-1){
   if(daeun.inventory.berries<=0){daeunSay('먹을 열매가 없어.');return false;}
   daeun.inventory.berries--;daeun.stats.hunger=Math.min(100,daeun.stats.hunger+12);daeunSay('열매를 먹었어. 허기 +12');return true;
  }
- if(type==='sleep'&&safeRestPoint(daeun.mesh.position)){daeunSleepStart(true);return true;}
+ if(type==='sleep'){
+  // Manual sleep is an in-place action, not a navigation task. Cave entrance
+  // geometry can fail safeRestPoint despite the character standing safely.
+  daeunSleepStart(true);return true;
+ }
  if(type==='rest'&&safeRestPoint(daeun.mesh.position)){
   daeun.manualTask={type,phase:'perform',age:0};daeun.action='manualRest';daeun.actionAge=0;return true;
  }
@@ -7076,13 +7160,14 @@ function resourceReach(type){return type==='water'?2.8:type==='berry'?2.0:1.6;}
 function resourcePosition(item){return item?.group?.position||item?.g?.position||item?.position||null;}
 function approachResourceTask(task,mesh,step,who){
  if(!task||task.phase!=='approach')return false;
- const p=resourcePosition(task.item);if(!p){task.invalid=true;return false;}
+ const p=task.stop||resourcePosition(task.item);if(!p){task.invalid=true;return false;}
  const dx=p.x-mesh.position.x,dz=p.z-mesh.position.z,d=Math.hypot(dx,dz);
  if(d<=resourceReach(task.type)){task.phase='perform';task.age=0;return false;}
  if(task.approachAge===undefined){task.approachAge=0;task.bestDistance=d;task.stalled=0;}
  task.approachAge+=step;
  const travel=Math.min(Math.max(0,d-resourceReach(task.type)+.12),step*DAEUN_RULES.walkSpeed);
  const moved=moveManualWithAssist(mesh,dx/d*travel,dz/d*travel,step);
+ task.walking=!!moved;
  if(moved)mesh.rotation.y=Math.atan2(dx,dz);
  if(d<task.bestDistance-.12){task.bestDistance=d;task.stalled=0;}
  else task.stalled+=step;
@@ -7196,7 +7281,7 @@ function hinaManualInteract(type,item){
  if(type==='fish'&&!fishNearby(pos.x,pos.z,10)){say('지금은 물고기가 안 보여.');return;}
  if(type==='fire'&&fireSuccess&&fireDryStock<2){say('불을 유지하려면 나뭇가지 2개가 필요해.');return;}
  if(type==='fire'&&!fireSuccess&&fireDryStock<1){say('나뭇가지부터 주워야겠어.');return;}
- hinaManualTask={type,item,phase:Math.hypot(pos.x-p.x,pos.z-p.z)<=resourceReach(type)?'perform':'approach',age:0,duration:{berry:4,branch:2.8,water:6,fish:8,rabbit:7,fire:10}[type]||3};
+ hinaManualTask={type,item,stop:type==='rabbit'?p.clone():null,phase:Math.hypot(pos.x-p.x,pos.z-p.z)<=resourceReach(type)?'perform':'approach',age:0,duration:{berry:4,branch:2.8,water:6,fish:8,rabbit:7,fire:10}[type]||3};
  say({berry:'열매를 따 보자.',branch:'나뭇가지를 주워야겠어.',water:'물을 마시자.',fish:'물고기 움직임을 살펴보자.',rabbit:'토끼가 어떻게 움직이는지 보자.',fire:'모닥불을 손봐야겠어.'}[type]);
 }
 function updateHinaManualTask(step){
@@ -7222,8 +7307,9 @@ function updateHinaManualTask(step){
   if(!fishNearby(hana.position.x,hana.position.z,10))return;
   fishObservations++;fishSkill=Math.min(100,fishSkill+4);say('🐟 물고기가 다니는 길을 조금 알 것 같아!');
  }else if(task.type==='rabbit'){
-  if(!o||o.caught||!o.g.visible||Math.hypot(hana.position.x-o.g.position.x,hana.position.z-o.g.position.z)>9)return;
-  rabbitObservations++;rabbitPattern=Math.min(100,rabbitPattern+10);say('🐰 토끼의 움직임을 관찰했어!');
+  if(!o||o.caught)return;
+  // Observe the clicked rabbit at its original location; do not chase its live position.
+  o.caught=true;o.g.visible=false;o.hopActive=false;o.respawnDaeunAt=elapsed+DAY_SECONDS*(.45+Math.random()*.35);rabbitObservations++;rabbitPattern=Math.min(100,rabbitPattern+10);say('🐰 토끼를 관찰했어! 토끼는 숲으로 달아났어.');
  }else if(task.type==='fire'){
   if(fireSuccess){if(fireDryStock<2)return;fireDryStock-=2;fireKnowledge=Math.min(100,fireKnowledge+40);say('🔥 나뭇가지 2개를 넣었어.');}
   else{if(fireDryStock<1)return;fireDryStock--;attemptFire();}
@@ -7395,7 +7481,13 @@ function clearCleanProgressRing(el){if(el.classList.contains('daeunResourceEmoji
 const branchButton=document.createElement('button');branchButton.id='daeunBranchAction';branchButton.textContent='🪵';branchButton.title='나뭇가지 줍기';document.body.appendChild(branchButton);let nearbyBranchIndex=-1;branchButton.onclick=()=>{if(nearbyBranchIndex>=0){const b=daeunResources.branches[nearbyBranchIndex];if(b?.available)manualAction('branch',b.group.position,nearbyBranchIndex);}};
 function toggleManualPanel(){manualButtons.classList.toggle('open');}
 document.getElementById('daeunItemToggle').onclick=toggleManualPanel;
-document.getElementById('daeunSleepButton').onclick=()=>{if(daeun.action==='manualSleep'){daeun.action='idle';daeun.actionAge=0;}else manualAction('sleep',daeun.mesh.position);};
+document.getElementById('daeunSleepButton').onclick=()=>{
+ if(!isManualDaeun())return;
+ if(['manualSleep','sleep','sleepPrepare'].includes(daeun.action)){
+  daeun.action='idle';daeun.actionAge=0;daeun.path=[];daeun.destination=null;
+  daeun.timers.sleepCooldownUntil=elapsed+DAEUN_SLEEP_COOLDOWN;
+ }else manualAction('sleep',daeun.mesh.position);
+};
 document.getElementById('daeunEatButton').onclick=()=>{manualAction('eat');manualButtons.classList.remove('open');};
 // v23.7: One-tap food above inventory. Prioritize berries for everyday hunger;
 // save cooked fish for emergencies (hunger <=45), or when berries run out.
@@ -7424,7 +7516,19 @@ quickEatControl.addEventListener('click',e=>{
  quickEatDaeun();
 });
 document.getElementById('daeunFishEatButton').onclick=()=>manualAction('eatFish');
-document.getElementById('daeunAddFirewoodButton').onclick=()=>{if(!isManualDaeun())return;const inv=daeun.inventory,fire=daeunResources.fire.group.position;if(inv.fuel>=95){daeunSay(fullLine(FULL_FIRE_LINES));return;}if(Math.hypot(daeun.mesh.position.x-fire.x,daeun.mesh.position.z-fire.z)>6){daeunSay('모닥불 가까이 가서 나뭇가지를 넣자.');return;}if(inv.fuel<=0){daeunSay('불이 꺼졌어. 먼저 불을 피워야 해.');return;}if(inv.fuel>=95){daeunSay(fullLine(FULL_FIRE_LINES));return;}if(inv.branches<2){daeunSay('나뭇가지가 더 필요해! 2개를 모아야 불을 유지할 수 있어.');return;}inv.branches-=2;inv.fuel=Math.min(100,inv.fuel+40);daeun.timers.fuelFlutterUntil=elapsed+2.4;daeun.lastCraftActiveAt=elapsed;daeunSay('🪵 나뭇가지 2개를 넣었어! 불 유지 +40');};
+document.getElementById('daeunAddFirewoodButton').onclick=()=>{
+ if(!isManualDaeun())return;
+ const inv=daeun.inventory,fire=daeunDisplayedFirePosition(),fuel=daeunDisplayedFuel();
+ if(fuel>=95){daeunSay(fullLine(FULL_FIRE_LINES));return;}
+ if(Math.hypot(daeun.mesh.position.x-fire.x,daeun.mesh.position.z-fire.z)>6){daeunSay('모닥불 가까이 가서 나뭇가지를 넣자.');return;}
+ if(fuel<=0){daeunSay('불이 꺼졌어. 먼저 불을 피워야 해.');return;}
+ if(inv.branches<2){daeunSay('나뭇가지가 더 필요해! 2개를 모아야 불을 유지할 수 있어.');return;}
+ inv.branches-=2;
+ if(sharedHomeActive){fireKnowledge=Math.min(100,fireKnowledge+40);fireDryStock+=2;}
+ else inv.fuel=Math.min(100,inv.fuel+40);
+ daeun.timers.fuelFlutterUntil=elapsed+2.4;daeun.lastCraftActiveAt=elapsed;
+ daeunSay('🪵 나뭇가지 2개를 넣었어! 불 유지 +40');
+};
 document.getElementById('daeunTakeTorchButton').onclick=takeDaeunTorch;
 document.getElementById('daeunBagCraftButton').onclick=bagPracticeAtCave;
 document.getElementById('daeunCookFishButton').onclick=()=>manualAction('cookFish',daeunResources.fire.group.position);
@@ -7463,7 +7567,7 @@ function refreshManualActionUI(){
  document.getElementById('daeunBerryCount').textContent='🎒 '+(daeun.bag.crafted?'가방 완성':'제작 '+Math.round(daeun.bag.progress)+'% · '+daeun.bag.days.length+'/3일')+' · 🍓 '+daeun.inventory.berries+'/'+daeunBagCap()+' · 🐟 생물고기 '+daeun.inventory.fish+' · 🍽️ 구운 '+daeun.inventory.cookedFish+'/'+daeunFishCap()+' · 🌿 가방 '+daeun.inventory.branches;
  document.getElementById('daeunEatButton').disabled=daeun.inventory.berries===0;
  document.getElementById('daeunFishEatButton').disabled=daeun.inventory.cookedFish===0;
- document.getElementById('daeunAddFirewoodButton').disabled=daeun.inventory.fuel<=0||daeun.inventory.branches<2;
+ document.getElementById('daeunAddFirewoodButton').disabled=daeunDisplayedFuel()<=0||daeun.inventory.branches<2;
  const quickEatButton=document.getElementById('daeunQuickEat');
  const hasBerry=daeun.inventory.berries>0,hasFish=daeun.inventory.cookedFish>0;
  const preferFish=hasFish&&(daeun.stats.hunger<=45||!hasBerry);
@@ -7478,8 +7582,8 @@ function refreshManualActionUI(){
  const nearCave=Math.hypot(daeun.mesh.position.x-daeun.sites.shelter.x,daeun.mesh.position.z-daeun.sites.shelter.z)<7;
  refreshDaeunBagDay();
  document.getElementById('daeunFishEatButton').disabled=daeun.inventory.cookedFish===0;
- document.getElementById('daeunFireFuel').textContent='🔥 불 유지 '+Math.round(daeun.inventory.fuel)+'% · 🌿 가방 '+daeun.inventory.branches+'개';
- document.getElementById('daeunAddFirewoodButton').disabled=daeun.inventory.fuel<=0||Math.hypot(daeun.mesh.position.x-daeunResources.fire.group.position.x,daeun.mesh.position.z-daeunResources.fire.group.position.z)>6;
+ document.getElementById('daeunFireFuel').textContent='🔥 불 유지 '+Math.round(daeunDisplayedFuel())+'% · 🌿 가방 '+daeun.inventory.branches+'개';
+ document.getElementById('daeunAddFirewoodButton').disabled=daeunDisplayedFuel()<=0||daeun.inventory.branches<2||Math.hypot(daeun.mesh.position.x-daeunDisplayedFirePosition().x,daeun.mesh.position.z-daeunDisplayedFirePosition().z)>6;
  document.getElementById('daeunTakeTorchButton').disabled=!nearCave||daeun.inventory.fuel<=0;
  document.getElementById('daeunTakeTorchButton').textContent=daeun.torchExpiresAt>elapsed?'🔥 횃불 남은 시간 '+Math.ceil((daeun.torchExpiresAt-elapsed)/DAY_SECONDS*24)+'시간':'🔥 횃불 들기 (반나절)';
  document.getElementById('daeunBagCraftButton').disabled=!nearCave||daeun.bag.crafted||daeun.bag.today>=DAEUN_BAG_DAILY_MAX;
@@ -7489,7 +7593,7 @@ function refreshManualActionUI(){
  refreshDaeunDailyPractice();document.getElementById('daeunSkills').textContent='숙련도 · 🔥 불 '+daeun.skills.fire+'% ('+daeun.dailyPractice.fire+'/3) · 🐰 토끼 '+daeun.skills.rabbit+'% ('+daeun.dailyPractice.rabbit+'/3) · 🐟 물고기 '+daeun.skills.fish+'% ('+daeun.dailyPractice.fish+'/4)'+' · 🐰🐟 기회는 하루 중 랜덤 등장';
  document.getElementById('daeunSleepButton').textContent=daeun.action==='manualSleep'?'☀ 일어나기':'☾ 잠자기';
  document.getElementById('daeunRestButton').textContent=daeun.action==='manualRest'?'↥ 일어나기':'♧ 앉아서 쉬기';
- const pos=daeun.mesh.position,fishSelected=daeun.manualTask?.type==='fish',nearWater=Math.hypot(pos.x-DAEUN_ZONE.pond.x,pos.z-DAEUN_ZONE.pond.z)<10;
+ const pos=daeun.mesh.position,fishSelected=daeun.manualTask?.type==='fish',sharedPond=new THREE.Vector3(-9,terrainTopAt(-9,4),4),useSharedPond=sharedHomeActive&&Math.hypot(pos.x, pos.z-4)<28,fishPond=useSharedPond?sharedPond:daeunResources.pondMesh.getWorldPosition(new THREE.Vector3()),nearWater=Math.hypot(pos.x-fishPond.x,pos.z-fishPond.z)<10;
  waterButton.style.display='none';branchButton.style.display='none';
  // The water marker sits over the center of the pond, not on the shoreline.
  if(nearWater){
@@ -7498,15 +7602,15 @@ function refreshManualActionUI(){
  }else pondEmojiMarker.style.display='none';
  if((nearWater||fishSelected)&&(activeWildlifeChance('fish')>=0||fishSelected)&&daeun.dailyPractice.fish<DAEUN_DAILY_PRACTICE_LIMIT.fish){
   // Keep fishing beside the drinking button in screen space, regardless of camera rotation.
-  const waterXY=projectToScreen(daeunResources.pondMesh.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.6,0)));
+  const waterXY=projectToScreen(fishPond.clone().add(new THREE.Vector3(0,.6,0)));
   if(waterXY){
    const buttonGap=66,buttonHalf=28;
    const rightFits=waterXY.x+buttonGap+buttonHalf<window.innerWidth-8;
    const leftFits=waterXY.x-buttonGap-buttonHalf>8;
    const fishX=rightFits?waterXY.x+buttonGap:leftFits?waterXY.x-buttonGap:waterXY.x;
    const fishY=rightFits||leftFits?waterXY.y:waterXY.y-66;
-   fishEmojiMarker._worldAnchor=daeunResources.pondMesh.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.6,0));fishEmojiMarker._screenOffsetX=fishX-waterXY.x;fishEmojiMarker._screenOffsetY=fishY-waterXY.y;fishEmojiMarker.style.display='flex';fishEmojiMarker.style.left=fishX+'px';fishEmojiMarker.style.top=fishY+'px';
-   fishEmojiMarker.onclick=()=>{if(!daeun.manualTask||daeun.manualTask.type!=='fish')manualAction('fish',fishEmojiBankPoint(parseFloat(fishEmojiMarker.style.left),parseFloat(fishEmojiMarker.style.top)));};
+   fishEmojiMarker._worldAnchor=fishPond.clone().add(new THREE.Vector3(0,.6,0));fishEmojiMarker._screenOffsetX=fishX-waterXY.x;fishEmojiMarker._screenOffsetY=fishY-waterXY.y;fishEmojiMarker.style.display='flex';fishEmojiMarker.style.left=fishX+'px';fishEmojiMarker.style.top=fishY+'px';
+   fishEmojiMarker.onclick=()=>{if(!daeun.manualTask||daeun.manualTask.type!=='fish')manualAction('fish',useSharedPond?findActionSpot(sharedPond,'fish'):fishEmojiBankPoint(parseFloat(fishEmojiMarker.style.left),parseFloat(fishEmojiMarker.style.top)));};
   }else fishEmojiMarker.style.display='none';
  }else fishEmojiMarker.style.display='none';
  const cavePos=daeun.sites.shelter;
@@ -7517,7 +7621,7 @@ function refreshManualActionUI(){
   }else bagEmojiMarker.style.display='none';
   storeEmojiMarker.style.display='none';
  }else{bagEmojiMarker.style.display='none';storeEmojiMarker.style.display='none';}
- const firePos=daeunResources.fire.group.position;if(Math.hypot(pos.x-firePos.x,pos.z-firePos.z)<7&&(daeun.inventory.fuel>0||daeun.dailyPractice.fire<DAEUN_DAILY_PRACTICE_LIMIT.fire)){fireEmojiMarker.classList.toggle('fuel-maintenance',daeun.inventory.fuel>0);fireEmojiMarker.textContent='🔥';fireEmojiMarker.title=daeun.inventory.fuel>0?'불을 유지해야 해 · 나뭇가지 넣기':'나뭇가지를 비벼 모닥불 피우기';fireEmojiMarker.setAttribute('aria-label',fireEmojiMarker.title);positionEmojiMarker(fireEmojiMarker,firePos.clone().add(new THREE.Vector3(0,1.8,0)),()=>{if(daeun.inventory.fuel>0)document.getElementById('daeunAddFirewoodButton').click();else manualAction('fire',firePos);});}else fireEmojiMarker.style.display='none';
+ const firePos=daeunDisplayedFirePosition();if(Math.hypot(pos.x-firePos.x,pos.z-firePos.z)<7&&(daeunFireIsLit()||(!sharedHomeActive&&daeun.dailyPractice.fire<DAEUN_DAILY_PRACTICE_LIMIT.fire))){fireEmojiMarker.classList.toggle('fuel-maintenance',daeunDisplayedFuel()>0);fireEmojiMarker.textContent='🔥';fireEmojiMarker.title=daeunDisplayedFuel()>0?'불을 유지해야 해 · 나뭇가지 넣기':'나뭇가지를 비벼 모닥불 피우기';fireEmojiMarker.setAttribute('aria-label',fireEmojiMarker.title);positionEmojiMarker(fireEmojiMarker,firePos.clone().add(new THREE.Vector3(0,1.8,0)),()=>{if(daeunDisplayedFuel()>0)document.getElementById('daeunAddFirewoodButton').click();else manualAction('fire',firePos);});}else fireEmojiMarker.style.display='none';
  // Rabbits remain interactable whenever visible and nearby; random timed wildlife
  // windows should not make a rabbit's marker vanish in front of the player.
  const rabbits=critters.map((r,i)=>({r,i,d:Math.hypot(pos.x-r.g.position.x,pos.z-r.g.position.z)}))
@@ -7803,6 +7907,46 @@ function updateRainSpeech(){
  }
  rainSpeech.turn++;
 }
+// v3.73: Ambient conversations after reunion, independent of player/AI control mode.
+const companionChat={nextAt:performance.now()+24000,index:0,replyAt:0,pending:null};
+const companionChatLines={
+ day:[['오늘은 주변을 조금 더 둘러볼까?','응, 너무 멀리만 가지 말자.'],['여기 바람은 참 좋다.','그러게. 잠깐은 평화로운 것 같아.'],['다른 친구들도 이 풍경을 보고 있을까?','분명 어딘가에서 우리를 찾고 있을 거야.']],
+ night:[['밤이 되니까 숲이 조금 무섭다.','괜찮아, 우리 이제 혼자가 아니잖아.'],['오늘도 무사히 하루를 보냈네.','내일도 서로 잘 챙겨주자.']],
+ rain:[['비가 오네. 젖기 전에 쉬자.','응, 모닥불도 잘 살펴야겠어.'],['빗소리 들으니까 마음이 차분해져.','나도. 같이 있으니 더 그렇네.']],
+ fire:[['모닥불이 있으니까 든든하다.','맞아. 나뭇가지도 틈틈이 모으자.'],['불이 꺼지지 않게 조심하자.','응, 내가 가까이 있을 때 확인할게.']],
+ hunger:[['배고프지 않아? 열매라도 먹자.','좋아. 남은 식량도 확인해 보자.']],
+ thirst:[['목마르지 않아? 물부터 마시자.','응, 무리하지 말고 쉬어 가자.']]
+};
+function updateCompanionChat(){
+ const now=performance.now();
+ if(!sharedHomeActive||!hinaControlUnlocked||!dualReady||meetingFollowUntil||paused)return;
+ const distance=Math.hypot(hana.position.x-daeun.mesh.position.x,hana.position.z-daeun.mesh.position.z);
+ if(distance>14){companionChat.pending=null;companionChat.nextAt=Math.max(companionChat.nextAt,now+10000);return;}
+ const asleepH=['night','outdoorSleep','sleep'].includes(state);
+ const asleepD=['sleep','manualSleep','sleepPrepare','exhausted'].includes(daeun.action);
+ if(asleepH||asleepD)return;
+ if(companionChat.pending){
+  if(now<companionChat.replyAt)return;
+  const {speaker,line}=companionChat.pending;
+  if(speaker==='hina'){meetingHinaLine=line;meetingHinaLineUntil=now+7000;say(line);}else daeunSay(line);
+  companionChat.pending=null;companionChat.nextAt=now+37000+Math.random()*25000;
+  return;
+ }
+ if(now<companionChat.nextAt)return;
+ // Do not overwrite recent action feedback or urgent speech.
+ if((hinaSpeechExpiresAt&&now<hinaSpeechExpiresAt)||(daeun.speechExpiresAt&&now<daeun.speechExpiresAt)){
+  companionChat.nextAt=now+9000;return;
+ }
+ const hour=clockParts().h;
+ let group=raining()?'rain':stats.thirst<35?'thirst':stats.hunger<35?'hunger':fireSuccess&&distance<10?'fire':hour>=19||hour<6?'night':'day';
+ const pool=companionChatLines[group],pair=pool[companionChat.index++%pool.length];
+ // When the player controls one character, the other initiates the conversation.
+ const speaker=isManualHina()?'daeun':isManualDaeun()?'hina':companionChat.index%2?'hina':'daeun';
+ const first=speaker==='hina'?pair[0]:pair[1],answer=speaker==='hina'?pair[1]:pair[0];
+ if(speaker==='hina'){meetingHinaLine=first;meetingHinaLineUntil=now+7000;say(first);}else daeunSay(first);
+ companionChat.pending={speaker:speaker==='hina'?'daeun':'hina',line:answer};
+ companionChat.replyAt=now+4400;
+}
 // Daeun periodically remembers her missing friends during autonomous exploration.
 // Real-time cooldown prevents speech spam even when game speed is accelerated.
 const daeunFriendThoughts={nextAt:performance.now()+42000,index:0};
@@ -7833,7 +7977,7 @@ function updateDaeunFriendThoughts(){
 function animate(t){requestAnimationFrame(animate);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
  lastRenderAt=t;
- let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused){updateDaeun(dt*speed,dt);updateSharedDaeunResourceTask(dt*speed);updateSharedCampfireBonus();checkHinaDaeunMeeting();updateMeetingFollow(dt*speed);trackDailySleep(dt*speed);updateMiddleBear(dt*speed);updateDualExploration();updateRainSpeech();updateDaeunFriendThoughts();}refreshCharacterUI(t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina')$('bubble').textContent=meetingHinaLine;}if(!paused){animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);}if(followCamera){
+ let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused){updateDaeun(dt*speed,dt);updateSharedDaeunResourceTask(dt*speed);updateSharedCampfireBonus();checkHinaDaeunMeeting();updateMeetingFollow(dt*speed);trackDailySleep(dt*speed);updateMiddleBear(dt*speed);updateDualExploration();updateRainSpeech();updateDaeunFriendThoughts();updateCompanionChat();}refreshCharacterUI(t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina')$('bubble').textContent=meetingHinaLine;}if(!paused){animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);}if(followCamera){
   updateFollowDeadZone(dt);
   followDesired.copy(followFocus).add(followOffset);
   const lerp=1-Math.exp(-Math.min(dt,.08)*5);
