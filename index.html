@@ -128,24 +128,41 @@ let followCamera=false;let followDistance=21.4;const followOffset=new THREE.Vect
 // World-space follow-camera dead zone: applies to both characters, AI and manual control.
 const deadZoneRight=new THREE.Vector3(),deadZoneForward=new THREE.Vector3(),deadZoneDelta=new THREE.Vector3();
 const deadZoneAnchor=new THREE.Vector3();
+let deadZoneVelocityX=0,deadZoneVelocityZ=0;
+// Idle recenter: keep dead-zone freedom while moving, then settle the character back to screen center.
+const deadZonePreviousCharacter=new THREE.Vector3();
+let deadZoneIdleSeconds=0;
+
 function updateFollowDeadZone(dt){
  const character=observedCharacter().mesh.position;
  const fov=THREE.MathUtils.degToRad(camera.fov);
  const viewHeight=2*Math.tan(fov*.5)*followDistance;
  const viewWidth=viewHeight*camera.aspect;
  // Dead zone occupies about 24% of screen width and 19% of height.
- const halfWidth=viewWidth*.24,halfHeight=viewHeight*.19; // 2x dead zone: 48% width / 38% height
+ const halfWidth=viewWidth*.12,halfHeight=viewHeight*.095; // restored: 24% width / 19% height
  deadZoneRight.set(followOffset.z,0,-followOffset.x).normalize();
  deadZoneForward.set(-followOffset.x,0,-followOffset.z).normalize();
  deadZoneDelta.copy(character).sub(deadZoneAnchor);
  const x=deadZoneDelta.dot(deadZoneRight),z=deadZoneDelta.dot(deadZoneForward);
- const excessX=Math.sign(x)*Math.max(0,Math.abs(x)-halfWidth);
- const excessZ=Math.sign(z)*Math.max(0,Math.abs(z)-halfHeight);
- if(excessX||excessZ){
-  const followFactor=1-Math.exp(-Math.max(0,dt)*11);
-  deadZoneAnchor.addScaledVector(deadZoneRight,excessX*followFactor);
-  deadZoneAnchor.addScaledVector(deadZoneForward,excessZ*followFactor);
- }
+ // Measure actual character movement (not camera movement); avoid tiny animation jitter.
+ const movementSq=(character.x-deadZonePreviousCharacter.x)**2+(character.z-deadZonePreviousCharacter.z)**2;
+ if(movementSq>0.000025)deadZoneIdleSeconds=0;
+ else deadZoneIdleSeconds+=Math.max(0,dt);
+ deadZonePreviousCharacter.copy(character);
+ const idleRecenter=deadZoneIdleSeconds>.65;
+ const excessX=idleRecenter?x:Math.sign(x)*Math.max(0,Math.abs(x)-halfWidth);
+ const excessZ=idleRecenter?z:Math.sign(z)*Math.max(0,Math.abs(z)-halfHeight);
+ // Soft, spring-damped camera response at the dead-zone boundary.
+ const safeDt=Math.min(.05,Math.max(0,dt));
+ const targetX=excessX, targetZ=excessZ;
+ const spring=idleRecenter?25:58,damping=2*Math.sqrt(spring)*(idleRecenter?1.12:.88);
+ deadZoneVelocityX+=(targetX*spring-deadZoneVelocityX*damping)*safeDt;
+ deadZoneVelocityZ+=(targetZ*spring-deadZoneVelocityZ*damping)*safeDt;
+ const moveX=deadZoneVelocityX*safeDt,moveZ=deadZoneVelocityZ*safeDt;
+ deadZoneAnchor.addScaledVector(deadZoneRight,moveX);
+ deadZoneAnchor.addScaledVector(deadZoneForward,moveZ);
+ if(Math.abs(targetX)<.0001&&Math.abs(deadZoneVelocityX)<.002)deadZoneVelocityX=0;
+ if(Math.abs(targetZ)<.0001&&Math.abs(deadZoneVelocityZ)<.002)deadZoneVelocityZ=0;
  // Follow vertical terrain changes without snapping the horizontal camera.
  deadZoneAnchor.y=THREE.MathUtils.lerp(deadZoneAnchor.y,character.y,1-Math.exp(-Math.max(0,dt)*5));
  followFocus.copy(deadZoneAnchor).add(new THREE.Vector3(0,1.25,0));
@@ -4521,7 +4538,7 @@ const nightAudio=new Audio('data:audio/ogg;codecs=opus;base64,T2dnUwACAAAAAAAAAA
 nightAudio.loop=true;nightAudio.preload='none';nightAudio.volume=0;
 let nightAudioGain=0,nightAudioPlayPending=false;
 function unlockNightAudio(){
- if(!soundEnabled||!rainAudioUnlocked||!nightAudio.paused||nightAudioPlayPending)return;
+ if(!soundEnabled||!nightAudio.paused||nightAudioPlayPending)return;
  nightAudioPlayPending=true;
  const p=nightAudio.play();
  if(p&&p.then)p.then(()=>{nightAudioPlayPending=false;},()=>{nightAudioPlayPending=false;});
@@ -4563,20 +4580,26 @@ function updateRainAudio(dt){
 let ambientResumePromise=null;
 async function unlockAmbient(){
  if(!soundEnabled)return;
- if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;audioCtx=new C();}
+ // HTMLMediaElement.play() must be invoked synchronously inside the user gesture.
+ unlockRainAudio();
+ unlockNightAudio();
+ if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C();}
+ if(!audioCtx)return;
  if(audioCtx.state!=='running'){
   if(!ambientResumePromise){
-   ambientResumePromise=audioCtx.resume().finally(()=>{ambientResumePromise=null;});
+   ambientResumePromise=Promise.resolve(audioCtx.resume()).finally(()=>{ambientResumePromise=null;});
   }
   await ambientResumePromise;
  }
- if(!soundEnabled)return;
- unlockRainAudio();
- unlockNightAudio();
 }
 function firstInteractionUnlock(){if(soundEnabled)unlockAmbient().catch(()=>{});}
-window.addEventListener('pointerdown',firstInteractionUnlock,{passive:true});
+window.addEventListener('pointerdown',firstInteractionUnlock,{passive:true,capture:true});
+window.addEventListener('touchstart',firstInteractionUnlock,{passive:true,capture:true});
+window.addEventListener('click',firstInteractionUnlock,{capture:true});
 window.addEventListener('keydown',firstInteractionUnlock);
+document.addEventListener('visibilitychange',()=>{
+ if(!document.hidden&&soundEnabled)unlockAmbient().catch(()=>{});
+});
 function tone(freq,duration,type='sine',volume=.035,delay=0){
  if(!soundEnabled||!audioCtx)return;
  const now=audioCtx.currentTime+delay,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
@@ -4643,7 +4666,7 @@ function updateSound(dt,isNight){
 }
 $('soundToggle').onclick=async()=>{
  soundEnabled=!soundEnabled;
- if(soundEnabled){ambientTimer=Math.max(ambientTimer,1.5);await unlockAmbient();}
+ if(soundEnabled){ambientTimer=Math.max(ambientTimer,1.5);unlockAmbient().catch(()=>{});}
  if(!soundEnabled){rainAudioGain=0;rainAudio.volume=0;rainAudio.pause();nightAudioGain=0;nightAudio.volume=0;nightAudio.pause();}
  $('soundToggle').textContent=soundEnabled?'환경음 ON':'환경음 OFF';$('soundToggle').setAttribute('aria-pressed',String(soundEnabled));
 };
@@ -4868,7 +4891,7 @@ function setCameraMode(on){
  followCamera=on;orbit.enabled=!on;
  $('cameraMode').textContent=on?'카메라: 팔로우':'카메라: 자유';
  $('cameraMode').setAttribute('aria-pressed',String(on));
- if(on){followOffset.set(12,13,12).normalize().multiplyScalar(followDistance);deadZoneAnchor.copy(observedCharacter().mesh.position);followFocus.copy(deadZoneAnchor).add(new THREE.Vector3(0,1.25,0));
+ if(on){followOffset.set(12,13,12).normalize().multiplyScalar(followDistance);deadZoneAnchor.copy(observedCharacter().mesh.position);deadZonePreviousCharacter.copy(deadZoneAnchor);deadZoneIdleSeconds=0;deadZoneVelocityX=0;deadZoneVelocityZ=0;followFocus.copy(deadZoneAnchor).add(new THREE.Vector3(0,1.25,0));
    orbit.target.copy(followFocus);camera.position.copy(followFocus).add(followOffset);camera.lookAt(followFocus);}
  else{orbit.target.copy(observedCharacter().mesh.position).add(new THREE.Vector3(0,1.25,0));orbit.update();}
 }
