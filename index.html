@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA · 두 사람의 살아 있는 섬 v17.0</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA SURVIVAL v4.0</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileCategories{display:none}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media(max-width:700px){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
@@ -122,8 +122,8 @@ const bearPass={x:-117,halfWidth:3.8,minZ:17.5,maxZ:26.5};
 const DAEUN_ZONE=Object.freeze({center:{x:-215,z:25},spawn:{x:-211,z:37},cave:{x:-228,z:11},pond:{x:-222,z:29},radius:37});
 const WORLD_BOUNDS=Object.freeze({minX:-286,maxX:112,minZ:-95,maxZ:99});
 const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||matchMedia('(max-width:700px)').matches;
-let highQuality=!isMobile;
-let mobileTargetFPS=20;let lastRenderAt=0;let ultraLowPower=isMobile;let nextUiFrame=0;
+let highQuality=true;
+let mobileTargetFPS=20;let lastRenderAt=0;let ultraLowPower=false;let nextUiFrame=0;
 let followCamera=false;let followDistance=21.4;const followOffset=new THREE.Vector3(12,13,12);const followFocus=new THREE.Vector3();const followDesired=new THREE.Vector3();
 // World-space follow-camera dead zone: applies to both characters, AI and manual control.
 // v3.60: restore original continuous centered follow camera (dead-zone removed).
@@ -193,7 +193,12 @@ function updatePanningCloudShadows(dt,hour){
  }
 }
 
-let terrainGrid=null;const vegetationRoots=[];const groundPlatforms=[];const wildlifeSurfaces=[];const solidObstacles=[];const detailMeshes=[];const cameraOccluders=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x217db5),riverMat=mat(0x4aafd9),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=(h>=1.5||w>=2.2||d>=2.2);o.receiveShadow=true;scene.add(o);
+let terrainGrid=null;const vegetationRoots=[];const groundPlatforms=[];const wildlifeSurfaces=[];const solidObstacles=[];const detailMeshes=[];const cameraOccluders=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x217db5),riverMat=mat(0x4aafd9),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){
+ // v3.78: clear the cave cavity of overlapping green/brown voxel ledges completely.
+ // Skip creation before geometry, walkable-surface registration, and camera occlusion registration.
+ const overlapsHinaCaveInterior=(x+w*.5>-8.55&&x-w*.5<.55&&z+d*.5>-14.55&&z-d*.5<-6.55&&y+h*.5>.18&&y-h*.5<4.25);
+ if(overlapsHinaCaveInterior&&(m===grass||m===dirt||m===dirt2||m===moss))return new THREE.Object3D();
+ const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=(h>=1.5||w>=2.2||d>=2.2);o.receiveShadow=true;scene.add(o);
  // Keep the actual solid volume, including caps and cave ceiling underside.
  if((m===grass||m===dirt||m===dirt2||m===rock||m===rockDark||m===stone||m===moss)&&w>=.08&&d>=.08&&w<100&&d<100){
   const surface={x,z,rx:w*.5,rz:d*.5,bottom:y-h*.5,top:y+h*.5,minorDecoration:h<1.45&&w<2.2&&d<2.2};
@@ -380,29 +385,19 @@ for(const [x,z,w,d,h] of [[-17,-30,8,7,5.8],[8,-28,7,7,5.4],[-23,-52,9,9,7.9],[6
 // Back, side walls and ceiling are separate voxel rock pieces: a real hollow space.
 const caveX=-4,caveZ=-10;
 function groundHeightAt(x,z,currentY=0){return terrainTopAt(x,z,currentY);}
-function legacyGroundHeightAt(x,z,currentY=0){
- // The cave has a flat stone floor, not the roof above it.
- if(x>caveX-4.55&&x<caveX+4.55&&z>caveZ-4.55&&z<caveZ+3.35)return .26;
- let top=.30;
- for(const p of groundPlatforms){
-  if(Math.abs(x-p.x)<=p.rx-.12&&Math.abs(z-p.z)<=p.rz-.12){
-   // Only step onto ledges within a reasonable height of the current feet.
-   if(p.top<=currentY+1.9)top=Math.max(top,p.top);
-  }
- }
- return top;
-}
 
-box(12,3.8,2.1,rock,caveX,1.9,caveZ-3.9); // back wall
-box(2.3,3.9,8.1,rock,caveX-5.0,1.95,caveZ-1.0);
-box(2.3,3.9,8.1,rock,caveX+5.0,1.95,caveZ-1.0);
+const caveBackWall=box(12,3.8,2.1,rock,caveX,1.9,caveZ-3.9); // back wall
+const caveLeftWall=box(2.3,3.9,8.1,rock,caveX-5.0,1.95,caveZ-1.0);
+const caveRightWall=box(2.3,3.9,8.1,rock,caveX+5.0,1.95,caveZ-1.0);
+for(const part of [caveBackWall,caveLeftWall,caveRightWall])part.userData.caveStructure=true;
 const caveCeilingRock=box(12,1.35,8.4,rock,caveX,4.65,caveZ-1.0); // restored structural cave roof
 const caveCeilingCap=box(12,.25,8.4,grass,caveX,5.43,caveZ-1.0);
 caveCeilingRock.userData.caveOccluder=true;
 caveCeilingCap.userData.caveOccluder=true;
 caveCeilingRock.userData.caveRoofFade=true;
 caveCeilingCap.userData.caveRoofFade=true;
-box(10,.22,7.5,stone,caveX,.13,caveZ-1.1); // dry cave floor
+const caveFloorMesh=box(10,.22,7.5,stone,caveX,.13,caveZ-1.1); // dry cave floor
+caveFloorMesh.userData.caveStructure=true;
 // Irregular rocks frame the cave entrance, leaving a clear opening.
 // v13.7: keep only the large structural stones around the cave mouth;
 // the four small decorative blocks are removed for a cleaner silhouette.
@@ -416,7 +411,7 @@ box(9,.05,6,rock,caveX,.285,caveZ-1.0);
 // The pond is a genuine opening in the sand voxel field, not a coplanar blue box.
 // Deep basin, translucent water, terraced sandy banks and stones.
 const pondBottom=box(8.5,.2,6.6,dirt,-9,-.40,4);
-const pondWaterMat=new THREE.MeshPhongMaterial({color:0x1679df,transparent:true,opacity:.95,shininess:115,specular:0x79c9ff,depthWrite:false,side:THREE.DoubleSide});
+const pondWaterMat=new THREE.MeshLambertMaterial({color:0x238bc9,transparent:false,depthWrite:true,side:THREE.DoubleSide});
 const pondWater=makePondSurface(-9,4,.31);
 const pondRim=mat(0xd1bd9b),pondRock=mat(0xb7b3a5); // v27.5 brighter warm-gray pond boulders
 placePondStones(-9,4);
@@ -486,6 +481,13 @@ function palm(x,z,h=0){
   const y=(k+.5)*ht/9, width=.54-k*.020;
   const segment=groupPalmPart(g,width,ht/9+.09,width,k%2?wood:earlyPalmTrunkLight,Math.sin(k/9*1.35)*lean,y,0);
   segment.rotation.z=-.04;
+  if(k===0)segment.userData.keepTreeBaseVisible=true;
+  if(k===1){
+   // Preserve only the lower half of the second ring: 1.5 rings total.
+   const halfRing=groupPalmPart(g,width,(ht/9+.09)*.5,width,k%2?wood:earlyPalmTrunkLight,Math.sin(k/9*1.35)*lean,y-(ht/9+.09)*.25,0);
+   halfRing.rotation.z=-.04;
+   halfRing.userData.keepTreeBaseVisible=true;
+  }
  }
  const cx=Math.sin(1.35)*lean;
  for(let i=0;i<9;i++){
@@ -709,6 +711,12 @@ function lushPalm(x,z,h=0,scale=1){
   const width=(.60-k*.024)*scale;
   const segment=groupPalmPart(g,width,height/9+.10,width,k%2?wood:trunkLight,lean,y,0);
   segment.rotation.z=-.055;
+  if(k===0)segment.userData.keepTreeBaseVisible=true;
+  if(k===1){
+   const halfRing=groupPalmPart(g,width,(height/9+.10)*.5,width,k%2?wood:trunkLight,lean,y-(height/9+.10)*.25,0);
+   halfRing.rotation.z=-.055;
+   halfRing.userData.keepTreeBaseVisible=true;
+  }
  }
  const cx=Math.sin(1.35)*.52*scale;
  // Long, light lime-green fronds instead of broadleaf-like cube crowns.
@@ -753,7 +761,10 @@ function mountainBroadleaf(x,z,ground,scale=1,variant=0){
  const trunkWidth=(.70+rand()*.15)*scale;
  addTrunkCollider(x,z,ground,trunkWidth*.52,trunkHeight);
  // Broadleaf trunks are straight and smooth, unlike the palm's bent ringed trunk.
- groupPalmPart(g,trunkWidth,trunkHeight,trunkWidth,broadleafTrunk,0,trunkHeight*.5,0);
+ const baseTrunk=groupPalmPart(g,trunkWidth,trunkHeight,trunkWidth,broadleafTrunk,0,trunkHeight*.5,0);
+ // Preserve only the bottom half of the broadleaf trunk when foliage fades.
+ const trunkStub=groupPalmPart(g,trunkWidth,trunkHeight*.5,trunkWidth,broadleafTrunk,0,trunkHeight*.25,0);
+ trunkStub.userData.keepTreeBaseVisible=true;
  const crownY=trunkHeight+.95*scale; // canopy lowered together with trunk
  // Compact overlapping box clusters, as in the original dense voxel broadleaf.
  // All foliage shares the same parent and occluder registration as the trunk.
@@ -1364,19 +1375,20 @@ function updateSnakes(step){
 // Fish schools periodically surface for observation (2-4 in-game hours between visits).
 // Visibility and skill gains share the same real, timed encounter.
 const FISH_VISIT_MIN=2,FISH_VISIT_SPAN=2;
-let fishVisitEnd=-1,fishNextVisit=0,fishVisitId=0;
+let fishVisitEnd=-1,fishNextVisit=0,fishVisitId=0,hinaPondFishVisitEnd=-1;
 function fishVisitActive(){return elapsed<fishVisitEnd;}
 function updateFishVisit(){
  const hour=DAY_SECONDS/24;
  if(elapsed>=fishNextVisit){
   fishVisitId++;
   fishVisitEnd=elapsed+hour*(.8+Math.random()*.45);
+  hinaPondFishVisitEnd=elapsed+(fishVisitEnd-elapsed)*1.5;
   fishNextVisit=fishVisitEnd+hour*(FISH_VISIT_MIN+Math.random()*FISH_VISIT_SPAN);
  }
- for(const f of fishes)f.g.visible=fishVisitActive();
+ for(const f of fishes)f.g.visible=fishVisitActive()||(f.hinaPond&&elapsed<hinaPondFishVisitEnd);
 }
 function fishNearby(x,z,radius=8){
- return fishVisitActive()&&fishes.some(f=>f.g.visible&&Math.hypot(f.g.position.x-x,f.g.position.z-z)<radius);
+ return fishes.some(f=>f.g.visible&&Math.hypot(f.g.position.x-x,f.g.position.z-z)<radius);
 }
 const fishes=[],fishOrange=mat(0xffb85e),fishBlue=mat(0x3b819a),fishSilver=mat(0xb8d2ce),fishDark=mat(0x466f86);
 function fish(x,z,phase,color){
@@ -1386,7 +1398,7 @@ function fish(x,z,phase,color){
  tail.rotation.z=.25;
  groupCube(g,.09,.12,.08,fishDark,.22,.04,.12);
  const fin=groupCube(g,.15,.14,.09,color,-.05,.17,0);fin.rotation.z=.3;
- g.position.set(x,-.26,z);fishes.push({g,x,z,phase,tail,pond:(x<0&&x>-15&&z>1&&z<7)||Math.hypot(x-DAEUN_ZONE.pond.x,z-DAEUN_ZONE.pond.z)<5,swimHeading:phase*2.399,swimSpeed:.22+(phase%1)*.18,turnAt:0,homeX:x,homeZ:z});
+ g.position.set(x,-.26,z);fishes.push({g,x,z,phase,tail,pond:(x<0&&x>-15&&z>1&&z<7)||Math.hypot(x-DAEUN_ZONE.pond.x,z-DAEUN_ZONE.pond.z)<5,hinaPond:(x<0&&x>-15&&z>1&&z<7),swimHeading:phase*2.399,swimSpeed:.22+(phase%1)*.18,turnAt:0,homeX:x,homeZ:z});
 }
 for(let i=0;i<23;i++){
  const a=rand()*Math.PI*2,r=49+rand()*17;
@@ -1559,7 +1571,7 @@ function updateHandCargo(){
  const nearShelter=Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<3.4;
  if(handCargoBranchHeld&&nearShelter)handCargoBranchHeld=false;
  // Berries are stored in Hina's pockets: inventory remains, but no hand-held fruit prop.
- const hasBranch=handCargoBranchHeld||state==='branchGather';
+ const hasBranch=false; // v3.86: hide hand-held branch props; inventory and gathering remain unchanged.
  const active=!sleepingPose&&!['rest','night','fieldRest','mentalRest'].includes(state);
  handBerry.visible=false;
  handBranch.visible=active&&hasBranch;
@@ -1741,6 +1753,11 @@ function updateCharacterPose(){
  const sleep=!meetingWalking&&!outdoorSleepBlocked('hina')&&(isManualHina()?state==='sleep':((((state==='rest'||state==='night')&&atShelter&&!target)||state==='outdoorSleep')&&(day>1||darkHours())));
  // In the cave, a stationary survivor should not stand motionless through the night.
  const caveQuiet=atShelter&&!target&&darkHours()&&['fireTry','recover','wake','idle','caveScout'].includes(state);
+ if(state==='branchFeed'&&!sleep){
+  const t=elapsed*9;
+  arms.forEach((arm,i)=>arm.rotation.x=-1.05+Math.sin(t+i*.8)*.24);
+  legs.forEach(l=>l.rotation.x=0);
+ }
  const sitting=!meetingWalking&&!sleep&&(isManualHina()?state==='rest':(state==='fieldRest'||state==='mentalRest'||state==='rest'||state==='night'||(caveQuiet&&state!=='fireTry')));
  // Face the campfire during stationary cave rest; never override navigation heading while moving.
  if(sitting&&fireSuccess&&campfire.visible&&Math.hypot(hana.position.x-campfire.position.x,hana.position.z-campfire.position.z)<6){
@@ -1810,6 +1827,16 @@ function changeWill(amount,reason){
 const FULL_FOOD_LINES=['이제 배부른데?','더 먹으면 배가 터질 것 같아.','남은 건 나중에 먹어야겠다.'];
 const FULL_FIRE_LINES=['이제 그만 넣어도 되겠다.','불이 충분히 잘 타고 있어.','나뭇가지는 아껴두자.'];
 function fullLine(lines){return lines[Math.floor(Math.random()*lines.length)];}
+// v3.82: proximity reassurance is a single non-stacking multiplier.
+// Only routine morale drain is reduced; direct snake/bear damage remains dangerous.
+function companionWillDrainMultiplier(character){
+ const owner=character==='hina'?hana.position:daeun.mesh.position;
+ const other=character==='hina'?daeun.mesh.position:hana.position;
+ const together=dualReady&&Math.hypot(owner.x-other.x,owner.z-other.z)<=10;
+ const torchLit=torchGroup.visible&&torchCarried&&torchLight.intensity>0;
+ const torchNearby=torchLit&&Math.hypot(owner.x-hana.position.x,owner.z-hana.position.z)<=10;
+ return (together||torchNearby)?.5:1;
+}
 function moraleUpdate(step){
  const h=clockParts().h,night=h>=19||h<6;
  // Fish familiarity also grows through real observation near the pond, even when
@@ -1858,7 +1885,7 @@ function moraleUpdate(step){
   stats.will=Math.min(92,stats.will+step*recovery*diminishing);
   loneliness=Math.max(0,loneliness-step*.022);
  }else{
-  stats.will=Math.max(0,stats.will-step*drain*(1-mentalResilience())*(petRabbit?.5:1)*(darkHours()&&exposed?2:1));
+  stats.will=Math.max(0,stats.will-step*drain*(1-mentalResilience())*(petRabbit?.5:1)*(darkHours()&&exposed?2:1)*companionWillDrainMultiplier('hina'));
  }
  if(elapsed>lastMoraleMessage+32&&stats.will<34&&state==='wander'){
   lastMoraleMessage=elapsed;
@@ -1903,6 +1930,26 @@ let nightSleepChoiceDay=-1,nightSleepInCave=true;
 let rabbitObservations=0,rabbitAttempts=0,rabbitCaught=0,lastRabbitAttemptDay=0;
 let fireDay10Planned=false;
 let fireEverLit=false,fireSkill=0,lastFireOutDay=0,lastBranchDay=0,firstFireMoraleGranted=false;
+// Shared ignition morale rule for current and future survivors:
+// first successful ignition => 100 will; each subsequent relight => +20.
+// Fuel top-ups while already burning never trigger an ignition reward.
+let daeunFirstFireMoraleGranted=false;
+function awardIgnitionMorale(who,wasBurning){
+ if(wasBurning)return;
+ const apply=(target,first)=>{
+  if(first){target.will=100;return '첫 점화 · 의지력 100';}
+  target.will=Math.min(100,target.will+20);return '재점화 · 의지력 +20';
+ };
+ if(who==='hina'||who==='shared'){
+  const msg=apply(stats,!firstFireMoraleGranted);
+  firstFireMoraleGranted=true;log('🔥 히나 '+msg);
+ }
+ if(who==='daeun'||who==='shared'){
+  const msg=apply(daeun.stats,!daeunFirstFireMoraleGranted);
+  daeunFirstFireMoraleGranted=true;log('🔥 다은 '+msg);
+ }
+}
+
 let fishObservations=0,fishAttempts=0,fishCaught=0,lastFishDay=0;
 // v5.2: learned survival systems. Timers use simulation seconds.
 let fishSkill=0,lastFishStudyAt=-999,fishSpear=false,storedFish=[],carriedFish=[],rainWater=0,waterVessel=false,lastFoodCheckAt=0;
@@ -2027,7 +2074,7 @@ function updateRoastFishButton(){
     &&[...storedFish,...carriedFish].some(f=>!f.cooked&&elapsed-f.at<f.life);
  roastTouchEligible=eligible;
  if(!eligible){cancelRoastTouch();hideRoastFishShortcut();return;}
- roastFireProjection.copy(firePos).add(new THREE.Vector3(0,1.8,0)).project(camera);
+ roastFireProjection.copy(firePos);roastFireProjection.y+=1.8;roastFireProjection.project(camera);
  if(roastFireProjection.z>1||roastFireProjection.z< -1){hideRoastFishShortcut();return;}
  const rect=renderer.domElement.getBoundingClientRect();
  const x=rect.left+(roastFireProjection.x+1)*rect.width/2;
@@ -2129,6 +2176,13 @@ petBenefitStyle.textContent=`
 #petRabbitHud:hover .petTooltip,#petRabbitHud:focus-visible .petTooltip{display:block}
 @media(max-width:700px){#petRabbitHud{left:auto;right:9px;top:60px;width:37px;height:37px;font-size:22px}#petRabbitHud .petTooltip{left:auto;right:0}}
 `;
+petBenefitStyle.textContent+=`
+#willShieldHud{position:fixed;right:16px;top:198px;z-index:49;width:43px;height:43px;border:2px solid #e7a5bc;border-radius:50%;background:#203a36;color:white;font-size:23px;display:none;align-items:center;justify-content:center;cursor:help;box-shadow:0 3px 12px #0008}
+#willShieldHud .petTooltip{display:none;position:absolute;top:calc(100% + 9px);right:0;width:max-content;max-width:min(270px,80vw);padding:10px 12px;background:#2d2434f5;color:#fff1f6;border:1px solid #e7a5bc;border-radius:11px;text-align:left;font-size:12px;line-height:1.65;white-space:normal;box-shadow:0 4px 16px #0009;pointer-events:none}
+#willShieldHud:hover .petTooltip,#willShieldHud:focus-visible .petTooltip,#willShieldHud.tip-open .petTooltip{display:block}
+@media(max-width:700px){#willShieldHud{width:37px;height:37px;font-size:21px;right:9px}}
+#memoryClose,#profileClose{display:none!important}
+`;
 document.head.appendChild(petBenefitStyle);
 const petRabbitHud=document.createElement('button');
 petRabbitHud.id='petRabbitHud';
@@ -2136,6 +2190,52 @@ petRabbitHud.type='button';
 petRabbitHud.setAttribute('aria-label','토끼 펫 효과 보기');
 petRabbitHud.innerHTML='🐰<span class="petTooltip">🐰 토끼 동행 효과<br>💜 의지력 감소 50%↓<br>외로움 증가 50%↓</span>';
 document.body.appendChild(petRabbitHud);
+// v3.83: compact morale shield indicator. Tooltip opens on tap and closes outside.
+const willShieldHud=document.createElement('button');
+willShieldHud.id='willShieldHud';willShieldHud.type='button';
+willShieldHud.setAttribute('aria-label','의지력 감소 보호 효과 설명');
+willShieldHud.setAttribute('aria-expanded','false');
+willShieldHud.innerHTML='💗<span class="petTooltip" id="willShieldTip"></span>';
+document.body.appendChild(willShieldHud);
+function closeWillShieldTip(){
+ willShieldHud.classList.remove('tip-open');
+ willShieldHud.setAttribute('aria-expanded','false');
+}
+willShieldHud.addEventListener('click',e=>{
+ e.stopPropagation();
+ const opening=!willShieldHud.classList.contains('tip-open');
+ closeWillShieldTip();
+ if(opening){willShieldHud.classList.add('tip-open');willShieldHud.setAttribute('aria-expanded','true');}
+});
+document.addEventListener('pointerdown',e=>{
+ if(!willShieldHud.contains(e.target))closeWillShieldTip();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeWillShieldTip();});
+function updateWillShieldHud(){
+ const character=observedId==='daeun'?'daeun':'hina';
+ const pos=character==='hina'?hana.position:daeun.mesh.position;
+ const other=character==='hina'?daeun.mesh.position:hana.position;
+ const together=dualReady&&Math.hypot(pos.x-other.x,pos.z-other.z)<=10;
+ const torchLit=torchGroup.visible&&torchCarried&&torchLight.intensity>0;
+ const torchNearby=torchLit&&Math.hypot(pos.x-hana.position.x,pos.z-hana.position.z)<=10;
+ const multiplier=companionWillDrainMultiplier(character);
+ const active=multiplier<1;
+ willShieldHud.style.display=active?'flex':'none';
+ if(!active){closeWillShieldTip();return;}
+ const mobile=window.matchMedia('(max-width:700px)').matches;
+ const anchor=mobile?document.getElementById('mobileMenu'):document.getElementById('badge');
+ if(anchor){
+  const rect=anchor.getBoundingClientRect();
+  const petVisible=petRabbitHud.style.display==='flex';
+  willShieldHud.style.top=Math.round(rect.bottom+9+(petVisible?(mobile?46:52):0))+'px';
+  willShieldHud.style.right=Math.round(Math.max(mobile?9:8,window.innerWidth-rect.right))+'px';
+ }
+ willShieldHud.style.visibility=(mobile&&document.body.classList.contains('menu-open'))?'hidden':'visible';
+ const causes=[together?'동료 10m 이내':null,torchNearby?'켜진 횃불 10m 이내':null].filter(Boolean);
+ const detail='💗 의지력 감소 50% 완화<br>'+causes.join(' + ')+'<br>두 조건이 겹쳐도 50%만 적용<br>뱀·곰의 직접 공포 피해는 제외';
+ const tip=document.getElementById('willShieldTip');
+ if(tip.innerHTML!==detail)tip.innerHTML=detail;
+}
 function updatePetBenefitFeedback(){
  const active=!!((petRabbit?.g?.visible)||(daeunPetRabbit?.g?.visible));
  petRabbitHud.style.display=active?'flex':'none';
@@ -2389,6 +2489,26 @@ function wildlifeGroundY(x,z){
  return top;
 }
 function caveEntrancePortal(x,z){return (Math.abs(x-caveX)<4.45&&z>caveZ+1.5&&z<caveZ+7.4)||(Math.abs(x-DAEUN_ZONE.cave.x)<4.45&&z>DAEUN_ZONE.cave.z+1.5&&z<DAEUN_ZONE.cave.z+7.4);}
+// v3.79: Shared lightweight AABB collision volumes for voxel terrain and cave walls.
+// These boxes are physics proxies, not rendered meshes. Both manual and AI pathing
+// call terrainPassable(), so they receive the same wall collision rules.
+const FIREWOOD_FEED_SECONDS=1.5;
+const BOX_BODY_RADIUS=.28;
+const CAVE_WALL_BOXES=[
+ {x:caveX,z:caveZ-3.9,hx:6,hz:1.05,bottom:0,top:3.8},
+ {x:caveX-5,z:caveZ-1,hx:1.15,hz:4.05,bottom:0,top:3.9},
+ {x:caveX+5,z:caveZ-1,hx:1.15,hz:4.05,bottom:0,top:3.9},
+ {x:DAEUN_ZONE.cave.x,z:DAEUN_ZONE.cave.z-3.9,hx:6,hz:1.05,bottom:0,top:3.8},
+ {x:DAEUN_ZONE.cave.x-5,z:DAEUN_ZONE.cave.z-1,hx:1.15,hz:4.05,bottom:0,top:3.9},
+ {x:DAEUN_ZONE.cave.x+5,z:DAEUN_ZONE.cave.z-1,hx:1.15,hz:4.05,bottom:0,top:3.9}
+];
+function boxBodyBlocked(x,z,feetY){
+ for(const b of CAVE_WALL_BOXES){
+  if(feetY+1.55<=b.bottom||feetY+.08>=b.top)continue;
+  if(Math.abs(x-b.x)<b.hx+BOX_BODY_RADIUS&&Math.abs(z-b.z)<b.hz+BOX_BODY_RADIUS)return true;
+ }
+ return false;
+}
 function terrainPassable(fromX,fromZ,toX,toZ){
  // A crossing through the central mountain pass must stay inside its open gap.
  // Bear-pass data is declared later; this function is only called after initialization.
@@ -2417,6 +2537,8 @@ function terrainPassable(fromX,fromZ,toX,toZ){
   const dc=DAEUN_ZONE.cave;
   if(Math.abs(x-dc.x)<6.3&&z>dc.z-5.35&&z<dc.z+4.9&&!inCaveWalkZone(x,z)&&!caveEntrancePortal(x,z))return false;
   const next=terrainTopAt(x,z);
+  // The walkable floor is independent of the solid cave wall volumes.
+  if(boxBodyBlocked(x,z,next))return false;
   // Descending a cliff is never allowed, including at the edge of cave portals.
   // The portal exception is for the walkable entrance, not the high side walls.
   if(current-next>MAX_SAFE_DROP+.001)return false;
@@ -2471,7 +2593,7 @@ function rabbitGroundY(x,z){
  for(const dx of [-.55,.55])for(const dz of [-.65,.65])top=Math.max(top,wildlifeGroundY(x+dx,z+dz));
  return top;
 }
-function safeWalkingSpot(x,z){return Number.isFinite(x)&&Number.isFinite(z)&&landAt(x,z)&&terrainPassable(x,z,x,z);}
+function safeWalkingSpot(x,z){return Number.isFinite(x)&&Number.isFinite(z)&&landAt(x,z)&&!boxBodyBlocked(x,z,terrainTopAt(x,z))&&terrainPassable(x,z,x,z);}
 // Platform recovery: prefer a true traversable edge, never teleport through a cliff.
 function findPlatformExit(x,z){
  for(const radius of [1,2,3,4,6,8,11]){
@@ -2595,7 +2717,11 @@ function refreshCollisionDebug(force=false){
   '<div>격자 검사: 통과 '+clear+' / 차단 '+blocked+' · 나무 '+trunkShown+'</div>'+
   '<div style="opacity:.8">※ 실제 충돌 판정 기준. 검수용 격자는 화면에서만 표시됩니다.</div>';
 }
-const $=id=>document.getElementById(id);
+// UI ownership: cache only fixed, connected HUD elements. Dynamic nodes remain discoverable.
+const hudElements=new Map();
+const $=id=>{let el=hudElements.get(id);if(!el?.isConnected){el=document.getElementById(id);if(el)hudElements.set(id,el);}return el;};
+function setHudHTML(el,html){if(el&&el.innerHTML!==html)el.innerHTML=html;}
+
 $('collisionDebug').onclick=()=>setCollisionDebug(!collisionDebugEnabled);
 function navFindOpen(x,z){return {x,z};}
 function navBuild(from,to){
@@ -2751,7 +2877,8 @@ const bubbleEnabled=true;let bubbleUntil=0;const bubbleAnchor=new THREE.Vector3(
 let nextNightSoundAt=0,nightSoundUntil=0,nightSoundText='',nightSoundPosition=new THREE.Vector3();
 const nightSoundPool=[['찌르르... 🦗',7],['사각... 🍃',8],['졸졸... 💧',10]];
 function updateNightSoundBubble(){
- const el=$('ambientBubble'),t=clockParts(),isNight=t.h>=19||t.h<6;
+ const el=$('ambientBubble'),t=clockParts(),isNight=t.h>=20||t.h<4;
+ if(observedId==='daeun'?daeunSleepSpeechLock():hinaSleepSpeechLock()){el.classList.remove('show');return;}
  const observer=observedId==='daeun'?daeun.mesh.position:hana.position;
  const inForest=landAt(observer.x,observer.z)||Math.hypot(observer.x-DAEUN_ZONE.center.x,observer.z-DAEUN_ZONE.center.z)<DAEUN_ZONE.radius+18;
  if(!inForest){el.classList.remove('show');return;}
@@ -2783,24 +2910,67 @@ function updateNightSoundBubble(){
  if(x<40||x>innerWidth-40||y<45||y>innerHeight-45){el.classList.remove('show');return;}
  el.textContent=nightSoundText;el.style.left=x+'px';el.style.top=y+'px';el.classList.add('show');
 }
+// v3.88: unified continuous recovery policy for all five survivors.
+// Shared by Hina and Daeun now; future survivors call the same pure function.
+// Hunger/thirst slow recovery but never completely disable it.
+const SURVIVOR_RECOVERY=Object.freeze({sleepPerSecond:.85,restPerSecond:.45,emptyHunger:.32,emptyThirst:.45,outdoorBlocked:.08});
+function survivorRecoveryPerSecond({sleeping=false,hunger=100,thirst=100,outdoorBlocked=false,quality=1}){
+ const base=sleeping?SURVIVOR_RECOVERY.sleepPerSecond:SURVIVOR_RECOVERY.restPerSecond;
+ const nutrition=(hunger<=0?SURVIVOR_RECOVERY.emptyHunger:1)*(thirst<=0?SURVIVOR_RECOVERY.emptyThirst:1);
+ return base*nutrition*(outdoorBlocked?SURVIVOR_RECOVERY.outdoorBlocked:1)*Math.max(.1,quality);
+}
 // Shared sleep presentation rules for all five survivors (future AI included).
 // A sleep bubble requires both an actual resting pose and no active travel.
 function survivorIsVisiblySleeping({sleepRequested,lyingPose,moving=false,hasPath=false}){
  return Boolean(sleepRequested&&lyingPose&&!moving&&!hasPath);
 }
+// One presentation arbiter; AI decisions, dialogue data and survival timers stay independent.
+// At most one live message per priority and character; expired messages are discarded.
+const survivorSpeech=(()=>{
+ const slots=new Map();
+ function priority(text,channel){
+  if(/뱀이다|곰이 따라|위험|도망|벗어나야|후퇴/.test(text))return 2;
+  if(channel==='companion')return 4;
+  if(/모닥불|나뭇가지|불이 꺼|물을 마|열매|만들|제작|찾았|발견/.test(text))return 3;
+  return /사슴|바스락|찌르르|풍경|날씨/.test(text)?5:4;
+ }
+ function post(id,text,channel='primary',duration=7500){
+  if(!slots.has(id))slots.set(id,new Map());const messages=slots.get(id),rank=priority(text,channel);
+  messages.set(rank,{text,channel,rank,until:performance.now()+duration});
+ }
+ function current(id){
+  const messages=slots.get(id);if(!messages)return null;const now=performance.now();let chosen=null;
+  for(const [rank,message] of messages){if(message.until<=now){messages.delete(rank);continue;}if(!chosen||rank<chosen.rank)chosen=message;}
+  return chosen;
+ }
+ function companionOwns(id){return current(id)?.channel==='companion';}
+ return {post,current,companionOwns,clear:()=>slots.clear()};
+})();
 function applySurvivorSleepBubble(el,sleeping,label='Zzz…'){
  el.classList.toggle('sleep-bubble',sleeping);
  if(sleeping)el.textContent=label;
 }
+// v3.87: one authoritative sleep-bubble priority shared by all speech renderers.
+function hinaSleepSpeechLock(){
+ return (isManualHina()?state==='sleep':['rest','night','outdoorSleep','sleep'].includes(state))
+  && !target && (sleepingPose || state==='sleep' || state==='night' || state==='outdoorSleep');
+}
+function daeunSleepSpeechLock(){
+ return ['sleep','manualSleep'].includes(daeun.action) && daeun.path.length===0;
+}
 function updateBubble(){
  if(observedId==='daeun'){drawDaeunBubble();return;}
  const el=$('bubble');
+ // The character's companion dialogue owns the speech slot until it expires.
+ if(!hinaSleepSpeechLock()&&typeof companionSpeech!=='undefined'&&companionSpeech.until>performance.now()&&companionSpeech.speaker==='hina'&&survivorSpeech.companionOwns('hina')){
+  el.classList.remove('show','sleep-bubble');return;
+ }
  // Sleep has its own persistent bubble; it does not overwrite the AI's thoughts.
  if(!bubbleEnabled){el.classList.remove('show');return;}
- const showSleep=!(meetingFollowUntil>performance.now())&&(day>1||darkHours())&&survivorIsVisiblySleeping({sleepRequested:isManualHina()?state==='sleep':(state==='rest'||state==='night'||state==='outdoorSleep'),lyingPose:sleepingPose,moving:!!target,hasPath:!!target});  const showOutdoorCharge=false; // Rest charge is displayed on the existing action icon, not in a second speech bubble.
+ const showSleep=hinaSleepSpeechLock();  const showOutdoorCharge=false; // Rest charge is displayed on the existing action icon, not in a second speech bubble.
   if(showSleep){   applySurvivorSleepBubble(el,true,'Zzz...');  }else if(showOutdoorCharge){el.classList.remove('sleep-bubble');el.textContent='🔋⚡';}else{
   applySurvivorSleepBubble(el,false);
-  if(el.textContent==='Zzz...'||el.textContent==='🔋⚡')el.textContent=$('thought').textContent.replace(/^[“"]|[”"]$/g,'');   if(elapsed>bubbleUntil||performance.now()>hinaSpeechExpiresAt){el.classList.remove('show');return;}
+  if(el.textContent==='Zzz...'||el.textContent==='🔋⚡')el.textContent=$('thought').textContent.replace(/^[“"]|[”"]$/g,'');   const speech=survivorSpeech.current('hina');if(speech)el.textContent=speech.text;else if(elapsed>bubbleUntil||performance.now()>hinaSpeechExpiresAt){el.classList.remove('show');return;}
  }
  // A lying character's torso is horizontal, so anchor sleep bubbles above the resting body.
  bubbleAnchor.set(0,showSleep?1.55:3.35,showSleep?-.5:0);hana.localToWorld(bubbleAnchor);bubbleAnchor.project(camera);
@@ -2822,7 +2992,7 @@ function applySleepAssessment(id,hours,completedDay){
  if(change<0&&sleepLedger.shortStreak[id]>=2)change-=5;
  stat.energy=Math.max(0,Math.min(100,stat.energy+change));
  const label=id==='hina'?'히나':'다은';
- console.info('[SLEEP_DAILY]',{character:id,day:completedDay,hours:+hours.toFixed(2),energyDelta:change,energy:stat.energy});
+ if(collisionDebugEnabled)console.info('[SLEEP_DAILY]',{character:id,day:completedDay,hours:+hours.toFixed(2),energyDelta:change,energy:stat.energy});
  if(id==='hina')log('💤 '+label+' 전날 수면 '+hours.toFixed(1)+'시간 · 체력 '+(change>=0?'+':'')+change);
  else {daeun.log.unshift({at:elapsed,text:'💤 전날 수면 '+hours.toFixed(1)+'시간 · 체력 '+(change>=0?'+':'')+change});if(daeun.log.length>28)daeun.log.length=28;}
 }
@@ -3143,7 +3313,8 @@ let hinaSpeechExpiresAt=0;
 function say(t){
  inspectBlockedSpeech(t);
  if(elapsed<DAY_SECONDS && t.includes('또 하루가 시작됐네'))return;
- $('thought').textContent='“'+t+'”';hinaSpeechExpiresAt=performance.now()+7500;if(observedId==='hina')$('bubble').textContent=t;
+ survivorSpeech.post('hina',t);
+ $('thought').textContent='“'+t+'”';hinaSpeechExpiresAt=performance.now()+7500;if(observedId==='hina'&&!hinaSleepSpeechLock())$('bubble').textContent=t;
  bubbleUntil=elapsed+Math.max(7,Math.min(15,4+t.length*.24));
 }
 function setState(s,g,p,words){
@@ -3203,6 +3374,7 @@ function setState(s,g,p,words){
 }
 let memoryFirstInit=true;
 function init(){
+ survivorSpeech.clear();
  if(memoryFirstInit){memoryFirstInit=false;}unlockedMemories={};renderMemoryAlbum();memoryClose();document.getElementById('memoryToast').style.opacity='0';
  for(const [mesh,original] of fadedMeshes){mesh.material=original;}fadedMeshes.clear();
  // Restore both simulation data and visuals. A reset must match a fresh page load.
@@ -3217,7 +3389,7 @@ function init(){
  stats={energy:92,thirst:85,hunger:83,will:85};redrawNeeds();
  loneliness=0;lastMoraleMessage=0;introSpeechStage=0;resilienceXP=0;mentalRestCooldown=0;mentalRestStart=0;willEventTimes.clear();
  exhaustionCooldown=0;previousEnergyBand=100;moraleCooldown=0;
- fireAttempts=0;fireSuccess=false;fireKnowledge=0;fireSkill=0;fireEverLit=false;firstFireMoraleGranted=false;lastFireOutDay=0;lastBranchDay=0;fireDryStock=0;
+ fireAttempts=0;fireSuccess=false;fireKnowledge=0;fireSkill=0;fireEverLit=false;firstFireMoraleGranted=false;daeunFirstFireMoraleGranted=false;lastFireOutDay=0;lastBranchDay=0;fireDryStock=0;
  torchOuting=false;torchNightDay=0;torchOutingsToday=0;torchDecisionAt=-Infinity;torchGroup.visible=false;torchLight.intensity=0;
  fishObservations=0;fishAttempts=0;fishCaught=0;lastFishDay=0;
  fishSkill=0;lastFishStudyAt=-999;fishSpear=false;storedFish=[];carriedFish=[];rainWater=0;waterVessel=false;lastFoodCheckAt=0;
@@ -3249,7 +3421,7 @@ function init(){
   r.caught=false;r.pet=false;r.panic=0;r.hopActive=false;r.hopClock=0;r.restUntil=0;r.g.visible=true;
   r.g.position.set(r.homeX,rabbitGroundY(r.homeX,r.homeZ)+.04,r.homeZ);r.g.rotation.set(0,0,0);r.habitatLeaveAt=elapsed+80+Math.random()*130;r.habitatReturnAt=0;
  });
- fishVisitEnd=-1;fishNextVisit=0;fishVisitId=0;fishes.forEach(f=>{f.g.position.set(f.x,f.pond?.08:-.3,f.z);f.tail.rotation.y=0;});
+ fishVisitEnd=-1;fishNextVisit=0;fishVisitId=0;hinaPondFishVisitEnd=-1;fishes.forEach(f=>{f.g.position.set(f.x,f.pond?.08:-.3,f.z);f.tail.rotation.y=0;});
  campfire.visible=false;fireLight.intensity=0;
  rainDrops.forEach(d=>d.visible=false);
  resetBerryTrees();
@@ -3280,7 +3452,7 @@ function hinaDiagnostic(){
  const t=target?`(${target.x.toFixed(1)}, ${target.z.toFixed(1)})`:'없음';
  const detail=`[HINA_AI] 상태=${state} 행동=${goal} 위치=(${hana.position.x.toFixed(1)},${hana.position.z.toFixed(1)}) 목적지=${t} 경로=${navPath.length} 정체=${navStuck.toFixed(1)}초 상태유지=${(elapsed-phaseAt).toFixed(0)}초 탐색대기=${Math.max(0,elapsed-lastDayOneCaveWalkAt).toFixed(1)}초`;
  log('🔎 '+detail);
- console.info(detail);
+ if(collisionDebugEnabled)console.info(detail);
 }
 // DAY 1: non-collecting observation walk. Never spam new short destinations.
 function dayOneCaveScout(){
@@ -3592,7 +3764,7 @@ function attemptFire(){
  if(succeeded){
   fireSkill=100;fireSuccess=true;fireEverLit=true;fireKnowledge=100;
   fireDryStock=Math.max(1,fireDryStock);campfire.visible=true;
-     if(!firstFireMoraleGranted){stats.will=100;firstFireMoraleGranted=true;log('🔥 첫 모닥불 점화 성공 · 의지력 100% 회복');} growResilience(1.5);
+     awardIgnitionMorale(sharedHomeActive?'shared':'hina',false); growResilience(1.5);
   log(`불씨 생성 성공 · ${fireAttempts}번째 시도 · 불 숙련도 100%`);
   setState('fireResult','첫 모닥불 성공',null,'됐다!! 연습한 대로 하니까 불이 붙었어! 이제 밤이 조금 덜 무섭겠어!');
  }else{
@@ -3609,7 +3781,7 @@ function attemptFire(){
  // Shorter rest between trials allows progress without arbitrary date gates.
  nextFireAttempt=elapsed+(rain?37:25);
 }
-function dayTwoPlusDecide(){
+function dayTwoPlusDecide(step){
  if(clockParts().day<2)return;
  if(state==='washTravel'&&!target){
   if(distanceTo('water')<4.5){
@@ -3682,20 +3854,37 @@ function dayTwoPlusDecide(){
   return;
  }
  if(state==='branchReturn'&&!target){
-  if(distanceTo('shelter')>4){setState('branchReturn','모닥불로 돌아가기',sites.shelter.clone(),'동굴로 돌아가서 나뭇가지를 넣자.');return;}
-  if(fireSuccess&&fireDryStock>=2){
-   fireDryStock-=2;
-   fireKnowledge=Math.min(100,fireKnowledge+40);
-   log(`🔥 히나 자동 생존 · 나뭇가지 2개 투입 · 불유지 +40 (${Math.round(fireKnowledge)})`);
-   say('🔥 나뭇가지 2개를 넣었어.');
+  // Arrive at the actual campfire, not merely somewhere near the cave.
+  const fireDist=Math.hypot(hana.position.x-campfire.position.x,hana.position.z-campfire.position.z);
+  if(fireDist>2.5){
+   const stand=new THREE.Vector3(campfire.position.x+1.15,.5,campfire.position.z+1.15);
+   if(safeWalkingSpot(stand.x,stand.z)){
+    setState('branchReturn','모닥불 가까이 이동',null);
+    target=stand;navReset();return;
+   }
+   setState('recover','모닥불 접근 재시도',null,'모닥불 가까이 가야 나뭇가지를 넣을 수 있어.');return;
   }
-  setState('recover','모닥불 연료 관리 완료',null,'이제 다른 일을 해보자.');return;
+  if(fireSuccess&&fireDryStock>=2){
+   setState('branchFeed','모닥불에 나뭇가지 넣기',null,'모아온 나뭇가지를 불에 넣자.');
+   return;
+  }
+  setState('recover','나뭇가지 수집 완료',null,'나뭇가지를 더 모아야겠어.');return;
+ }
+ if(state==='branchFeed'){
+  // Keep the refuel animation visible before consuming inventory and adding fuel.
+  if(elapsed-phaseAt<FIREWOOD_FEED_SECONDS)return;
+  if(fireSuccess&&fireDryStock>=2&&Math.hypot(hana.position.x-campfire.position.x,hana.position.z-campfire.position.z)<2.7){
+   fireDryStock-=2;fireKnowledge=Math.min(100,fireKnowledge+40);
+   log(`🔥 히나 자동 생존 · 모닥불에 나뭇가지 2개 투입 · 불유지 +40 (${Math.round(fireKnowledge)})`);
+   setState('recover','모닥불 연료 관리 완료',null,'🔥 나뭇가지 2개를 넣었어.');
+  }else setState('recover','모닥불 연료 투입 실패',null,'모닥불에 더 가까이 가야겠어.');
+  return;
  }
  if(state==='branchTravel'&&!target){
   const pile=nearestBranchPile();
   if(pile&&Math.hypot(hana.position.x-pile.x,hana.position.z-pile.z)<2.6){
    pile.available=false;pile.group.visible=false;pile.respawnAt=elapsed+randomBetween(120,260);
-   handCargoBranchHeld=true;handCargoLast='branch';
+   handCargoBranchHeld=false;handCargoLast='none';
   }
   setState('branchGather','주변의 떨어진 나뭇가지 수집',null,
    raining()?'나뭇가지가 젖었네... 그래도 쓸 만한 걸 찾아보자.':'마른 나뭇가지부터 모으자.');return;
@@ -3719,9 +3908,15 @@ function dayTwoPlusDecide(){
    nextFireAttempt=elapsed+18;
    setState('recover','나뭇가지 수집 · 불 피우기 연습 필요',null,'나뭇가지는 모았어. 먼저 불 피우는 법부터 제대로 익혀야 해.');return;
   }
+  // Never ignite a distant campfire while standing at the branch pickup site.
+  if(distanceTo('shelter')>3.2){
+   setState('fireTravel','나뭇가지 들고 동굴로 귀환','shelter','불은 동굴에 가서 다시 피워야 해.');
+   return;
+  }
   const chance=raining()?.22:Math.min(.94,.50+fireSkill*.004);
   if(Math.random()<chance){
    fireSuccess=true;fireKnowledge=100;campfire.visible=true;
+   awardIgnitionMorale(sharedHomeActive?'shared':'hina',false);
    log('꺼졌던 모닥불 다시 피우기 성공 · 연료 100');
    setState('recover','모닥불 재점화 성공',null,'휴... 다시 불이 붙었어! 이번엔 꺼뜨리지 말아야지.');return;
   }
@@ -3974,15 +4169,16 @@ function dayTwoPlusDecide(){
     }
   }
   const night=hours>=19||hours<6;
+  // Recover gradually every simulation tick, rather than a single 22-second burst.
+  // Resting outside remains inefficient when the night-fear rule blocks sleep.
+  const sleepingHere=!(clockParts().h>=22||clockParts().h<4)||Math.hypot(hana.position.x-caveX,hana.position.z-caveZ)<3.4;
+  stats.energy=Math.min(100,stats.energy+step*survivorRecoveryPerSecond({
+   sleeping:sleepingHere,hunger:stats.hunger,thirst:stats.thirst,
+   outdoorBlocked:!sleepingHere,quality:state==='rest'?(leafBed?1.12:1):.75
+  }));
   if(!sleepRestored&&elapsed-phaseAt>22){
    sleepRestored=true;
-   const rainPenalty=raining()?9:0;
-   const quality=sleepQuality<.22?'불편한 잠':sleepQuality<.7?'보통 잠':'숙면';
-   const recovery=(sleepQuality<.22?randomBetween(3,7):sleepQuality<.7?randomBetween(7,12):randomBetween(12,19))-rainPenalty;
-   const actual=Math.max(2,recovery+(leafBed?3:0));
-   stats.energy=Math.min(97,stats.energy+actual);
-   log(`${quality} · 체력 +${Math.round(actual)} (현재 ${Math.round(stats.energy)})`);
-   say(sleepQuality<.22?'몸이 찌뿌둥해... 잠을 설쳤나 봐.':sleepQuality<.7?'조금 쉬니까 살 것 같아.':(clockParts().h>=6&&clockParts().h<19?'아침이네… 오늘도 무사해야 할 텐데. 몸은 한결 가벼워.':'조금은 몸이 가벼워진 것 같아.'));
+   log(`휴식 진행 · 체력 ${Math.round(stats.energy)} · 지속 회복 중`);
   }
   // Night rest must remain stable: exiting for low needs immediately selects sleep again,
   // causing a repeated 'rest complete' line and endless sleep/recover loop.
@@ -4009,7 +4205,7 @@ function dayTwoPlusDecide(){
  }
  if(elapsed-phaseAt>11)chooseNextDayAction();
 }
-function decide(){
+function decide(step){
  const current=clockParts();
  if(current.day===1 && ![
   'confused','orient','waterScout','waterObserve','berryScout','berryObserve',
@@ -4035,7 +4231,7 @@ function decide(){
   if(state==='rest'&&goal==='첫날 밤 · 동굴에서 휴식'){
    setState('wake','둘째 날 · 행동 시작',null,'어제는 아무것도 몰랐지만, 오늘은 조금씩 해보자.');
   }
-  dayTwoPlusDecide();
+  dayTwoPlusDecide(step);
  }
 }
 function updateIntroMovement(step){
@@ -4087,6 +4283,7 @@ function updateNatureEncounters(){
   }
  }
 }
+const manualMovementScratch={forward:new THREE.Vector3(),right:new THREE.Vector3(),movement:new THREE.Vector3()};
 function update(dt){
  if(paused)return;
  if(target&&target.x< -108){target=null;navReset();state='recover';phaseAt=elapsed;}
@@ -4098,9 +4295,9 @@ function update(dt){
  updateNatureEncounters();
  // Manual Hina suspends autonomous navigation, while the rest of the world continues.
  if(isManualHina()){
-  const forward=new THREE.Vector3();camera.getWorldDirection(forward);forward.y=0;forward.normalize();
-  const right=new THREE.Vector3(-forward.z,0,forward.x);
-  const movement=new THREE.Vector3();
+  const forward=manualMovementScratch.forward;camera.getWorldDirection(forward);forward.y=0;forward.normalize();
+  const right=manualMovementScratch.right.set(-forward.z,0,forward.x);
+  const movement=manualMovementScratch.movement.set(0,0,0);
   if(playerKeys.has('KeyW'))movement.add(forward);
   if(playerKeys.has('KeyS'))movement.sub(forward);
   if(playerKeys.has('KeyD'))movement.add(right);
@@ -4112,7 +4309,7 @@ function update(dt){
    if(state==='rest'||state==='resting'||state==='sleep'){
     state='recover';goal='플레이어 직접 이동';sleepingPose=false;
    }
-   movement.normalize().multiplyScalar(step*DAEUN_RULES.walkSpeed);
+   movement.normalize().multiplyScalar(step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(stats,'hinaManual'));
    moved=moveManualWithAssist(hana,movement.x,movement.z,step);
    if(moved){
     hana.rotation.y=Math.atan2(movement.x,movement.z);
@@ -4131,8 +4328,10 @@ function update(dt){
   // Manual mode advances the same clock, lighting and HUD as autonomous mode.
   stats.thirst=Math.max(0,stats.thirst-step*thirstRate);
   stats.hunger=Math.max(0,stats.hunger-step*hungerRate);
-  if(state==='rest')stats.energy=Math.min(100,stats.energy+step*.45);
-  if(state==='sleep')stats.energy=Math.min(100,stats.energy+step*.85);
+  if(state==='rest'||state==='sleep')stats.energy=Math.min(100,stats.energy+step*survivorRecoveryPerSecond({
+   sleeping:state==='sleep',hunger:stats.hunger,thirst:stats.thirst,
+   outdoorBlocked:state==='sleep'&&(clockParts().h>=22||clockParts().h<4)&&Math.hypot(hana.position.x-caveX,hana.position.z-caveZ)>=3.4
+  }));
   updateHinaWorldUIAndLighting(step,dt);
   return;
  }
@@ -4243,6 +4442,10 @@ function update(dt){
   if(fireKnowledge<=0){
    torchOuting=false;
    fireKnowledge=0;fireSuccess=false;campfire.visible=false;lastFireOutDay=day;
+   // v3.86: exact -30 on extinguish, once per transition; no resilience multiplier.
+   stats.will=Math.max(0,stats.will-30);
+   if(sharedHomeActive)daeun.stats.will=Math.max(0,daeun.stats.will-30);
+   log('💔 모닥불 소화 · 의지력 -30'+(sharedHomeActive?' (히나·다은)':''));
    nextFireAttempt=elapsed+12;
    log('모닥불 소화 · 나뭇가지와 재점화 필요');
    say('앗! 불이 꺼져버렸어... 다시 피워야 해!');
@@ -4333,7 +4536,7 @@ function update(dt){
     const dist=Math.hypot(dx,dz);
     if(dist<.08){navPath.shift();}
     else{
-     const movement=Math.min(dist,step*1.8*(stats.energy<25?.52:stats.energy<45?.76:1));
+     const movement=Math.min(dist,step*1.8*survivorMovementMultiplier(stats,'hinaAuto'));
      const nx=hana.position.x+dx/dist*movement,nz=hana.position.z+dz/dist*movement;
      if(!navBlocked(nx,nz)){
       // No cliff height collision checks in free-movement prototype.
@@ -4367,7 +4570,7 @@ function update(dt){
   else {walkPose(step,false);head.rotation.y=0;}
  }
  if(darkHours()&&fireSuccess&&fireKnowledge>0&&!torchCarried&&atCaveForTorch()&&!sleepingPose&&!['rest','night','mentalRest'].includes(state))prepareCaveTorch();
- decide();
+ decide(step);
  hinaDiagnostic();
  if(!fireEverLit&&elapsed>hinaFireHintAt&&stats.thirst>=25&&stats.hunger>=25&&state!=='outdoorSleep'&&state!=='night'&&state!=='rest'){
   say(hinaFireHints[Math.floor(Math.random()*hinaFireHints.length)]);hinaFireHintAt=elapsed+160+Math.random()*65;
@@ -4386,6 +4589,21 @@ function update(dt){
  updateHinaWorldUIAndLighting(step,dt);
 }
 
+const DAYLIGHT_KEYS=[
+  {h:0,sky:0x102e66,fog:0x17366f,ambient:0x6d9bff,sun:0x3155a0,fill:0x4c8de0,hemi:.39,solar:.035,bounce:.21,exposure:.98},
+  {h:4,sky:0x153968,fog:0x204575,ambient:0x7aabef,sun:0x486fba,fill:0x6097e2,hemi:.39,solar:.08,bounce:.20,exposure:.96},
+  {h:6,sky:0x826caa,fog:0x9d83b9,ambient:0xb39bd5,sun:0xffb7d0,fill:0x9581d8,hemi:1.25,solar:1.0,bounce:.36,exposure:1.08},
+  {h:8,sky:0x9acfe0,fog:0xaddbd7,ambient:0xe5f6ec,sun:0xfff3d5,fill:0xb6e5e2,hemi:2.1,solar:2.25,bounce:.60,exposure:1.24},
+  {h:15.5,sky:0x9ad4e7,fog:0xb4d8d4,ambient:0xe4f7e9,sun:0xffefce,fill:0xb3dce5,hemi:2.15,solar:2.35,bounce:.60,exposure:1.23},
+  {h:17.5,sky:0xf4a478,fog:0xf4b18c,ambient:0xffbdac,sun:0xffa16c,fill:0xeab4c1,hemi:1.6,solar:1.65,bounce:.40,exposure:1.10},
+  {h:19,sky:0x41679d,fog:0x5374a2,ambient:0x8ca9d9,sun:0x9b9ad4,fill:0x6e93d5,hemi:.92,solar:.43,bounce:.23,exposure:.90},
+  {h:21,sky:0x41679d,fog:0x5374a2,ambient:0x8ca9d9,sun:0x9b9ad4,fill:0x6e93d5,hemi:.92,solar:.43,bounce:.23,exposure:.90},
+  
+  {h:22,sky:0x102e66,fog:0x17366f,ambient:0x6d9bff,sun:0x3155a0,fill:0x4c8de0,hemi:.39,solar:.035,bounce:.21,exposure:.98},
+  {h:23.99,sky:0x102e66,fog:0x17366f,ambient:0x6d9bff,sun:0x3155a0,fill:0x4c8de0,hemi:.39,solar:.035,bounce:.21,exposure:.98},
+  {h:24,sky:0x102e66,fog:0x17366f,ambient:0x6d9bff,sun:0x3155a0,fill:0x4c8de0,hemi:.39,solar:.035,bounce:.21,exposure:.98}
+ ];
+const daylightColorScratch=new THREE.Color(),daylightFogScratch=new THREE.Color();
 function updateHinaWorldUIAndLighting(step,dt){
  const t=clockParts();
  $('dayLabel').textContent=`· DAY ${String(t.day).padStart(2,'0')}`;
@@ -4400,31 +4618,18 @@ function updateHinaWorldUIAndLighting(step,dt){
  const hour=t.h+t.m/60;
  const smoothstep=(a,b,x)=>{const q=THREE.MathUtils.clamp((x-a)/(b-a),0,1);return q*q*(3-2*q)};
  // All transitions are smooth. The final evening ramp reaches complete darkness at 00:00.
- const keys=[
-  {h:0,sky:0x102e66,fog:0x17366f,ambient:0x6d9bff,sun:0x3155a0,fill:0x4c8de0,hemi:.39,solar:.035,bounce:.21,exposure:.98},
-  {h:4,sky:0x153968,fog:0x204575,ambient:0x7aabef,sun:0x486fba,fill:0x6097e2,hemi:.39,solar:.08,bounce:.20,exposure:.96},
-  {h:6,sky:0x826caa,fog:0x9d83b9,ambient:0xb39bd5,sun:0xffb7d0,fill:0x9581d8,hemi:1.25,solar:1.0,bounce:.36,exposure:1.08},
-  {h:8,sky:0x9acfe0,fog:0xaddbd7,ambient:0xe5f6ec,sun:0xfff3d5,fill:0xb6e5e2,hemi:2.1,solar:2.25,bounce:.60,exposure:1.24},
-  {h:15.5,sky:0x9ad4e7,fog:0xb4d8d4,ambient:0xe4f7e9,sun:0xffefce,fill:0xb3dce5,hemi:2.15,solar:2.35,bounce:.60,exposure:1.23},
-  {h:17.5,sky:0xf4a478,fog:0xf4b18c,ambient:0xffbdac,sun:0xffa16c,fill:0xeab4c1,hemi:1.6,solar:1.65,bounce:.40,exposure:1.10},
-  {h:19,sky:0x41679d,fog:0x5374a2,ambient:0x8ca9d9,sun:0x9b9ad4,fill:0x6e93d5,hemi:.92,solar:.43,bounce:.23,exposure:.90},
-  {h:21,sky:0x41679d,fog:0x5374a2,ambient:0x8ca9d9,sun:0x9b9ad4,fill:0x6e93d5,hemi:.92,solar:.43,bounce:.23,exposure:.90},
-  
-  {h:22,sky:0x102e66,fog:0x17366f,ambient:0x6d9bff,sun:0x3155a0,fill:0x4c8de0,hemi:.39,solar:.035,bounce:.21,exposure:.98},
-  {h:23.99,sky:0x102e66,fog:0x17366f,ambient:0x6d9bff,sun:0x3155a0,fill:0x4c8de0,hemi:.39,solar:.035,bounce:.21,exposure:.98},
-  {h:24,sky:0x102e66,fog:0x17366f,ambient:0x6d9bff,sun:0x3155a0,fill:0x4c8de0,hemi:.39,solar:.035,bounce:.21,exposure:.98}
- ];
+ const keys=DAYLIGHT_KEYS;
  let k=0;while(k<keys.length-2&&hour>keys[k+1].h)k++;
  const from=keys[k],to=keys[k+1],blend=smoothstep(from.h,to.h,hour);
  const lerp=(x,y)=>THREE.MathUtils.lerp(x,y,blend);
  const blendColor=(out,a,b)=>out.setHex(a).lerp(_todColor.setHex(b),blend);
- const _todColor=new THREE.Color();
+ const _todColor=daylightColorScratch;
  const weatherDim=THREE.MathUtils.lerp(groundWet()?.88:1,.70,rainVisualStrength);
  const nightBlack=hour<4; // Dim moonless blue ambient light remains for orientation.
  blendColor(scene.background,from.sky,to.sky);
  // Rain makes the palette slightly cooler and darker without flattening the sunset.
  if(rainVisualStrength>.001)scene.background.lerp(_todColor.setHex(0x344f6c),.20*rainVisualStrength);
- scene.fog.color.copy(scene.background).lerp(_todColor.setHex(from.fog).lerp(new THREE.Color(to.fog),blend),.30);
+ scene.fog.color.copy(scene.background).lerp(_todColor.setHex(from.fog).lerp(daylightFogScratch.setHex(to.fog),blend),.30);
  blendColor(ambient.color,from.ambient,to.ambient);
  blendColor(sun.color,from.sun,to.sun);
  blendColor(fill.color,from.fill,to.fill);
@@ -4437,19 +4642,19 @@ function updateHinaWorldUIAndLighting(step,dt){
  pondRippleMat.opacity=.025+.49*lightLevel;
  waterSurface.material.opacity=.77;
  animateFireflies();
- weatherUpdate(step);updatePanningCloudShadows(step,hour);updateLightning(step);updateSound(dt,lightLevel<.25);updateBonfireAmbience(dt);updateRainAudio(dt);updateNightAudio(dt,lightLevel<.25);updateCampfire(elapsed);
+ weatherUpdate(step);updatePanningCloudShadows(step,hour);updateLightning(step);updateSound(dt,(hour>=20||hour<4));updateBonfireAmbience(dt);updateRainAudio(dt);updateNightAudio(dt,(hour>=20||hour<4));updateCampfire(elapsed);
  // WeatherUpdate modifies sunlight for rain and wet ground; keep its existing behavior.
  if(elapsed>=uiNextUpdate){uiNextUpdate=elapsed+.3;
  updateStableStatBars($('stats'),{체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불유지:fireEverLit&&fireSuccess?Math.min(100,fireKnowledge):0},true);
  const hinaSupplies=`🏕 동굴 생선 ${storedFish.length}/${MAX_CAVE_FISH} · 휴대 ${carriedFish.length}/${MAX_CARRY_FISH} · 휴대 열매 ${carriedBerries}/${berryCarryCapacity()} · 동굴 열매 ${caveBerries}/${MAX_CAVE_BERRIES} · ${fishSpear?'작살 완성':'맨손 포획'} · 💧 빗물 ${rainWater}/4 · ${leafBed?'🛏️ 침상 완성':'침상 미제작'}${petRabbit?' · 🐇 펫 친밀도 '+Math.round(petBond):''}`;
  let supplyRow=$('hinaSupplies');if(!supplyRow){supplyRow=document.createElement('div');supplyRow.id='hinaSupplies';supplyRow.style.cssText='font-size:12px;color:#e8d8b8;margin-top:7px';$('stats').appendChild(supplyRow);}if(supplyRow.textContent!==hinaSupplies)supplyRow.textContent=hinaSupplies;
  
- $('skillContent').innerHTML='<div class="skillSectionTitle">📚 생존 숙련도</div>'+[
+ setHudHTML($('skillContent'),'<div class="skillSectionTitle">📚 생존 숙련도</div>'+[
   ['🔥 모닥불 점화',fireSkill],['🐇 토끼 관찰·친화',rabbitPattern],['🐟 물고기 관찰·포획',fishSkill],['🌿 식물 연구',plantKnowledge],['🐰 펫 친밀도',petBond]
  ].map(([label,value])=>{const v=Math.max(0,Math.min(100,Number(value)||0));return `<div class="skillMeter"><div class="skillMeterHead"><span>${label}</span><b>${Math.round(v)}%</b></div><div class="skillMeterTrack"><div class="skillMeterFill ${v>=100?'completed':''}" style="width:${v}%"></div></div></div>`;}).join('')+
  '<div class="skillSectionTitle">🗺️ 탐험 기록</div><div class="exploreRings">'+[
   ['섬 발견도',discoveryPercent(),'#72cbb2'],['친구 단서',friendClue,'#d9b977']
- ].map(([label,value,color])=>{const v=Math.max(0,Math.min(100,Number(value)||0));return `<div class="exploreRing"><div class="exploreCircle" style="--value:${v};--ring:${color}"><div class="exploreCircleInner">${Math.round(v)}%</div></div><div class="exploreRingLabel">${label}</div></div>`;}).join('')+'</div><div class="skillFootnote">발견도는 새로 확인한 섬 지역만 계산해. 친구 단서는 별도의 탐험 기록이야.</div>';
+ ].map(([label,value,color])=>{const v=Math.max(0,Math.min(100,Number(value)||0));return `<div class="exploreRing"><div class="exploreCircle" style="--value:${v};--ring:${color}"><div class="exploreCircleInner">${Math.round(v)}%</div></div><div class="exploreRingLabel">${label}</div></div>`;}).join('')+'</div><div class="skillFootnote">발견도는 새로 확인한 섬 지역만 계산해. 친구 단서는 별도의 탐험 기록이야.</div>');
  }
 }
 
@@ -4587,7 +4792,6 @@ async function unlockAmbient(){
  // HTMLMediaElement.play() must be invoked synchronously inside the user gesture.
  unlockRainAudio();
  unlockNightAudio();
- if(bonfireAmbience.paused&&bonfireAmbience.volume>0)bonfireAmbience.play().catch(()=>{});
  if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C();}
  if(!audioCtx)return;
  if(audioCtx.state!=='running'){
@@ -4652,11 +4856,32 @@ function forestRustle(){
 function forestFrog(){
  tone(230,.17,'sine',.013);tone(195,.19,'sine',.011,.19);
 }
-// v3.74: one quiet, distance-attenuated bonfire ambience for every lit fire.
-const bonfireAmbience=new Audio('bonfire_loop.ogg');
-bonfireAmbience.loop=true;bonfireAmbience.preload='auto';bonfireAmbience.volume=0;
-let bonfireGain=0;
+// v3.76: subtle procedural fire crackles, mixed beneath the forest ambience.
+// No external bonfire sample: short low-pass noise bursts avoid an obvious loud loop.
+let bonfireCrackleTimer=.7;
+function softFireCrackle(level){
+ if(!audioCtx||audioCtx.state!=='running'||!soundEnabled||level<=0)return;
+ const duration=.022+Math.random()*.065;
+ const sampleRate=audioCtx.sampleRate;
+ const buffer=audioCtx.createBuffer(1,Math.ceil(sampleRate*duration),sampleRate);
+ const data=buffer.getChannelData(0);
+ let smoothed=0;
+ for(let i=0;i<data.length;i++){
+  smoothed=smoothed*.76+(Math.random()*2-1)*.24;
+  data[i]=smoothed;
+ }
+ const source=audioCtx.createBufferSource();source.buffer=buffer;
+ const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=650+Math.random()*750;
+ const gain=audioCtx.createGain(),now=audioCtx.currentTime;
+ const peak=(.0042+Math.random()*.0056)*level; // v3.78: +40%, still quiet beneath forest ambience
+ gain.gain.setValueAtTime(.00001,now);
+ gain.gain.linearRampToValueAtTime(peak,now+.008);
+ gain.gain.exponentialRampToValueAtTime(.00001,now+duration);
+ source.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
+ source.start(now);source.stop(now+duration+.01);
+}
 function updateBonfireAmbience(dt){
+ if(!soundEnabled||paused||document.hidden||!audioCtx||audioCtx.state!=='running')return;
  const listener=observedId==='daeun'?daeun.mesh.position:hana.position;
  const fires=[];
  if(fireSuccess&&campfire.visible)fires.push(campfire.position);
@@ -4664,14 +4889,15 @@ function updateBonfireAmbience(dt){
  let proximity=0;
  for(const pos of fires){
   const d=Math.hypot(listener.x-pos.x,listener.z-pos.z);
-  const a=Math.max(0,Math.min(1,(17-d)/14));
+  const a=Math.max(0,Math.min(1,(12-d)/9));
   proximity=Math.max(proximity,a*a*(3-2*a));
  }
- const target=soundEnabled&&!paused&&!document.hidden?0.13*proximity:0;
- bonfireGain+=(target-bonfireGain)*Math.min(1,dt*2.8);
- bonfireAmbience.volume=Math.max(0,Math.min(.15,bonfireGain));
- if(target>.003&&bonfireAmbience.paused){bonfireAmbience.play().catch(()=>{});}
- if(target===0&&bonfireGain<.001&&!bonfireAmbience.paused)bonfireAmbience.pause();
+ if(proximity<.015){bonfireCrackleTimer=Math.max(.15,bonfireCrackleTimer);return;}
+ bonfireCrackleTimer-=Math.min(dt,.2);
+ if(bonfireCrackleTimer<=0){
+  softFireCrackle(proximity);
+  bonfireCrackleTimer=.22+Math.random()*.85;
+ }
 }
 function updateSound(dt,isNight){
  if(!soundEnabled||!audioCtx||audioCtx.state!=='running'||paused)return;
@@ -4680,7 +4906,8 @@ function updateSound(dt,isNight){
  forestTextureTimer-=dt;
  if(forestTextureTimer<=0){
   // The listener follows the currently viewed survivor, including Daeun's area.
-  const observer=observedId==='daeun'?daeun.mesh.position:hana.position;
+  if(observedId==='daeun'?daeunSleepSpeechLock():hinaSleepSpeechLock()){el.classList.remove('show');return;}
+ const observer=observedId==='daeun'?daeun.mesh.position:hana.position;
   const inDaeunForest=Math.hypot(observer.x-DAEUN_ZONE.center.x,observer.z-DAEUN_ZONE.center.z)<DAEUN_ZONE.radius+18;
   const inHinaForest=landAt(observer.x,observer.z);
   if(inDaeunForest||inHinaForest){
@@ -4740,7 +4967,7 @@ function applyQuality(){
  renderer.shadowMap.enabled=true;
  sun.shadow.needsUpdate=true;
  shoreMesh.traverse(o=>{if(o.isMesh)o.castShadow=highQuality&&!isMobile;});
- $('qualityToggle').textContent=ultraLowPower?'화질: 초절전':highQuality?'화질: 높음':'화질: 절약';
+ $('qualityToggle').textContent=ultraLowPower?'화질: 하':highQuality?'화질: 상':'화질: 중';
  updateDetailVisibility(true);
 }
 
@@ -4759,7 +4986,7 @@ const caveFadeMeshes=new Set(); // Rock walls, cliff face and overhead geometry 
 // v9.9: terrain outside the cave and props below half Hina's torso never fade.
 const occlusionBoundsScratch=new THREE.Box3();
 function canFadeScenery(mesh){
- if(!mesh||!mesh.isMesh||mesh.userData.noOcclusion||mesh.parent?.userData.renderBush||mesh.parent?.userData.noOcclusion)return false;
+ if(!mesh||!mesh.isMesh||mesh.userData.noOcclusion||mesh.userData.keepTreeBaseVisible||mesh.parent?.userData.renderBush||mesh.parent?.userData.noOcclusion)return false;
  if(mesh.userData.treePart||mesh.parent?.userData.treeOccluder)return true;
  // The shared grass/rock material must not determine whether a mesh fades.
  // Terrain is identified by its registered walkable geometry, not its material.
@@ -5042,10 +5269,15 @@ $('rainTest').onclick=()=>{
 // ---- v15.1 independent Character / AIController / PlayerController ----
 function daeunNearestAutoBranch(pos){
  const candidates=sharedHomeActive?branchPiles:daeunResources.branches;
- return candidates.filter(b=>b.available&&Math.hypot(b.x-pos.x,b.z-pos.z)<DAEUN_RULES.autoRadius+8)
-  .sort((a,b)=>a.group.position.distanceToSquared(pos)-b.group.position.distanceToSquared(pos))
-  .find(b=>safeWalkingSpot(b.x,b.z)&&!bearNearRoute(b.x,b.z));
+ const radiusSq=(DAEUN_RULES.autoRadius+8)**2;let nearest,nearestSq=Infinity;
+ for(const b of candidates){
+  if(!b.available||(b.x-pos.x)**2+(b.z-pos.z)**2>=radiusSq)continue;
+  const distanceSq=b.group.position.distanceToSquared(pos);
+  if(distanceSq<nearestSq&&safeWalkingSpot(b.x,b.z)&&!bearNearRoute(b.x,b.z)){nearest=b;nearestSq=distanceSq;}
+ }
+ return nearest;
 }
+
 const daeunResources={berries:[],branches:[],caveMeshes:[]};
 const daeunExplored=new Set();let observedId='hina',dualReady=false,dualLastUI=-1,dualLastSave=0;
 let hinaControlUnlocked=false,hinaManual=false,hinaMeetAnnounced=false;
@@ -5086,37 +5318,65 @@ const meetingTalk=[
 function meetingFollowStep(mesh,leader,step){
  const dx=leader.position.x-mesh.position.x,dz=leader.position.z-mesh.position.z,dist=Math.hypot(dx,dz);
  if(dist<2.1||dist>18)return false;
- const amount=Math.min(Math.max(0,dist-2.1),step*DAEUN_RULES.walkSpeed);
+ const amount=Math.min(Math.max(0,dist-2.1),step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(stats,'hinaManual'));
  const moved=moveManualWithAssist(mesh,dx/dist*amount,dz/dist*amount,step);
  if(moved)mesh.rotation.y=Math.atan2(dx,dz);
  return moved;
 }
-// Separate reunion speech for Hina while the player is watching Daeun.
+// Reunion and everyday companion dialogue bubbles: always anchor speech to the character speaking.
 const hinaMeetingBubble=document.createElement('div');
-hinaMeetingBubble.style.cssText='position:fixed;z-index:42;display:none;max-width:260px;padding:10px 13px;border-radius:14px;background:#fffdf1;color:#20332d;border:2px solid #304a45;font:600 13px/1.5 sans-serif;text-align:center;pointer-events:none;transform:translate(-50%,-100%);box-shadow:0 4px 12px #0004';
-document.body.appendChild(hinaMeetingBubble);
-const hinaMeetingScreen=new THREE.Vector3();
-function drawHinaMeetingBubble(){
- const active=meetingHinaLine&&performance.now()<meetingHinaLineUntil&&meetingFollowUntil>performance.now();
- if(!active||observedId==='hina'){hinaMeetingBubble.style.display='none';return;}
- hinaMeetingScreen.copy(hana.position).add(new THREE.Vector3(0,3.6,0)).project(camera);
- if(hinaMeetingScreen.z< -1||hinaMeetingScreen.z>1||Math.abs(hinaMeetingScreen.x)>1||Math.abs(hinaMeetingScreen.y)>1){hinaMeetingBubble.style.display='none';return;}
- hinaMeetingBubble.textContent=meetingHinaLine;
- hinaMeetingBubble.style.left=Math.max(135,Math.min(innerWidth-135,(hinaMeetingScreen.x*.5+.5)*innerWidth))+'px';
- hinaMeetingBubble.style.top=Math.max(100,(-hinaMeetingScreen.y*.5+.5)*innerHeight-8)+'px';
- hinaMeetingBubble.style.display='block';
- // Keep both characters' speech readable when they stand close together.
- // Move Hina's bubble up by the exact overlapping height, not a fixed offset.
- const other=$('bubble');
- if(other&&other.classList.contains('show')&&getComputedStyle(other).opacity!=='0'){
-  const a=hinaMeetingBubble.getBoundingClientRect();
-  const b=other.getBoundingClientRect();
-  const margin=12;
-  if(a.left<b.right+margin&&a.right>b.left-margin&&a.top<b.bottom+margin&&a.bottom>b.top-margin){
-   const raisedTop=parseFloat(hinaMeetingBubble.style.top)-(a.bottom-b.top+margin);
-   hinaMeetingBubble.style.top=Math.max(a.height+12,raisedTop)+'px';
+const daeunCompanionBubble=document.createElement('div');
+const companionBubbleStyle='position:fixed;z-index:42;display:none;max-width:260px;padding:10px 13px;border-radius:14px;background:#fffdf1;color:#20332d;border:2px solid #304a45;font:600 13px/1.5 sans-serif;text-align:center;pointer-events:none;transform:translate(-50%,-100%);box-shadow:0 4px 12px #0004';
+hinaMeetingBubble.style.cssText=companionBubbleStyle;daeunCompanionBubble.style.cssText=companionBubbleStyle;
+document.body.appendChild(hinaMeetingBubble);document.body.appendChild(daeunCompanionBubble);
+const hinaMeetingScreen=new THREE.Vector3(),daeunMeetingScreen=new THREE.Vector3();
+const companionSpeech={speaker:'',line:'',until:0};
+function showCompanionSpeech(speaker,line,duration=6500){
+ survivorSpeech.post(speaker,line,'companion',duration);
+ companionSpeech.speaker=speaker;companionSpeech.line=line;companionSpeech.until=performance.now()+duration;
+ if(speaker==='hina'){meetingHinaLine=line;meetingHinaLineUntil=companionSpeech.until;}
+}
+function drawOneCompanionBubble(el,screen,mesh,line,active){
+ if(!active||!line){el.style.display='none';return;}
+ screen.copy(mesh.position).add(new THREE.Vector3(0,3.6,0)).project(camera);
+ if(screen.z< -1||screen.z>1||Math.abs(screen.x)>1||Math.abs(screen.y)>1){el.style.display='none';return;}
+ el.textContent=line;el.style.left=Math.max(135,Math.min(innerWidth-135,(screen.x*.5+.5)*innerWidth))+'px';
+ el.style.top=Math.max(100,(-screen.y*.5+.5)*innerHeight-8)+'px';el.style.display='block';
+}
+// Screen-space layout: shift lower-priority speech upward instead of overlapping.
+function avoidSpeechBubbleOverlaps(){
+ const els=[$('bubble'),hinaMeetingBubble,daeunCompanionBubble].filter(el=>el&&((el.id==='bubble'&&el.classList.contains('show'))||(el.id!=='bubble'&&el.style.display==='block')));
+ // Sleep Zzz is pinned to the sleeper; move regular dialogue instead.
+ els.sort((a,b)=>Number(b.classList.contains('sleep-bubble'))-Number(a.classList.contains('sleep-bubble')));
+ const placed=[];
+ for(const el of els){
+  let rect=el.getBoundingClientRect();
+  for(let attempt=0;attempt<7;attempt++){
+   const collision=placed.find(p=>rect.left<p.right+9&&rect.right>p.left-9&&rect.top<p.bottom+9&&rect.bottom>p.top-9);
+   if(!collision)break;
+   const current=parseFloat(el.style.top)||rect.top;
+   el.style.top=Math.max(48,current-Math.max(24,rect.height+12))+'px';
+   rect=el.getBoundingClientRect();
   }
+  placed.push(rect);
  }
+}
+function drawHinaMeetingBubble(){
+ const now=performance.now();
+ // Sleeping bubbles have priority: don't flash dialogue over a sleeping character.
+ const hinaAsleep=hinaSleepSpeechLock();
+ const daeunAsleep=daeunSleepSpeechLock();
+ const chatActive=companionSpeech.until>now;
+ if(chatActive){
+  drawOneCompanionBubble(hinaMeetingBubble,hinaMeetingScreen,hana,companionSpeech.line,companionSpeech.speaker==='hina'&&!hinaAsleep&&survivorSpeech.companionOwns('hina'));
+  drawOneCompanionBubble(daeunCompanionBubble,daeunMeetingScreen,daeun.mesh,companionSpeech.line,companionSpeech.speaker==='daeun'&&!daeunAsleep&&survivorSpeech.companionOwns('daeun'));
+  return;
+ }
+ daeunCompanionBubble.style.display='none';
+ // Preserve the original first-meeting line while the reunion scene is playing.
+ const active=meetingHinaLine&&now<meetingHinaLineUntil&&meetingFollowUntil>now;
+ if(active&&observedId!=='hina'&&!hinaAsleep)drawOneCompanionBubble(hinaMeetingBubble,hinaMeetingScreen,hana,meetingHinaLine,true);
+ else hinaMeetingBubble.style.display='none';
 }
 function finishMeetingFollow(){
  if(!meetingFollowUntil)return;
@@ -5159,7 +5419,7 @@ function checkHinaDaeunMeeting(){
  if(distance>5.5)return;
  hinaControlUnlocked=true;hinaMeetAnnounced=true;
  activateSharedHome();
- meetingFollowUntil=performance.now()+15000;meetingNextTalk=performance.now();meetingTalkIndex=0;
+ meetingFollowUntil=performance.now()+15000;meetingNextTalk=performance.now();meetingTalkIndex=0;companionChat.pending=null;companionChat.nextAt=performance.now()+21000;companionSpeech.until=0;
  log('🤝 히나와 다은이 만났어! 히나 수동 조작이 해금되었어.');
  daeunSay('히나야! 드디어 찾았어! 이제 너도 직접 도와줄 수 있겠어.');
  meetingHinaLine='다은아! 무사했구나. 함께 살아남자!';meetingHinaLineUntil=performance.now()+3800;say(meetingHinaLine);
@@ -5175,8 +5435,16 @@ function setHinaAuto(on){
 }
 // v15.2: Do not merge legacy album-only storage into a fresh dual-survivor game.
 // The dual save snapshot remains the sole authority when explicitly continuing a saved game.
-// Persistence intentionally disabled for prototype.
-const DAEUN_RULES=Object.freeze({walkSpeed:1.5,willBaseDrain:.011,willMoveDrain:.014,willDistanceDrain:.012,willNightDrain:.009,willLowNeedsDrain:.045,willRestRecovery:.145,lowEnergy:20,lowEnergySpeed:.45,hungerEmptySpeed:.32,thirstEmptySpeed:.35,minSpeed:.1,exhaustionResume:8,restRecovery:1.05,exhaustionMinRecovery:.55,hungerRate:.13,thirstRate:.16,autoRadius:37});
+// v4.0: progressStore below owns persistence for both survivors.
+// Character-specific profiles keep existing balance; zero will consistently slows travel.
+function survivorMovementMultiplier(values,profile='daeun'){
+ if(profile==='hinaAuto')return (values.energy<25?.52:values.energy<45?.76:1)*(values.will<=0?.12:1);
+ if(profile==='hinaManual')return values.will<=0?.12:1;
+ const r=DAEUN_RULES;
+ const penalty=(values.energy<=r.lowEnergy?r.lowEnergySpeed:1)*(values.will<=0?r.zeroWillSpeed:1)*(values.hunger===0?r.hungerEmptySpeed:1)*(values.thirst===0?r.thirstEmptySpeed:1);
+ return Math.max(values.will<=0?.06:r.minSpeed,penalty);
+}
+const DAEUN_RULES=Object.freeze({walkSpeed:1.5,willBaseDrain:.011,willMoveDrain:.014,willDistanceDrain:.012,willNightDrain:.009,willLowNeedsDrain:.045,willRestRecovery:.145,lowEnergy:20,lowEnergySpeed:.45,zeroWillSpeed:.12,hungerEmptySpeed:.32,thirstEmptySpeed:.35,minSpeed:.1,exhaustionResume:8,restRecovery:1.05,exhaustionMinRecovery:.55,hungerRate:.13,thirstRate:.16,autoRadius:37});
 function daeunPondAt(x,z){return pondInside(x,z,DAEUN_ZONE.pond.x,DAEUN_ZONE.pond.z,4.65,3.45,.76);}
 function deepPondAt(x,z){return pondInside(x,z,-9,4,4.65,3.45,.55)||pondInside(x,z,DAEUN_ZONE.pond.x,DAEUN_ZONE.pond.z,4.65,3.45,.76);}
 // v28.5: continuous obstacle sliding shared by Hina AI and Daeun manual/AI movement.
@@ -5706,6 +5974,33 @@ function clearHinaCaveStrayPlants(){
  for(const obj of removed){scene.remove(obj);obj.traverse(o=>{if(o.isMesh)o.geometry?.dispose?.()});}
 }
 clearHinaCaveStrayPlants();
+// v3.78: remove intrusive green ground slabs from the *inside* of Hina's cave.
+// Preserve roof turf, the stone floor and the structural walls.
+function clearHinaCaveInteriorGreenTerrain(){
+ const removedMeshes=new Set(),removedSurfaces=new Set();
+ // Remove every low non-structural walkable slab inside the hollow room,
+ // including tiny brown terrain records that have no mesh handle.
+ for(const surface of wildlifeSurfaces){
+  const mesh=surface.mesh;
+  if(mesh?.userData.caveStructure)continue;
+  const overlaps=surface.x+surface.rx>caveX-3.85&&surface.x-surface.rx<caveX+3.85&&surface.z+surface.rz>caveZ-3.25&&surface.z-surface.rz<caveZ+3.15;
+  if(!overlaps||surface.bottom>.55||surface.top>3.25)continue;
+  if(surface.rx>5||surface.rz>5)continue;
+  // Material identity is checked where a mesh exists; mesh-less records are
+  // the small procedural terrain/collision patches in this same cave pocket.
+  if(!mesh||[grass,moss,dirt,dirt2,rock,rockDark,stone].includes(mesh.material)){
+   removedSurfaces.add(surface);if(mesh)removedMeshes.add(mesh);
+  }
+ }
+ for(const mesh of removedMeshes){
+  scene.remove(mesh);mesh.geometry?.dispose?.();
+  const i=cameraOccluders.indexOf(mesh);if(i>=0)cameraOccluders.splice(i,1);
+  for(let j=groundPlatforms.length-1;j>=0;j--)if(groundPlatforms[j].mesh===mesh)groundPlatforms.splice(j,1);
+ }
+ for(let k=wildlifeSurfaces.length-1;k>=0;k--)if(removedSurfaces.has(wildlifeSurfaces[k]))wildlifeSurfaces.splice(k,1);
+}
+clearHinaCaveInteriorGreenTerrain();
+
 // Daeun has her own snakes; Hina's snake encounter system is unchanged.
 const daeunSnakes=[];
 let nextDaeunSnakeAt=DAY_SECONDS*1.6;
@@ -6021,14 +6316,40 @@ function refreshDaeunBagDay(){
  if(b.practiceDay!==today){b.practiceDay=today;b.today=0;}
 }
 function updateDaeunBagVisual(){daeunWovenBag.visible=!!daeun.bag?.crafted&&!(['sleep','manualSleep'].includes(daeun.action));}
-function daeunNearCave(){return Math.hypot(daeun.mesh.position.x-daeun.sites.shelter.x,daeun.mesh.position.z-daeun.sites.shelter.z)<7;}
+function daeunNearCave(){return Math.hypot(daeun.mesh.position.x-daeun.sites.shelter.x,daeun.mesh.position.z-daeun.sites.shelter.z)<9;}
+// v3.84: a cave being nearby is NOT the same as sleeping inside its safe floor.
+function daeunInsideSafeShelter(){const p=daeun.mesh.position;return inCaveWalkZone(p.x,p.z)||caveEntrancePortal(p.x,p.z);}
+function daeunNightShelterPriority(){
+ const d=daeun,p=d.mesh.position,h=clockParts().h;
+ if(!d.auto||!(h>=19||h<6)||daeunInsideSafeShelter())return false;
+ // Do not interrupt life-saving drinking/eating, or an existing return route.
+ if(d.stats.thirst<18||d.stats.hunger<15)return false;
+ if(d.destination&&['sleep','shelterReturn'].includes(d.action))return true;
+ const distance=Math.hypot(p.x-d.sites.shelter.x,p.z-d.sites.shelter.z);
+ if(distance>26)return false; // distant survivors retain the normal survival fallback
+ d.path=[];d.destination=null;d.failedRoute=null;
+ if(setDaeunDestination(d.sites.shelter,'sleep')){
+  if(elapsed>=(d.timers.shelterReminderAt||0)){daeunSay('동굴이 바로 앞이야. 밖에서 자지 말고 안으로 들어가자.');d.timers.shelterReminderAt=elapsed+70;}
+  return true;
+ }
+ // A blocked route must not turn into outdoor sleep next to the entrance.
+ d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+5;
+ return true;
+}
+// Bag crafting is Daeun's own skill at either home cave, including shared Hina cave.
+function daeunBagCraftPoint(){
+ // Place the crafting spot on the opposite side of the cave from the campfire,
+ // matching the spaced-out interaction markers used at Daeun's original cave.
+ const c=daeun.sites.shelter, x=c.x-4.0, z=c.z+2.35;
+ return new THREE.Vector3(x,terrainTopAt(x,z),z);
+}
 function bagPracticeAtCave(){
  if(!isManualDaeun()||daeun.bag.crafted||!daeunNearCave())return false;
  refreshDaeunBagDay();
  const b=daeun.bag;
  if(b.today>=DAEUN_BAG_DAILY_MAX){daeunSay('오늘은 가방 제작을 충분히 연습했어. 내일 이어서 하자.');return false;}
  if(daeun.inventory.branches<DAEUN_BAG_BRANCH_COST){daeunSay('나뭇가지 최소 2개가 필요합니다.');return false;}
- return manualAction('bag',daeunResources.fire.group.position.clone().add(new THREE.Vector3(-5,0,0)));
+ return manualAction('bag',daeunBagCraftPoint());
 }
 function storeBranchesAtCave(){
  if(!isManualDaeun()||daeun.inventory.branches<1||!daeunNearCave())return false;
@@ -6040,7 +6361,7 @@ function observedCharacter(){return characters.get(observedId)||characters.get('
 let daeunBerrySelectionDay=0;
 let daeunPetRabbit=null;
 function dRandom(){daeun.aiRandom=(Math.imul(1664525,daeun.aiRandom)+1013904223)>>>0;return daeun.aiRandom/4294967296;}
-function daeunSay(text){daeun.thought=text;daeun.speechExpiresAt=performance.now()+7500;daeun.log.unshift({at:elapsed,text});if(daeun.log.length>28)daeun.log.length=28;}
+function daeunSay(text){survivorSpeech.post('daeun',text);daeun.thought=text;daeun.speechExpiresAt=performance.now()+7500;daeun.log.unshift({at:elapsed,text});if(daeun.log.length>28)daeun.log.length=28;}
 // Developer-friendly navigation diagnostics: visible in the action log and copyable from console.
 const daeunNavDiagnostics={lastX:NaN,lastZ:NaN,repeats:0,lastAt:-999};
 function daeunNavWarning(message,goal=null){
@@ -6142,7 +6463,7 @@ function setDaeunDestination(point,action='travel'){
  const p=point.clone?point.clone():new THREE.Vector3(point.x,.4,point.z);
  // v18.4: A shelter is an area, not a single unreachable point behind a cave wall.
  const shelterTrip=Math.hypot(p.x-daeun.sites.shelter.x,p.z-daeun.sites.shelter.z)<1.5;
- if(shelterTrip&&daeunNearCave()){
+ if(shelterTrip&&daeunNearCave()&&daeunInsideSafeShelter()){
   daeun.path=[];daeun.destination=null;daeun.action=action==='sleep'?'sleep':action==='rest'?'rest':'idle';daeun.actionAge=0;
   if(action==='sleep')daeunSleepStart();
   return true;
@@ -6226,7 +6547,7 @@ function daeunFirstDayThink(){
  const d=daeun,p=d.mesh.position,t=clockParts(),h=t.h+t.m/60;
  if(elapsed-d.timers.introStart<18)return;
  if(h>=19||h<6){
-  if(daeunNearCave()){daeunSleepStart();return;}
+  if(daeunInsideSafeShelter()){daeunSleepStart();return;}
   if(setDaeunDestination(d.sites.shelter,'sleep')){daeunSay('어두워졌어. 낮에 봐둔 동굴로 돌아가자.');return;}
   d.action='rest';d.actionAge=0;d.timers.nextThink=elapsed+24;
   daeunSay('동굴까지 갈 수 없네… 안전한 곳에서 밤을 보내자.');return;
@@ -6287,6 +6608,8 @@ class DaeunAIController{
   // Needs are evaluated immediately after waking, before exploration detours.
   const urgentWater=s.thirst<57,urgentFood=s.hunger<57;
   if(!sharedHomeActive&&clockParts().day===1&&d.auto&&!urgentWater&&!urgentFood){if(!daeunNightNeedsTalk())daeunFirstDayThink();return;}
+  // Shelter is a survival priority, ahead of route-failure exploration and rest.
+  if(daeunNightShelterPriority())return;
   // When a route repeatedly fails, choose a genuinely reachable nearby waypoint first.
   if(d.failedRoute&&elapsed>=d.failedRoute.until)d.failedRoute=null;
   if(d.failedRoute&&elapsed<d.failedRoute.until&&!urgentWater&&!urgentFood){
@@ -6300,12 +6623,12 @@ class DaeunAIController{
    }
    d.action='idle';d.timers.nextThink=elapsed+8;return;
   }
-  if(daeunNearCave()&&d.action==='idle'&&(clockParts().h>=21||clockParts().h<5)&&elapsed>=(d.timers.sleepCooldownUntil||0)&&(s.energy<90||s.will<85)){if(daeunSleepStart())return;}
+  if(daeunInsideSafeShelter()&&d.action==='idle'&&(clockParts().h>=21||clockParts().h<5)&&elapsed>=(d.timers.sleepCooldownUntil||0)&&(s.energy<90||s.will<85)){if(daeunSleepStart())return;}
   if(bearNearRoute(pos.x,pos.z)&&bearTerritoryDistance(pos.x,pos.z)<bearTerritory.chaseRadius){
    if(setDaeunDestination(d.sites.shelter,'home'))daeunSay('곰이 있는 길은 위험해. 동굴 쪽으로 돌아가자.');
    return;
   }
-  if((s.energy<25||s.will<45)&&!urgentWater&&!urgentFood){if(pos.distanceTo(d.sites.shelter)<4){d.action='rest';d.actionAge=0;daeunSay('여기서 몸과 마음을 좀 쉬자.');}else if(!daeunCaveReturnSafe()||!setDaeunDestination(d.sites.shelter,'rest')){d.action='rest';d.actionAge=0;}return;}
+  if((s.energy<25||s.will<45)&&!urgentWater&&!urgentFood){if(daeunInsideSafeShelter()){d.action='rest';d.actionAge=0;daeunSay('여기서 몸과 마음을 좀 쉬자.');}else if(!daeunCaveReturnSafe()||!setDaeunDestination(d.sites.shelter,'rest')){d.action='rest';d.actionAge=0;}return;}
   if(urgentWater){
    // An unreachable exact pond coordinate must not trap Daeun in idle/detour.
    // First try the existing shore stop, then reachable bank-side action spots.
@@ -6366,17 +6689,13 @@ class DaeunAIController{
   }
   // Keep a lit fire alive with branches from the bag; no cave stockpile.
   if(!sharedHomeActive&&inv.fuel>0&&inv.fuel<40&&inv.branches>=2){
-   if(daeunNearCave()){inv.branches-=2;inv.fuel=Math.min(100,inv.fuel+40);d.timers.fuelFlutterUntil=elapsed+2.4;d.lastCraftActiveAt=elapsed;daeunSay('🪵 모닥불에 나뭇가지를 넣어 불을 유지했어.');}
+   if(daeunNearCave()){if(beginDaeunFuelFeed())return;setDaeunDestination(daeunDisplayedFirePosition(),'home');return;}
    else {setDaeunDestination(d.sites.shelter,'home');return;}
   }
   // v17.9: auto fire study is a real multi-day activity, never a free ignition.
   refreshDaeunDailyPractice();
   if(sharedHomeActive&&fireSuccess&&fireKnowledge<40&&inv.branches>=2){
-   if(daeunNearCave()){
-    inv.branches-=2;fireKnowledge=Math.min(100,fireKnowledge+40);
-    d.timers.fuelFlutterUntil=elapsed+2.4;
-    daeunSay('🔥 히나 동굴의 모닥불에 나뭇가지 2개를 넣었어.');
-   }else{setDaeunDestination(d.sites.shelter,'home');return;}
+   if(daeunNearCave()){if(beginDaeunFuelFeed())return;setDaeunDestination(daeunDisplayedFirePosition(),'home');return;}else{setDaeunDestination(d.sites.shelter,'home');return;}
   }
   if((sharedHomeActive?!fireSuccess:inv.fuel<=0)&&d.dailyPractice.fire<DAEUN_DAILY_PRACTICE_LIMIT.fire){
    if(inv.branches>0){
@@ -6440,8 +6759,11 @@ class DaeunAIController{
    const t=(sharedHomeActive?berryTrees:daeunResources.berries)[d.resourceId];if(t&&t.stock>0&&inv.berries<daeunBagCap()){const n=Math.min(3,t.stock);const picked=Math.min(n,daeunBagCap()-inv.berries);t.stock-=picked;inv.berries+=picked;t.fruits.forEach((f,i)=>f.visible=i<t.stock);if(s.hunger<70){inv.berries--;s.hunger=Math.min(100,s.hunger+34);}daeunSay('열매를 모았어. 조금은 나중을 위해 남겨 두자.');d.memory.push({kind:'forage',at:elapsed});}
   }
   if(d.action==='branch'){const b=(sharedHomeActive?branchPiles:daeunResources.branches)[d.branchId];if(b&&b.available){daeunResourceVisited.set(b,elapsed);b.available=false;b.group.visible=false;b.respawnAt=elapsed+DAY_SECONDS*(1.25+dRandom()*2.25);const gained=dRandom()<.2?2:1;inv.branches+=gained;daeunSay(gained===2?'운이 좋네! 나뭇가지 두 개를 주웠어!':'마른 나뭇가지를 주웠어.');}}
-  if(['sleep','sleepPrepare','rest'].includes(d.action)){d.actionAge=0;return;}
-  if(d.mesh.position.distanceTo(d.sites.shelter)<4){while(inv.berries>1&&inv.caveBerries<8){inv.berries--;inv.caveBerries++;}if(!sharedHomeActive&&inv.branches>=2&&inv.fuel>0&&inv.fuel<70){inv.branches-=2;inv.fuel=Math.min(100,inv.fuel+40);d.timers.fuelFlutterUntil=elapsed+2.4;d.lastCraftActiveAt=elapsed;daeunSay('모닥불에 나뭇가지를 넣었어.');}}
+  if(['sleep','sleepPrepare','rest'].includes(d.action)){
+   if(d.action==='sleep'&&!daeunInsideSafeShelter()&&daeunNightShelterPriority())return;
+   d.actionAge=0;return;
+  }
+  if(d.mesh.position.distanceTo(d.sites.shelter)<4){while(inv.berries>1&&inv.caveBerries<8){inv.berries--;inv.caveBerries++;}if(!sharedHomeActive&&inv.branches>=2&&inv.fuel>0&&inv.fuel<70){if(beginDaeunFuelFeed())return;}}
   d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+2;
  }
 }
@@ -6482,6 +6804,11 @@ function outdoorSleepBlocked(who){
  return !(inCaveWalkZone(p.x,p.z)||caveEntrancePortal(p.x,p.z))&&!outdoorSleepAllowed(who);
 }
 function daeunSleepStart(manual=false){
+ if(!manual&&!daeunInsideSafeShelter()){
+  // Do not recursively re-enter setDaeunDestination from sleep start.
+  daeun.action='idle';daeun.actionAge=0;daeun.timers.nextThink=elapsed+1;
+  return false;
+ }
  if(!manual&&elapsed<(daeun.timers.sleepCooldownUntil||0))return false;
  cancelManualTask();daeun.path=[];daeun.destination=null;
  daeun.action=manual?'manualSleep':'sleepPrepare';daeun.actionAge=0;
@@ -6497,7 +6824,37 @@ function clearPlayerInput(){playerKeys.clear();playerPointers.clear();resetJoyst
 function cancelManualTask(){daeun.manualTask=null;if(['manualPick','manualDrink','manualEat','manualRest','manualBranch','manualFire','manualRabbit','manualFish','manualBag','manualStore'].includes(daeun.action)){daeun.action='idle';daeun.actionAge=0;}}
 function interruptManualMovement(){if(daeun.manualTask)return;cancelManualTask();daeun.path=[];daeun.destination=null;daeun.action='manual';}
 function isManualDaeun(){return observedId==='daeun'&&!daeun.auto;}
+// One timed fuel transaction for the independent/common camp and auto/manual buttons.
+// Costs and reward are committed together; interruption never consumes inventory.
+function beginDaeunFuelFeed(){
+ const d=daeun,fire=daeunDisplayedFirePosition();
+ if(d.fuelFeed||d.inventory.branches<2||daeunDisplayedFuel()<=0)return false;
+ const approaching=Math.hypot(d.mesh.position.x-fire.x,d.mesh.position.z-fire.z)>resourceReach('fire');
+ const route=approaching?navBuild(d.mesh.position,fire):[];if(approaching&&!route.length)return false;
+ d.manualTask=null;sharedDaeunResourceTask=null;d.autoTask=null;
+ d.path=route;d.destination=approaching?fire.clone():null;d.action=approaching?'fuelApproach':'feedFuel';d.actionAge=0;
+ d.fuelFeed={started:elapsed,shared:sharedHomeActive,phase:approaching?'approach':'perform'};
+ d.timers.fuelFlutterUntil=elapsed+FIREWOOD_FEED_SECONDS;d.lastCraftActiveAt=elapsed;
+ d.mesh.rotation.y=Math.atan2(fire.x-d.mesh.position.x,fire.z-d.mesh.position.z);
+ daeunSay('🪵 모닥불에 나뭇가지를 넣는 중…');return true;
+}
+function updateDaeunFuelFeed(){
+ const d=daeun,t=d.fuelFeed;if(!t)return;
+ const fire=daeunDisplayedFirePosition();
+ if(t.phase==='approach'){
+  if(d.action!=='fuelApproach'||elapsed-t.started>45||t.shared!==sharedHomeActive){d.fuelFeed=null;if(d.action==='fuelApproach'){d.action='idle';d.path=[];d.destination=null;}return;}
+  if(Math.hypot(d.mesh.position.x-fire.x,d.mesh.position.z-fire.z)>resourceReach('fire'))return;
+  t.phase='perform';t.started=elapsed;d.path=[];d.destination=null;d.action='feedFuel';d.actionAge=0;d.timers.fuelFlutterUntil=elapsed+FIREWOOD_FEED_SECONDS;
+ }
+ if(d.action!=='feedFuel'||t.shared!==sharedHomeActive||d.inventory.branches<2||daeunDisplayedFuel()<=0||Math.hypot(d.mesh.position.x-fire.x,d.mesh.position.z-fire.z)>resourceReach('fire')){d.fuelFeed=null;if(d.action==='feedFuel')d.action='idle';return;}
+ if(elapsed-t.started<FIREWOOD_FEED_SECONDS)return;
+ d.fuelFeed=null;d.inventory.branches-=2;
+ if(sharedHomeActive)fireKnowledge=Math.min(100,fireKnowledge+40);else d.inventory.fuel=Math.min(100,d.inventory.fuel+40);
+ d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+2;
+ daeunSay('🪵 나뭇가지 2개를 넣었어! 불 유지 +40');
+}
 function updateDaeun(step,realDt){
+ updateDaeunFuelFeed();
  updateDaeunSnakes(step);
  const d=daeun,s=d.stats,inv=d.inventory;let moving=false;
  if(sharedHomeActive&&d.destination&&Math.hypot(d.destination.x-caveX,d.destination.z-caveZ)>100){
@@ -6545,7 +6902,8 @@ function updateDaeun(step,realDt){
  }
  d.actionAge+=step;
  // v19.1: allow a brief settling-in beat before lying down; no Zzz while preparing.
- if(d.action==='sleepPrepare'&&d.actionAge>=2.4){d.action='sleep';d.actionAge=0;daeunSay('휴… 이제 조금 안심이 돼. 잘 자자.');}
+ if(d.auto&&['sleepPrepare','sleep'].includes(d.action)&&!daeunInsideSafeShelter()&&daeunNightShelterPriority()){d.timers.nextThink=elapsed+4;}
+ if(d.action==='sleepPrepare'&&d.actionAge>=2.4&&(!d.auto||daeunInsideSafeShelter())){d.action='sleep';d.actionAge=0;daeunSay('휴… 이제 조금 안심이 돼. 잘 자자.');}
  s.hunger=Math.max(0,s.hunger-step*DAEUN_RULES.hungerRate);s.thirst=Math.max(0,s.thirst-step*(raining()?.035:DAEUN_RULES.thirstRate));
  // v26.6: life-threatening needs override an existing exploration/rest route.
  // A queued destination otherwise prevents the AI from thinking until arrival.
@@ -6559,7 +6917,11 @@ function updateDaeun(step,realDt){
  daeunNightNeedsTalk();
  if(s.energy<=0&&!d.restLocked){cancelManualTask();d.restLocked=true;d.path=[];d.destination=null;d.action='exhausted';d.actionAge=0;}
  const resting=d.restLocked||['rest','sleep','sleepPrepare','manualRest','manualSleep'].includes(d.action)&&!d.path.length;
- if(resting){const efficiency=(s.hunger===0?.32:1)*(s.thirst===0?.45:1);s.energy=Math.min(100,s.energy+step*DAEUN_RULES.restRecovery*(outdoorSleepBlocked('daeun')?.08:(d.action==='sleep'||d.action==='manualSleep'?.42:1))*Math.max(d.restLocked?DAEUN_RULES.exhaustionMinRecovery:.22,efficiency));
+ if(resting){const efficiency=(s.hunger===0?.32:1)*(s.thirst===0?.45:1);s.energy=Math.min(100,s.energy+step*survivorRecoveryPerSecond({
+  sleeping:['sleep','manualSleep'].includes(d.action),hunger:s.hunger,thirst:s.thirst,
+  outdoorBlocked:(clockParts().h>=22||clockParts().h<4)&&!daeunInsideSafeShelter(),
+  quality:d.restLocked?DAEUN_RULES.exhaustionMinRecovery:1
+ }));
   // Rest helps morale, but does not instantly erase prolonged isolation or hunger.
   const sheltered=inCaveWalkZone(d.mesh.position.x,d.mesh.position.z)||caveEntrancePortal(d.mesh.position.x,d.mesh.position.z);
   const moraleRecovery=DAEUN_RULES.willRestRecovery*(s.will>=85?.12:s.will>=70?.45:1)*(s.hunger<20||s.thirst<20?.38:1)*(sheltered?1:.45);
@@ -6572,10 +6934,9 @@ function updateDaeun(step,realDt){
   if(d.restLocked&&s.energy>=DAEUN_RULES.exhaustionResume){d.restLocked=false;d.action='idle';d.timers.nextThink=elapsed;daeunSay('조금 회복했어. 천천히 움직일 수 있겠어.');}
   else if(!d.restLocked&&d.action!=='manualRest'&&d.action!=='manualSleep'&&d.action!=='sleep'&&d.actionAge>12&&((s.energy>86&&s.will>=75)||s.thirst<35||s.hunger<35)){d.action='idle';d.timers.nextThink=elapsed;}
  }else{
-  const penalty=(s.energy<=20?DAEUN_RULES.lowEnergySpeed:1)*(s.hunger===0?DAEUN_RULES.hungerEmptySpeed:1)*(s.thirst===0?DAEUN_RULES.thirstEmptySpeed:1);
-  const distance=step*DAEUN_RULES.walkSpeed*Math.max(DAEUN_RULES.minSpeed,penalty);let movement=null;
+  const distance=step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(s);let movement=null;
   if(isManualDaeun()&&!d.manualTask&&(playerKeys.size||Math.hypot(joystick.x,joystick.y)>.12)){
-   interruptManualMovement();const forward=new THREE.Vector3();camera.getWorldDirection(forward);forward.y=0;forward.normalize();const right=new THREE.Vector3(-forward.z,0,forward.x);movement=new THREE.Vector3();
+   interruptManualMovement();const forward=manualMovementScratch.forward;camera.getWorldDirection(forward);forward.y=0;forward.normalize();const right=manualMovementScratch.right.set(-forward.z,0,forward.x);movement=manualMovementScratch.movement.set(0,0,0);
    if(playerKeys.has('KeyW'))movement.add(forward);if(playerKeys.has('KeyS'))movement.sub(forward);if(playerKeys.has('KeyD'))movement.add(right);if(playerKeys.has('KeyA'))movement.sub(right);if(Math.hypot(joystick.x,joystick.y)>.12){movement.addScaledVector(forward,-joystick.y).addScaledVector(right,joystick.x);}if(movement.lengthSq())movement.normalize().multiplyScalar(distance);
   }else if(d.path.length){
    const dest=d.path[0],dx=dest.x-d.mesh.position.x,dz=dest.z-d.mesh.position.z,len=Math.hypot(dx,dz);
@@ -6644,7 +7005,7 @@ function updateDaeun(step,realDt){
   const drain=sheltered?0:DAEUN_RULES.willBaseDrain+(moving?DAEUN_RULES.willMoveDrain:0)+(distanceFromHome>DAEUN_RULES.autoRadius*.75?DAEUN_RULES.willDistanceDrain:0)+DAEUN_RULES.willNightDrain*fear+(s.hunger<25||s.thirst<25?DAEUN_RULES.willLowNeedsDrain:0);
   // Night exploration costs three times as much will, including manual control.
   const nightExposureMultiplier=!sheltered&&nightFearIntensity()>.05?3:1;
-  s.will=Math.max(0,Math.min(100,s.will+step*((!moving&&!darkHours()&&distanceFromHome<DAEUN_RULES.autoRadius*.5&&s.hunger>=40&&s.thirst>=40)?.018:0)-step*drain*(darkHours()&&moving&&!sheltered?2:1)*nightExposureMultiplier));
+  s.will=Math.max(0,Math.min(100,s.will+step*((!moving&&!darkHours()&&distanceFromHome<DAEUN_RULES.autoRadius*.5&&s.hunger>=40&&s.thirst>=40)?.018:0)-step*drain*(darkHours()&&moving&&!sheltered?2:1)*nightExposureMultiplier*companionWillDrainMultiplier('daeun')));
  }
  // Eating while seated does not interrupt rest, its recovery or seated animation.
  if(d.seatedEating>0){
@@ -6674,8 +7035,8 @@ function updateDaeun(step,realDt){
    const firstReady=d.skills.fire>=100&&d.firePracticeDays.length>=3;
    const success=firstReady&&dRandom()<(raining()?.24:.75);
    if(success){
-    if(sharedHomeActive){fireSuccess=true;fireEverLit=true;fireKnowledge=100;campfire.visible=true;}
-    else inv.fuel=Math.max(inv.fuel,65);
+    if(sharedHomeActive){const wasBurning=fireSuccess;fireSuccess=true;fireEverLit=true;fireKnowledge=100;campfire.visible=true;awardIgnitionMorale('shared',wasBurning);}
+    else {const wasBurning=inv.fuel>0;inv.fuel=Math.max(inv.fuel,65);awardIgnitionMorale('daeun',wasBurning);}
     daeunSay('🔥 드디어 불이 붙었어! 연습한 보람이 있어!');
    }
    else daeunSay('🔥 불 피우기 연습 '+d.skills.fire+'% · 오늘 '+d.dailyPractice.fire+'/3회'+(firstReady?' · 이번에는 실패했어.':' · 아직 연습이 필요해.'));
@@ -6734,7 +7095,7 @@ function updateDaeun(step,realDt){
     d.attempts[kind]++;d.dailyPractice[kind]++;if(kind==='fire'&&!d.firePracticeDays.includes(clockParts().day))d.firePracticeDays.push(clockParts().day);d.skills[kind]=Math.min(100,skill+gain);
     const mastered=d.skills[kind]>=100&&(kind!=='fire'||d.firePracticeDays.length>=3);
     const success=mastered&&dRandom()<(kind==='fire'?(raining()?.24:.75):kind==='rabbit'?.32:.48);
-    if(success&&kind==='fire'){inv.fuel=Math.max(inv.fuel,65);daeunSay('🔥 모닥불 점화 성공! 나뭇가지를 더 모아 유지하자.');}
+    if(success&&kind==='fire'){const wasBurning=inv.fuel>0;inv.fuel=Math.max(inv.fuel,65);awardIgnitionMorale('daeun',wasBurning);daeunSay('🔥 모닥불 점화 성공! 나뭇가지를 더 모아 유지하자.');}
     else if(success&&kind==='rabbit'){const r=critters[task.index];if(r&&r.g.visible&&!r.caught&&!daeunPetRabbit){rabbitCaptureHold(r,'daeun');daeunPetRabbit=r;daeunSay(rabbitLine(rabbitSuccessLines));}else {if(r)scareRabbit(r,d.mesh.position);daeunSay(rabbitLine(rabbitFailLines));}}
     else if(success&&kind==='fish'){inv.fish++;daeunSay('🐟 물고기 잡기 성공! 소지품 +1');}
     else {if(kind==='rabbit'){const r=critters[task.index];if(r)scareRabbit(r,d.mesh.position);daeunSay(rabbitLine(rabbitFailLines));}else daeunSay((kind==='fire'?'🔥 불 피우기':'🐟 물고기잡기')+' 시도 · 숙련도 '+d.skills[kind]+'% (+ '+gain+'%)'+(mastered?' · 이번엔 실패':' · 아직 연습이 필요해'));}
@@ -6766,7 +7127,13 @@ function updateDaeun(step,realDt){
   const spot=wildlifeSpawnSpot(WILDLIFE_RABBIT_HABITATS,observer.x,observer.z,12);
   if(spot){r.homeX=spot.x;r.homeZ=spot.z;r.g.position.set(spot.x,rabbitGroundY(spot.x,spot.z)+.04,spot.z);r.habitatLeaveAt=elapsed+85+Math.random()*125;}
   else {r.g.visible=false;r.habitatReturnAt=elapsed+12;}}
- inv.fuel=Math.max(0,inv.fuel-step*(100/DAY_SECONDS)*(raining()?2:1));const fire=daeunResources.fire;
+ const previousDaeunFuel=inv.fuel;
+ inv.fuel=Math.max(0,inv.fuel-step*(100/DAY_SECONDS)*(raining()?2:1));
+ if(!sharedHomeActive&&previousDaeunFuel>0&&inv.fuel<=0){
+  s.will=Math.max(0,s.will-30);
+  daeunSay('불이 꺼졌어… 마음이 너무 불안해.');
+ }
+ const fire=daeunResources.fire;
  fire.group.visible=!sharedHomeActive&&inv.fuel>0;
  if(!sharedHomeActive&&inv.fuel>0){
   const hour=clockParts().h+clockParts().m/60;
@@ -6775,7 +7142,14 @@ function updateDaeun(step,realDt){
   fire.halo.material.opacity=.26+Math.sin(elapsed*5.7)*.055;
   fire.flames.forEach((f,i)=>{f.scale.y=.73+Math.sin(elapsed*9+i*1.7)*.23;f.rotation.y=elapsed*1.8+i;});
  }else fire.light.intensity=0;
- if(d.auto&&d.action==='rest'&&!d.path.length&&!d.restLocked&&nightFearIntensity()<=.05&&s.energy>=60&&s.will>=45){d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed;daeunSay('날이 밝았네. 이제 움직여 보자.');}
+ if(d.auto&&d.action==='rest'&&!d.path.length&&!d.restLocked&&nightFearIntensity()<=.05&&s.energy>=60&&s.will>=45){
+  d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed;
+  const now=clockParts();
+  if(now.h>=6&&now.h<9&&d.timers.lastMorningGreetingDay!==now.day){
+   d.timers.lastMorningGreetingDay=now.day;
+   daeunSay('날이 밝았네. 이제 움직여 보자.');
+  }
+ }
  // A stale cave-exit/detour action without waypoints must never block survival AI.
  if(d.auto&&!d.path.length&&!d.restLocked&&['caveExit','routeDetour','travel','explore','home'].includes(d.action)&&d.actionAge>4){
   d.action='idle';d.actionAge=0;d.destination=null;d.timers.nextThink=elapsed;
@@ -6789,8 +7163,10 @@ function updateDaeun(step,realDt){
    const doe=deerFamily[herd*3];if(!doe)continue;
    const dist=Math.hypot(d.mesh.position.x-doe.g.position.x,d.mesh.position.z-doe.g.position.z);
    if(dist>15)continue;
+   const firstDeerEncounter=!d.timers.deerFirstEncounterDone;
    const lines=['우와, 사슴 가족이다! 새끼들이 정말 귀여워.','저기 봐! 아기 사슴들이 엄마를 졸졸 따라가네.','조용히 구경해야지. 놀라서 달아나면 안 되니까.'];
-   daeunSay(lines[Math.floor(dRandom()*lines.length)]);
+   daeunSay(firstDeerEncounter?'저게 뭐야...? 사슴인가? 새끼들도 있네.':lines[Math.floor(dRandom()*lines.length)]);
+   d.timers.deerFirstEncounterDone=true;
    d.timers.deerSeenHerds.push(herd);d.timers.nextDeerRemarkAt=elapsed+115;break;
   }
  }
@@ -6799,7 +7175,7 @@ function updateDaeun(step,realDt){
  // Visual-only cave rest pose: idle waiting at night is seated, never mistaken for actual sleep.
  const caveDistance=Math.hypot(d.mesh.position.x-d.sites.shelter.x,d.mesh.position.z-d.sites.shelter.z);
  const caveQuiet=!moving&&!d.path.length&&caveDistance<7&&darkHours()&&['idle','sleepPrepare','recover','wake','exhausted'].includes(d.action);
- const craftingAction=['autoFirePractice','autoBagPractice','manualFire','manualBag'].includes(d.action);
+ const craftingAction=['autoFirePractice','autoBagPractice','manualFire','manualBag','feedFuel'].includes(d.action);
  // Keep the character standing after finishing a fire/bag interaction, including
  // when the cave's automatic night-rest pose would otherwise make her sit down.
  if(craftingAction)d.lastCraftActiveAt=elapsed;
@@ -6832,9 +7208,13 @@ function updateDualExploration(){
  if(changed)fogMesh.instanceMatrix.needsUpdate=true;
 }
 function drawDaeunBubble(){
- const isSleeping=survivorIsVisiblySleeping({sleepRequested:daeun.action==='sleep'||daeun.action==='manualSleep',lyingPose:Math.abs(daeun.mesh.rotation.x-Math.PI/2)<.1,moving:false,hasPath:daeun.path.length>0});
+ const isSleeping=daeunSleepSpeechLock();
  const el=$('bubble'),p=daeun.mesh.position.clone().add(new THREE.Vector3(0,isSleeping?1.8:3.3,0)).project(camera);
- const visibleSpeech=daeunVisibleSpeech();  const chargeRest=false; // Avoid a duplicate battery speech bubble during rest.
+ const visibleSpeech=survivorSpeech.current('daeun')?.text||daeunVisibleSpeech();
+  if(companionSpeech.until>performance.now()&&companionSpeech.speaker==='daeun'&&!isSleeping&&survivorSpeech.companionOwns('daeun')){
+   el.classList.remove('show','sleep-bubble');return;
+  }
+  const chargeRest=false; // Avoid a duplicate battery speech bubble during rest.
   el.textContent=isSleeping?'Zzz…':chargeRest?'🔋⚡':visibleSpeech;  if(!isSleeping&&!visibleSpeech&&!chargeRest){el.classList.remove('show','sleep-bubble');return;}
  applySurvivorSleepBubble(el,isSleeping);
  if(p.z< -1||p.z>1||Math.abs(p.x)>1||Math.abs(p.y)>1){el.classList.remove('show');return;}
@@ -6908,10 +7288,10 @@ function watchSkillGains(character,values){
 function refreshMobileVitals(){
  const values=observedId==='daeun'?daeun.stats:stats;
  const labels=[['체력','energy'],['갈증','thirst'],['허기','hunger'],['의지력','will'],['불유지','fireFuel']];
- mobileVitals.innerHTML='<div class="mv-name">'+(observedId==='daeun'?'다은':'히나')+' · 생존 상태</div>'+labels.map(([label,key])=>{
+ setHudHTML(mobileVitals,'<div class="mv-name">'+(observedId==='daeun'?'다은':'히나')+' · 생존 상태</div>'+labels.map(([label,key])=>{
  const n=Math.max(0,Math.min(100,Math.round(Number(key==='fireFuel'?(observedId==='daeun'?daeunDisplayedFuel():(fireEverLit&&fireSuccess?fireKnowledge:0)):values[key])||0)));
  return '<div class="mv-row"><span>'+label+'</span><div class="mv-track"><div class="mv-fill" style="width:'+n+'%;background:'+(key==='fireFuel'?'#ed9343':VITAL_BAR_COLORS[label]||'#75b8a6')+'"></div></div><span class="mv-num">'+n+'</span></div>';
- }).join('');
+ }).join(''));
 }
 const characterBar=document.createElement('div');characterBar.id='characterBar';characterBar.innerHTML='<button id="observeHina" aria-pressed="true">히나</button><button id="observeDaeun" aria-pressed="false">다은</button><button id="daeunAuto" hidden aria-pressed="true">자동 생존 ON</button><button id="hinaAuto" hidden aria-pressed="true">자동 생존 ON</button>';document.body.appendChild(characterBar);
 const pane=document.createElement('div');pane.id='daeunPane';pane.innerHTML='<div class="hinaProfileHead"><button type="button" class="profilePortrait" id="daeunProfileOpen" aria-label="다은 프로필 크게 보기" title="다은 프로필 확대"><img src="memories/daeun_profile.webp" alt="다은 프로필"/></button><div><h2>다은 <span class="muted" id="daeunDay"></span></h2><span class="hinaProfileSub">20세 · 자유로운 탐험가</span></div></div><div id="daeunAction" class="muted"></div><div class="thought" id="daeunThought"></div><div id="daeunStats"></div><div id="daeunInventory" style="font-size:12px;line-height:1.7"></div><details id="daeunSkillPanel" open style="margin-top:10px"><summary style="cursor:pointer;font-weight:700">📚 숙련도 · 탐험 기록</summary><div id="daeunSkillContent" style="font-size:12px;line-height:1.7;padding:8px 2px"></div></details><details><summary>다은의 행동 기록</summary><div id="daeunLog"></div></details>';document.getElementById('ui').appendChild(pane);bindStatHelpArea($('daeunStats'));
@@ -6951,13 +7331,14 @@ function refreshCharacterUI(now,force=false){
   const daeunRegionTiles=fogTiles.filter(tile=>tile.region==='daeun');
   const daeunFound=daeunRegionTiles.filter(tile=>daeunExplored.has(tile.key)).length;
   const daeunDiscovery=daeunFound/Math.max(1,daeunRegionTiles.length)*100;
-  $('daeunSkillContent').innerHTML='<div class="skillSectionTitle">📚 생존 숙련도</div>'+[
+  setHudHTML($('daeunSkillContent'),'<div class="skillSectionTitle">📚 생존 숙련도</div>'+[
     ['🔥 모닥불 점화',d.skills.fire],['🐇 토끼 관찰·친화',d.skills.rabbit],['🐟 물고기 관찰·포획',d.skills.fish],['🧶 가방 제작',d.bag.progress]
   ].map(skillMeter).join('')+'<div class="skillSectionTitle">🗺️ 탐험 기록</div><div class="exploreRings">'+[
     ['다은 지역 발견도',daeunDiscovery,'#72cbb2']
-  ].map(ring).join('')+'</div><div class="skillFootnote">다은이 직접 발견한 지역만 계산해. 숙련도는 히나와 별도로 성장해.</div>';
+  ].map(ring).join('')+'</div><div class="skillFootnote">다은이 직접 발견한 지역만 계산해. 숙련도는 히나와 별도로 성장해.</div>');
 
-  $('daeunLog').replaceChildren(...d.log.slice(0,12).map(v=>{const el=document.createElement('div');el.textContent=v.text;return el;}));
+  const logRows=d.log.slice(0,12),signature=JSON.stringify(logRows.map(v=>v.text));
+  const logEl=$('daeunLog');if(logEl.dataset.signature!==signature){logEl.dataset.signature=signature;logEl.replaceChildren(...logRows.map(v=>{const el=document.createElement('div');el.textContent=v.text;return el;}));}
  }
 
 }
@@ -7165,7 +7546,7 @@ function approachResourceTask(task,mesh,step,who){
  if(d<=resourceReach(task.type)){task.phase='perform';task.age=0;return false;}
  if(task.approachAge===undefined){task.approachAge=0;task.bestDistance=d;task.stalled=0;}
  task.approachAge+=step;
- const travel=Math.min(Math.max(0,d-resourceReach(task.type)+.12),step*DAEUN_RULES.walkSpeed);
+ const travel=Math.min(Math.max(0,d-resourceReach(task.type)+.12),step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(who==='hina'?stats:daeun.stats,who==='hina'?'hinaManual':'daeun'));
  const moved=moveManualWithAssist(mesh,dx/d*travel,dz/d*travel,step);
  task.walking=!!moved;
  if(moved)mesh.rotation.y=Math.atan2(dx,dz);
@@ -7195,7 +7576,7 @@ function sharedHinaResourceInteract(type,item){
  if(type==='fire'&&daeun.inventory.branches<(fireSuccess?2:1)){
   daeunSay(fireSuccess?'나뭇가지 2개가 있어야 불을 유지할 수 있어.':'불을 피우려면 나뭇가지가 필요해.');return;
  }
- sharedDaeunResourceTask={type,item,phase:Math.hypot(daeun.mesh.position.x-p.x,daeun.mesh.position.z-p.z)<=resourceReach(type)?'perform':'approach',age:0,duration:{berry:4,branch:2.8,water:6,fire:10}[type]||4};
+ sharedDaeunResourceTask={type,item,phase:Math.hypot(daeun.mesh.position.x-p.x,daeun.mesh.position.z-p.z)<=resourceReach(type)?'perform':'approach',age:0,duration:{berry:4,branch:2.8,water:6,fire:daeunDisplayedFuel()>0?FIREWOOD_FEED_SECONDS:10}[type]||4};
  daeunSay({berry:'열매를 따 보자.',branch:'나뭇가지를 주워야겠어.',water:'물을 마시자.',fire:'히나의 모닥불을 함께 피워 보자.'}[type]);
 }
 let sharedCampfireBonusAt=-999;
@@ -7244,7 +7625,8 @@ function updateSharedDaeunResourceTask(step){
    if(!daeun.firePracticeDays.includes(clockParts().day))daeun.firePracticeDays.push(clockParts().day);
    daeun.skills.fire=Math.min(100,daeun.skills.fire+8+Math.floor(dRandom()*9));
    if(daeun.skills.fire>=100&&daeun.firePracticeDays.length>=3){
-    fireSuccess=true;fireEverLit=true;fireKnowledge=100;campfire.visible=true;
+    const wasBurning=fireSuccess;fireSuccess=true;fireEverLit=true;fireKnowledge=100;campfire.visible=true;
+    awardIgnitionMorale('shared',wasBurning);
     daeunSay('🔥 히나의 모닥불 점화 성공! 이제 둘이 함께 쓸 수 있어!');
     log('🔥 다은이 히나 동굴의 모닥불을 점화함');
    }else if(daeun.dailyPractice.fire>=DAEUN_DAILY_PRACTICE_LIMIT.fire)
@@ -7281,7 +7663,7 @@ function hinaManualInteract(type,item){
  if(type==='fish'&&!fishNearby(pos.x,pos.z,10)){say('지금은 물고기가 안 보여.');return;}
  if(type==='fire'&&fireSuccess&&fireDryStock<2){say('불을 유지하려면 나뭇가지 2개가 필요해.');return;}
  if(type==='fire'&&!fireSuccess&&fireDryStock<1){say('나뭇가지부터 주워야겠어.');return;}
- hinaManualTask={type,item,stop:type==='rabbit'?p.clone():null,phase:Math.hypot(pos.x-p.x,pos.z-p.z)<=resourceReach(type)?'perform':'approach',age:0,duration:{berry:4,branch:2.8,water:6,fish:8,rabbit:7,fire:10}[type]||3};
+ hinaManualTask={type,item,stop:type==='rabbit'?p.clone():null,phase:Math.hypot(pos.x-p.x,pos.z-p.z)<=resourceReach(type)?'perform':'approach',age:0,duration:{berry:4,branch:2.8,water:6,fish:8,rabbit:7,fire:fireSuccess?FIREWOOD_FEED_SECONDS:10}[type]||3};
  say({berry:'열매를 따 보자.',branch:'나뭇가지를 주워야겠어.',water:'물을 마시자.',fish:'물고기 움직임을 살펴보자.',rabbit:'토끼가 어떻게 움직이는지 보자.',fire:'모닥불을 손봐야겠어.'}[type]);
 }
 function updateHinaManualTask(step){
@@ -7389,7 +7771,7 @@ function smoothResourceMarkerPositions(){
  }
  const task=daeun.manualTask;
  if(task&&task.phase==='perform'){
-  const durations={berry:4,branch:2.8,water:6,fire:10,rabbit:7,fish:8,bag:8,cookFish:8,eat:4,eatFish:4,storeBranches:3.6};
+  const durations={berry:4,branch:2.8,water:6,fire:daeunDisplayedFuel()>0?FIREWOOD_FEED_SECONDS:10,rabbit:7,fish:8,bag:8,cookFish:8,eat:4,eatFish:4,storeBranches:3.6};
   const fraction=Math.max(0,Math.min(1,task.age/(durations[task.type]||4)));
   const marker=resourceMarkers.find(b=>b.classList.contains('interacting'));
   if(marker)updateCleanProgressRing(marker,fraction);
@@ -7523,11 +7905,7 @@ document.getElementById('daeunAddFirewoodButton').onclick=()=>{
  if(Math.hypot(daeun.mesh.position.x-fire.x,daeun.mesh.position.z-fire.z)>6){daeunSay('모닥불 가까이 가서 나뭇가지를 넣자.');return;}
  if(fuel<=0){daeunSay('불이 꺼졌어. 먼저 불을 피워야 해.');return;}
  if(inv.branches<2){daeunSay('나뭇가지가 더 필요해! 2개를 모아야 불을 유지할 수 있어.');return;}
- inv.branches-=2;
- if(sharedHomeActive){fireKnowledge=Math.min(100,fireKnowledge+40);fireDryStock+=2;}
- else inv.fuel=Math.min(100,inv.fuel+40);
- daeun.timers.fuelFlutterUntil=elapsed+2.4;daeun.lastCraftActiveAt=elapsed;
- daeunSay('🪵 나뭇가지 2개를 넣었어! 불 유지 +40');
+ beginDaeunFuelFeed();
 };
 document.getElementById('daeunTakeTorchButton').onclick=takeDaeunTorch;
 document.getElementById('daeunBagCraftButton').onclick=bagPracticeAtCave;
@@ -7538,7 +7916,8 @@ document.getElementById('daeunRestButton').onclick=()=>{
  manualAction('rest',daeun.mesh.position);
 };
 waterButton.onclick=()=>manualAction('water',sharedHomeActive?daeun.sites.water.clone():new THREE.Vector3(DAEUN_ZONE.pond.x,0,DAEUN_ZONE.pond.z));
-function projectToScreen(point){const p=point.clone().project(camera);if(p.z< -1||p.z>1||Math.abs(p.x)>1.1||Math.abs(p.y)>1.1)return null;return {x:(p.x*.5+.5)*innerWidth,y:(-p.y*.5+.5)*innerHeight};}
+const screenProjectionScratch=new THREE.Vector3();
+function projectToScreen(point){const p=screenProjectionScratch.copy(point).project(camera);if(p.z< -1||p.z>1||Math.abs(p.x)>1.1||Math.abs(p.y)>1.1)return null;return {x:(p.x*.5+.5)*innerWidth,y:(-p.y*.5+.5)*innerHeight};}
 function refreshManualActionUI(){
  const hinaVisible=isManualHina()&&!document.body.classList.contains('cinematic-mode');
  hinaActions.style.display=hinaVisible?'flex':'none';
@@ -7579,7 +7958,7 @@ function refreshManualActionUI(){
  if(!['manualSleep','sleep'].includes(daeun.action))for(const [key,line] of warnings){
   if(daeun.stats[key]<=0&&elapsed-daeun.manualZeroWarnings[key]>45){daeun.manualZeroWarnings[key]=elapsed;daeunSay(line);break;}
  }
- const nearCave=Math.hypot(daeun.mesh.position.x-daeun.sites.shelter.x,daeun.mesh.position.z-daeun.sites.shelter.z)<7;
+ const nearCave=daeunNearCave();
  refreshDaeunBagDay();
  document.getElementById('daeunFishEatButton').disabled=daeun.inventory.cookedFish===0;
  document.getElementById('daeunFireFuel').textContent='🔥 불 유지 '+Math.round(daeunDisplayedFuel())+'% · 🌿 가방 '+daeun.inventory.branches+'개';
@@ -7614,10 +7993,10 @@ function refreshManualActionUI(){
   }else fishEmojiMarker.style.display='none';
  }else fishEmojiMarker.style.display='none';
  const cavePos=daeun.sites.shelter;
- if(Math.hypot(pos.x-cavePos.x,pos.z-cavePos.z)<9){
+ if(Math.hypot(pos.x-cavePos.x,pos.z-cavePos.z)<11){
   const caveGround=terrainTopAt(cavePos.x,cavePos.z);
   if(!daeun.bag.crafted&&daeun.bag.today<DAEUN_BAG_DAILY_MAX){
-   const f=daeunResources.fire.group.position;const bx=f.x-5,bz=f.z;positionEmojiMarker(bagEmojiMarker,new THREE.Vector3(bx,terrainTopAt(bx,bz)+1.8,bz),()=>bagPracticeAtCave());
+   const bp=daeunBagCraftPoint();positionEmojiMarker(bagEmojiMarker,new THREE.Vector3(bp.x,bp.y+1.8,bp.z),()=>bagPracticeAtCave());
   }else bagEmojiMarker.style.display='none';
   storeEmojiMarker.style.display='none';
  }else{bagEmojiMarker.style.display='none';storeEmojiMarker.style.display='none';}
@@ -7652,7 +8031,7 @@ function refreshManualActionUI(){
  const task=daeun.manualTask,progress=task&&task.phase==='perform'?task:null;
  // A timed interaction transforms its ORIGINAL resource marker into a clockwise ring.
  // No second emoji is drawn. In auto mode the same gauge follows the active action.
- const taskDurations={berry:4,branch:2.8,water:6,fire:10,rabbit:7,fish:8,bag:8,cookFish:8,eat:4,eatFish:4,storeBranches:3.6};
+ const taskDurations={berry:4,branch:2.8,water:6,fire:daeunDisplayedFuel()>0?FIREWOOD_FEED_SECONDS:10,rabbit:7,fish:8,bag:8,cookFish:8,eat:4,eatFish:4,storeBranches:3.6};
  const taskIcons={rest:'⚡',berry:'🍓',branch:'🌿',water:'💧',fire:'🔥',rabbit:'🐰',fish:'🐟',bag:'🧶',cookFish:'🐟',eat:'🍓',eatFish:'🐟',storeBranches:'🌿'};
  let activeMarker=null;
  if(progress){
@@ -7709,7 +8088,7 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('keyup',e=>playerKeys.delete(e.code));window.addEventListener('blur',clearPlayerInput);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearPlayerInput();});
 function updateDestinationMarker(){destinationMarker.visible=isManualDaeun()&&Boolean(daeun.destination);if(destinationMarker.visible)destinationMarker.position.set(daeun.destination.x,terrainTopAt(daeun.destination.x,daeun.destination.z)+.04,daeun.destination.z);}
-// Save/load/new-game functionality intentionally deferred. Reloading starts a fresh session.
+// v4.0 persistence is initialized after every subsystem is available.
 dualReady=true;
 // v18.6.1: defer character selection until init() initializes Daeun's inventory and bag.
 // ---- end two-survivor extension ----
@@ -7719,24 +8098,27 @@ dualReady=true;
 const renderBatching=(()=>{
  const unit=new THREE.BoxGeometry(1,1,1),entries=[],pools=new Map(),roots=new Map(),paletteMaterials=new Map();
  const matrix=new THREE.Matrix4(),scaleMatrix=new THREE.Matrix4();
+ const cellEntries=new Map();
  const bounds=new THREE.Box3(),point=new THREE.Vector3();let nextLOD=0;
  // Tiny character-contact bush sway; rotations feed the existing instanced batches.
  // No additional meshes, lights, materials, or draw calls.
- const bushMotion=new Map();let lastBushTick=0;
+ const bushMotion=new Map(),bushCharacters=[];let lastBushTick=0;
  function swayNearbyBushes(now){
   const dt=Math.min(.05,Math.max(.001,(now-lastBushTick)/1000));lastBushTick=now;
-  const characters=[hana.position,daeun.mesh.position];
+  bushCharacters[0]=hana.position;bushCharacters[1]=daeun.mesh.position;
+  const characters=bushCharacters;
   for(const [root,state] of roots){
    if(state.kind!=='bush')continue;
-   let nearest=null,distSq=Infinity;
+   let nearestDx=0,nearestDz=0,distSq=Infinity;
    for(const c of characters){const dx=root.position.x-c.x,dz=root.position.z-c.z;
-    const ds=dx*dx+dz*dz;if(ds<distSq){distSq=ds;nearest={dx,dz};}}
-   const motion=bushMotion.get(root)||{x:0,z:0,vx:0,vz:0};
+    const ds=dx*dx+dz*dz;if(ds<distSq){distSq=ds;nearestDx=dx;nearestDz=dz;}}
+   const existing=bushMotion.get(root);if(distSq>=1.65*1.65&&!existing)continue;
+   const motion=existing||{x:0,z:0,vx:0,vz:0};
    const radius=1.65,proximity=Math.max(0,1-Math.sqrt(distSq)/radius);
    // Lean away from the passing character, with springy recovery.
    const len=Math.max(.15,Math.sqrt(distSq));
-   const targetX=proximity*(nearest.dz/len)*.60;
-   const targetZ=-proximity*(nearest.dx/len)*.60;
+   const targetX=proximity*(nearestDz/len)*.60;
+   const targetZ=-proximity*(nearestDx/len)*.60;
    const stiffness=75,damping=14;
    motion.vx+=(targetX-motion.x)*stiffness*dt;motion.vz+=(targetZ-motion.z)*stiffness*dt;
    motion.vx*=Math.exp(-damping*dt);motion.vz*=Math.exp(-damping*dt);
@@ -7756,6 +8138,7 @@ const renderBatching=(()=>{
   mesh.updateWorldMatrix(true,false);mesh.getWorldPosition(point);
   const cell=Math.floor(point.x/24)+':'+Math.floor(point.z/24);
   const e={mesh,root,kind,index,cell,lod:0,baseMaterial:mesh.material,detailVisible:true};entries.push(e);
+  if(!cellEntries.has(cell))cellEntries.set(cell,[]);cellEntries.get(cell).push(e);
  }
  scene.updateMatrixWorld(true);
  // Only tagged, immobile vegetation is included; character and animal parts stay untouched.
@@ -7796,16 +8179,19 @@ const renderBatching=(()=>{
  }
  function poolFor(e,material){
   const cast=e.kind==='bush'||e.kind==='detail'?false:e.mesh.castShadow;
+  const faded=fadedMeshes.has(e.mesh),emissive=material.emissive?.getHex(),cached=e.poolState;
+  if(cached&&cached.material===material&&cached.emissive===emissive&&cached.opacity===material.opacity&&cached.transparent===material.transparent&&cached.side===material.side&&cached.offset===material.polygonOffset&&cached.factor===material.polygonOffsetFactor&&cached.units===material.polygonOffsetUnits&&cached.flat===material.flatShading&&cached.map===material.map&&cached.faded===faded&&cached.cast===cast)return e.pool;
+  e.poolState={material,emissive,opacity:material.opacity,transparent:material.transparent,side:material.side,offset:material.polygonOffset,factor:material.polygonOffsetFactor,units:material.polygonOffsetUnits,flat:material.flatShading,map:material.map,faded,cast};
   const palette=paletteFor(e,material),key=e.cell+':'+palette.key+':'+cast;
-  if(pools.has(key))return pools.get(key);
+  if(pools.has(key)){e.pool=pools.get(key);return e.pool;}
   // Capacity covers any combination of palette colors and fade transitions in this cell.
-  const candidates=entries.filter(x=>x.cell===e.cell);
+  const candidates=cellEntries.get(e.cell);
   const mesh=new THREE.InstancedMesh(unit,palette.material,Math.max(1,candidates.length));
   mesh.name='v118 '+key;mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.castShadow=cast;mesh.receiveShadow=true;mesh.count=0;scene.add(mesh);
   const batchBounds=new THREE.Box3();for(const c of candidates)batchBounds.expandByObject(c.mesh);
   batchBounds.expandByScalar(5);mesh.boundingSphere=batchBounds.getBoundingSphere(new THREE.Sphere());
-  const p={mesh,colored:palette.colored};pools.set(key,p);return p;
+  const p={mesh,colored:palette.colored,dirty:true,colorDirty:true};pools.set(key,p);e.pool=p;return p;
  }
  function isVisible(mesh){for(let o=mesh;o&&o!==scene;o=o.parent)if(!o.visible)return false;return true;}
  function update(now){
@@ -7852,10 +8238,16 @@ const renderBatching=(()=>{
    matrix.copy(e.mesh.matrixWorld);
    if(e.kind==='palm'&&lod&&e.index<9){scaleMatrix.makeScale(1,2,1);matrix.multiply(scaleMatrix);}
    else if(enlarge!==1){scaleMatrix.makeScale(enlarge,enlarge,enlarge);matrix.multiply(scaleMatrix);}
-   if(p.colored)m.setColorAt(m.count,e.mesh.material.color);
-   m.setMatrixAt(m.count++,matrix);
+   const offset=m.count*16,data=m.instanceMatrix.array,values=matrix.elements;
+   let changed=false;for(let i=0;i<16;i++)if(data[offset+i]!==Math.fround(values[i])){changed=true;break;}
+   if(changed){m.setMatrixAt(m.count,matrix);p.dirty=true;}
+   if(p.colored){
+    const c=e.mesh.material.color,k=m.count*3,colors=m.instanceColor?.array;
+    if(!colors||colors[k]!==Math.fround(c.r)||colors[k+1]!==Math.fround(c.g)||colors[k+2]!==Math.fround(c.b)){m.setColorAt(m.count,c);p.colorDirty=true;}
+   }
+   m.count++;
   }
-  for(const p of pools.values()){p.mesh.visible=p.mesh.count>0;if(p.mesh.visible){p.mesh.instanceMatrix.needsUpdate=true;if(p.mesh.instanceColor)p.mesh.instanceColor.needsUpdate=true;}}
+  for(const p of pools.values()){p.mesh.visible=p.mesh.count>0;if(p.mesh.visible){if(p.dirty)p.mesh.instanceMatrix.needsUpdate=true;if(p.colorDirty&&p.mesh.instanceColor)p.mesh.instanceColor.needsUpdate=true;}p.dirty=false;p.colorDirty=false;}
   rain.count=0;
   for(const d of rainDrops)if(d.visible){d.updateMatrixWorld();rain.setMatrixAt(rain.count++,d.matrixWorld);}
   rain.visible=rain.count>0;if(rain.visible)rain.instanceMatrix.needsUpdate=true;
@@ -7865,8 +8257,8 @@ const renderBatching=(()=>{
 })();
 initializeOcclusionGroups(); // Include original unbatched trees near the bear.
 // Read-only capture for repeatable diagnostics. CPU submission is not GPU time.
-const renderSamples=[];let previousSampleTime=0;
-window.hinaPerformance={version:'15.1',snapshot:()=>({render:{...renderer.info.render},memory:{...renderer.info.memory},batching:renderBatching.stats(),gpuTiming:'not measured'}),samples:()=>renderSamples.map(s=>({...s}))};
+const renderSamples=[];let previousSampleTime=0,renderSampleCursor=0;
+window.hinaPerformance={version:'4.0',snapshot:()=>({render:{...renderer.info.render},memory:{...renderer.info.memory},batching:renderBatching.stats(),gpuTiming:'not measured',jsHeapBytes:performance.memory?.usedJSHeapSize??null}),samples:()=>{const ordered=renderSamples.length<600?renderSamples:[...renderSamples.slice(renderSampleCursor),...renderSamples.slice(0,renderSampleCursor)];return ordered.map(s=>({...s}));}};
 
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();selectCharacter('daeun');setCameraMode(true);
 // v19.8: Weather-aware spontaneous speech for both survivors.
@@ -7907,8 +8299,8 @@ function updateRainSpeech(){
  }
  rainSpeech.turn++;
 }
-// v3.73: Ambient conversations after reunion, independent of player/AI control mode.
-const companionChat={nextAt:performance.now()+24000,index:0,replyAt:0,pending:null};
+// v3.78: Ambient conversations after reunion; both survivors speak audibly through anchored bubbles.
+const companionChat={nextAt:performance.now()+26000,index:0,replyAt:0,pending:null};
 const companionChatLines={
  day:[['오늘은 주변을 조금 더 둘러볼까?','응, 너무 멀리만 가지 말자.'],['여기 바람은 참 좋다.','그러게. 잠깐은 평화로운 것 같아.'],['다른 친구들도 이 풍경을 보고 있을까?','분명 어딘가에서 우리를 찾고 있을 거야.']],
  night:[['밤이 되니까 숲이 조금 무섭다.','괜찮아, 우리 이제 혼자가 아니잖아.'],['오늘도 무사히 하루를 보냈네.','내일도 서로 잘 챙겨주자.']],
@@ -7919,33 +8311,31 @@ const companionChatLines={
 };
 function updateCompanionChat(){
  const now=performance.now();
- if(!sharedHomeActive||!hinaControlUnlocked||!dualReady||meetingFollowUntil||paused)return;
+ if(!sharedHomeActive||!hinaControlUnlocked||paused)return;
  const distance=Math.hypot(hana.position.x-daeun.mesh.position.x,hana.position.z-daeun.mesh.position.z);
- if(distance>14){companionChat.pending=null;companionChat.nextAt=Math.max(companionChat.nextAt,now+10000);return;}
- const asleepH=['night','outdoorSleep','sleep'].includes(state);
- const asleepD=['sleep','manualSleep','sleepPrepare','exhausted'].includes(daeun.action);
- if(asleepH||asleepD)return;
+ if(distance>16){companionChat.pending=null;companionChat.nextAt=Math.max(companionChat.nextAt,now+7000);return;}
+ const asleepH=hinaSleepSpeechLock()||['night','outdoorSleep','sleep'].includes(state);
+ const asleepD=daeunSleepSpeechLock()||['sleep','manualSleep','sleepPrepare','exhausted'].includes(daeun.action);
+ if(asleepH||asleepD){companionChat.pending=null;companionSpeech.until=0;companionChat.nextAt=Math.max(companionChat.nextAt,now+8000);return;}
  if(companionChat.pending){
   if(now<companionChat.replyAt)return;
   const {speaker,line}=companionChat.pending;
-  if(speaker==='hina'){meetingHinaLine=line;meetingHinaLineUntil=now+7000;say(line);}else daeunSay(line);
-  companionChat.pending=null;companionChat.nextAt=now+37000+Math.random()*25000;
+  showCompanionSpeech(speaker,line,7600);
+  if(speaker==='hina')say(line);else daeunSay(line);
+  companionChat.pending=null;companionChat.nextAt=now+33000+Math.random()*18000;
   return;
  }
  if(now<companionChat.nextAt)return;
- // Do not overwrite recent action feedback or urgent speech.
- if((hinaSpeechExpiresAt&&now<hinaSpeechExpiresAt)||(daeun.speechExpiresAt&&now<daeun.speechExpiresAt)){
-  companionChat.nextAt=now+9000;return;
- }
  const hour=clockParts().h;
- let group=raining()?'rain':stats.thirst<35?'thirst':stats.hunger<35?'hunger':fireSuccess&&distance<10?'fire':hour>=19||hour<6?'night':'day';
+ const group=raining()?'rain':stats.thirst<35?'thirst':stats.hunger<35?'hunger':fireSuccess&&distance<10?'fire':hour>=19||hour<6?'night':'day';
  const pool=companionChatLines[group],pair=pool[companionChat.index++%pool.length];
- // When the player controls one character, the other initiates the conversation.
+ // If one survivor is manually controlled, the other starts. In full AI mode alternate speakers.
  const speaker=isManualHina()?'daeun':isManualDaeun()?'hina':companionChat.index%2?'hina':'daeun';
  const first=speaker==='hina'?pair[0]:pair[1],answer=speaker==='hina'?pair[1]:pair[0];
- if(speaker==='hina'){meetingHinaLine=first;meetingHinaLineUntil=now+7000;say(first);}else daeunSay(first);
+ showCompanionSpeech(speaker,first,7600);
+ if(speaker==='hina')say(first);else daeunSay(first);
  companionChat.pending={speaker:speaker==='hina'?'daeun':'hina',line:answer};
- companionChat.replyAt=now+4400;
+ companionChat.replyAt=now+5200;
 }
 // Daeun periodically remembers her missing friends during autonomous exploration.
 // Real-time cooldown prevents speech spam even when game speed is accelerated.
@@ -7974,10 +8364,253 @@ function updateDaeunFriendThoughts(){
  daeunSay(daeunFriendLines[daeunFriendThoughts.index++%daeunFriendLines.length]);
  daeunFriendThoughts.nextAt=now+65000+Math.random()*35000;
 }
-function animate(t){requestAnimationFrame(animate);
+// Game loop coordinator: render-only animation remains below; simulation pauses together.
+
+// Save/Load adapter. v3.99 contained no persistence or legacy save key.
+// Explicit bindings avoid eval and prevent renderer/DOM/audio objects entering a save.
+const progressBindings={
+ elapsed:{get:()=>elapsed,set:v=>{elapsed=v;}},
+ speed:{get:()=>speed,set:v=>{speed=v;}},
+ state:{get:()=>state,set:v=>{state=v;}},
+ target:{get:()=>target,set:v=>{target=v;}},
+ goal:{get:()=>goal,set:v=>{goal=v;}},
+ phaseAt:{get:()=>phaseAt,set:v=>{phaseAt=v;}},
+ water:{get:()=>water,set:v=>{water=v;}},
+ food:{get:()=>food,set:v=>{food=v;}},
+ shelter:{get:()=>shelter,set:v=>{shelter=v;}},
+ failedFire:{get:()=>failedFire,set:v=>{failedFire=v;}},
+ rested:{get:()=>rested,set:v=>{rested=v;}},
+ seenRabbit:{get:()=>seenRabbit,set:v=>{seenRabbit=v;}},
+ seenFish:{get:()=>seenFish,set:v=>{seenFish=v;}},
+ knownWater:{get:()=>knownWater,set:v=>{knownWater=v;}},
+ knownBerries:{get:()=>knownBerries,set:v=>{knownBerries=v;}},
+ knownCave:{get:()=>knownCave,set:v=>{knownCave=v;}},
+ stats:{get:()=>stats,set:v=>{stats=v;}},
+ actions:{get:()=>actions,set:v=>{actions=v;}},
+ day:{get:()=>day,set:v=>{day=v;}},
+ resilienceXP:{get:()=>resilienceXP,set:v=>{resilienceXP=v;}},
+ mentalRestCooldown:{get:()=>mentalRestCooldown,set:v=>{mentalRestCooldown=v;}},
+ mentalRestStart:{get:()=>mentalRestStart,set:v=>{mentalRestStart=v;}},
+ loneliness:{get:()=>loneliness,set:v=>{loneliness=v;}},
+ moraleCooldown:{get:()=>moraleCooldown,set:v=>{moraleCooldown=v;}},
+ discoveryBoostAt:{get:()=>discoveryBoostAt,set:v=>{discoveryBoostAt=v;}},
+ previousExplorationCount:{get:()=>previousExplorationCount,set:v=>{previousExplorationCount=v;}},
+ exhaustionCooldown:{get:()=>exhaustionCooldown,set:v=>{exhaustionCooldown=v;}},
+ previousEnergyBand:{get:()=>previousEnergyBand,set:v=>{previousEnergyBand=v;}},
+ lastMoraleMessage:{get:()=>lastMoraleMessage,set:v=>{lastMoraleMessage=v;}},
+ introSpeechStage:{get:()=>introSpeechStage,set:v=>{introSpeechStage=v;}},
+ thirstTrigger:{get:()=>thirstTrigger,set:v=>{thirstTrigger=v;}},
+ hungerTrigger:{get:()=>hungerTrigger,set:v=>{hungerTrigger=v;}},
+ thirstRate:{get:()=>thirstRate,set:v=>{thirstRate=v;}},
+ hungerRate:{get:()=>hungerRate,set:v=>{hungerRate=v;}},
+ carriedBerries:{get:()=>carriedBerries,set:v=>{carriedBerries=v;}},
+ caveBerries:{get:()=>caveBerries,set:v=>{caveBerries=v;}},
+ lastBerryStorageAt:{get:()=>lastBerryStorageAt,set:v=>{lastBerryStorageAt=v;}},
+ thirstDelayUntil:{get:()=>thirstDelayUntil,set:v=>{thirstDelayUntil=v;}},
+ hungerDelayUntil:{get:()=>hungerDelayUntil,set:v=>{hungerDelayUntil=v;}},
+ randomHesitationDuration:{get:()=>randomHesitationDuration,set:v=>{randomHesitationDuration=v;}},
+ lastWeatherDay:{get:()=>lastWeatherDay,set:v=>{lastWeatherDay=v;}},
+ fireAttempts:{get:()=>fireAttempts,set:v=>{fireAttempts=v;}},
+ fireSuccess:{get:()=>fireSuccess,set:v=>{fireSuccess=v;}},
+ fireKnowledge:{get:()=>fireKnowledge,set:v=>{fireKnowledge=v;}},
+ sleepRestored:{get:()=>sleepRestored,set:v=>{sleepRestored=v;}},
+ sleepStartEnergy:{get:()=>sleepStartEnergy,set:v=>{sleepStartEnergy=v;}},
+ sleepQuality:{get:()=>sleepQuality,set:v=>{sleepQuality=v;}},
+ fieldRestEnd:{get:()=>fieldRestEnd,set:v=>{fieldRestEnd=v;}},
+ fieldRestRecovery:{get:()=>fieldRestRecovery,set:v=>{fieldRestRecovery=v;}},
+ fieldRestStarted:{get:()=>fieldRestStarted,set:v=>{fieldRestStarted=v;}},
+ restCooldownUntil:{get:()=>restCooldownUntil,set:v=>{restCooldownUntil=v;}},
+ nightSleepChoiceDay:{get:()=>nightSleepChoiceDay,set:v=>{nightSleepChoiceDay=v;}},
+ nightSleepInCave:{get:()=>nightSleepInCave,set:v=>{nightSleepInCave=v;}},
+ rabbitObservations:{get:()=>rabbitObservations,set:v=>{rabbitObservations=v;}},
+ rabbitAttempts:{get:()=>rabbitAttempts,set:v=>{rabbitAttempts=v;}},
+ rabbitCaught:{get:()=>rabbitCaught,set:v=>{rabbitCaught=v;}},
+ lastRabbitAttemptDay:{get:()=>lastRabbitAttemptDay,set:v=>{lastRabbitAttemptDay=v;}},
+ fireDay10Planned:{get:()=>fireDay10Planned,set:v=>{fireDay10Planned=v;}},
+ fireEverLit:{get:()=>fireEverLit,set:v=>{fireEverLit=v;}},
+ fireSkill:{get:()=>fireSkill,set:v=>{fireSkill=v;}},
+ lastFireOutDay:{get:()=>lastFireOutDay,set:v=>{lastFireOutDay=v;}},
+ lastBranchDay:{get:()=>lastBranchDay,set:v=>{lastBranchDay=v;}},
+ firstFireMoraleGranted:{get:()=>firstFireMoraleGranted,set:v=>{firstFireMoraleGranted=v;}},
+ daeunFirstFireMoraleGranted:{get:()=>daeunFirstFireMoraleGranted,set:v=>{daeunFirstFireMoraleGranted=v;}},
+ fishObservations:{get:()=>fishObservations,set:v=>{fishObservations=v;}},
+ fishAttempts:{get:()=>fishAttempts,set:v=>{fishAttempts=v;}},
+ fishCaught:{get:()=>fishCaught,set:v=>{fishCaught=v;}},
+ lastFishDay:{get:()=>lastFishDay,set:v=>{lastFishDay=v;}},
+ fishSkill:{get:()=>fishSkill,set:v=>{fishSkill=v;}},
+ lastFishStudyAt:{get:()=>lastFishStudyAt,set:v=>{lastFishStudyAt=v;}},
+ fishSpear:{get:()=>fishSpear,set:v=>{fishSpear=v;}},
+ storedFish:{get:()=>storedFish,set:v=>{storedFish=v;}},
+ carriedFish:{get:()=>carriedFish,set:v=>{carriedFish=v;}},
+ rainWater:{get:()=>rainWater,set:v=>{rainWater=v;}},
+ waterVessel:{get:()=>waterVessel,set:v=>{waterVessel=v;}},
+ lastFoodCheckAt:{get:()=>lastFoodCheckAt,set:v=>{lastFoodCheckAt=v;}},
+ leafBed:{get:()=>leafBed,set:v=>{leafBed=v;}},
+ leafStock:{get:()=>leafStock,set:v=>{leafStock=v;}},
+ plantKnowledge:{get:()=>plantKnowledge,set:v=>{plantKnowledge=v;}},
+ petBond:{get:()=>petBond,set:v=>{petBond=v;}},
+ friendClue:{get:()=>friendClue,set:v=>{friendClue=v;}},
+ lastBuildDay:{get:()=>lastBuildDay,set:v=>{lastBuildDay=v;}},
+ lastPlantDay:{get:()=>lastPlantDay,set:v=>{lastPlantDay=v;}},
+ lastPetCareDay:{get:()=>lastPetCareDay,set:v=>{lastPetCareDay=v;}},
+ lastClueDay:{get:()=>lastClueDay,set:v=>{lastClueDay=v;}},
+ lastRainCollectionDay:{get:()=>lastRainCollectionDay,set:v=>{lastRainCollectionDay=v;}},
+ basketIdeaNoticed:{get:()=>basketIdeaNoticed,set:v=>{basketIdeaNoticed=v;}},
+ basketCrafted:{get:()=>basketCrafted,set:v=>{basketCrafted=v;}},
+ rabbitPattern:{get:()=>rabbitPattern,set:v=>{rabbitPattern=v;}},
+ petRabbit:{get:()=>petRabbit,set:v=>{petRabbit=v;}},
+ petRabbitSnakeEncounters:{get:()=>petRabbitSnakeEncounters,set:v=>{petRabbitSnakeEncounters=v;}},
+ fireDryStock:{get:()=>fireDryStock,set:v=>{fireDryStock=v;}},
+ fireLearnedWet:{get:()=>fireLearnedWet,set:v=>{fireLearnedWet=v;}},
+ nextFireAttempt:{get:()=>nextFireAttempt,set:v=>{nextFireAttempt=v;}},
+ manualRain:{get:()=>manualRain,set:v=>{manualRain=v;}},
+ navPath:{get:()=>navPath,set:v=>{navPath=v;}},
+ navGoal:{get:()=>navGoal,set:v=>{navGoal=v;}},
+ navReplanAt:{get:()=>navReplanAt,set:v=>{navReplanAt=v;}},
+ navStuck:{get:()=>navStuck,set:v=>{navStuck=v;}},
+ navNoPathSince:{get:()=>navNoPathSince,set:v=>{navNoPathSince=v;}},
+ navLastProgressAt:{get:()=>navLastProgressAt,set:v=>{navLastProgressAt=v;}},
+ navLastPosition:{get:()=>navLastPosition,set:v=>{navLastPosition=v;}},
+ routeFailures:{get:()=>routeFailures,set:v=>{routeFailures=v;}},
+ hinaConsecutiveNavFailures:{get:()=>hinaConsecutiveNavFailures,set:v=>{hinaConsecutiveNavFailures=v;}},
+ climbBlockedSince:{get:()=>climbBlockedSince,set:v=>{climbBlockedSince=v;}},
+ climbUntil:{get:()=>climbUntil,set:v=>{climbUntil=v;}},
+ climbCooldownUntil:{get:()=>climbCooldownUntil,set:v=>{climbCooldownUntil=v;}},
+ lastSafeSpot:{get:()=>lastSafeSpot,set:v=>{lastSafeSpot=v;}},
+ lastSafeSpotAt:{get:()=>lastSafeSpotAt,set:v=>{lastSafeSpotAt=v;}},
+ rescueCooldownUntil:{get:()=>rescueCooldownUntil,set:v=>{rescueCooldownUntil=v;}},
+ terrainMismatchSince:{get:()=>terrainMismatchSince,set:v=>{terrainMismatchSince=v;}},
+ retreatPoints:{get:()=>retreatPoints,set:v=>{retreatPoints=v;}},
+ retreatUntil:{get:()=>retreatUntil,set:v=>{retreatUntil=v;}},
+ retreatCooldown:{get:()=>retreatCooldown,set:v=>{retreatCooldown=v;}},
+ retreatGoalKey:{get:()=>retreatGoalKey,set:v=>{retreatGoalKey=v;}},
+ lastHistoryAt:{get:()=>lastHistoryAt,set:v=>{lastHistoryAt=v;}},
+ progressAnchor:{get:()=>progressAnchor,set:v=>{progressAnchor=v;}},
+ progressAnchorAt:{get:()=>progressAnchorAt,set:v=>{progressAnchorAt=v;}},
+ explorationExperience:{get:()=>explorationExperience,set:v=>{explorationExperience=v;}},
+ lastRevealPosition:{get:()=>lastRevealPosition,set:v=>{lastRevealPosition=v;}},
+ mind:{get:()=>mind,set:v=>{mind=v;}},
+ lastBeachWalkDay:{get:()=>lastBeachWalkDay,set:v=>{lastBeachWalkDay=v;}},
+ lastBeachArrivalDay:{get:()=>lastBeachArrivalDay,set:v=>{lastBeachArrivalDay=v;}},
+ unlockedMemories:{get:()=>unlockedMemories,set:v=>{unlockedMemories=v;}},
+ lastWashDay:{get:()=>lastWashDay,set:v=>{lastWashDay=v;}},
+ lastWashAttemptDay:{get:()=>lastWashAttemptDay,set:v=>{lastWashAttemptDay=v;}},
+ leafWaterDay:{get:()=>leafWaterDay,set:v=>{leafWaterDay=v;}},
+ leafWaterDrinks:{get:()=>leafWaterDrinks,set:v=>{leafWaterDrinks=v;}},
+ lastLeafWaterAt:{get:()=>lastLeafWaterAt,set:v=>{lastLeafWaterAt=v;}},
+ lastDeerRemarkAt:{get:()=>lastDeerRemarkAt,set:v=>{lastDeerRemarkAt=v;}},
+ hinaControlUnlocked:{get:()=>hinaControlUnlocked,set:v=>{hinaControlUnlocked=v;}},
+ hinaManual:{get:()=>hinaManual,set:v=>{hinaManual=v;}},
+ hinaMeetAnnounced:{get:()=>hinaMeetAnnounced,set:v=>{hinaMeetAnnounced=v;}},
+ sharedHomeActive:{get:()=>sharedHomeActive,set:v=>{sharedHomeActive=v;}},
+ meetingFollowUntil:{get:()=>meetingFollowUntil,set:v=>{meetingFollowUntil=v;}},
+ meetingNextTalk:{get:()=>meetingNextTalk,set:v=>{meetingNextTalk=v;}},
+ meetingTalkIndex:{get:()=>meetingTalkIndex,set:v=>{meetingTalkIndex=v;}},
+ daeunPetRabbit:{get:()=>daeunPetRabbit,set:v=>{daeunPetRabbit=v;}},
+ sharedCampfireBonusAt:{get:()=>sharedCampfireBonusAt,set:v=>{sharedCampfireBonusAt=v;}},
+ hinaManualTask:{get:()=>hinaManualTask,set:v=>{hinaManualTask=v;}},
+ sharedDaeunResourceTask:{get:()=>sharedDaeunResourceTask,set:v=>{sharedDaeunResourceTask=v;}},
+ handCargoLast:{get:()=>handCargoLast,set:v=>{handCargoLast=v;}},
+ handCargoBranchHeld:{get:()=>handCargoBranchHeld,set:v=>{handCargoBranchHeld=v;}},
+ sleepingPose:{get:()=>sleepingPose,set:v=>{sleepingPose=v;}},
+ torchCarried:{get:()=>torchCarried,set:v=>{torchCarried=v;}},
+ torchOuting:{get:()=>torchOuting,set:v=>{torchOuting=v;}},
+ torchNightDay:{get:()=>torchNightDay,set:v=>{torchNightDay=v;}},
+ torchOutingsToday:{get:()=>torchOutingsToday,set:v=>{torchOutingsToday=v;}},
+ torchDecisionAt:{get:()=>torchDecisionAt,set:v=>{torchDecisionAt=v;}},
+ outdoorTorchAttemptAt:{get:()=>outdoorTorchAttemptAt,set:v=>{outdoorTorchAttemptAt=v;}},
+ outdoorTorchBurnoutAt:{get:()=>outdoorTorchBurnoutAt,set:v=>{outdoorTorchBurnoutAt=v;}}
+};
+const progressStore=(()=>{
+ const key='hina-survival-progress-v400',backup=key+'-backup';let nextAt=0,lastError='',ready=false;
+ const progressMaps={hinaBerryVisited,willEventTimes,blockedGoalUntil,deerRemarkDay,daeunResourceVisited};
+ const resourceLists={branches:branchPiles,berries:berryTrees,daeunBranches:daeunResources.branches,daeunBerries:daeunResources.berries,rabbits:critters,fish:fishes};
+ const references=new Map();for(const [name,list] of Object.entries(resourceLists))list.forEach((item,index)=>references.set(item,[name,index]));
+ const excluded=new Set(['mesh','arms','legs','head','eyes','closedEyes','g','group','fruits','light','material','geometry']);
+ function pack(v,depth=0){
+  if(depth>40)throw Error('저장 데이터가 너무 깊습니다');
+  if(v===null||typeof v==='string'||typeof v==='boolean')return v;
+  if(typeof v==='number')return Number.isFinite(v)?v:{$type:'number',value:String(v)};
+  if(typeof v!=='object')return undefined;
+  if(references.has(v))return {$type:'resource',value:references.get(v)};
+  if(v.isVector3)return {$type:'vector',value:v.toArray()};
+  if(v instanceof Map)return {$type:'map',value:[...v].map(([k,x])=>[pack(k,depth+1),pack(x,depth+1)])};
+  if(v instanceof Set)return {$type:'set',value:[...v].map(x=>pack(x,depth+1))};
+  if(Array.isArray(v))return v.map(x=>pack(x,depth+1));
+  if(Object.getPrototypeOf(v)!==Object.prototype)return undefined;
+  const out={};for(const [k,x] of Object.entries(v)){if(excluded.has(k))continue;const p=pack(x,depth+1);if(p!==undefined)out[k]=p;}return out;
+ }
+ function unpack(v,depth=0){
+  if(depth>40)throw Error('복원 데이터가 너무 깊습니다');
+  if(v===null||typeof v!=='object')return v;
+  if(Array.isArray(v))return v.map(x=>unpack(x,depth+1));
+  if(v.$type){switch(v.$type){
+   case 'number':if(!['Infinity','-Infinity','NaN'].includes(v.value))throw Error('숫자 오류');return Number(v.value);
+   case 'vector':if(!Array.isArray(v.value)||v.value.length!==3||!v.value.every(Number.isFinite))throw Error('위치 오류');return new THREE.Vector3(...v.value);
+   case 'resource':{const [name,index]=v.value||[];const item=resourceLists[name]?.[index];if(!item||!Number.isInteger(index))throw Error('자원 참조 오류');return item;}
+   case 'map':return new Map(v.value.map(([k,x])=>[unpack(k,depth+1),unpack(x,depth+1)]));
+   case 'set':return new Set(v.value.map(x=>unpack(x,depth+1)));
+   default:throw Error('알 수 없는 저장 자료형');
+  }}
+  const out={};for(const [k,x] of Object.entries(v)){if(['__proto__','prototype','constructor'].includes(k))throw Error('잘못된 키');out[k]=unpack(x,depth+1);}return out;
+ }
+ function entityData(entity){const out={};for(const [k,v] of Object.entries(entity)){if(!excluded.has(k)){const p=pack(v);if(p!==undefined)out[k]=p;}}return out;}
+ function capture(){
+  const vars={};for(const [name,b] of Object.entries(progressBindings))vars[name]=pack(b.get());
+  return {vars,maps:pack(progressMaps),daeun:entityData(daeun),hinaPosition:hana.position.toArray(),hinaRotation:hana.rotation.y,daeunPosition:daeun.mesh.position.toArray(),daeunRotation:daeun.mesh.rotation.y,
+   sleepLedger:pack(sleepLedger),fogCount:fogTiles.length,explored:pack(explored),daeunExplored:pack(daeunExplored),
+   resources:Object.fromEntries(Object.entries(resourceLists).map(([name,list])=>[name,list.map(item=>({data:entityData(item),position:(item.group||item.g)?.position.toArray(),visible:(item.group||item.g)?.visible}))]))};
+ }
+ function validate(data){
+  if(!data||!data.vars||!data.daeun||!data.resources)throw Error('저장 구조 오류');
+  if(!Number.isFinite(data.vars.elapsed)||data.vars.elapsed<0||data.vars.elapsed>1e9)throw Error('시간 오류');
+  for(const p of [data.hinaPosition,data.daeunPosition])if(!Array.isArray(p)||p.length!==3||!p.every(Number.isFinite)||p[0]<WORLD_BOUNDS.minX-10||p[0]>WORLD_BOUNDS.maxX+10||p[2]<WORLD_BOUNDS.minZ-10||p[2]>WORLD_BOUNDS.maxZ+10)throw Error('캐릭터 위치 오류');
+  for(const values of [data.vars.stats,data.daeun.stats])for(const k of ['energy','will','thirst','hunger'])if(!Number.isFinite(values?.[k])||values[k]<0||values[k]>100)throw Error('생존 상태 오류');
+  for(const name of Object.keys(progressBindings))if(!(name in data.vars))throw Error('저장 항목 누락: '+name);
+  for(const [name,list] of Object.entries(resourceLists))if(data.resources[name]?.length!==list.length)throw Error('소스 버전의 자원 배치가 다릅니다');
+  if(data.fogCount!==fogTiles.length)throw Error('탐험 지도 오류');
+  // Decode everything before mutating live game state.
+  return unpack(data);
+ }
+ function apply(raw){
+  const d=validate(raw);
+  for(const [name,b] of Object.entries(progressBindings))b.set(d.vars[name]);
+  for(const k of Object.keys(entityData(daeun)))if(!(k in d.daeun))delete daeun[k];Object.assign(daeun,d.daeun);Object.assign(sleepLedger,d.sleepLedger);
+  if(d.maps)for(const [name,map] of Object.entries(progressMaps)){map.clear();for(const [k,v] of d.maps[name]||[])map.set(k,v);}
+  hana.position.fromArray(d.hinaPosition);hana.rotation.y=d.hinaRotation;
+  daeun.mesh.position.fromArray(d.daeunPosition);daeun.mesh.rotation.y=d.daeunRotation;
+  explored.clear();for(const k of d.explored)explored.add(k);daeunExplored.clear();for(const k of d.daeunExplored)daeunExplored.add(k);
+  for(const [name,list] of Object.entries(resourceLists))list.forEach((item,i)=>{const saved=d.resources[name][i];Object.assign(item,saved.data);const mesh=item.group||item.g;if(mesh&&saved.position){mesh.position.fromArray(saved.position);mesh.visible=saved.visible;}if(item.fruits)item.fruits.forEach((fruit,k)=>fruit.visible=k<item.stock);});
+  campfire.visible=fireSuccess;daeunResources.fire.group.visible=daeunDisplayedFuel()>0;
+  torchGroup.visible=torchCarried;wovenBasket.visible=basketCrafted;updateDaeunBagVisual();updateHandCargo();
+  survivorSpeech.clear();daeun.speechExpiresAt=0;hinaSpeechExpiresAt=0;meetingHinaLine='';meetingHinaLineUntil=0;
+  prev=performance.now();lastRenderAt=0;explorationNextUpdate=detailNextUpdate=uiNextUpdate=0;dualLastUI=-Infinity;
+  clearPlayerInput();renderMemoryAlbum();renderMind();updateExploration(true);updateDetailVisibility(true);selectCharacter(observedId);refreshCharacterUI(performance.now(),true);
+ }
+ function checksum(text){let n=2166136261;for(let i=0;i<text.length;i++){n^=text.charCodeAt(i);n=Math.imul(n,16777619);}return (n>>>0).toString(16);}
+ function save(){try{const payload=capture();validate(payload);const text=JSON.stringify(payload),record=JSON.stringify({game:'HINA SURVIVAL',schema:1,version:'4.0',checksum:checksum(text),payload});const old=localStorage.getItem(key);if(old){try{const previous=JSON.parse(old);if(previous.schema===1&&checksum(JSON.stringify(previous.payload))===previous.checksum){validate(previous.payload);localStorage.setItem(backup,old);}}catch{}}localStorage.setItem(key,record);lastError='';return true;}catch(e){lastError=String(e.message);return false;}}
+ function load(){
+  let rollback;for(const slot of [key,backup])try{const text=localStorage.getItem(slot);if(!text)continue;if(text.length>8e6)throw Error('저장 파일 크기 오류');const record=JSON.parse(text);if(record.game!=='HINA SURVIVAL'||record.schema!==1||checksum(JSON.stringify(record.payload))!==record.checksum)throw Error('저장 파일 검증 실패');validate(record.payload);rollback=capture();apply(record.payload);lastError='';return true;}catch(e){lastError=String(e.message);if(rollback){try{apply(rollback);}catch{}rollback=null;}}
+  return false;
+ }
+ function initialize(){ready=true;load();nextAt=performance.now()+15000;
+  const parent=$('extraControls');for(const [label,action] of [['💾 저장',save],['📂 불러오기',load]]){const button=document.createElement('button');button.type='button';button.textContent=label;button.onclick=()=>{button.title=action()?'완료':lastError||'저장된 진행이 없습니다';button.textContent=button.title==='완료'?'✓ '+label:label;};parent.appendChild(button);}
+  window.addEventListener('pagehide',()=>save());document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+ }
+ return {initialize,save,load,status:()=>({ready,lastError,key}),tick:now=>{if(ready&&now>=nextAt){nextAt=now+15000;save();}}};
+})();
+window.hinaSave={save:progressStore.save,load:progressStore.load,status:progressStore.status};
+
+function updateSurvivorSystems(dt){
+ if(paused)return;const step=dt*speed;
+ updateDaeun(step,dt);updateSharedDaeunResourceTask(step);updateSharedCampfireBonus();
+ checkHinaDaeunMeeting();updateMeetingFollow(step);trackDailySleep(step);updateMiddleBear(step);
+ updateDualExploration();updateRainSpeech();updateDaeunFriendThoughts();updateCompanionChat();
+}
+function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
- lastRenderAt=t;
- let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);if(!paused){updateDaeun(dt*speed,dt);updateSharedDaeunResourceTask(dt*speed);updateSharedCampfireBonus();checkHinaDaeunMeeting();updateMeetingFollow(dt*speed);trackDailySleep(dt*speed);updateMiddleBear(dt*speed);updateDualExploration();updateRainSpeech();updateDaeunFriendThoughts();updateCompanionChat();}refreshCharacterUI(t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina')$('bubble').textContent=meetingHinaLine;}if(!paused){animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);}if(followCamera){
+ lastRenderAt=t;const frameCpuStart=performance.now();
+ let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);updateSurvivorSystems(dt);refreshCharacterUI(t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina'&&!hinaSleepSpeechLock()&&survivorSpeech.companionOwns('hina'))$('bubble').textContent=meetingHinaLine;}if(!paused){animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);}if(followCamera){
   updateFollowDeadZone(dt);
   followDesired.copy(followFocus).add(followOffset);
   const lerp=1-Math.exp(-Math.min(dt,.08)*5);
@@ -7998,6 +8631,8 @@ function animate(t){requestAnimationFrame(animate);
  smoothResourceMarkerPositions();
  if(t>=nextUiFrame){nextUiFrame=t+(ultraLowPower?250:100);if(hinaSpeechExpiresAt&&performance.now()>hinaSpeechExpiresAt){$('thought').textContent='';hinaSpeechExpiresAt=0;}updateBubble();updateNightSoundBubble();}
  drawHinaMeetingBubble();
+ if(observedId==='hina'?hinaSleepSpeechLock():daeunSleepSpeechLock()){updateBubble();$('ambientBubble').classList.remove('show');}
+ avoidSpeechBubbleOverlaps();
  const clockNow=clockParts();
  const nightNow=clockNow.h>=19||clockNow.h<6;
  const dn=$('dayNight');
@@ -8006,12 +8641,43 @@ function animate(t){requestAnimationFrame(animate);
  updateDestinationMarker();
  updateRoastFishButton();
  updatePetBenefitFeedback();
+ updateWillShieldHud();
  renderBatching.update(t);
  const cpuStart=performance.now();renderer.render(scene,camera);updateSubtleBloom(t);
  const submitMs=performance.now()-cpuStart;
- renderSamples.push({time:t,frameMs:previousSampleTime?t-previousSampleTime:0,cpuSubmitMs:submitMs,...renderer.info.render,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures});
- previousSampleTime=t;if(renderSamples.length>600)renderSamples.shift();
+ const sample=renderSamples[renderSampleCursor]||(renderSamples[renderSampleCursor]={});
+ Object.assign(sample,{time:t,frameMs:previousSampleTime?t-previousSampleTime:0,cpuSubmitMs:submitMs,cpuFrameMs:performance.now()-frameCpuStart,...renderer.info.render,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures});
+ renderSampleCursor=(renderSampleCursor+1)%600;previousSampleTime=t;
  perfFrames++;perfCpu+=performance.now()-cpuStart;
  if(t>=perfNext){const seconds=Math.max(.001,(t-perfLast)/1000);perfFps=Math.round(perfFrames/seconds);perfDraw=renderer.info.render.calls;perfTris=renderer.info.render.triangles;perfRenderMs=(perfCpu/Math.max(1,perfFrames)).toFixed(1);perfFrames=0;perfCpu=0;perfLast=t;perfNext=t+1500;refreshPerfHud();}
-}requestAnimationFrame(animate);
-</script></body></html>
+}progressStore.initialize();requestAnimationFrame(animate);
+</script><!-- v3.92 mobile HUD layout -->
+<style>
+@media(max-width:700px){
+ #badge{top:calc(7px + env(safe-area-inset-top))!important}
+ #mobileMenu{top:calc(7px + env(safe-area-inset-top))!important}
+ #mobileVitals{top:calc(72px + env(safe-area-inset-top))!important}
+ #controls #cameraMode{
+  position:fixed!important;left:8px!important;top:var(--camera-under-vitals,210px)!important;
+  bottom:auto!important;transform:none!important;z-index:20!important;
+  font-size:11px!important;padding:8px 10px!important;
+ }
+ #characterBar{bottom:calc(43px + env(safe-area-inset-bottom))!important}
+ body.menu-open #controls #cameraMode{display:none!important}
+}
+</style>
+<script>
+(function(){
+ const vitals=document.getElementById('mobileVitals');
+ function placeCamera(){
+  if(!vitals||innerWidth>700)return;
+  const r=vitals.getBoundingClientRect();
+  if(r.height>0)document.documentElement.style.setProperty('--camera-under-vitals',Math.ceil(r.bottom+8)+'px');
+ }
+ window.addEventListener('resize',placeCamera,{passive:true});
+ if(typeof ResizeObserver!=='undefined'&&vitals)new ResizeObserver(placeCamera).observe(vitals);
+ document.addEventListener('DOMContentLoaded',placeCamera);
+ setTimeout(placeCamera,200);
+})();
+</script>
+</body></html>
