@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA SURVIVAL v4.17</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA SURVIVAL v4.43</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileCategories{display:none}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media(max-width:700px){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
@@ -6618,7 +6618,7 @@ function setDaeunDestination(point,action='travel'){
 }
 function setDaeunAuto(on){
  sharedDaeunResourceTask=null;
- const wasSleeping=daeun.action==='manualSleep'||daeun.action==='sleep';cancelManualTask();daeun.auto=Boolean(on);daeun.path=[];daeun.destination=null;daeun.action=wasSleeping?'sleep':'idle';if(!wasSleeping)daeun.actionAge=0;daeun.timers.nextThink=elapsed;clearPlayerInput();
+ const wasSleeping=daeun.action==='manualSleep'||daeun.action==='sleep';cancelManualTask();daeun.auto=Boolean(on);window.syncDaeunBorder?.(daeun.auto);daeun.path=[];daeun.destination=null;daeun.action=wasSleeping?'sleep':'idle';if(!wasSleeping)daeun.actionAge=0;daeun.timers.nextThink=elapsed;clearPlayerInput();
  daeunSay(on?'자동 생존으로 돌아갈게.':'이제 직접 움직일 수 있어.');updateJoystickVisibility();refreshCharacterUI(performance.now(),true);
 }
 function selectCharacter(id){
@@ -7440,7 +7440,7 @@ function refreshCharacterUI(now,force=false){
  $('hinaAuto').hidden=observedId!=='hina'||!hinaControlUnlocked;
  $('hinaAuto').textContent='자동 생존 '+(hinaManual?'OFF':'ON');
  $('hinaAuto').setAttribute('aria-pressed',String(!hinaManual));
- $('observeHina').setAttribute('aria-pressed',String(observedId==='hina'));$('observeDaeun').setAttribute('aria-pressed',String(observedId==='daeun'));$('daeunAuto').hidden=observedId!=='daeun';$('daeunAuto').setAttribute('aria-pressed',String(d.auto));$('daeunAuto').textContent='자동 생존 '+(d.auto?'ON':'OFF');
+ window.syncDaeunBorder?.(!!d.auto);$('observeHina').setAttribute('aria-pressed',String(observedId==='hina'));$('observeDaeun').setAttribute('aria-pressed',String(observedId==='daeun'));$('daeunAuto').hidden=observedId!=='daeun';$('daeunAuto').setAttribute('aria-pressed',String(d.auto));$('daeunAuto').textContent='자동 생존 '+(d.auto?'ON':'OFF');
  if(observedId==='daeun'){
   $('daeunDay').textContent='· DAY '+String(clockParts().day).padStart(2,'0');$('daeunAction').textContent=(d.auto?'자동 생존 · ':'수동 이동 · ')+(actionNames[d.action]||d.action);$('daeunThought').textContent=daeunVisibleSpeech()?'“'+daeunVisibleSpeech()+'”':'';
   updateStableStatBars($('daeunStats'),{체력:d.stats.energy,갈증:d.stats.thirst,허기:d.stats.hunger,의지력:d.stats.will,불유지:daeunDisplayedFuel()});
@@ -9099,7 +9099,6 @@ window.HinaInteractionSFX={play};
  document.addEventListener('pointerdown',e=>{const a=document.getElementById('daeunActionButtons');if(a?.classList.contains('open')&&!a.contains(e.target))a.classList.remove('open');},true);
  function syncCompact(){if(innerWidth>700)return;const v=document.getElementById('mobileVitals');const b=document.getElementById('characterBar');if(!v||!b)return;const rect=v.getBoundingClientRect();b.style.setProperty('top',Math.round(rect.bottom+5)+'px','important');
   const d=document.getElementById('observeDaeun');const h=document.getElementById('observeHina');const da=document.getElementById('daeunAuto');const ha=document.getElementById('hinaAuto');
-  if(d&&da){if(!d.querySelector('.v440-border')){d.innerHTML='다은<svg class="v440-border" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><rect x="2.5" y="2.5" width="95" height="35" rx="9" pathLength="100"/></svg>';} d.classList.toggle('v435-manual',da.getAttribute('aria-pressed')==='false');d.classList.toggle('v440-auto',da.getAttribute('aria-pressed')==='true');}
   if(h&&ha)h.textContent=ha.hidden?'히나 🔒':'히나';
  }
  setInterval(syncCompact,350);window.addEventListener('resize',syncCompact);syncCompact();
@@ -9119,8 +9118,6 @@ window.HinaInteractionSFX={play};
  #daeunActionButtons{display:flex!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;right:max(8px,env(safe-area-inset-right))!important;z-index:40!important}
  #daeunActionButtons .invPanel{position:absolute;bottom:calc(100% + 8px);right:0;max-width:min(245px,85vw);box-sizing:border-box}
  #daeunActionButtons>button{display:block;visibility:visible;opacity:1}
- #characterBar #observeDaeun.v435-manual{background:#4c957b!important;border-color:#b9ffe0!important;color:white!important}
- #characterBar #observeDaeun:not(.v435-manual){background:#24443e!important;border-color:#759b8e!important}
 }
 </style><style id="v436-patches">
 @media(max-width:700px){
@@ -9129,8 +9126,6 @@ window.HinaInteractionSFX={play};
  body.cinematic-mode #daeunActionButtons>button:not(#daeunItemToggle){display:none!important}
  body.cinematic-mode #daeunActionButtons #daeunItemToggle{display:flex!important}
  body.cinematic-mode #daeunActionButtons.open .invPanel{display:block!important}
- #characterBar #observeDaeun.v435-manual{background:#53a687!important;border:2px solid #c2ffdd!important;color:white!important}
- #characterBar #observeDaeun:not(.v435-manual){background:#294942!important;border:2px solid #6f9688!important;color:white!important}
 }
 </style>
 <style id="v439-mobile-day10">
@@ -9159,36 +9154,11 @@ window.HinaInteractionSFX={play};
  });
 })();
 </script>
-<style id="v440-reliable-animated-border">
-@media(max-width:700px){
-#characterBar #observeDaeun{position:relative!important;overflow:visible!important;isolation:isolate!important;box-sizing:border-box!important}
-#characterBar #observeDaeun.v440-auto{background:#294942!important;border:5px solid #416d5b!important;border-radius:13px!important;animation:none!important}
-#characterBar #observeDaeun.v440-auto::before,#characterBar #observeDaeun.v440-auto::after{content:none!important;display:none!important}
-#characterBar #observeDaeun .v440-border{display:none;position:absolute;inset:-5px;width:calc(100% + 10px);height:calc(100% + 10px);overflow:visible;pointer-events:none;z-index:3}
-#characterBar #observeDaeun.v440-auto .v440-border{display:block!important}
-#characterBar #observeDaeun .v440-border rect{fill:none;stroke:#baffd7;stroke-width:5;stroke-linecap:round;stroke-dasharray:22 78;animation:v440-border-flow 3s linear infinite}
-#characterBar #observeDaeun.v435-manual{border:5px solid #9ce7b7!important;background:#53a687!important;animation:none!important}
-#characterBar #observeDaeun.v435-manual .v440-border{display:none!important}
-@keyframes v440-border-flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
-#profileViewer,#daeunProfileViewer{padding:clamp(24px,5dvh,46px) 24px!important;align-items:center!important;justify-content:center!important}
+<style id="v445-profile-preserved">@media(max-width:700px){#profileViewer,#daeunProfileViewer{padding:clamp(24px,5dvh,46px) 24px!important;align-items:center!important;justify-content:center!important}
 #profileViewer #profileCard,#daeunProfileViewer #profileCard{width:min(84vw,370px)!important;max-width:84vw!important;height:min(78dvh,720px)!important;max-height:78dvh!important;border-radius:16px!important}
 #profileViewer #profileCard .profileArt,#daeunProfileViewer #profileCard .profileArt{height:51dvh!important;max-height:51dvh!important;min-height:0!important}
-}
-@media(prefers-reduced-motion:reduce){#characterBar #observeDaeun .v440-border rect{animation:none!important}}
-</style><style id="v441-state-and-day10">
+}</style><style id="v441-state-and-day10">
 @media(max-width:700px){
- #characterBar #observeDaeun.v441-auto{
-  background:#468b70!important;color:#fff!important;
-  border:5px solid #8fe7b9!important;
-  border-radius:13px!important;
- }
- #characterBar #observeDaeun.v441-manual{
-  background:#2b403c!important;color:#fff!important;
-  border:5px solid #80968d!important;
-  border-radius:13px!important;
- }
- #characterBar #observeDaeun.v441-auto .v440-border{display:block!important;visibility:visible!important;opacity:1!important}
- #characterBar #observeDaeun.v441-manual .v440-border{display:none!important}
  #v441Day10{
   display:block!important;width:100%;min-height:44px;padding:10px;
   border:2px solid #9ce7b7;border-radius:10px;background:#356d59;
@@ -9203,27 +9173,41 @@ window.HinaInteractionSFX={play};
 </style>
 <script id="v441-stability">
 (()=>{
- const bar=document.getElementById('characterBar');
- const button=document.getElementById('observeDaeun');
- const sync=()=>{
+ // One source of truth: actual AI state, not an aria label or an animation.
+ const sync=(automatic)=>{
+  // The button is created later by the module script. Never cache a null reference.
+  const button=document.getElementById('observeDaeun');
   if(!button)return;
-  let automatic=true;
-  try{automatic=!!daeun.auto;}catch(e){automatic=document.getElementById('daeunAuto')?.getAttribute('aria-pressed')==='true';}
-  button.classList.toggle('v441-auto',automatic);
-  button.classList.toggle('v441-manual',!automatic);
-  button.classList.toggle('v440-auto',automatic);
-  button.classList.toggle('v435-manual',!automatic);
-  if(!button.querySelector('.v440-border')){
+  const isAuto=typeof automatic==='boolean'?automatic:(typeof daeun!=='undefined'?!!daeun.auto:true);
+  button.dataset.auto=String(isAuto);
+  // One persistent SVG overlay: never rebuild it on mode changes.
+  if(!button.querySelector('.v446-orbit')){
    const ns='http://www.w3.org/2000/svg';
-   const svg=document.createElementNS(ns,'svg');svg.setAttribute('class','v440-border');
-   svg.setAttribute('viewBox','0 0 100 40');svg.setAttribute('preserveAspectRatio','none');
+   const svg=document.createElementNS(ns,'svg');
+   svg.setAttribute('class','v446-orbit');
+   svg.setAttribute('viewBox','0 0 100 44');
+   svg.setAttribute('preserveAspectRatio','none');
    svg.setAttribute('aria-hidden','true');
-   const rect=document.createElementNS(ns,'rect');
-   for(const [k,v] of Object.entries({x:'2.5',y:'2.5',width:'95',height:'35',rx:'9',pathLength:'100'}))rect.setAttribute(k,v);
-   svg.appendChild(rect);button.appendChild(svg);
+   const track=document.createElementNS(ns,'rect');
+   track.setAttribute('x','2.5');track.setAttribute('y','2.5');
+   track.setAttribute('width','95');track.setAttribute('height','39');
+   track.setAttribute('rx','10');track.setAttribute('ry','10');
+   track.setAttribute('pathLength','100');
+   track.setAttribute('fill','none');
+   track.setAttribute('class','v446-orbit-light');
+   svg.appendChild(track);
+   button.appendChild(svg);
   }
+  button.style.setProperty('background',isAuto?'#468B70':'#2B403C','important');
+  button.style.setProperty('background-color',isAuto?'#468B70':'#2B403C','important');
+  button.style.setProperty('background-image','none','important');
+  button.style.setProperty('border-color',isAuto?'#9CE9C0':'#80968D','important');
+  button.style.setProperty('color','#FFFFFF','important');
  };
- setInterval(sync,200);sync();
+ window.syncDaeunBorder=sync;
+ sync();
+ // The module creates the UI after this script has run; wait until it exists.
+ const waitForButton=setInterval(()=>{if(document.getElementById('observeDaeun')){sync();clearInterval(waitForButton);}},100);
  const wrap=document.createElement('div');wrap.id='v441Day10Wrap';
  wrap.innerHTML='<button type="button" id="v441Day10">🧪 DAY 10 테스트 실행</button><div id="v441Day10Status">현재 진행 상태를 테스트 상태로 교체합니다.</div>';
  document.body.appendChild(wrap);
@@ -9242,4 +9226,35 @@ window.HinaInteractionSFX={play};
   }catch(err){status.textContent='실행 실패: '+err.message;console.error('[DAY10]',err);}
  },{passive:false});
 })();
-</script></body></html>
+</script>
+<style id="v445-daeun-color-only">
+@media(max-width:700px){
+ #characterBar #observeDaeun {
+  background:#2B403C!important;background-image:none!important;
+  border:3px solid #80968D!important;color:#fff!important;
+  transition:background-color .12s ease,border-color .12s ease!important;
+ }
+ #characterBar #observeDaeun[data-auto="true"] {
+  background:#468B70!important;background-image:none!important;
+  border-color:#9CE9C0!important;color:#fff!important;
+ }
+ #characterBar #observeDaeun .daeun-border,
+ #characterBar #observeDaeun .v440-border{display:none!important}
+}
+</style><style id="v446-continuous-border">
+@media(max-width:700px){
+ #characterBar #observeDaeun{position:relative!important;isolation:isolate}
+ #characterBar #observeDaeun .v446-orbit{
+  display:none;position:absolute;inset:-3px;width:calc(100% + 6px);height:calc(100% + 6px);
+  pointer-events:none;overflow:visible;z-index:2;
+ }
+ #characterBar #observeDaeun[data-auto="true"] .v446-orbit{display:block}
+ #characterBar #observeDaeun .v446-orbit-light{
+  stroke:#D1FFE2;stroke-width:5;stroke-linecap:round;
+  stroke-dasharray:17 83;stroke-dashoffset:0;
+  animation:v446-orbit 3s linear infinite;
+  filter:drop-shadow(0 0 2px #A6FFD0);
+ }
+ @keyframes v446-orbit{to{stroke-dashoffset:-100}}
+}
+</style></body></html>
