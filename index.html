@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA SURVIVAL v4.50</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HINA SURVIVAL v4.61</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media(max-width:700px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media(max-width:700px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileCategories{display:none}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media(max-width:700px){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
@@ -469,6 +469,19 @@ pondWaterMat.opacity=1;
 pondWaterMat.depthWrite=true;
 pondWaterMat.needsUpdate=true;
 const pondWater=makePondSurface(-9,4,.31);
+// v4.60: Real blue pond illumination, sharing one night-controlled light per pond.
+// Unlike the previous shader ring, this lights nearby terrain, plants, and characters.
+const nightPondLights=[];
+function makeNightPondLight(cx,cz,waterY){
+ const light=new THREE.PointLight(0x65b9ff,0,12,1.7);
+ light.position.set(cx,waterY+2.5,cz);
+ light.castShadow=false; // Keep mobile shadow-map cost unchanged.
+ scene.add(light);
+ nightPondLights.push(light);
+ return light;
+}
+makeNightPondLight(-9,4,.31);
+
 const pondRim=mat(0xd1bd9b),pondRock=mat(0xb7b3a5); // v27.5 brighter warm-gray pond boulders
 placePondStones(-9,4);
 function randSafe(n){return (Math.sin(n*127.1+15.7)*43758.5453)%1<0?1+((Math.sin(n*127.1+15.7)*43758.5453)%1):((Math.sin(n*127.1+15.7)*43758.5453)%1)}
@@ -2168,7 +2181,12 @@ function updateRoastFishButton(){
  const buttonX=x+42,buttonY=y-45;
  const pointerNear=Math.hypot(fireHoverPointer.x-x,fireHoverPointer.y-y)<94
   ||Math.hypot(fireHoverPointer.x-buttonX,fireHoverPointer.y-buttonY)<34;
- if(!roastTouch?.ready&&!pointerNear&&performance.now()>fireHoverKeepUntil){hideRoastFishShortcut();return;}
+ // v4.62: On mobile, show the roast-fish affordance automatically when a survivor
+ // carrying raw fish approaches a usable campfire. Cooking still requires
+ // holding the campfire icon and dragging onto this fish icon; visibility alone
+ // must never trigger the action. Desktop retains the existing hover behavior.
+ const discoverableOnMobile=isMobile&&eligible;
+ if(!discoverableOnMobile&&!roastTouch?.ready&&!pointerNear&&performance.now()>fireHoverKeepUntil){hideRoastFishShortcut();return;}
  // Use the icon center as the anchor, so the connector reads as one interaction group.
  const ux=(buttonX-x)/Math.hypot(buttonX-x,buttonY-y),uy=(buttonY-y)/Math.hypot(buttonX-x,buttonY-y);
  const anchorX=x+ux*21,anchorY=y+uy*21;
@@ -3076,7 +3094,30 @@ function updateBubble(){
 }
 // v22.4: daily sleep is counted in game seconds, not real-world seconds.
 const sleepLedger={day:1,hina:0,daeun:0,shortStreak:{hina:0,daeun:0}};
-function resetSleepLedger(){sleepLedger.day=1;sleepLedger.hina=0;sleepLedger.daeun=0;sleepLedger.shortStreak.hina=0;sleepLedger.shortStreak.daeun=0;}
+// Sleep deprivation dialogue: three randomized lines per severity, shared by Hina/Daeun.
+const sleepFatigueLines={
+ moderate:['잠을 제대로 못 잤더니 체력이 너무 딸려...','조금만 움직여도 피곤해. 어제 너무 못 잤나 봐.','아직도 졸려... 오늘은 일찍 쉬어야겠어.'],
+ severe:['거의 못 잤더니 몸에 힘이 하나도 없어...','눈이 자꾸 감겨... 이러다 쓰러지겠어.','잠을 너무 못 잤어... 조금이라도 쉬어야 해.']
+};
+const pendingSleepFatigue={hina:null,daeun:null};
+function queueSleepFatigueSpeech(id,hours){
+ const lines=hours<2?sleepFatigueLines.severe:sleepFatigueLines.moderate;
+ pendingSleepFatigue[id]=lines[Math.floor(Math.random()*lines.length)];
+}
+function flushSleepFatigueSpeech(){
+ for(const id of ['hina','daeun']){
+  const line=pendingSleepFatigue[id];if(!line)continue;
+  const sleeping=id==='hina'?hinaSleepSpeechLock():daeunSleepSpeechLock();
+  if(sleeping)continue;
+  // Preserve currently active dialogue and release fatigue speech when the character wakes.
+  if(id==='hina' && performance.now()<hinaSpeechExpiresAt)continue;
+  if(id==='daeun' && performance.now()<(daeun.speechExpiresAt||0))continue;
+  pendingSleepFatigue[id]=null;
+  if(id==='hina')say(line);else daeunSay(line);
+ }
+}
+
+function resetSleepLedger(){sleepLedger.day=1;sleepLedger.hina=0;sleepLedger.daeun=0;sleepLedger.shortStreak.hina=0;sleepLedger.shortStreak.daeun=0;pendingSleepFatigue.hina=null;pendingSleepFatigue.daeun=null;}
 function applySleepAssessment(id,hours,completedDay){
  const stat=id==='hina'?stats:daeun.stats;
  const deficit=hours<=4;
@@ -3085,6 +3126,7 @@ function applySleepAssessment(id,hours,completedDay){
  if(change<0&&completedDay===1)change*=.5; // first-day disorientation grace
  if(change<0&&sleepLedger.shortStreak[id]>=2)change-=5;
  stat.energy=Math.max(0,Math.min(100,stat.energy+change));
+ if(hours<=4 && change<0)queueSleepFatigueSpeech(id,hours);
  const label=id==='hina'?'히나':'다은';
  if(collisionDebugEnabled)console.info('[SLEEP_DAILY]',{character:id,day:completedDay,hours:+hours.toFixed(2),energyDelta:change,energy:stat.energy});
  if(id==='hina')log('💤 '+label+' 전날 수면 '+hours.toFixed(1)+'시간 · 체력 '+(change>=0?'+':'')+change);
@@ -4732,8 +4774,14 @@ function updateHinaWorldUIAndLighting(step,dt){
  sun.intensity=lerp(from.solar,to.solar)*weatherDim;
  fill.intensity=lerp(from.bounce,to.bounce)*weatherDim;
  renderer.toneMappingExposure=lerp(from.exposure,to.exposure);
+ // Dusk 18-20 fade in, dawn 05-07 fade out; rainy nights slightly softer.
+ const pondNight=(hour>=20||hour<5)?1:hour>=18?THREE.MathUtils.smoothstep(hour,18,20):hour<7?1-THREE.MathUtils.smoothstep(hour,5,7):0;
+ const pondGlow=pondNight*(raining()?.68:1);
+ for(const light of nightPondLights){
+  light.intensity=pondGlow*(isMobile?2.0:2.6);
+ }
  const lightLevel=lerp(from.hemi,to.hemi)/2.15;
- pondWaterMat.color.setRGB(.015+.21*lightLevel,.025+.70*lightLevel,.035+.73*lightLevel);
+ pondWaterMat.color.setRGB(.015+.21*lightLevel+.015*pondGlow,.025+.70*lightLevel+.075*pondGlow,.035+.73*lightLevel+.11*pondGlow);
  pondRippleMat.opacity=.025+.49*lightLevel;
  waterSurface.material.opacity=.77;
  animateFireflies();
@@ -4880,7 +4928,7 @@ function unlockRainAudio(){
  }
 }
 function updateRainAudio(dt){
- const target=soundEnabled&&!paused&&raining()?Math.min(.34,Math.max(0,rainVisualStrength)*.34)*ambientVolume:0;
+ const target=soundEnabled&&!paused&&raining()?Math.min(.34,Math.max(0,rainVisualStrength)*.34)*ambientVolume/3:0;
  const response=target>rainAudioGain?1.2:.8;
  rainAudioGain+= (target-rainAudioGain)*Math.min(1,Math.max(0,dt)*response);
  if(Math.abs(rainAudioGain-target)<.001)rainAudioGain=target;
@@ -5764,7 +5812,7 @@ function buildDaeunWorld(){
   const o=box(w,.11,d,grass,x,y+.07,z);o.userData.minorDecoration=true;
  }
 
- const pond=makePondSurface(p.x,p.z,.49);daeunResources.pondMesh=pond;
+ const pond=makePondSurface(p.x,p.z,.49);makeNightPondLight(p.x,p.z,.49);daeunResources.pondMesh=pond;
  // Match Hina's pear-shaped shoreline, with a different, natural stone rhythm.
  placePondStones(p.x,p.z,true);
  // Match Hina's animated concentric ripples (separate meshes, same material).
@@ -9158,7 +9206,7 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  sun.target.updateMatrixWorld();
  updateCameraOcclusion(t);
  smoothResourceMarkerPositions();
- if(t>=nextUiFrame){nextUiFrame=t+(ultraLowPower?250:100);if(hinaSpeechExpiresAt&&performance.now()>hinaSpeechExpiresAt){$('thought').textContent='';hinaSpeechExpiresAt=0;}updateBubble();updateNightSoundBubble();}
+ if(t>=nextUiFrame){flushSleepFatigueSpeech();nextUiFrame=t+(ultraLowPower?250:100);if(hinaSpeechExpiresAt&&performance.now()>hinaSpeechExpiresAt){$('thought').textContent='';hinaSpeechExpiresAt=0;}updateBubble();updateNightSoundBubble();}
  drawHinaMeetingBubble();
  if(observedId==='hina'?hinaSleepSpeechLock():daeunSleepSpeechLock()){updateBubble();$('ambientBubble').classList.remove('show');}
  avoidSpeechBubbleOverlaps();
