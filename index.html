@@ -1442,7 +1442,7 @@ function updateSnakes(step){
   // Snake proximity penalties apply to both characters, even during manual control.
  // Standing close to a snake is frightening continuously; backing away stops it.
   if(d<5.0){
-   if(!snake.hinaFearInside){snake.hinaFearInside=true;stats.will=Math.max(0,stats.will-30);log('🐍 히나 뱀 5m 진입 · 의지력 -30');}
+   if(!snake.hinaFearInside){snake.hinaFearInside=true;const before=stats.will;stats.will=Math.max(0,stats.will-30);gameVitalFloat('hina','will',stats.will-before);log('🐍 히나 뱀 5m 진입 · 의지력 감소');}
 
    if(elapsed-snake.lastScare>18){snake.lastScare=elapsed;if(elapsed-lastSnakeWarning>16){say('뱀이 너무 가까워! 얼른 떨어지자!');lastSnakeWarning=elapsed;}}
   }
@@ -6152,7 +6152,7 @@ function updateDaeunSnakes(step){
   snake.phase+=step*.7;snake.g.rotation.y=Math.sin(snake.phase)*.48;
   if(d<5&&!snake.noticed){snake.noticed=true;daeunSay('🐍 뱀이야! 가까이 가지 말자.');}
   if(d<5){
-   if(!snake.daeunFearInside){snake.daeunFearInside=true;daeun.stats.will=Math.max(0,daeun.stats.will-30);daeunSay('🐍 뱀이 바로 앞에 있어! 의지력 -30');}
+   if(!snake.daeunFearInside){snake.daeunFearInside=true;const before=daeun.stats.will;daeun.stats.will=Math.max(0,daeun.stats.will-30);gameVitalFloat('daeun','will',daeun.stats.will-before);daeunSay('뱀이 바로 앞에 있어! 도망가야 해!');}
    if(elapsed-snake.lastScare>18){snake.lastScare=elapsed;daeunSay('뱀이 너무 가까워! 무서워…');}
   }
   if(d>=5)snake.daeunFearInside=false;
@@ -6351,7 +6351,7 @@ function updateMiddleBear(step){
   // Fear doubles at near-contact, but the bear never physically overlaps a character.
   const proximity=Math.hypot(tracked.mesh.position.x-middleBear.position.x,tracked.mesh.position.z-middleBear.position.z);
   const fearRate=proximity<=bearTerritory.contactRange?.60:.30;
-  tracked.stats.will=Math.max(0,tracked.stats.will-step*fearRate);
+  const before=tracked.stats.will;tracked.stats.will=Math.max(0,tracked.stats.will-step*fearRate);continuousFearFloat(tracked.id,'bear',tracked.stats.will-before,elapsed);
   if(elapsed-bearState.lastWarning>22){
    bearState.lastWarning=elapsed;
    if(tracked.id==='daeun')daeunSay('🐻 곰이 따라오고 있어! 이곳을 벗어나야 해!');
@@ -6915,9 +6915,9 @@ class DaeunAIController{
   if(d.action==='wash'){d.lastWashDay=clockParts().day;s.will=Math.min(100,s.will+5);daeunSay('아, 개운하다! 이제 좀 살 것 같아.');d.memory.push({kind:'wash',at:elapsed});}
   if(d.action==='drink'){s.thirst=Math.min(100,s.thirst+65);daeunSay('물을 마셨더니 살 것 같아.');d.memory.push({kind:'water',at:elapsed});}
   if(d.action==='forage'){
-   const t=(sharedHomeActive?berryTrees:daeunResources.berries)[d.resourceId];if(t&&t.stock>0&&inv.berries<daeunBagCap()){const n=Math.min(3,t.stock);const picked=Math.min(n,daeunBagCap()-inv.berries);t.stock-=picked;inv.berries+=picked;t.fruits.forEach((f,i)=>f.visible=i<t.stock);if(s.hunger<70){inv.berries--;s.hunger=Math.min(100,s.hunger+34);}daeunSay('열매를 모았어. 조금은 나중을 위해 남겨 두자.');d.memory.push({kind:'forage',at:elapsed});}
+   const t=(sharedHomeActive?berryTrees:daeunResources.berries)[d.resourceId];if(t&&t.stock>0&&inv.berries<daeunBagCap()){const n=Math.min(3,t.stock);const picked=Math.min(n,daeunBagCap()-inv.berries);t.stock-=picked;inv.berries+=picked;t.fruits.forEach((f,i)=>f.visible=i<t.stock);const ateBerry=s.hunger<70;if(ateBerry){inv.berries--;s.hunger=Math.min(100,s.hunger+34);}inventoryPickupFloat('daeun','berries',Math.max(0,picked-(s.hunger<70?1:0)));d.memory.push({kind:'forage',at:elapsed});}
   }
-  if(d.action==='branch'){const b=(sharedHomeActive?branchPiles:daeunResources.branches)[d.branchId];if(b&&b.available){daeunResourceVisited.set(b,elapsed);b.available=false;b.group.visible=false;b.respawnAt=elapsed+DAY_SECONDS*(1.25+dRandom()*2.25);const gained=dRandom()<.2?2:1;inv.branches+=gained;daeunSay(gained===2?'운이 좋네! 나뭇가지 두 개를 주웠어!':'마른 나뭇가지를 주웠어.');}}
+  if(d.action==='branch'){const b=(sharedHomeActive?branchPiles:daeunResources.branches)[d.branchId];if(b&&b.available){daeunResourceVisited.set(b,elapsed);b.available=false;b.group.visible=false;b.respawnAt=elapsed+DAY_SECONDS*(1.25+dRandom()*2.25);const gained=dRandom()<.2?2:1;inv.branches+=gained;inventoryPickupFloat('daeun','branches',gained);}}
   if(['sleep','sleepPrepare','rest'].includes(d.action)){
    if(d.action==='sleep'&&!daeunInsideSafeShelter()&&daeunNightShelterPriority())return;
    d.actionAge=0;return;
@@ -7175,7 +7175,7 @@ function updateDaeun(step,realDt){
  // Eating while seated does not interrupt rest, its recovery or seated animation.
  if(d.seatedEating>0){
   d.seatedEating=Math.max(0,d.seatedEating-step);
-  if(d.seatedEating===0&&inv.berries>0&&s.hunger<95){inv.berries--;s.hunger=Math.min(100,s.hunger+12);daeunSay('앉아서 열매를 먹었어. 허기 +12');}
+  if(d.seatedEating===0&&inv.berries>0&&s.hunger<95){const before=s.hunger;inv.berries--;s.hunger=Math.min(100,s.hunger+12);showFoodConsumption('daeun','berries',before,s.hunger);}
  }
  // Finish autonomous wildlife observation without inventing caught animals.
  if(d.auto&&(d.action==='autoRabbitObserve'||d.action==='autoFishObserve')&&d.actionAge>=7){
@@ -7238,18 +7238,18 @@ function updateDaeun(step,realDt){
    }else daeunSay(inv.branches<DAEUN_BAG_BRANCH_COST?'나뭇가지 최소 2개가 필요합니다.':'오늘은 더 제작할 수 없어.');
    cancelManualTask();
   }
-  else if(task.type==='berry'&&task.age>=4){const t=daeunResources.berries[task.index];if(t&&t.stock>0&&inv.berries<daeunBagCap()){const roll=Math.random(),n=Math.min(t.stock,roll<.4?1:roll<.8?2:3);const picked=Math.min(n,daeunBagCap()-inv.berries);t.stock-=picked;inv.berries+=picked;t.fruits.forEach((f,i)=>f.visible=i<t.stock);if(t.stock<=0){for(const marker of berryEmojiMarkers){if(marker._berryTree===t){marker.style.display='none';marker.onclick=null;marker._berryTree=null;}}}daeunSay('열매 +'+picked+'개 · 소지품에 보관했어.');}else if(t&&t.stock>0&&inv.berries>=daeunBagCap())daeunSay('더 이상 담을 수 없겠다.');else daeunSay('열매가 남아 있지 않아.');cancelManualTask();}
-  else if(task.type==='branch'&&task.age>=2.8){const b=daeunResources.branches[task.index];if(b&&b.available){b.available=false;b.group.visible=false;b.respawnAt=elapsed+DAY_SECONDS*(1.25+dRandom()*2.25);const gained=dRandom()<.2?2:1;inv.branches+=gained;daeunSay(`나뭇가지 +${gained}개 · 소지품에 보관했어.`);}else daeunSay('이미 주운 나뭇가지야.');cancelManualTask();}
-  else if(task.type==='water'&&task.age>=6){s.thirst=Math.min(100,s.thirst+25);daeunSay('물을 마셨어. 갈증 +25');cancelManualTask();}
+  else if(task.type==='berry'&&task.age>=4){const t=daeunResources.berries[task.index];if(t&&t.stock>0&&inv.berries<daeunBagCap()){const roll=Math.random(),n=Math.min(t.stock,roll<.4?1:roll<.8?2:3);const picked=Math.min(n,daeunBagCap()-inv.berries);t.stock-=picked;inv.berries+=picked;t.fruits.forEach((f,i)=>f.visible=i<t.stock);if(t.stock<=0){for(const marker of berryEmojiMarkers){if(marker._berryTree===t){marker.style.display='none';marker.onclick=null;marker._berryTree=null;}}}inventoryPickupFloat('daeun','berries',picked);}else if(t&&t.stock>0&&inv.berries>=daeunBagCap())daeunSay('더 이상 담을 수 없겠다.');else daeunSay('열매가 남아 있지 않아.');cancelManualTask();}
+  else if(task.type==='branch'&&task.age>=2.8){const b=daeunResources.branches[task.index];if(b&&b.available){b.available=false;b.group.visible=false;b.respawnAt=elapsed+DAY_SECONDS*(1.25+dRandom()*2.25);const gained=dRandom()<.2?2:1;inv.branches+=gained;inventoryPickupFloat('daeun','branches',gained);}else daeunSay('이미 주운 나뭇가지야.');cancelManualTask();}
+  else if(task.type==='water'&&task.age>=6){const old=s.thirst;s.thirst=Math.min(100,s.thirst+25);gameVitalFloat('daeun','thirst',s.thirst-old);cancelManualTask();}
   else if(task.type==='cookFish'&&task.age>=8){
-   if(inv.fish>0&&inv.cookedFish<daeunFishCap()&&inv.fuel>0){inv.fish--;inv.cookedFish++;inv.fuel=Math.max(0,inv.fuel-8);daeunSay('🐟 구운 물고기 +1 · 휴대 '+inv.cookedFish+'/'+daeunFishCap());}
+   if(inv.fish>0&&inv.cookedFish<daeunFishCap()&&inv.fuel>0){inv.fish--;inv.cookedFish++;inv.fuel=Math.max(0,inv.fuel-8);gameTransactionFloat('daeun','item','fish',-1);gameTransactionFloat('daeun','item','cookedFish',1);}
    else daeunSay('물고기, 모닥불 연료 또는 소지품 공간이 부족해.');
    cancelManualTask();
   }
   else if(task.type==='eatFish'&&task.age>=4){
-   if(inv.cookedFish>0&&s.hunger<95){inv.cookedFish--;s.hunger=100;daeunSay('구운 물고기를 먹었어. 허기가 가득 찼어!');}cancelManualTask();
+   if(inv.cookedFish>0&&s.hunger<95){const old=s.hunger;inv.cookedFish--;s.hunger=100;gameTransactionFloat('daeun','item','cookedFish',-1);gameVitalFloat('daeun','hunger',s.hunger-old);}cancelManualTask();
   }
-  else if(task.type==='eat'&&task.age>=4){if(inv.berries>0&&s.hunger<95){inv.berries--;s.hunger=Math.min(100,s.hunger+12);daeunSay('열매를 먹었어. 허기 +12');}cancelManualTask();}
+  else if(task.type==='eat'&&task.age>=4){if(inv.berries>0&&s.hunger<95){const old=s.hunger;inv.berries--;s.hunger=Math.min(100,s.hunger+12);gameTransactionFloat('daeun','item','berries',-1);gameVitalFloat('daeun','hunger',s.hunger-old);}cancelManualTask();}
   else if(['fire','rabbit','fish'].includes(task.type)&&task.age>=(task.type==='fire'?10:task.type==='rabbit'?7:8)){
    refreshDaeunDailyPractice();
    const kind=task.type,skill=d.skills[kind],gain=kind==='fire'?8+Math.floor(dRandom()*9):kind==='rabbit'?6+Math.floor(dRandom()*9):7+Math.floor(dRandom()*10);
@@ -7262,8 +7262,8 @@ function updateDaeun(step,realDt){
     const success=mastered&&dRandom()<(kind==='fire'?(raining()?.24:.75):kind==='rabbit'?.32:.48);
     if(success&&kind==='fire'){const wasBurning=inv.fuel>0;inv.fuel=Math.max(inv.fuel,65);awardIgnitionMorale('daeun',wasBurning);daeunSay('🔥 모닥불 점화 성공! 나뭇가지를 더 모아 유지하자.');}
     else if(success&&kind==='rabbit'){const r=critters[task.index];if(r&&r.g.visible&&!r.caught&&!daeunPetRabbit){rabbitCaptureHold(r,'daeun');daeunPetRabbit=r;daeunSay(rabbitLine(rabbitSuccessLines));}else {if(r)scareRabbit(r,d.mesh.position);daeunSay(rabbitLine(rabbitFailLines));}}
-    else if(success&&kind==='fish'){inv.fish++;daeunSay('🐟 물고기 잡기 성공! 소지품 +1');}
-    else {if(kind==='rabbit'){const r=critters[task.index];if(r)scareRabbit(r,d.mesh.position);daeunSay(rabbitLine(rabbitFailLines));}else daeunSay((kind==='fire'?'🔥 불 피우기':'🐟 물고기잡기')+' 시도 · 숙련도 '+d.skills[kind]+'% (+ '+gain+'%)'+(mastered?' · 이번엔 실패':' · 아직 연습이 필요해'));}
+    else if(success&&kind==='fish'){inv.fish++;inventoryPickupFloat('daeun','fish',1);}
+    else {if(kind==='rabbit'){const r=critters[task.index];if(r)scareRabbit(r,d.mesh.position);daeunSay(rabbitLine(rabbitFailLines));}else daeunSay(mastered?'아쉽다… 이번엔 실패했어.':'조금씩 감이 잡히는 것 같아.');}
     cancelManualTask();
    }
   }
@@ -7413,7 +7413,7 @@ const joystickEl=document.createElement('div');joystickEl.id='daeunJoystick';joy
 let joyOriginX=0,joyOriginY=0;
 function trackJoystick(e){const radius=43,dx=e.clientX-joyOriginX,dy=e.clientY-joyOriginY,length=Math.hypot(dx,dy),scale=length>radius?radius/length:1;joystick.x=dx*scale/radius;joystick.y=dy*scale/radius;document.getElementById('daeunStickKnob').style.transform=`translate(calc(-50% + ${dx*scale}px),calc(-50% + ${dy*scale}px))`;}
 function placeFloatingJoystick(e){const rect=joystickEl.getBoundingClientRect(),size=116;joyOriginX=e.clientX;joyOriginY=e.clientY;const left=e.clientX-rect.left-size/2,top=e.clientY-rect.top-size/2;const base=document.getElementById('daeunStickBase'),knob=document.getElementById('daeunStickKnob');base.style.left=left+'px';base.style.top=top+'px';knob.style.left=(left+size/2)+'px';knob.style.top=(top+size/2)+'px';knob.style.opacity='1';joystickEl.classList.add('active');}
-joystickEl.addEventListener('pointerdown',e=>{if(!(isManualDaeun()||isManualHina())||joystick.pointerId!==null||(isManualDaeun()&&daeun.manualTask))return;e.preventDefault();e.stopPropagation();joystick.pointerId=e.pointerId;joystickEl.setPointerCapture(e.pointerId);placeFloatingJoystick(e);if(isManualDaeun())interruptManualMovement();trackJoystick(e);});
+joystickEl.addEventListener('pointerdown',e=>{if(!(isManualDaeun()||isManualHina())||joystick.pointerId!==null||(isManualDaeun()&&daeun.manualTask&&!['manualRest','manualSleep'].includes(daeun.action)))return;e.preventDefault();e.stopPropagation();if(isManualDaeun()&&['manualRest','manualSleep'].includes(daeun.action)){cancelManualTask();daeun.path=[];daeun.destination=null;daeun.action='manual';daeun.actionAge=0;}joystick.pointerId=e.pointerId;joystickEl.setPointerCapture(e.pointerId);placeFloatingJoystick(e);if(isManualDaeun())interruptManualMovement();trackJoystick(e);});
 joystickEl.addEventListener('pointermove',e=>{if(e.pointerId!==joystick.pointerId)return;e.preventDefault();e.stopPropagation();trackJoystick(e);});
 for(const eventName of ['pointerup','pointercancel','lostpointercapture'])joystickEl.addEventListener(eventName,e=>{if(e.pointerId===joystick.pointerId){e.stopPropagation();resetJoystick();}});
 // v16.0: compact always-visible vitals for mobile/tablet; character follows observation selection.
@@ -7442,6 +7442,39 @@ function skillFloatNotice(character,key,label,value){
  document.body.appendChild(node);skillFloatPending.set(id,{node,amount:value,time:now});
  node.addEventListener('animationend',()=>{if(skillFloatPending.get(id)?.node===node)skillFloatPending.delete(id);node.remove();},{once:true});
 }
+// v4.51: Inventory pickup feedback reuses the EXACT skillGainFloat typography, rise timing and animation.
+// The branch graphic is cloned from the inventory slot, not replaced with an unrelated emoji.
+// Unified transaction notices: the same class, position and animation as skill gains.
+function gameTransactionFloat(character,kind,key,amount){
+ if(!Number.isFinite(amount)||Math.abs(amount)<.001||character!==observedId)return;
+ const node=document.createElement('div');node.className='skillGainFloat';
+ node.style.top=(Math.min(innerHeight*.47,250)+(document.querySelectorAll('.skillGainFloat').length%3)*28)+'px';
+ const iconSelectors={branches:'#v435InvGrid .v435-slot[title="나뭇가지"] svg',berries:'#v435InvGrid .v435-slot[title="열매"] svg',fish:'#v435InvGrid .v435-slot[title="물고기"] svg',cookedFish:'#v435InvGrid .v435-slot[title="구운 물고기"] svg'};
+ const icon=kind==='item'?document.querySelector(iconSelectors[key]||'#__none__'):null;
+ if(icon){const copy=icon.cloneNode(true);copy.setAttribute('width','20');copy.setAttribute('height','20');copy.style.verticalAlign='middle';copy.style.marginRight='5px';node.appendChild(copy);}
+ else {const label=document.createElement('span');label.textContent=kind==='item'?({berries:'열매',branches:'나뭇가지',fish:'물고기',cookedFish:'구운 물고기'}[key]||key)+' ':({thirst:'갈증',hunger:'허기',energy:'체력',will:'의지력',fuel:'불유지'}[key]||key)+' ';node.appendChild(label);}
+ const n=document.createElement('span');n.textContent=(amount>0?'+':'')+Math.round(amount*10)/10;if(amount<0&&kind==='vital')n.style.color='#ff9292';node.appendChild(n);
+ document.body.appendChild(node);node.addEventListener('animationend',()=>node.remove(),{once:true});
+}
+function inventoryPickupFloat(character,item,amount){gameTransactionFloat(character,'item',item,amount);}
+function gameVitalFloat(character,key,amount){gameTransactionFloat(character,'vital',key,amount);}
+function showFoodConsumption(character,item,oldHunger,newHunger){
+ gameTransactionFloat(character,'item',item,-1);
+ gameVitalFloat(character,'hunger',Math.max(0,newHunger-oldHunger));
+}
+// Continuous threats: show the real accumulated change at a readable cadence.
+const threatFloatAccumulator=new Map();
+function continuousFearFloat(character,source,amount,now){
+ if(amount>=0)return;
+ const id=character+':'+source,entry=threatFloatAccumulator.get(id)||{amount:0,last:now};
+ entry.amount+=amount;
+ if(now-entry.last>=2.5){
+  if(entry.amount<-.05)gameVitalFloat(character,'will',entry.amount);
+  entry.amount=0;entry.last=now;
+ }
+ threatFloatAccumulator.set(id,entry);
+}
+
 function watchSkillGains(character,values){
  const previous=skillFloatPrevious[character];
  if(previous){for(const [key,entry] of Object.entries(values)){
@@ -7574,8 +7607,8 @@ function manualAction(type,point,index=-1){
   daeunSay('오늘 '+(type==='fire'?'불 피우기':type==='rabbit'?'토끼잡기':'물고기잡기')+' 연습은 충분히 했어. 내일 다시 해보자.');return false;
  }
  if(type==='eat'||type==='eatFish'){
-  const inv=daeun.inventory;if(type==='eatFish'){if(inv.cookedFish<1){daeunSay('구운 물고기가 없어.');return false;}inv.cookedFish--;daeun.stats.hunger=100;daeunSay('구운 물고기를 먹었어. 허기가 가득 찼어!');}
-  else{if(inv.berries<1){daeunSay('먹을 열매가 없어.');return false;}inv.berries--;daeun.stats.hunger=Math.min(100,daeun.stats.hunger+12);daeunSay('열매를 먹었어. 허기 +12');}
+  const inv=daeun.inventory;if(type==='eatFish'){if(inv.cookedFish<1){daeunSay('구운 물고기가 없어.');return false;}const before=daeun.stats.hunger;inv.cookedFish--;daeun.stats.hunger=100;showFoodConsumption('daeun','cookedFish',before,daeun.stats.hunger);}
+  else{if(inv.berries<1){daeunSay('먹을 열매가 없어.');return false;}const before=daeun.stats.hunger;inv.berries--;daeun.stats.hunger=Math.min(100,daeun.stats.hunger+12);showFoodConsumption('daeun','berries',before,daeun.stats.hunger);}
   return true; // instant consumption: never cancel joystick, WASD, navigation or walking pose
  }
  cancelManualTask();daeun.path=[];daeun.destination=null;
@@ -7592,11 +7625,11 @@ function manualAction(type,point,index=-1){
  if(type==='bag'&&daeun.inventory.branches<DAEUN_BAG_BRANCH_COST){daeunSay('나뭇가지 최소 2개가 필요합니다.');return false;}
  if(type==='fire'&&daeun.inventory.fuel>0){daeunSay('불을 유지해야 해. 나뭇가지를 모닥불에 넣자.');return false;}
  if(type==='fire'&&daeun.inventory.branches<1){daeunSay('불을 피우려면 나뭇가지가 필요해.');return false;}
- if(type==='eatFish'){if(daeun.stats.hunger>=95){daeunSay(fullLine(FULL_FOOD_LINES));return false;}if(daeun.inventory.cookedFish<1)return false;daeun.inventory.cookedFish--;daeun.stats.hunger=100;daeunSay('구운 물고기를 먹었어. 허기가 가득 찼어!');return true;}
+ if(type==='eatFish'){if(daeun.stats.hunger>=95){daeunSay(fullLine(FULL_FOOD_LINES));return false;}if(daeun.inventory.cookedFish<1)return false;const before=daeun.stats.hunger;daeun.inventory.cookedFish--;daeun.stats.hunger=100;showFoodConsumption('daeun','cookedFish',before,daeun.stats.hunger);return true;}
  if(type==='eat'){
   if(daeun.stats.hunger>=95){daeunSay(fullLine(FULL_FOOD_LINES));return false;}
   if(daeun.inventory.berries<=0){daeunSay('먹을 열매가 없어.');return false;}
-  daeun.inventory.berries--;daeun.stats.hunger=Math.min(100,daeun.stats.hunger+12);daeunSay('열매를 먹었어. 허기 +12');return true;
+  const before=daeun.stats.hunger;daeun.inventory.berries--;daeun.stats.hunger=Math.min(100,daeun.stats.hunger+12);showFoodConsumption('daeun','berries',before,daeun.stats.hunger);return true;
  }
  if(type==='sleep'){
   // Manual sleep is an in-place action, not a navigation task. Cave entrance
@@ -7839,7 +7872,7 @@ function hinaManualInteract(type,item){
  if(type==='eat'){
   if(carriedBerries<=0){say('먹을 열매가 없어.');return;}
   if(stats.hunger>=95){say('아직 배가 부른데?');return;}
-  carriedBerries--;stats.hunger=Math.min(100,stats.hunger+12);say('🍓 열매를 먹었어. 허기가 조금 줄었어.');return;
+  const before=stats.hunger;carriedBerries--;stats.hunger=Math.min(100,stats.hunger+12);showFoodConsumption('hina','berries',before,stats.hunger);return;
  }
  if(!p){say('대상을 찾지 못했어.');return;}
  if(type==='berry'&&(item.stock<=0||carriedBerries>=berryCarryCapacity())){say('열매가 없거나 주머니가 가득 찼어.');return;}
@@ -7862,24 +7895,24 @@ function updateHinaManualTask(step){
  if(task.type==='berry'){
   if(!o||o.stock<=0||carriedBerries>=berryCarryCapacity())return;
   o.stock--;carriedBerries++;if(o.fruits?.length)o.fruits.filter(f=>f.visible).slice(0,1).forEach(f=>f.visible=false);
-  say('🍓 열매를 하나 땄어!');
+  inventoryPickupFloat('hina','berries',1);
  }else if(task.type==='branch'){
   if(!o?.available)return;
   o.available=false;o.group.visible=false;o.respawnAt=elapsed+90+Math.random()*80;
   const count=Math.random()<.2?2:1;fireDryStock=Math.min(8,fireDryStock+count);
-  say('🌿 나뭇가지 '+count+'개를 주웠어!');
+  inventoryPickupFloat('hina','branches',count);
  }else if(task.type==='water'){
-  stats.thirst=Math.min(100,stats.thirst+55);water=true;say('💧 목이 좀 축여졌어.');
+  const old=stats.thirst;stats.thirst=Math.min(100,stats.thirst+55);water=true;gameVitalFloat('hina','thirst',stats.thirst-old);
  }else if(task.type==='fish'){
   if(!fishNearby(hana.position.x,hana.position.z,10))return;
   fishObservations++;fishSkill=Math.min(100,fishSkill+4);
-  if(fishSkill<100){say('🐟 물고기 움직임을 관찰했어! 숙련도 '+Math.round(fishSkill)+'%');}
+  if(fishSkill<100){say('움직임이 조금씩 보이기 시작해.');}
   else if(carriedFish.length>=MAX_CARRY_FISH){say('🐟 물고기를 담을 공간이 없어. 동굴에 먼저 보관하자.');}
   else{
    fishAttempts++;
    const chance=Math.min(.72,.32+(fishSpear?.18:0)+Math.min(.22,fishAttempts*.022));
    stats.energy=Math.max(0,stats.energy-randomBetween(1.5,3.5));
-   if(Math.random()<chance&&storeFish()){fishCaught++;recordMemory('fish');say('🐟 물고기 잡았다! 생물고기 '+carriedFish.length+'/'+MAX_CARRY_FISH+'마리 획득');}
+   if(Math.random()<chance&&storeFish()){fishCaught++;recordMemory('fish');inventoryPickupFloat('hina','fish',1);say('잡았다! 진짜 잡았어!');}
    else say('🐟 물고기를 놓쳤어. 다음엔 잡을 수 있을 거야!');
   }
  }else if(task.type==='rabbit'){
@@ -7887,7 +7920,7 @@ function updateHinaManualTask(step){
   // Observe the clicked rabbit at its original location; do not chase its live position.
   o.caught=true;o.g.visible=false;o.hopActive=false;o.respawnDaeunAt=elapsed+DAY_SECONDS*(.45+Math.random()*.35);rabbitObservations++;rabbitPattern=Math.min(100,rabbitPattern+10);say('🐰 토끼를 관찰했어! 토끼는 숲으로 달아났어.');
  }else if(task.type==='fire'){
-  if(fireSuccess){if(fireDryStock<2)return;fireDryStock-=2;fireKnowledge=Math.min(100,fireKnowledge+40);say('🔥 나뭇가지 2개를 넣었어.');}
+  if(fireSuccess){if(fireDryStock<2)return;fireDryStock-=2;fireKnowledge=Math.min(100,fireKnowledge+40);gameTransactionFloat('hina','item','branches',-2);}
   else{if(fireDryStock<1)return;fireDryStock--;attemptFire();}
  }
 }
@@ -7981,6 +8014,10 @@ const manualUIStyle=document.createElement('style');manualUIStyle.textContent=`
 #daeunQuickEat{min-width:124px;border-color:#ffcc8e!important;background:#744127e8!important;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px}
 #daeunQuickEat:disabled{opacity:.45;filter:grayscale(1)}
 
+/* v4.55: drag food to the single quick-eat slot */
+#v435InvGrid .v435-slot[data-food-kind]{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#daeunQuickEat.v455-drop-target{outline:3px solid #a6f5c9!important;box-shadow:0 0 18px #86efac!important}
+.v455-food-ghost{position:fixed;z-index:99999;pointer-events:none;transform:translate(-50%,-120%);padding:7px 12px;border-radius:14px;background:#224b3de8;color:white;border:2px solid #a6f5c9;font-size:15px;font-weight:700;white-space:nowrap}
 /* v28.18: matched inner discs and subtle hover feedback for linked fire actions. */
 :root{--linked-fire-disc:#243338;--linked-fire-disc-hover:#607e83;}
 .daeunResourceEmoji.linked-fire-action,
@@ -8080,16 +8117,65 @@ document.getElementById('daeunSleepButton').onclick=()=>{
  }else manualAction('sleep',daeun.mesh.position);
 };
 document.getElementById('daeunEatButton').onclick=()=>{manualAction('eat');manualButtons.classList.remove('open');};
-// v23.7: One-tap food above inventory. Prioritize berries for everyday hunger;
-// save cooked fish for emergencies (hunger <=45), or when berries run out.
+// v4.55: One explicit food slot; never auto-switch the player's selected food.
+let selectedQuickFood=null; // null until player drags a food from inventory
+const QUICK_FOODS={berries:{action:'eat',label:'열매',icon:'🍓'},cookedFish:{action:'eatFish',label:'구운 물고기',icon:'🍖'}};
 function quickEatDaeun(){
  if(!isManualDaeun())return;
+ if(!selectedQuickFood){daeunSay('소지품에서 음식을 길게 눌러 음식 먹기 칸에 놓아줘.');return;}
  if(daeun.stats.hunger>=95){daeunSay(fullLine(FULL_FOOD_LINES));return;}
- const inv=daeun.inventory;
- const kind=inv.cookedFish>0&&(daeun.stats.hunger<=45||inv.berries===0)?'eatFish':inv.berries>0?'eat':inv.cookedFish>0?'eatFish':null;
- if(!kind){daeunSay('먹을 음식이 없어. 열매를 채집해야겠어.');return;}
- manualAction(kind);
+ if((daeun.inventory[selectedQuickFood]||0)<=0){daeunSay('선택한 음식이 없어.');return;}
+ manualAction(QUICK_FOODS[selectedQuickFood].action);
 }
+// A single pointer-based drag path for mouse and touch. The inventory grid is
+// re-rendered frequently, so gesture listeners live on its stable parent.
+const foodDrag={pointerId:null,kind:null,startX:0,startY:0,startAt:0,active:false,ghost:null};
+function endFoodDrag(){
+ if(foodDrag.ghost)foodDrag.ghost.remove();
+ Object.assign(foodDrag,{pointerId:null,kind:null,active:false,ghost:null});
+ document.getElementById('daeunQuickEat')?.classList.remove('v455-drop-target');
+}
+function startFoodGhost(x,y){
+ if(foodDrag.active)return;
+ foodDrag.active=true;
+ const item=QUICK_FOODS[foodDrag.kind];
+ const el=document.createElement('div');el.className='v455-food-ghost';el.textContent=item.icon+' '+item.label;
+ document.body.appendChild(el);foodDrag.ghost=el;
+ moveFoodGhost(x,y);
+}
+function moveFoodGhost(x,y){
+ if(foodDrag.ghost){foodDrag.ghost.style.left=x+'px';foodDrag.ghost.style.top=y+'px';}
+ const rect=document.getElementById('daeunQuickEat').getBoundingClientRect();
+ document.getElementById('daeunQuickEat').classList.toggle('v455-drop-target',foodDrag.active&&x>=rect.left&&x<=rect.right&&y>=rect.top&&y<=rect.bottom);
+}
+const foodGrid=document.getElementById('v435InvGrid');
+foodGrid.addEventListener('pointerdown',e=>{
+ const slot=e.target.closest('.v435-slot[data-food-kind]');
+ if(!slot||!isManualDaeun())return;
+ const kind=slot.dataset.foodKind;
+ if(!QUICK_FOODS[kind]||(daeun.inventory[kind]||0)<=0)return;
+ foodDrag.pointerId=e.pointerId;foodDrag.kind=kind;foodDrag.startX=e.clientX;foodDrag.startY=e.clientY;foodDrag.startAt=performance.now();foodDrag.active=false;
+ // Keep subsequent events on the stable grid, even if its slots are rebuilt.
+ try{foodGrid.setPointerCapture(e.pointerId);}catch(_){}
+ e.stopPropagation();
+},{passive:false});
+foodGrid.addEventListener('pointermove',e=>{
+ if(foodDrag.pointerId!==e.pointerId)return;
+ const held=performance.now()-foodDrag.startAt;
+ const moved=Math.hypot(e.clientX-foodDrag.startX,e.clientY-foodDrag.startY);
+ if(!foodDrag.active&&(e.pointerType==='mouse'?moved>6:held>=380))startFoodGhost(e.clientX,e.clientY);
+ if(foodDrag.active){e.preventDefault();e.stopPropagation();moveFoodGhost(e.clientX,e.clientY);}
+},{passive:false});
+foodGrid.addEventListener('pointerup',e=>{
+ if(foodDrag.pointerId!==e.pointerId)return;
+ const rect=document.getElementById('daeunQuickEat').getBoundingClientRect();
+ if(foodDrag.active&&e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom){
+  selectedQuickFood=foodDrag.kind;
+  refreshManualActionUI();
+ }
+ endFoodDrag();e.stopPropagation();
+});
+foodGrid.addEventListener('pointercancel',endFoodDrag);
 const quickEatControl=document.getElementById('daeunQuickEat');
 quickEatControl.style.touchAction='manipulation';
 quickEatControl.style.userSelect='none';
@@ -8132,7 +8218,7 @@ function refreshV435Inventory(){
  if(!grid)return;
  const inv=daeun.inventory||{};
  const slots=[['🍓','열매',inv.berries],['🌿','나뭇가지',inv.branches],['🐟','물고기',inv.fish],['🍖','구운 물고기',inv.cookedFish],['🐇','토끼',inv.rabbits],['🔥','횃불',daeun.torchExpiresAt>elapsed?1:0],['🧺','바구니',daeun.bag?.crafted?1:0],['','빈 칸',0]];
- const html=slots.map(([emoji,label,amount])=>'<div class="v435-slot" title="'+label+'">'+(amount?'<span>'+(label==='나뭇가지'?'<svg viewBox="0 0 40 40" width="28" height="28" aria-label="나뭇가지"><path d="M6 33 L32 7 M17 22 L10 12 M24 15 L34 21" fill="none" stroke="#a87544" stroke-width="4.5" stroke-linecap="round"/><path d="M9 12 Q6 4 14 7 M34 21 Q40 16 35 13" fill="none" stroke="#7cb16b" stroke-width="3" stroke-linecap="round"/></svg>':emoji)+'</span><small>×'+amount+'</small>':'<span class="v435-empty">·</span>')+'</div>').join('');
+ const html=slots.map(([emoji,label,amount])=>'<div class="v435-slot" title="'+label+'"'+(label==='열매'?' data-food-kind="berries"':label==='구운 물고기'?' data-food-kind="cookedFish"':'')+'>'+(amount?'<span>'+(label==='나뭇가지'?'<svg viewBox="0 0 40 40" width="28" height="28" aria-label="나뭇가지"><path d="M6 33 L32 7 M17 22 L10 12 M24 15 L34 21" fill="none" stroke="#a87544" stroke-width="4.5" stroke-linecap="round"/><path d="M9 12 Q6 4 14 7 M34 21 Q40 16 35 13" fill="none" stroke="#7cb16b" stroke-width="3" stroke-linecap="round"/></svg>':emoji)+'</span><small>×'+amount+'</small>':'<span class="v435-empty">·</span>')+'</div>').join('');
  if(grid.innerHTML!==html)grid.innerHTML=html;
  const mode=document.getElementById('v435InvMode');if(mode)mode.textContent=daeun.auto?'자동 관찰':'수동';
 }
@@ -8166,10 +8252,11 @@ function refreshV435Inventory(){
  document.getElementById('daeunFishEatButton').disabled=daeun.inventory.cookedFish===0;
  document.getElementById('daeunAddFirewoodButton').disabled=daeunDisplayedFuel()<=0||daeun.inventory.branches<2;
  const quickEatButton=document.getElementById('daeunQuickEat');
- const hasBerry=daeun.inventory.berries>0,hasFish=daeun.inventory.cookedFish>0;
- const preferFish=hasFish&&(daeun.stats.hunger<=45||!hasBerry);
- quickEatButton.disabled=(!hasBerry&&!hasFish)||daeun.restLocked;
- quickEatButton.textContent=preferFish?'🐟 바로 먹기 ('+daeun.inventory.cookedFish+')':hasBerry?'🍓 바로 먹기 ('+daeun.inventory.berries+')':'🍽️ 음식 없음';
+ const chosen=selectedQuickFood?QUICK_FOODS[selectedQuickFood]:null;
+ const available=selectedQuickFood?(daeun.inventory[selectedQuickFood]||0):0;
+ quickEatButton.disabled=!chosen||available<=0||daeun.restLocked;
+ quickEatButton.textContent=chosen?chosen.icon+' 바로 먹기 ('+available+')':'＋ 음식 먹기';
+ quickEatButton.title=chosen?'선택한 '+chosen.label+' 바로 먹기':'소지품 음식을 길게 눌러 이 칸으로 옮기기';
  // Manual survival warnings: only when an actual meter reaches zero, once per cooldown.
  if(!daeun.manualZeroWarnings)daeun.manualZeroWarnings={energy:-99999,hunger:-99999,thirst:-99999};
  const warnings=[['energy','기운이 하나도 없어… 쉬어야겠어.'],['thirst','목이 너무 말라… 물을 찾아야 해.'],['hunger','배가 너무 고파… 뭐라도 먹어야겠어.']];
@@ -8302,7 +8389,7 @@ renderer.domElement.addEventListener('pointerup',e=>{const p=playerPointers.get(
 renderer.domElement.addEventListener('pointercancel',e=>{playerPointers.delete(e.pointerId);},true);
 window.addEventListener('keydown',e=>{
  if(!['KeyW','KeyA','KeyS','KeyD'].includes(e.code)||!(isManualDaeun()||isManualHina())||e.ctrlKey||e.altKey||e.metaKey||e.target.isContentEditable||['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
- e.preventDefault();playerKeys.add(e.code);if(isManualDaeun()&&!daeun.restLocked)interruptManualMovement();
+ e.preventDefault();playerKeys.add(e.code);if(isManualDaeun()&&!daeun.restLocked){if(['manualRest','manualSleep'].includes(daeun.action)){cancelManualTask();daeun.path=[];daeun.destination=null;daeun.action='manual';daeun.actionAge=0;}else interruptManualMovement();}
 });
 window.addEventListener('keyup',e=>playerKeys.delete(e.code));window.addEventListener('blur',clearPlayerInput);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearPlayerInput();});
 function updateDestinationMarker(){destinationMarker.visible=isManualDaeun()&&Boolean(daeun.destination);if(destinationMarker.visible)destinationMarker.position.set(daeun.destination.x,terrainTopAt(daeun.destination.x,daeun.destination.z)+.04,daeun.destination.z);}
