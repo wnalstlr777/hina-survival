@@ -572,14 +572,19 @@ function palm(x,z,h=0){
  const ht=(4.6+rand()*2.0)*1.25,lean=.38;
  for(let k=0;k<9;k++){
   const y=(k+.5)*ht/9, width=.54-k*.020;
-  const segment=groupPalmPart(g,width,ht/9+.09,width,k%2?wood:earlyPalmTrunkLight,Math.sin(k/9*1.35)*lean,y,0);
-  segment.rotation.z=-.04;
-  if(k===0)segment.userData.keepTreeBaseVisible=true;
+  // v4.64: contiguous, non-overlapping trunk rings; the lower 1.5 rings stay opaque.
+  // The second ring is physically split into two halves, never duplicated.
+  const ringH=ht/9;
+  const ringMat=k%2?wood:earlyPalmTrunkLight;
   if(k===1){
-   // Preserve only the lower half of the second ring: 1.5 rings total.
-   const halfRing=groupPalmPart(g,width,(ht/9+.09)*.5,width,k%2?wood:earlyPalmTrunkLight,Math.sin(k/9*1.35)*lean,y-(ht/9+.09)*.25,0);
-   halfRing.rotation.z=-.04;
-   halfRing.userData.keepTreeBaseVisible=true;
+   const low=groupPalmPart(g,width,ringH*.5,width,ringMat,Math.sin(k/9*1.35)*lean,ringH*1.25,0);
+   low.rotation.z=-.04;low.userData.keepTreeBaseVisible=true;low.userData.treeTrunkPart=true;
+   const high=groupPalmPart(g,width,ringH*.5,width,ringMat,Math.sin(k/9*1.35)*lean,ringH*1.75,0);
+   high.rotation.z=-.04;high.userData.treeTrunkPart=true;
+  }else{
+   const segment=groupPalmPart(g,width,ringH,width,ringMat,Math.sin(k/9*1.35)*lean,y,0);
+   segment.rotation.z=-.04;segment.userData.treeTrunkPart=true;
+   if(k===0)segment.userData.keepTreeBaseVisible=true;
   }
  }
  const cx=Math.sin(1.35)*lean;
@@ -802,13 +807,19 @@ function lushPalm(x,z,h=0,scale=1){
   const y=(k+.5)*height/9;
   const lean=Math.sin(k/9*1.35)*.52*scale;
   const width=(.60-k*.024)*scale;
-  const segment=groupPalmPart(g,width,height/9+.10,width,k%2?wood:trunkLight,lean,y,0);
-  segment.rotation.z=-.055;
-  if(k===0)segment.userData.keepTreeBaseVisible=true;
+  // v4.64: contiguous, non-overlapping trunk rings; the lower 1.5 rings stay opaque.
+  // The second ring is physically split into two halves, never duplicated.
+  const ringH=height/9;
+  const ringMat=k%2?wood:trunkLight;
   if(k===1){
-   const halfRing=groupPalmPart(g,width,(height/9+.10)*.5,width,k%2?wood:trunkLight,lean,y-(height/9+.10)*.25,0);
-   halfRing.rotation.z=-.055;
-   halfRing.userData.keepTreeBaseVisible=true;
+   const low=groupPalmPart(g,width,ringH*.5,width,ringMat,lean,ringH*1.25,0);
+   low.rotation.z=-.055;low.userData.keepTreeBaseVisible=true;low.userData.treeTrunkPart=true;
+   const high=groupPalmPart(g,width,ringH*.5,width,ringMat,lean,ringH*1.75,0);
+   high.rotation.z=-.055;high.userData.treeTrunkPart=true;
+  }else{
+   const segment=groupPalmPart(g,width,ringH,width,ringMat,lean,y,0);
+   segment.rotation.z=-.055;segment.userData.treeTrunkPart=true;
+   if(k===0)segment.userData.keepTreeBaseVisible=true;
   }
  }
  const cx=Math.sin(1.35)*.52*scale;
@@ -855,10 +866,13 @@ function mountainBroadleaf(x,z,ground,scale=1,variant=0){
  addTrunkCollider(x,z,ground,trunkWidth*.52,trunkHeight);
  // Broadleaf trunks are straight and smooth, unlike the palm's bent ringed trunk.
  // Six trunk rings provide enough vertical resolution for anchored wind bending.
- for(let k=0;k<6;k++)groupPalmPart(g,trunkWidth,trunkHeight/6+.015,trunkWidth,broadleafTrunk,0,(k+.5)*trunkHeight/6,0);
- // Preserve only the bottom half of the broadleaf trunk when foliage fades.
- const trunkStub=groupPalmPart(g,trunkWidth,trunkHeight*.5,trunkWidth,broadleafTrunk,0,trunkHeight*.25,0);
- trunkStub.userData.keepTreeBaseVisible=true;
+ // v4.64: use the actual lower trunk segments as the opaque base; no overlay stub.
+ // Exact segment heights avoid coplanar/overlapping faces and Z-fighting.
+ for(let k=0;k<6;k++){
+  const ring=groupPalmPart(g,trunkWidth,trunkHeight/6,trunkWidth,broadleafTrunk,0,(k+.5)*trunkHeight/6,0);
+  ring.userData.treeTrunkPart=true;
+  if(k<3)ring.userData.keepTreeBaseVisible=true;
+ }
  const crownY=trunkHeight+.95*scale; // canopy lowered together with trunk
  // Compact overlapping box clusters, as in the original dense voxel broadleaf.
  // All foliage shares the same parent and occluder registration as the trunk.
@@ -3135,13 +3149,13 @@ function applySleepAssessment(id,hours,completedDay){
 function trackDailySleep(step){
  let remain=step,from=elapsed-step;
  while(remain>0){
-  const dayIndex=Math.floor((from+1e-7)/DAY_SECONDS)+1;
-  const tillBoundary=dayIndex*DAY_SECONDS-from;
+  const dayIndex=Math.floor((from+DAY_SECONDS*.25+1e-7)/DAY_SECONDS)+1;
+  const tillBoundary=(dayIndex-.25)*DAY_SECONDS-from;
   const portion=Math.min(remain,Math.max(0.000001,tillBoundary));
   if(['night','rest','outdoorSleep','sleep'].includes(state)&&!target&&!outdoorSleepBlocked('hina'))sleepLedger.hina+=portion;
   if(['sleep','manualSleep'].includes(daeun.action)&&daeun.path.length===0&&!outdoorSleepBlocked('daeun'))sleepLedger.daeun+=portion;
   from+=portion;remain-=portion;
-  if(from>=dayIndex*DAY_SECONDS-1e-6){
+  if(from>=(dayIndex-.25)*DAY_SECONDS-1e-6){
    applySleepAssessment('hina',sleepLedger.hina/DAY_SECONDS*24,dayIndex);
    applySleepAssessment('daeun',sleepLedger.daeun/DAY_SECONDS*24,dayIndex);
    sleepLedger.hina=0;sleepLedger.daeun=0;sleepLedger.day=dayIndex+1;
@@ -3150,7 +3164,7 @@ function trackDailySleep(step){
 }
 function clockParts(){
  const safeElapsed=Math.max(0,elapsed),dayTime=safeElapsed%DAY_SECONDS,hr=12+dayTime/DAY_SECONDS*24;
- return {day:Math.floor(safeElapsed/DAY_SECONDS)+1,h:Math.floor(hr)%24,m:Math.floor((hr%1)*60),dayTime};
+ return {day:Math.floor((safeElapsed+DAY_SECONDS*.25)/DAY_SECONDS)+1,h:Math.floor(hr)%24,m:Math.floor((hr%1)*60),dayTime};
 }
 // Persistent-in-run personality, episodic memory and daily intentions.
 // This is a rule-based autonomous agent, not a conscious being or remote LLM.
@@ -5352,7 +5366,7 @@ $('fogToggle').onclick=()=>{fogEnabled=!fogEnabled;$('fogToggle').textContent=fo
 function devJumpToDay10(){
  init();daeunCaveFish=0;
  walkHistory.length=0;retreatPoints=[];retreatCooldown=0;
- elapsed=DAY_SECONDS*9+1;day=10;phaseAt=elapsed;
+ elapsed=DAY_SECONDS*8.75+1;day=10;phaseAt=elapsed;
  stats={energy:78,thirst:74,hunger:71,will:76};
  knownWater=knownBerries=knownCave=water=food=shelter=true;
  carriedBerries=2;caveBerries=3;
@@ -6559,7 +6573,8 @@ function daeunNavWarning(message,goal=null){
  else daeunNavDiagnostics.repeats=1;
  daeunNavDiagnostics.lastX=p.x;daeunNavDiagnostics.lastZ=p.z;daeunNavDiagnostics.lastAt=elapsed;
  const note=`${message} [위치 ${where}${target} / 반복 ${daeunNavDiagnostics.repeats}회]`;
- daeunSay(note);
+  if(collisionDebugEnabled)console.info('[DAEUN_NAV_DIAGNOSTIC]',note);
+  daeunSay(message);
  if(daeun.auto&&daeunNavDiagnostics.repeats>=3&&daeunNavDiagnostics.repeats%3===0){
   if(recoverAIAtNearestSafeSpot(daeun.mesh,'다은','경로 탐색 반복 실패')){
    daeun.path=[];daeun.destination=null;daeun.failedRoute=null;
@@ -6604,7 +6619,7 @@ function resetDaeun(){
  daeun.sites.shelter=new THREE.Vector3(DAEUN_ZONE.cave.x,.4,DAEUN_ZONE.cave.z+1.7);
  daeun.sites.water=new THREE.Vector3(DAEUN_ZONE.pond.x,.4,DAEUN_ZONE.pond.z);
  daeun.mesh.position.set(DAEUN_ZONE.spawn.x,terrainTopAt(DAEUN_ZONE.spawn.x,DAEUN_ZONE.spawn.z)+.1,DAEUN_ZONE.spawn.z);daeun.mesh.rotation.set(0,0,0);
- selectedQuickFood=null;daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,caveBranches:0,fuel:0,rabbits:0,fish:0,cookedFish:0};daeun.bag={crafted:false,days:[],practiceDay:1,today:0,progress:0};updateDaeunBagVisual();daeun.skills={fire:0,rabbit:0,fish:0};daeun.firePracticeDays=[];daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.speechExpiresAt=performance.now()+7500;daeun.log=[];daeun.memory=[];daeun.lastWashDay=0;daeun.nextWashRetryAt=0;daeun.lastNightNeedsTalkDay=0;daeun.lastNightNeedsTalkKey='';daeun.nextNightNeedsTalkAt=0;daeun.timers={nextThink:elapsed+18,stuck:0,introStart:elapsed,introStage:0,introMoveAt:0,introAnchorX:daeun.mesh.position.x,introAnchorZ:daeun.mesh.position.z,seenFirstRabbit:false,seenFirstFish:false};daeun.restLocked=false;daeun.failedRoute=null;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeun.seatedEating=0;daeun.torchExpiresAt=0;resetDaeunSnakes();resetMiddleBear();daeunExplored.clear();
+ clearGroundDrops();selectedQuickFood=null;daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,caveBranches:0,fuel:0,rabbits:0,fish:0,cookedFish:0};daeun.bag={crafted:false,days:[],practiceDay:1,today:0,progress:0};updateDaeunBagVisual();daeun.skills={fire:0,rabbit:0,fish:0};daeun.firePracticeDays=[];daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.speechExpiresAt=performance.now()+7500;daeun.log=[];daeun.memory=[];daeun.lastWashDay=0;daeun.nextWashRetryAt=0;daeun.lastNightNeedsTalkDay=0;daeun.lastNightNeedsTalkKey='';daeun.nextNightNeedsTalkAt=0;daeun.timers={nextThink:elapsed+18,stuck:0,introStart:elapsed,introStage:0,introMoveAt:0,introAnchorX:daeun.mesh.position.x,introAnchorZ:daeun.mesh.position.z,seenFirstRabbit:false,seenFirstFish:false};daeun.restLocked=false;daeun.failedRoute=null;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeun.seatedEating=0;daeun.torchExpiresAt=0;resetDaeunSnakes();resetMiddleBear();daeunExplored.clear();
  daeunBerrySelectionDay=clockParts().day;
  randomizeBerryDay(daeunResources.berries,daeunBerrySelectionDay,dRandom,true);
  for(const b of daeunResources.branches){b.x=b.homeX;b.z=b.homeZ;b.group.position.set(b.x,terrainTopAt(b.x,b.z)+.03,b.z);b.available=true;b.respawnAt=0;b.group.visible=true;}
@@ -6673,6 +6688,17 @@ function setDaeunDestination(point,action='travel'){
    const portal=new THREE.Vector3(dc.x,.4,dc.z+4.9);
    const outside=new THREE.Vector3(dc.x,.4,dc.z+9.0);
    const waypoints=[portal,exit,outside];
+   // Build each portal leg using the same validated navigation as ordinary travel.
+   // A direct ray can fail against a small step or obstacle even when the doorway is reachable.
+   const portalLeg=navBuild(here,portal);
+   const exitLeg=navBuild(portal,exit);
+   const outsideLeg=navBuild(exit,outside);
+   if(portalLeg.length&&exitLeg.length&&outsideLeg.length){
+    daeun.path=[...portalLeg,...exitLeg,...outsideLeg];daeun.destination=p;daeun.routeIntent=action;
+    daeun.action='caveExit';daeun.actionAge=0;daeun.timers.stuck=0;return true;
+   }
+   // A direct, individually collision-tested crossing is safe when A* grid cells
+   // cannot represent the narrow doorway. Never bypass collision validation.
    if(safeWalkingSpot(outside.x,outside.z)&&navSegmentClear(here.x,here.z,portal.x,portal.z)&&navSegmentClear(portal.x,portal.z,exit.x,exit.z)&&navSegmentClear(exit.x,exit.z,outside.x,outside.z)){
     daeun.path=waypoints;daeun.destination=p;daeun.routeIntent=action;
     daeun.action='caveExit';daeun.actionAge=0;daeun.timers.stuck=0;return true;
@@ -6687,7 +6713,7 @@ function setDaeunDestination(point,action='travel'){
  let path=navBuild(daeun.mesh.position,p);
  // The water/shelter goal may be unreachable as an exact coordinate while the
  // surrounding ground is traversable. Move in small validated segments instead.
- if(!path.length&&daeun.auto&&!insideDaeun&&Math.hypot(here.x-dc.x,here.z-(dc.z+6))>5){
+ if(!path.length&&daeun.auto&&!insideDaeun){
   const waypoint=daeunLocalWaypoint(p);
   if(waypoint){
    daeun.path=[waypoint];daeun.destination=p;daeun.routeIntent=action;
@@ -7631,7 +7657,7 @@ const DAEUN_DAILY_PRACTICE_LIMIT=Object.freeze({fire:3,rabbit:3,fish:4});
 // A missed opportunity expires without consuming a practice attempt or granting skill.
 const daeunWildlifeChances={day:-1,rabbit:null,fish:null};
 function resetWildlifeChances(){
- const day=Math.floor(elapsed/DAY_SECONDS)+1;
+ const day=clockParts().day;
  if(daeunWildlifeChances.day===day)return;
  daeunWildlifeChances.day=day;
  for(const [kind,max] of [['rabbit',3],['fish',4]]){
@@ -7646,7 +7672,7 @@ function resetWildlifeChances(){
 function activeWildlifeChance(kind){
  resetWildlifeChances();
  const state=daeunWildlifeChances[kind];if(!state)return -1;
- const time=elapsed%DAY_SECONDS;
+ const time=(elapsed+DAY_SECONDS*.25)%DAY_SECONDS;
  return state.windows.findIndex(w=>!w.used&&time>=w.start&&time<w.end);
 }
 function consumeWildlifeChance(kind){
@@ -7657,7 +7683,7 @@ function consumeWildlifeChance(kind){
 }
 
 function refreshDaeunDailyPractice(){
- const today=Math.floor(elapsed/DAY_SECONDS)+1;
+ const today=clockParts().day;
  if(daeun.practiceDay!==today){daeun.practiceDay=today;daeun.dailyPractice={fire:0,rabbit:0,fish:0};}
 }
 function manualAction(type,point,index=-1){
@@ -8082,9 +8108,29 @@ const manualUIStyle=document.createElement('style');manualUIStyle.textContent=`
 #daeunQuickEat:disabled{opacity:.45;filter:grayscale(1)}
 
 /* v4.55: drag food to the single quick-eat slot */
-#v435InvGrid .v435-slot[data-food-kind]{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#v435InvGrid .v435-slot[data-drop-kind]{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 #daeunQuickEat.v455-drop-target{outline:3px solid #a6f5c9!important;box-shadow:0 0 18px #86efac!important}
 .v455-food-ghost{position:fixed;z-index:99999;pointer-events:none;transform:translate(-50%,-120%);padding:7px 12px;border-radius:14px;background:#224b3de8;color:white;border:2px solid #a6f5c9;font-size:15px;font-weight:700;white-space:nowrap}
+#v465DropModal{position:fixed;inset:0;z-index:100000;align-items:center;justify-content:center;background:#061815a9;touch-action:manipulation}
+#v465DropModal .v465-dialog{width:min(330px,90vw);background:#1b3c35;color:#f2fff5;padding:20px;border:1px solid #9cdec0;border-radius:18px;display:flex;flex-direction:column;gap:14px;text-align:center}
+#v465DropModal small{color:#bbd9cb}.v465-counter{display:flex;align-items:center;justify-content:center;gap:25px}
+#v465DropModal button{border:1px solid #9ac5b0;border-radius:12px;padding:10px 14px;background:#315c4b;color:white;font-size:16px}
+.v465-counter b{font-size:24px}.v465-actions{display:flex;justify-content:space-between;gap:6px}
+#v465DropSlider{width:100%;accent-color:#a1eac1}
+/* v4.68: direct-tap pickup target; no detached pickup button. */
+/* v4.69: the hit area stays large for touch, but has absolutely no filled background.
+   Explicitly override the global button and button:hover background styles. */
+button.v468-ground-hit,button.v468-ground-hit:hover,button.v468-ground-hit:active,button.v468-ground-hit:focus{position:fixed;z-index:44;display:none;width:76px;height:74px;box-sizing:border-box;transform:translate(-50%,-50%);border:0!important;background:none!important;background-color:transparent!important;background-image:none!important;box-shadow:none!important;outline:none!important;touch-action:manipulation;cursor:pointer;padding:0!important;-webkit-tap-highlight-color:transparent;appearance:none;-webkit-appearance:none}
+/* v4.71: no pickup outline; transparent hit target remains fully tappable. */
+button.v468-ground-hit::after{content:none!important}
+.v466-ground-label.v468-pickable{pointer-events:auto;cursor:pointer;touch-action:manipulation}
+/* v4.67: labels follow projected item position every rendered frame */
+/* v4.66: transparent, icon-first world-space quantity labels, no square background */
+.v466-ground-label{position:fixed;z-index:43;display:none;align-items:center;justify-content:center;gap:4px;pointer-events:none;transform:translate(-50%,-100%);color:#fff;font-size:21px;font-weight:800;text-shadow:0 2px 4px #071b15,0 0 4px #071b15;white-space:nowrap}
+.v466-ground-label svg{width:25px;height:25px;filter:drop-shadow(0 1px 2px #081b16)}
+.v466-ground-label span{font-size:17px}
+.v466-drop-icon{display:inline-flex;vertical-align:middle;align-items:center;justify-content:center;font-size:23px;margin-right:5px}
+.v466-drop-icon svg{width:27px;height:27px}
 /* v28.18: matched inner discs and subtle hover feedback for linked fire actions. */
 :root{--linked-fire-disc:#243338;--linked-fire-disc-hover:#607e83;}
 .daeunResourceEmoji.linked-fire-action,
@@ -8196,6 +8242,162 @@ function quickEatDaeun(){
 }
 // A single pointer-based drag path for mouse and touch. The inventory grid is
 // re-rendered frequently, so gesture listeners live on its stable parent.
+// v4.65: one shared inventory gesture for quick-food equip and ground dropping.
+const DROP_KINDS={berries:{label:'열매',icon:'🍓'},branches:{label:'나뭇가지',icon:BRANCH_INVENTORY_ICON},fish:{label:'물고기',icon:'🐟'},cookedFish:{label:'구운 물고기',icon:'🐟'},rabbits:{label:'토끼',icon:'🐇'}};
+const groundDrops=[];
+const groundDropGroup=new THREE.Group();scene.add(groundDropGroup);
+// v4.66: reuse the actual collectible/carry meshes, never placeholder spheres.
+function groundDropVisual(kind){
+ const g=new THREE.Group();
+ if(kind==='branches'){
+  // Same collectible branch mesh and material as the world branch piles.
+  for(let i=0;i<2;i++){
+   const stick=new THREE.Mesh(branchGeo,i?branchTipMat:branchMat);
+   stick.rotation.z=Math.PI/2;stick.rotation.y=i?.28:-.24;
+   stick.position.set(i?.04:-.04,.12+i*.025,i?.07:-.07);g.add(stick);
+  }
+ }else if(kind==='berries'){
+  // v4.67: use exactly the same geometry/material as berries on the living berry trees.
+  const fruit=berryTrees.find(t=>t.fruits?.length)?.fruits[0];
+  if(fruit){
+   const f=new THREE.Mesh(fruit.geometry,fruit.material);
+   f.position.y=.215;f.rotation.copy(fruit.rotation);g.add(f);
+  }
+ }else if(kind==='fish'||kind==='cookedFish'){
+  const f=fishCarryShape.clone(true);f.scale.setScalar(1.2);f.rotation.y=.35;f.position.y=.18;
+  if(kind==='cookedFish'){
+   // A roasted fish on a skewer; clone geometry to avoid modifying live fish materials.
+   f.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.color.setHex(0xa96537);}});
+   const skewer=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,1.12,5),pantryWood);
+   skewer.rotation.z=Math.PI/2;skewer.position.set(0,.17,0);g.add(skewer);
+  }
+  g.add(f);
+ }else if(kind==='rabbits'){
+  // Reuse the original low-poly rabbit model, excluding its live AI logic.
+  const sample=critters[0]?.g;if(sample){const f=sample.clone(true);f.scale.setScalar(.68);g.add(f);}
+ }
+ g.traverse(o=>{if(o.isMesh)o.castShadow=true;});
+ return g;
+}
+// v4.72: outline the actual dropped 3D meshes rather than drawing a UI circle.
+// Back-face normal extrusion draws only a thin silhouette behind the original surface.
+// One shared material; no postprocessing pass or scene-wide outline effect.
+const groundPickupOutlineMat=new THREE.ShaderMaterial({
+ uniforms:{outlineColor:{value:new THREE.Color(0x78f0cb)},outlineWidth:{value:0.065}},
+ vertexShader:`uniform float outlineWidth;
+ void main(){vec3 expanded=position+normalize(normal)*outlineWidth;
+ gl_Position=projectionMatrix*modelViewMatrix*vec4(expanded,1.0);}`,
+ fragmentShader:`uniform vec3 outlineColor;
+ void main(){gl_FragColor=vec4(outlineColor,1.0);}`,
+ side:THREE.BackSide,depthTest:true,depthWrite:false,
+});
+function addGroundPickupOutline(root){
+ const parts=[];
+ root.traverse(o=>{if(o.isMesh&&!o.userData.groundPickupOutline)parts.push(o);});
+ const outlines=[];
+ for(const part of parts){
+  const shell=new THREE.Mesh(part.geometry,groundPickupOutlineMat);
+  shell.name='groundPickupOutline';shell.userData.groundPickupOutline=true;shell.raycast=()=>{};
+  shell.frustumCulled=part.frustumCulled;
+  shell.renderOrder=3; shell.visible=false;
+  // Child inherits each part's geometry and transform, including rotated branches.
+  part.add(shell);outlines.push(shell);
+ }
+ return outlines;
+}
+function groundDropMesh(kind,count,x,z){
+ const mesh=groundDropVisual(kind);
+ const outlines=addGroundPickupOutline(mesh);
+ mesh.position.set(x,terrainTopAt(x,z)+.035,z);mesh.userData.dropKind=kind;
+ groundDropGroup.add(mesh);
+ const badge=document.createElement('div');badge.className='v466-ground-label';
+ document.body.appendChild(badge);
+ const hit=document.createElement('button');hit.type='button';hit.className='v468-ground-hit';hit.setAttribute('aria-label','아이템 줍기');document.body.appendChild(hit);
+ const drop={kind,count,x,z,mesh,outlines,badge,hit,revealUntil:performance.now()+2200};
+ hit.addEventListener('pointerdown',e=>e.stopPropagation());
+ hit.addEventListener('click',e=>{e.stopPropagation();pickupGroundDrop(drop);});
+ badge.addEventListener('pointerdown',e=>e.stopPropagation());
+ badge.addEventListener('click',e=>{e.stopPropagation();pickupGroundDrop(drop);});
+ groundDrops.push(drop);return drop;
+}
+function removeGroundDrop(d){groundDropGroup.remove(d.mesh);d.badge?.remove();d.hit?.remove();const i=groundDrops.indexOf(d);if(i>=0)groundDrops.splice(i,1);}
+function clearGroundDrops(){for(const d of [...groundDrops])removeGroundDrop(d);}
+function findGroundDropSpot(){const p=daeun.mesh.position;const a=daeun.mesh.rotation.y;
+ for(const r of [1.4,1.8,2.2,2.8])for(const shift of [0,.65,-.65,1.3,-1.3]){
+  const x=p.x+Math.sin(a+shift)*r,z=p.z+Math.cos(a+shift)*r;
+  if(safeWalkingSpot(x,z)&&Math.abs(terrainTopAt(x,z)-terrainTopAt(p.x,p.z))<1.1)return {x,z};
+ }return null;
+}
+function confirmInventoryDrop(kind,amount){
+ if(!isManualDaeun()||!DROP_KINDS[kind])return;
+ const n=Math.min(Math.max(0,Math.floor(amount)),daeun.inventory[kind]||0);
+ if(!n)return;
+ const spot=findGroundDropSpot();if(!spot){daeunSay('여기에는 물건을 내려놓기 어렵겠어.');return;}
+ daeun.inventory[kind]-=n;
+ const existing=groundDrops.find(d=>d.kind===kind&&Math.hypot(d.x-spot.x,d.z-spot.z)<.85);
+ if(existing){existing.count+=n;existing.revealUntil=performance.now()+2200;}else groundDropMesh(kind,n,spot.x,spot.z);
+ refreshManualActionUI();
+}
+const dropModal=document.createElement('div');dropModal.id='v465DropModal';dropModal.style.display='none';
+dropModal.innerHTML='<div class="v465-dialog"><strong id="v465DropTitle">아이템 버리기</strong><small id="v465DropStock"></small><div class="v465-counter"><button id="v465DropMinus">−</button><b id="v465DropAmount">1</b><button id="v465DropPlus">+</button></div><input id="v465DropSlider" type="range" min="1" value="1" step="1"><div class="v465-actions"><button id="v465DropAll">전체</button><button id="v465DropCancel">취소</button><button id="v465DropConfirm">바닥에 놓기</button></div></div>';
+document.body.appendChild(dropModal);
+let pendingDrop=null;
+function showDropDialog(kind){const max=daeun.inventory[kind]||0;if(!max)return;
+ pendingDrop={kind,amount:1,max};dropModal.style.display='flex';
+ document.getElementById('v465DropTitle').innerHTML='<span class="v466-drop-icon">'+DROP_KINDS[kind].icon+'</span> 버리기';
+ document.getElementById('v465DropStock').textContent='보유 '+max+'개';
+ document.getElementById('v465DropSlider').max=max;refreshDropDialog();
+}
+function refreshDropDialog(){if(!pendingDrop)return;document.getElementById('v465DropAmount').textContent=pendingDrop.amount+'개';document.getElementById('v465DropSlider').value=pendingDrop.amount;}
+function closeDropDialog(){pendingDrop=null;dropModal.style.display='none';}
+document.getElementById('v465DropMinus').onclick=()=>{if(pendingDrop){pendingDrop.amount=Math.max(1,pendingDrop.amount-1);refreshDropDialog();}};
+document.getElementById('v465DropPlus').onclick=()=>{if(pendingDrop){pendingDrop.amount=Math.min(pendingDrop.max,pendingDrop.amount+1);refreshDropDialog();}};
+document.getElementById('v465DropAll').onclick=()=>{if(pendingDrop){pendingDrop.amount=pendingDrop.max;refreshDropDialog();}};
+document.getElementById('v465DropSlider').oninput=e=>{if(pendingDrop){pendingDrop.amount=+e.target.value;refreshDropDialog();}};
+document.getElementById('v465DropCancel').onclick=closeDropDialog;
+document.getElementById('v465DropConfirm').onclick=()=>{if(pendingDrop)confirmInventoryDrop(pendingDrop.kind,pendingDrop.amount);closeDropDialog();};
+dropModal.addEventListener('pointerdown',e=>e.stopPropagation());
+// v4.68: one shared pickup handler for the projected model hit area and item icon.
+function pickupGroundDrop(d){
+ if(!isManualDaeun()||!d||!groundDrops.includes(d))return;
+ const p=daeun.mesh.position;
+ if(Math.hypot(d.x-p.x,d.z-p.z)>=2.6)return;
+ const n=Math.min(d.count,groundDropFreeCapacity(d.kind));
+ if(n<=0){daeunSay('가방에 더 담을 수 없겠어.');return;}
+ daeun.inventory[d.kind]=(daeun.inventory[d.kind]||0)+n;d.count-=n;
+ inventoryPickupFloat('daeun',d.kind,n);
+ if(!d.count)removeGroundDrop(d);else d.revealUntil=performance.now()+1800;
+ refreshManualActionUI();
+}
+// One capacity rule for all dropped item kinds; unspecified types keep their existing unlimited capacity.
+function groundDropFreeCapacity(kind){
+ const inv=daeun.inventory;
+ if(kind==='berries')return Math.max(0,daeunBagCap()-(inv.berries||0));
+ if(kind==='fish'||kind==='cookedFish')return Math.max(0,daeunFishCap()-(inv[kind]||0));
+ if(kind==='rabbits')return Math.max(0,1-(inv.rabbits||0));
+ return Infinity;
+}
+// Called after the camera updates every rendered frame, not only on the slower HUD refresh.
+function updateGroundPickup(){
+ const p=daeun.mesh.position,now=performance.now();
+ for(const d of groundDrops){
+  const distance=Math.hypot(d.x-p.x,d.z-p.z);
+  const visible=distance<4.2||now<d.revealUntil;
+  const canPick=isManualDaeun()&&distance<2.6;
+  for(const outline of d.outlines)outline.visible=canPick;
+  const labelScreen=visible?projectToScreen(new THREE.Vector3(d.x,d.mesh.position.y+.65,d.z)):null;
+  const modelScreen=canPick?projectToScreen(new THREE.Vector3(d.x,d.mesh.position.y+.19,d.z)):null;
+  d.badge.style.display=labelScreen?'flex':'none';
+  d.badge.classList.toggle('v468-pickable',!!modelScreen);
+  if(labelScreen){
+   d.badge.style.left=labelScreen.x+'px';d.badge.style.top=(labelScreen.y-15)+'px';
+   const html=DROP_KINDS[d.kind].icon+' <span>×'+d.count+'</span>';
+   if(d.badge.innerHTML!==html)d.badge.innerHTML=html;
+  }
+  d.hit.style.display=modelScreen?'block':'none';
+  if(modelScreen){d.hit.style.left=modelScreen.x+'px';d.hit.style.top=modelScreen.y+'px';}
+ }
+}
 const foodDrag={pointerId:null,kind:null,startX:0,startY:0,startAt:0,active:false,ghost:null};
 function endFoodDrag(){
  if(foodDrag.ghost)foodDrag.ghost.remove();
@@ -8205,8 +8407,8 @@ function endFoodDrag(){
 function startFoodGhost(x,y){
  if(foodDrag.active)return;
  foodDrag.active=true;
- const item=QUICK_FOODS[foodDrag.kind];
- const el=document.createElement('div');el.className='v455-food-ghost';el.textContent=item.icon+' '+item.label;
+ const item=DROP_KINDS[foodDrag.kind];
+ const el=document.createElement('div');el.className='v455-food-ghost';el.innerHTML=item.icon+' '+item.label;
  document.body.appendChild(el);foodDrag.ghost=el;
  moveFoodGhost(x,y);
 }
@@ -8217,10 +8419,10 @@ function moveFoodGhost(x,y){
 }
 const foodGrid=document.getElementById('v435InvGrid');
 foodGrid.addEventListener('pointerdown',e=>{
- const slot=e.target.closest('.v435-slot[data-food-kind]');
+ const slot=e.target.closest('.v435-slot[data-drop-kind]');
  if(!slot||!isManualDaeun())return;
- const kind=slot.dataset.foodKind;
- if(!QUICK_FOODS[kind]||(daeun.inventory[kind]||0)<=0)return;
+ const kind=slot.dataset.dropKind;
+ if(!DROP_KINDS[kind]||(daeun.inventory[kind]||0)<=0)return;
  foodDrag.pointerId=e.pointerId;foodDrag.kind=kind;foodDrag.startX=e.clientX;foodDrag.startY=e.clientY;foodDrag.startAt=performance.now();foodDrag.active=false;
  // Keep subsequent events on the stable grid, even if its slots are rebuilt.
  try{foodGrid.setPointerCapture(e.pointerId);}catch(_){}
@@ -8236,9 +8438,15 @@ foodGrid.addEventListener('pointermove',e=>{
 foodGrid.addEventListener('pointerup',e=>{
  if(foodDrag.pointerId!==e.pointerId)return;
  const rect=document.getElementById('daeunQuickEat').getBoundingClientRect();
- if(foodDrag.active&&e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom){
+ if(foodDrag.active&&QUICK_FOODS[foodDrag.kind]&&e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom){
   selectedQuickFood=foodDrag.kind;
   refreshManualActionUI();
+ }else if(foodDrag.active){
+  const panel=document.getElementById('daeunItemPanel').getBoundingClientRect();
+  const outside=e.clientX<panel.left||e.clientX>panel.right||e.clientY<panel.top||e.clientY>panel.bottom;
+  const quick=document.getElementById('daeunQuickEat').getBoundingClientRect();
+  const onQuick=e.clientX>=quick.left&&e.clientX<=quick.right&&e.clientY>=quick.top&&e.clientY<=quick.bottom;
+  if(outside&&!onQuick&&e.clientX>=0&&e.clientX<=innerWidth&&e.clientY>=0&&e.clientY<=innerHeight)showDropDialog(foodDrag.kind);
  }
  endFoodDrag();e.stopPropagation();
 });
@@ -8289,8 +8497,8 @@ function refreshV435Inventory(){
  const grid=document.getElementById('v435InvGrid');
  if(!grid)return;
  const inv=daeun.inventory||{};
- const slots=[['🍓','열매',inv.berries],['🌿','나뭇가지',inv.branches],['🐟','물고기',inv.fish],['🍖','구운 물고기',inv.cookedFish],['🐇','토끼',inv.rabbits],['🔥','횃불',daeun.torchExpiresAt>elapsed?1:0],['🧺','바구니',daeun.bag?.crafted?1:0],['','빈 칸',0]];
- const html=slots.map(([emoji,label,amount])=>'<div class="v435-slot" title="'+label+'"'+(label==='열매'?' data-food-kind="berries"':label==='구운 물고기'?' data-food-kind="cookedFish"':'')+'>'+(amount?'<span>'+(label==='나뭇가지'?BRANCH_INVENTORY_ICON:emoji)+'</span><small>×'+amount+'</small>':'<span class="v435-empty">·</span>')+'</div>').join('');
+ const slots=[['🍓','열매',inv.berries,'berries'],[BRANCH_INVENTORY_ICON,'나뭇가지',inv.branches,'branches'],['🐟','물고기',inv.fish,'fish'],['🍖','구운 물고기',inv.cookedFish,'cookedFish'],['🐇','토끼',inv.rabbits,'rabbits'],['🔥','횃불',daeun.torchExpiresAt>elapsed?1:0,null],['🧺','바구니',daeun.bag?.crafted?1:0,null],['','빈 칸',0,null]];
+ const html=slots.map(([emoji,label,amount,kind])=>'<div class="v435-slot" title="'+label+'"'+(kind?' data-drop-kind="'+kind+'"':'')+(kind==='berries'||kind==='cookedFish'?' data-food-kind="'+kind+'"':'')+'>'+(amount?'<span>'+emoji+'</span><small>×'+amount+'</small>':'<span class="v435-empty">·</span>')+'</div>').join('');
  if(grid.innerHTML!==html)grid.innerHTML=html;
  const mode=document.getElementById('v435InvMode');if(mode)mode.textContent=daeun.auto?'자동 관찰':'수동';
 }
@@ -8601,20 +8809,18 @@ const renderBatching=(()=>{
    const r=roots.get(e.root),lod=r?.lod||0;
    if(r&&!r.smallVisible)continue;
    let enlarge=1;
-   if(e.kind==='broadleaf'&&e.index>1&&lod){
+   if(e.kind==='broadleaf'&&!e.mesh.userData.treeTrunkPart&&lod){
     if(e.index%(lod===1?2:5)!==0)continue;enlarge=lod===1?1.16:1.55;
    }
-   if(e.kind==='palm'&&lod){
-    // Ring pairs overlap after enlargement, retaining the bent trunk silhouette.
-    if(e.index<9){if(e.index%2===1)continue;}
-    else if((e.index-9)%(lod===1?2:3)!==0)continue;
-    enlarge=e.index<9?1:lod===1?1.2:1.45;
+   if(e.kind==='palm'&&lod&&!e.mesh.userData.treeTrunkPart){
+    // Thin only the foliage in distant LODs; never enlarge/merge trunk rings.
+    if(e.index%(lod===1?2:3)!==0)continue;
+    enlarge=lod===1?1.2:1.45;
    }
    const p=poolFor(e,e.mesh.material),m=p.mesh;
    // Native Three.js culling runs independently for camera and shadow passes.
    matrix.copy(e.mesh.matrixWorld);
-   if(e.kind==='palm'&&lod&&e.index<9){scaleMatrix.makeScale(1,2,1);matrix.multiply(scaleMatrix);}
-   else if(enlarge!==1){scaleMatrix.makeScale(enlarge,enlarge,enlarge);matrix.multiply(scaleMatrix);}
+   if(enlarge!==1){scaleMatrix.makeScale(enlarge,enlarge,enlarge);matrix.multiply(scaleMatrix);}
    const offset=m.count*16,data=m.instanceMatrix.array,values=matrix.elements;
    let changed=false;for(let i=0;i<16;i++)if(data[offset+i]!==Math.fround(values[i])){changed=true;break;}
    if(changed){m.setMatrixAt(m.count,matrix);p.dirty=true;}
@@ -8935,7 +9141,7 @@ const progressStore=(()=>{
  function capture(){
   const vars={};for(const [name,b] of Object.entries(progressBindings))vars[name]=pack(b.get());
   return {vars,maps:pack(progressMaps),daeun:entityData(daeun),hinaPosition:hana.position.toArray(),hinaRotation:hana.rotation.y,daeunPosition:daeun.mesh.position.toArray(),daeunRotation:daeun.mesh.rotation.y,
-   sleepLedger:pack(sleepLedger),fogCount:fogTiles.length,explored:pack(explored),daeunExplored:pack(daeunExplored),
+   sleepLedger:pack(sleepLedger),groundDrops:groundDrops.map(d=>({kind:d.kind,count:d.count,x:d.x,z:d.z})),fogCount:fogTiles.length,explored:pack(explored),daeunExplored:pack(daeunExplored),
    resources:Object.fromEntries(Object.entries(resourceLists).map(([name,list])=>[name,list.map(item=>({data:entityData(item),position:(item.group||item.g)?.position.toArray(),visible:(item.group||item.g)?.visible}))]))};
  }
  function validate(data){
@@ -8958,6 +9164,7 @@ const progressStore=(()=>{
   daeun.mesh.position.fromArray(d.daeunPosition);daeun.mesh.rotation.y=d.daeunRotation;
   explored.clear();for(const k of d.explored)explored.add(k);daeunExplored.clear();for(const k of d.daeunExplored)daeunExplored.add(k);
   for(const [name,list] of Object.entries(resourceLists))list.forEach((item,i)=>{const saved=d.resources[name][i];Object.assign(item,saved.data);const mesh=item.group||item.g;if(mesh&&saved.position){mesh.position.fromArray(saved.position);mesh.visible=saved.visible;}if(item.fruits)item.fruits.forEach((fruit,k)=>fruit.visible=k<item.stock);});
+  clearGroundDrops();if(Array.isArray(d.groundDrops))for(const q of d.groundDrops){if(DROP_KINDS[q.kind]&&Number.isInteger(q.count)&&q.count>0&&Number.isFinite(q.x)&&Number.isFinite(q.z)&&safeWalkingSpot(q.x,q.z))groundDropMesh(q.kind,q.count,q.x,q.z);}
   campfire.visible=fireSuccess;daeunResources.fire.group.visible=daeunDisplayedFuel()>0;
   torchGroup.visible=torchCarried;wovenBasket.visible=basketCrafted;updateDaeunBagVisual();updateHandCargo();
   survivorSpeech.clear();daeun.speechExpiresAt=0;hinaSpeechExpiresAt=0;meetingHinaLine='';meetingHinaLineUntil=0;
@@ -9206,6 +9413,7 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  sun.target.updateMatrixWorld();
  updateCameraOcclusion(t);
  smoothResourceMarkerPositions();
+ updateGroundPickup();
  if(t>=nextUiFrame){flushSleepFatigueSpeech();nextUiFrame=t+(ultraLowPower?250:100);if(hinaSpeechExpiresAt&&performance.now()>hinaSpeechExpiresAt){$('thought').textContent='';hinaSpeechExpiresAt=0;}updateBubble();updateNightSoundBubble();}
  drawHinaMeetingBubble();
  if(observedId==='hina'?hinaSleepSpeechLock():daeunSleepSpeechLock()){updateBubble();$('ambientBubble').classList.remove('show');}
