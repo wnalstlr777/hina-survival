@@ -3006,8 +3006,12 @@ function updateNightSoundBubble(){
 const SURVIVOR_RECOVERY=Object.freeze({sleepPerSecond:.85,restPerSecond:.45,emptyHunger:.32,emptyThirst:.45,outdoorBlocked:.08});
 function survivorRecoveryPerSecond({sleeping=false,hunger=100,thirst=100,outdoorBlocked=false,quality=1}){
  const base=sleeping?SURVIVOR_RECOVERY.sleepPerSecond:SURVIVOR_RECOVERY.restPerSecond;
- const nutrition=(hunger<=0?SURVIVOR_RECOVERY.emptyHunger:1)*(thirst<=0?SURVIVOR_RECOVERY.emptyThirst:1);
- return base*nutrition*(outdoorBlocked?SURVIVOR_RECOVERY.outdoorBlocked:1)*Math.max(.1,quality);
+ // v4.58: hunger-dependent sleep efficiency, evaluated every simulation tick.
+ // Applies equally to automatic/manual sleep for every survivor via this shared function.
+ const hungerEfficiency=sleeping?(hunger>=80?1.2:hunger>=50?1:hunger>=30?.75:hunger>=10?.45:.2):
+  (hunger<=0?SURVIVOR_RECOVERY.emptyHunger:1);
+ const thirstEfficiency=thirst<=0?SURVIVOR_RECOVERY.emptyThirst:1;
+ return base*hungerEfficiency*thirstEfficiency*(outdoorBlocked?SURVIVOR_RECOVERY.outdoorBlocked:1)*Math.max(.1,quality);
 }
 // Shared sleep presentation rules for all five survivors (future AI included).
 // A sleep bubble requires both an actual resting pose and no active travel.
@@ -6552,7 +6556,7 @@ function resetDaeun(){
  daeun.sites.shelter=new THREE.Vector3(DAEUN_ZONE.cave.x,.4,DAEUN_ZONE.cave.z+1.7);
  daeun.sites.water=new THREE.Vector3(DAEUN_ZONE.pond.x,.4,DAEUN_ZONE.pond.z);
  daeun.mesh.position.set(DAEUN_ZONE.spawn.x,terrainTopAt(DAEUN_ZONE.spawn.x,DAEUN_ZONE.spawn.z)+.1,DAEUN_ZONE.spawn.z);daeun.mesh.rotation.set(0,0,0);
- daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,caveBranches:0,fuel:0,rabbits:0,fish:0,cookedFish:0};daeun.bag={crafted:false,days:[],practiceDay:1,today:0,progress:0};updateDaeunBagVisual();daeun.skills={fire:0,rabbit:0,fish:0};daeun.firePracticeDays=[];daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.speechExpiresAt=performance.now()+7500;daeun.log=[];daeun.memory=[];daeun.lastWashDay=0;daeun.nextWashRetryAt=0;daeun.lastNightNeedsTalkDay=0;daeun.lastNightNeedsTalkKey='';daeun.nextNightNeedsTalkAt=0;daeun.timers={nextThink:elapsed+18,stuck:0,introStart:elapsed,introStage:0,introMoveAt:0,introAnchorX:daeun.mesh.position.x,introAnchorZ:daeun.mesh.position.z,seenFirstRabbit:false,seenFirstFish:false};daeun.restLocked=false;daeun.failedRoute=null;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeun.seatedEating=0;daeun.torchExpiresAt=0;resetDaeunSnakes();resetMiddleBear();daeunExplored.clear();
+ selectedQuickFood=null;daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,caveBranches:0,fuel:0,rabbits:0,fish:0,cookedFish:0};daeun.bag={crafted:false,days:[],practiceDay:1,today:0,progress:0};updateDaeunBagVisual();daeun.skills={fire:0,rabbit:0,fish:0};daeun.firePracticeDays=[];daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.speechExpiresAt=performance.now()+7500;daeun.log=[];daeun.memory=[];daeun.lastWashDay=0;daeun.nextWashRetryAt=0;daeun.lastNightNeedsTalkDay=0;daeun.lastNightNeedsTalkKey='';daeun.nextNightNeedsTalkAt=0;daeun.timers={nextThink:elapsed+18,stuck:0,introStart:elapsed,introStage:0,introMoveAt:0,introAnchorX:daeun.mesh.position.x,introAnchorZ:daeun.mesh.position.z,seenFirstRabbit:false,seenFirstFish:false};daeun.restLocked=false;daeun.failedRoute=null;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeun.seatedEating=0;daeun.torchExpiresAt=0;resetDaeunSnakes();resetMiddleBear();daeunExplored.clear();
  daeunBerrySelectionDay=clockParts().day;
  randomizeBerryDay(daeunResources.berries,daeunBerrySelectionDay,dRandom,true);
  for(const b of daeunResources.branches){b.x=b.homeX;b.z=b.homeZ;b.group.position.set(b.x,terrainTopAt(b.x,b.z)+.03,b.z);b.available=true;b.respawnAt=0;b.group.visible=true;}
@@ -6995,7 +6999,7 @@ function beginDaeunFuelFeed(){
  d.fuelFeed={started:elapsed,shared:sharedHomeActive,phase:approaching?'approach':'perform'};
  d.timers.fuelFlutterUntil=elapsed+FIREWOOD_FEED_SECONDS;d.lastCraftActiveAt=elapsed;
  d.mesh.rotation.y=Math.atan2(fire.x-d.mesh.position.x,fire.z-d.mesh.position.z);
- daeunSay('🪵 모닥불에 나뭇가지를 넣는 중…');return true;
+ daeunSay('모닥불에 나뭇가지를 넣는 중…');return true;
 }
 function updateDaeunFuelFeed(){
  const d=daeun,t=d.fuelFeed;if(!t)return;
@@ -7010,7 +7014,7 @@ function updateDaeunFuelFeed(){
  d.fuelFeed=null;d.inventory.branches-=2;
  if(sharedHomeActive)fireKnowledge=Math.min(100,fireKnowledge+40);else d.inventory.fuel=Math.min(100,d.inventory.fuel+40);
  d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+2;
- daeunSay('🪵 나뭇가지 2개를 넣었어! 불 유지 +40');
+ gameVitalFloat('daeun','fuel',40);
 }
 function updateDaeun(step,realDt){
  updateDaeunFuelFeed();
@@ -7082,7 +7086,7 @@ function updateDaeun(step,realDt){
  daeunNightNeedsTalk();
  if(s.energy<=0&&!d.restLocked){cancelManualTask();d.restLocked=true;d.path=[];d.destination=null;d.action='exhausted';d.actionAge=0;}
  const resting=d.restLocked||['rest','sleep','sleepPrepare','manualRest','manualSleep'].includes(d.action)&&!d.path.length;
- if(resting){const efficiency=(s.hunger===0?.32:1)*(s.thirst===0?.45:1);s.energy=Math.min(100,s.energy+step*survivorRecoveryPerSecond({
+ if(resting){s.energy=Math.min(100,s.energy+step*survivorRecoveryPerSecond({
   sleeping:['sleep','manualSleep'].includes(d.action),hunger:s.hunger,thirst:s.thirst,
   outdoorBlocked:(clockParts().h>=22||clockParts().h<4)&&!daeunInsideSafeShelter(),
   quality:d.restLocked?DAEUN_RULES.exhaustionMinRecovery:1
@@ -7242,14 +7246,14 @@ function updateDaeun(step,realDt){
   else if(task.type==='branch'&&task.age>=2.8){const b=daeunResources.branches[task.index];if(b&&b.available){b.available=false;b.group.visible=false;b.respawnAt=elapsed+DAY_SECONDS*(1.25+dRandom()*2.25);const gained=dRandom()<.2?2:1;inv.branches+=gained;inventoryPickupFloat('daeun','branches',gained);}else daeunSay('이미 주운 나뭇가지야.');cancelManualTask();}
   else if(task.type==='water'&&task.age>=6){const old=s.thirst;s.thirst=Math.min(100,s.thirst+25);gameVitalFloat('daeun','thirst',s.thirst-old);cancelManualTask();}
   else if(task.type==='cookFish'&&task.age>=8){
-   if(inv.fish>0&&inv.cookedFish<daeunFishCap()&&inv.fuel>0){inv.fish--;inv.cookedFish++;inv.fuel=Math.max(0,inv.fuel-8);gameTransactionFloat('daeun','item','fish',-1);gameTransactionFloat('daeun','item','cookedFish',1);}
+   if(inv.fish>0&&inv.cookedFish<daeunFishCap()&&inv.fuel>0){inv.fish--;inv.cookedFish++;inv.fuel=Math.max(0,inv.fuel-8);gameTransactionFloat('daeun','item','cookedFish',1);}
    else daeunSay('물고기, 모닥불 연료 또는 소지품 공간이 부족해.');
    cancelManualTask();
   }
   else if(task.type==='eatFish'&&task.age>=4){
-   if(inv.cookedFish>0&&s.hunger<95){const old=s.hunger;inv.cookedFish--;s.hunger=100;gameTransactionFloat('daeun','item','cookedFish',-1);gameVitalFloat('daeun','hunger',s.hunger-old);}cancelManualTask();
+   if(inv.cookedFish>0&&s.hunger<95){const old=s.hunger;inv.cookedFish--;s.hunger=100;gameVitalFloat('daeun','hunger',s.hunger-old);}cancelManualTask();
   }
-  else if(task.type==='eat'&&task.age>=4){if(inv.berries>0&&s.hunger<95){const old=s.hunger;inv.berries--;s.hunger=Math.min(100,s.hunger+12);gameTransactionFloat('daeun','item','berries',-1);gameVitalFloat('daeun','hunger',s.hunger-old);}cancelManualTask();}
+  else if(task.type==='eat'&&task.age>=4){if(inv.berries>0&&s.hunger<95){const old=s.hunger;inv.berries--;s.hunger=Math.min(100,s.hunger+12);gameVitalFloat('daeun','hunger',s.hunger-old);}cancelManualTask();}
   else if(['fire','rabbit','fish'].includes(task.type)&&task.age>=(task.type==='fire'?10:task.type==='rabbit'?7:8)){
    refreshDaeunDailyPractice();
    const kind=task.type,skill=d.skills[kind],gain=kind==='fire'?8+Math.floor(dRandom()*9):kind==='rabbit'?6+Math.floor(dRandom()*9):7+Math.floor(dRandom()*10);
@@ -7442,25 +7446,39 @@ function skillFloatNotice(character,key,label,value){
  document.body.appendChild(node);skillFloatPending.set(id,{node,amount:value,time:now});
  node.addEventListener('animationend',()=>{if(skillFloatPending.get(id)?.node===node)skillFloatPending.delete(id);node.remove();},{once:true});
 }
+const BRANCH_INVENTORY_ICON = '<svg viewBox="0 0 40 40" width="28" height="28" aria-label="나뭇가지"><path d="M6 33 L32 7 M17 22 L10 12 M24 15 L34 21" fill="none" stroke="#a87544" stroke-width="4.5" stroke-linecap="round"/><path d="M9 12 Q6 4 14 7 M34 21 Q40 16 35 13" fill="none" stroke="#7cb16b" stroke-width="3" stroke-linecap="round"/></svg>'; // one shared source for inventory and floating notifications
 // v4.51: Inventory pickup feedback reuses the EXACT skillGainFloat typography, rise timing and animation.
 // The branch graphic is cloned from the inventory slot, not replaced with an unrelated emoji.
 // Unified transaction notices: the same class, position and animation as skill gains.
+// v4.56: Shared floating feedback. Inventory consumption is reflected by inventory counters,
+// not by duplicate negative item floats. Always use the same animation as skill gains.
+const GAME_FLOAT_ICONS={berries:'🍓',fish:'🐟',cookedFish:'🍖',rabbits:'🐇',hunger:'🍖',thirst:'💧',energy:'⚡',will:'💗',fuel:'🔥'};
+const GAME_FLOAT_LABELS={hunger:'허기',thirst:'갈증',energy:'체력',will:'의지력',fuel:'불유지'};
 function gameTransactionFloat(character,kind,key,amount){
  if(!Number.isFinite(amount)||Math.abs(amount)<.001||character!==observedId)return;
+ if(kind==='item'&&amount<0)return;
  const node=document.createElement('div');node.className='skillGainFloat';
  node.style.top=(Math.min(innerHeight*.47,250)+(document.querySelectorAll('.skillGainFloat').length%3)*28)+'px';
- const iconSelectors={branches:'#v435InvGrid .v435-slot[title="나뭇가지"] svg',berries:'#v435InvGrid .v435-slot[title="열매"] svg',fish:'#v435InvGrid .v435-slot[title="물고기"] svg',cookedFish:'#v435InvGrid .v435-slot[title="구운 물고기"] svg'};
- const icon=kind==='item'?document.querySelector(iconSelectors[key]||'#__none__'):null;
- if(icon){const copy=icon.cloneNode(true);copy.setAttribute('width','20');copy.setAttribute('height','20');copy.style.verticalAlign='middle';copy.style.marginRight='5px';node.appendChild(copy);}
- else {const label=document.createElement('span');label.textContent=kind==='item'?({berries:'열매',branches:'나뭇가지',fish:'물고기',cookedFish:'구운 물고기'}[key]||key)+' ':({thirst:'갈증',hunger:'허기',energy:'체력',will:'의지력',fuel:'불유지'}[key]||key)+' ';node.appendChild(label);}
- const n=document.createElement('span');n.textContent=(amount>0?'+':'')+Math.round(amount*10)/10;if(amount<0&&kind==='vital')n.style.color='#ff9292';node.appendChild(n);
+ if(kind==='item'&&key==='branches'){
+  const holder=document.createElement('span');holder.innerHTML=BRANCH_INVENTORY_ICON;
+  const icon=holder.firstElementChild;icon.setAttribute('width','20');icon.setAttribute('height','20');icon.style.verticalAlign='middle';icon.style.marginRight='5px';node.appendChild(icon);
+ }else{
+  const symbol=document.createElement('span');symbol.textContent=(GAME_FLOAT_ICONS[key]||'✨')+' ';node.appendChild(symbol);
+ }
+ if(kind==='vital'||kind==='food'){
+  const label=document.createElement('span');label.textContent=(kind==='food'?'허기':GAME_FLOAT_LABELS[key]||key)+' ';node.appendChild(label);
+ }
+ const n=document.createElement('span');n.textContent=(amount>0?'+':'')+Math.round(amount*10)/10;
+ if(amount<0&&kind==='vital')n.style.color='#ff9292';node.appendChild(n);
  document.body.appendChild(node);node.addEventListener('animationend',()=>node.remove(),{once:true});
 }
 function inventoryPickupFloat(character,item,amount){gameTransactionFloat(character,'item',item,amount);}
 function gameVitalFloat(character,key,amount){gameTransactionFloat(character,'vital',key,amount);}
 function showFoodConsumption(character,item,oldHunger,newHunger){
- gameTransactionFloat(character,'item',item,-1);
- gameVitalFloat(character,'hunger',Math.max(0,newHunger-oldHunger));
+ const gained=Math.max(0,newHunger-oldHunger);
+ if(gained<=0)return;
+ // Reuse the inventory food icon; no item-consumption (-1) floating notice.
+ gameTransactionFloat(character,'food',item,gained);
 }
 // Continuous threats: show the real accumulated change at a readable cadence.
 const threatFloatAccumulator=new Map();
@@ -7723,9 +7741,10 @@ function issueResourceTap(x,y){
 const resourceMarkers=[];
 function makeResourceMarker(emoji,title){
  const btn=document.createElement('button');btn.type='button';btn.className='daeunResourceEmoji';
- btn.textContent=emoji;btn.title=title;btn.setAttribute('aria-label',title);
+ if(emoji==='🌿'&&/나뭇가지|가지 보관/.test(title)){btn.innerHTML=BRANCH_INVENTORY_ICON;btn.classList.add('branch-resource-marker');}else btn.textContent=emoji;btn.title=title;btn.setAttribute('aria-label',title);
  btn.style.display='none';document.body.appendChild(btn);resourceMarkers.push(btn);attachIdleRing(btn);return btn;
 }
+const branchMarkerStyle=document.createElement('style');branchMarkerStyle.textContent='.daeunResourceEmoji.branch-resource-marker > svg:not(.cleanProgressRing){width:28px;height:28px;flex-shrink:0;pointer-events:none}';document.head.appendChild(branchMarkerStyle);
 // The icon has one perimeter: its SVG circle is the idle border AND the progress bar.
 function attachIdleRing(btn){
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -7818,14 +7837,14 @@ function updateSharedDaeunResourceTask(step){
   if(t.item.stock<=0||daeun.inventory.berries>=daeunBagCap())return;
   t.item.stock--;daeun.inventory.berries++;
   if(t.item.fruits?.length)t.item.fruits.filter(f=>f.visible).slice(0,1).forEach(f=>f.visible=false);
-  daeunSay('🍓 열매 +1');
+  inventoryPickupFloat('daeun','berries',1);
  }else if(t.type==='branch'){
   if(!t.item.available)return;
   t.item.available=false;t.item.group.visible=false;t.item.respawnAt=elapsed+90+Math.random()*80;
   const n=Math.random()<.2?2:1;daeun.inventory.branches+=n;
-  daeunSay('🌿 나뭇가지 +'+n);
+  inventoryPickupFloat('daeun','branches',n);
  }else if(t.type==='water'){
-  daeun.stats.thirst=Math.min(100,daeun.stats.thirst+25);daeunSay('💧 물을 마셨어. 갈증 +25');
+  const before=daeun.stats.thirst;daeun.stats.thirst=Math.min(100,daeun.stats.thirst+25);gameVitalFloat('daeun','thirst',daeun.stats.thirst-before);
  }else if(t.type==='fire'){
   const inv=daeun.inventory;
   if(fireSuccess){
@@ -7920,7 +7939,7 @@ function updateHinaManualTask(step){
   // Observe the clicked rabbit at its original location; do not chase its live position.
   o.caught=true;o.g.visible=false;o.hopActive=false;o.respawnDaeunAt=elapsed+DAY_SECONDS*(.45+Math.random()*.35);rabbitObservations++;rabbitPattern=Math.min(100,rabbitPattern+10);say('🐰 토끼를 관찰했어! 토끼는 숲으로 달아났어.');
  }else if(task.type==='fire'){
-  if(fireSuccess){if(fireDryStock<2)return;fireDryStock-=2;fireKnowledge=Math.min(100,fireKnowledge+40);gameTransactionFloat('hina','item','branches',-2);}
+  if(fireSuccess){if(fireDryStock<2)return;fireDryStock-=2;fireKnowledge=Math.min(100,fireKnowledge+40);}
   else{if(fireDryStock<1)return;fireDryStock--;attemptFire();}
  }
 }
@@ -8214,11 +8233,16 @@ waterButton.onclick=()=>manualAction('water',sharedHomeActive?daeun.sites.water.
 const screenProjectionScratch=new THREE.Vector3();
 function projectToScreen(point){const p=screenProjectionScratch.copy(point).project(camera);if(p.z< -1||p.z>1||Math.abs(p.x)>1.1||Math.abs(p.y)>1.1)return null;return {x:(p.x*.5+.5)*innerWidth,y:(-p.y*.5+.5)*innerHeight};}
 function refreshV435Inventory(){
+ // First acquired edible food auto-fills the empty slot once; later choices are respected.
+ if(selectedQuickFood===null&&daeun?.inventory){
+  if(daeun.inventory.berries>0)selectedQuickFood='berries';
+  else if(daeun.inventory.cookedFish>0)selectedQuickFood='cookedFish';
+ }
  const grid=document.getElementById('v435InvGrid');
  if(!grid)return;
  const inv=daeun.inventory||{};
  const slots=[['🍓','열매',inv.berries],['🌿','나뭇가지',inv.branches],['🐟','물고기',inv.fish],['🍖','구운 물고기',inv.cookedFish],['🐇','토끼',inv.rabbits],['🔥','횃불',daeun.torchExpiresAt>elapsed?1:0],['🧺','바구니',daeun.bag?.crafted?1:0],['','빈 칸',0]];
- const html=slots.map(([emoji,label,amount])=>'<div class="v435-slot" title="'+label+'"'+(label==='열매'?' data-food-kind="berries"':label==='구운 물고기'?' data-food-kind="cookedFish"':'')+'>'+(amount?'<span>'+(label==='나뭇가지'?'<svg viewBox="0 0 40 40" width="28" height="28" aria-label="나뭇가지"><path d="M6 33 L32 7 M17 22 L10 12 M24 15 L34 21" fill="none" stroke="#a87544" stroke-width="4.5" stroke-linecap="round"/><path d="M9 12 Q6 4 14 7 M34 21 Q40 16 35 13" fill="none" stroke="#7cb16b" stroke-width="3" stroke-linecap="round"/></svg>':emoji)+'</span><small>×'+amount+'</small>':'<span class="v435-empty">·</span>')+'</div>').join('');
+ const html=slots.map(([emoji,label,amount])=>'<div class="v435-slot" title="'+label+'"'+(label==='열매'?' data-food-kind="berries"':label==='구운 물고기'?' data-food-kind="cookedFish"':'')+'>'+(amount?'<span>'+(label==='나뭇가지'?BRANCH_INVENTORY_ICON:emoji)+'</span><small>×'+amount+'</small>':'<span class="v435-empty">·</span>')+'</div>').join('');
  if(grid.innerHTML!==html)grid.innerHTML=html;
  const mode=document.getElementById('v435InvMode');if(mode)mode.textContent=daeun.auto?'자동 관찰':'수동';
 }
@@ -8247,7 +8271,7 @@ function refreshV435Inventory(){
   }else taskProgress.style.display='none';
   return;
  }
- document.getElementById('daeunBerryCount').textContent='🎒 '+(daeun.bag.crafted?'가방 완성':'제작 '+Math.round(daeun.bag.progress)+'% · '+daeun.bag.days.length+'/3일')+' · 🍓 '+daeun.inventory.berries+'/'+daeunBagCap()+' · 🐟 생물고기 '+daeun.inventory.fish+' · 🍽️ 구운 '+daeun.inventory.cookedFish+'/'+daeunFishCap()+' · 🌿 가방 '+daeun.inventory.branches;
+ document.getElementById('daeunBerryCount').textContent='🎒 '+(daeun.bag.crafted?'가방 완성':'제작 '+Math.round(daeun.bag.progress)+'% · '+daeun.bag.days.length+'/3일')+' · 🍓 '+daeun.inventory.berries+'/'+daeunBagCap()+' · 🐟 생물고기 '+daeun.inventory.fish+' · 🍽️ 구운 '+daeun.inventory.cookedFish+'/'+daeunFishCap()+' · 나뭇가지 '+daeun.inventory.branches;
  document.getElementById('daeunEatButton').disabled=daeun.inventory.berries===0;
  document.getElementById('daeunFishEatButton').disabled=daeun.inventory.cookedFish===0;
  document.getElementById('daeunAddFirewoodButton').disabled=daeunDisplayedFuel()<=0||daeun.inventory.branches<2;
@@ -9118,7 +9142,19 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  const shadowFocus=observedCharacter().mesh.position;
  const sx=Math.round(shadowFocus.x/snap)*snap,sz=Math.round(shadowFocus.z/snap)*snap;
  sun.target.position.set(sx,shadowFocus.y,sz);
- sun.position.set(sx-24,shadowFocus.y+36,sz+22);
+ // v4.57: Clock-driven solar arc. Sunrise east, noon high, sunset west.
+ // The shadow camera remains centered on the observed character to retain mobile shadow quality.
+ const solarClock=clockParts(),solarHour=solarClock.h+solarClock.m/60;
+ const solarProgress=THREE.MathUtils.clamp((solarHour-6)/13,0,1);
+ const solarAngle=solarProgress*Math.PI;
+ const sunElevation=Math.max(0,Math.sin(solarAngle));
+ const sunHorizontal=26+23*(1-sunElevation);
+ const sunHeight=7+56*sunElevation;
+ // Maintain a small north/south offset, with smooth azimuth motion across the day.
+ const sunX=-Math.cos(solarAngle)*sunHorizontal;
+ const sunZ=12+Math.sin(solarAngle-.35)*9;
+ // After dark sunlight is practically disabled by the existing day/night palette.
+ sun.position.set(sx+sunX,shadowFocus.y+sunHeight,sz+sunZ);
  sun.target.updateMatrixWorld();
  updateCameraOcclusion(t);
  smoothResourceMarkerPositions();
