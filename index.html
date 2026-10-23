@@ -5028,7 +5028,7 @@ $('mobileMenu').onclick=()=>{
  const open=document.body.classList.toggle('menu-open');
  if(open){$('ui').dataset.pane='vitals';document.querySelectorAll('#mobileCategories button').forEach(b=>b.classList.toggle('selected',b.dataset.pane==='vitals'));}
  $('mobileMenu').setAttribute('aria-expanded',String(open));
- $('mobileMenu').textContent=open?'✕ 닫기':'☰ 메뉴';
+ $('mobileMenu').textContent='☰ 메뉴';
 };
 function applyQuality(){
  glowCanvas.style.display=(highQuality&&!ultraLowPower)?'block':'none';
@@ -6447,7 +6447,10 @@ function observedCharacter(){return characters.get(observedId)||characters.get('
 let daeunBerrySelectionDay=0;
 let daeunPetRabbit=null;
 function dRandom(){daeun.aiRandom=(Math.imul(1664525,daeun.aiRandom)+1013904223)>>>0;return daeun.aiRandom/4294967296;}
-function daeunSay(text){survivorSpeech.post('daeun',text);daeun.thought=text;daeun.speechExpiresAt=performance.now()+7500;daeun.log.unshift({at:elapsed,text});if(daeun.log.length>28)daeun.log.length=28;}
+function daeunSay(text){
+ // DAY 1: observe and recover from the arrival, never announce resources as loot.
+ if(clockParts().day===1 && /나뭇가지|가지가|채집|수집|주워|모으|열매를 먹|물고기 잡|토끼 잡|불을 피우/.test(text))return;
+ survivorSpeech.post('daeun',text);daeun.thought=text;daeun.speechExpiresAt=performance.now()+7500;daeun.log.unshift({at:elapsed,text});if(daeun.log.length>28)daeun.log.length=28;}
 // Developer-friendly navigation diagnostics: visible in the action log and copyable from console.
 const daeunNavDiagnostics={lastX:NaN,lastZ:NaN,repeats:0,lastAt:-999};
 function daeunNavWarning(message,goal=null){
@@ -6693,7 +6696,7 @@ class DaeunAIController{
   if(sharedHomeActive&&meetingFollowUntil&&performance.now()<meetingFollowUntil)return;
   // Needs are evaluated immediately after waking, before exploration detours.
   const urgentWater=s.thirst<57,urgentFood=s.hunger<57;
-  if(!sharedHomeActive&&clockParts().day===1&&d.auto&&!urgentWater&&!urgentFood){if(elapsed-(d.timers.introStart??-1000)<30)return;if(!daeunNightNeedsTalk())daeunFirstDayThink();return;}
+  if(!sharedHomeActive&&clockParts().day===1&&d.auto){if(elapsed-(d.timers.introStart??-1000)<30)return;if(!daeunNightNeedsTalk())daeunFirstDayThink();return;}
   // Shelter is a survival priority, ahead of route-failure exploration and rest.
   if(daeunNightShelterPriority())return;
   // When a route repeatedly fails, choose a genuinely reachable nearby waypoint first.
@@ -7421,10 +7424,10 @@ $('daeunProfileOpen').addEventListener('click',()=>daeunProfileViewer.classList.
 $('daeunProfileClose').addEventListener('click',()=>daeunProfileViewer.classList.remove('open'));
 daeunProfileViewer.addEventListener('click',e=>{if(e.target===daeunProfileViewer)daeunProfileViewer.classList.remove('open')});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')daeunProfileViewer.classList.remove('open')});
-$('observeHina').onclick=()=>selectCharacter('hina');$('observeDaeun').onclick=()=>selectCharacter('daeun');$('daeunAuto').onclick=()=>setDaeunAuto(!daeun.auto);$('hinaAuto').onclick=()=>setHinaAuto(hinaManual);
+$('observeHina').onclick=()=>selectCharacter('hina');$('observeDaeun').onclick=()=>{if(window.innerWidth<=700&&observedId==='daeun'){setDaeunAuto(!daeun.auto);}else{selectCharacter('daeun');}};$('daeunAuto').onclick=()=>setDaeunAuto(!daeun.auto);$('hinaAuto').onclick=()=>setHinaAuto(hinaManual);
 const actionNames={autoFirePractice:'🔥 불 피우기 연습 중',autoBagPractice:'🧶 가방 엮는 중',autoStoreBranches:'🌿 동굴에 가지 보관 중',manualBag:'가방 엮는 중',manualStore:'동굴에 나뭇가지 보관 중',manualBranch:'나뭇가지 줍는 중',manualPick:'열매 채집 중',manualDrink:'물 마시는 중',manualEat:'열매 먹는 중',manualRest:'앉아서 쉬는 중',manualApproach:'상호작용 지점으로 이동',idle:'주변 살피기',travel:'목적지로 이동',manual:'직접 이동',drink:'물 마시러 이동',forage:'열매 채집',branch:'나뭇가지 모으기',explore:'근처 탐험',home:'자기 동굴로 귀환',rest:'휴식',sleep:'동굴에서 수면',exhausted:'제자리 회복 중'};
 function layoutCharacterBar(){
- if(innerWidth<=1000){characterBar.style.top='auto';characterBar.style.bottom=Math.max(62,innerHeight-$('controls').getBoundingClientRect().top+10)+'px';}
+ if(innerWidth<=700){characterBar.style.top='auto';characterBar.style.bottom='auto';}else if(innerWidth<=1000){characterBar.style.top='auto';characterBar.style.bottom=Math.max(62,innerHeight-$('controls').getBoundingClientRect().top+10)+'px';}
  else{characterBar.style.top='12px';characterBar.style.bottom='auto';}
 }
 new ResizeObserver(layoutCharacterBar).observe($('controls'));window.addEventListener('resize',layoutCharacterBar);
@@ -7950,7 +7953,7 @@ body.cinematic-mode .daeunResourceEmoji{display:none!important}
 body.cinematic-mode #hinaActionButtons{display:none!important}
 body.cinematic-mode #daeunActionButtons,body.cinematic-mode #daeunWaterAction,body.cinematic-mode #daeunTaskProgress,body.cinematic-mode #daeunBranchAction{display:none!important}
 `;document.head.appendChild(manualUIStyle);
-const manualButtons=document.createElement('div');manualButtons.id='daeunActionButtons';manualButtons.innerHTML='<div class="invPanel" id="daeunItemPanel"><div id="daeunBerryCount">열매 0개</div><div id="daeunSkills" style="font-size:12px;line-height:1.7;margin:6px 0"></div><button type="button" id="daeunEatButton">🍓 열매 먹기</button><button type="button" id="daeunFishEatButton">🐟 구운 물고기 먹기</button><div id="daeunFireFuel" style="font-size:13px;margin:8px 0;color:#f2ad69">🔥 불 유지 0%</div><button type="button" id="daeunAddFirewoodButton">🪵 모닥불에 나뭇가지 2개 넣기</button><button type="button" id="daeunTakeTorchButton">🔥 횃불 들기 (반나절)</button><button type="button" id="daeunBagCraftButton">🧶 가방 엮기</button><button type="button" id="daeunCookFishButton">🔥 물고기 굽기</button></div><button type="button" id="daeunQuickEat" title="소지품 음식 바로 먹기">🍓 음식 먹기</button><button type="button" id="daeunItemToggle">▣ 소지품</button><button type="button" id="daeunRestButton">♧ 앉아서 쉬기</button><button type="button" id="daeunSleepButton">☾ 잠자기</button>';document.body.appendChild(manualButtons);
+const manualButtons=document.createElement('div');manualButtons.id='daeunActionButtons';manualButtons.innerHTML='<div class="invPanel" id="daeunItemPanel"><div class="v435-inventory"><div class="v435-inv-title"><svg class="v437-bag-icon" viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><path d="M13 18 Q14 6 24 6 Q34 6 35 18" fill="none" stroke="#79502e" stroke-width="4" stroke-linecap="round"/><path d="M8 19 Q24 14 40 19 L36 39 Q24 45 12 39 Z" fill="#bb8750" stroke="#674325" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 24 Q24 28 38 24 M12 31 Q24 35 37 31 M17 19 L18 40 M24 18 L24 42 M31 19 L30 40" fill="none" stroke="#81532e" stroke-width="2.3" opacity=".9"/><path d="M10 20 Q24 17 38 20" fill="none" stroke="#e3b87d" stroke-width="3" stroke-linecap="round"/></svg> 다은 소지품 <span id="v435InvMode"></span></div><div id="v435InvGrid" class="v435-inv-grid"></div></div><div class="v435-legacy"><div id="daeunBerryCount">열매 0개</div><div id="daeunSkills" style="font-size:12px;line-height:1.7;margin:6px 0"></div><button type="button" id="daeunEatButton">🍓 열매 먹기</button><button type="button" id="daeunFishEatButton">🐟 구운 물고기 먹기</button><div id="daeunFireFuel" style="font-size:13px;margin:8px 0;color:#f2ad69">🔥 불 유지 0%</div><button type="button" id="daeunAddFirewoodButton">🪵 모닥불에 나뭇가지 2개 넣기</button><button type="button" id="daeunTakeTorchButton">🔥 횃불 들기 (반나절)</button><button type="button" id="daeunBagCraftButton">🧶 가방 엮기</button><button type="button" id="daeunCookFishButton">🔥 물고기 굽기</button></div></div><button type="button" id="daeunQuickEat" title="소지품 음식 바로 먹기">🍓 음식 먹기</button><button type="button" id="daeunItemToggle" aria-label="소지품 열기" title="소지품"><svg class="v437-bag-icon" viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><path d="M13 18 Q14 6 24 6 Q34 6 35 18" fill="none" stroke="#79502e" stroke-width="4" stroke-linecap="round"/><path d="M8 19 Q24 14 40 19 L36 39 Q24 45 12 39 Z" fill="#bb8750" stroke="#674325" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 24 Q24 28 38 24 M12 31 Q24 35 37 31 M17 19 L18 40 M24 18 L24 42 M31 19 L30 40" fill="none" stroke="#81532e" stroke-width="2.3" opacity=".9"/><path d="M10 20 Q24 17 38 20" fill="none" stroke="#e3b87d" stroke-width="3" stroke-linecap="round"/></svg></button><button type="button" id="daeunRestButton">♧ 앉아서 쉬기</button><button type="button" id="daeunSleepButton">☾ 잠자기</button>';document.body.appendChild(manualButtons);
 // Hina's own manual HUD. Daeun's HUD was previously hidden when switching to Hina.
 const hinaActions=document.createElement('div');
 hinaActions.id='hinaActionButtons';
@@ -8050,7 +8053,16 @@ document.getElementById('daeunRestButton').onclick=()=>{
 waterButton.onclick=()=>manualAction('water',sharedHomeActive?daeun.sites.water.clone():new THREE.Vector3(DAEUN_ZONE.pond.x,0,DAEUN_ZONE.pond.z));
 const screenProjectionScratch=new THREE.Vector3();
 function projectToScreen(point){const p=screenProjectionScratch.copy(point).project(camera);if(p.z< -1||p.z>1||Math.abs(p.x)>1.1||Math.abs(p.y)>1.1)return null;return {x:(p.x*.5+.5)*innerWidth,y:(-p.y*.5+.5)*innerHeight};}
-function refreshManualActionUI(){
+function refreshV435Inventory(){
+ const grid=document.getElementById('v435InvGrid');
+ if(!grid)return;
+ const inv=daeun.inventory||{};
+ const slots=[['🍓','열매',inv.berries],['🌿','나뭇가지',inv.branches],['🐟','물고기',inv.fish],['🍖','구운 물고기',inv.cookedFish],['🐇','토끼',inv.rabbits],['🔥','횃불',daeun.torchExpiresAt>elapsed?1:0],['🧺','바구니',daeun.bag?.crafted?1:0],['','빈 칸',0]];
+ const html=slots.map(([emoji,label,amount])=>'<div class="v435-slot" title="'+label+'">'+(amount?'<span>'+(label==='나뭇가지'?'<svg viewBox="0 0 40 40" width="28" height="28" aria-label="나뭇가지"><path d="M6 33 L32 7 M17 22 L10 12 M24 15 L34 21" fill="none" stroke="#a87544" stroke-width="4.5" stroke-linecap="round"/><path d="M9 12 Q6 4 14 7 M34 21 Q40 16 35 13" fill="none" stroke="#7cb16b" stroke-width="3" stroke-linecap="round"/></svg>':emoji)+'</span><small>×'+amount+'</small>':'<span class="v435-empty">·</span>')+'</div>').join('');
+ if(grid.innerHTML!==html)grid.innerHTML=html;
+ const mode=document.getElementById('v435InvMode');if(mode)mode.textContent=daeun.auto?'자동 관찰':'수동';
+}
+ function refreshManualActionUI(){refreshV435Inventory();
  const hinaVisible=isManualHina()&&!document.body.classList.contains('cinematic-mode');
  hinaActions.style.display=hinaVisible?'flex':'none';
  if(hinaVisible){
@@ -8062,7 +8074,7 @@ function refreshManualActionUI(){
  }
  const visible=isManualDaeun()&&!document.body.classList.contains('cinematic-mode');
  if(visible){refreshDaeunDailyPractice();refreshDaeunBagDay();}
- manualButtons.style.display=visible?'flex':'none';if(!visible){
+ manualButtons.style.display=(visible||observedId==='daeun')?'flex':'none';manualButtons.classList.toggle('v435-auto',!visible);manualButtons.classList.toggle('v436-cinematic',document.body.classList.contains('cinematic-mode'));if(!visible){
   waterButton.style.display='none';branchButton.style.display='none';hideResourceEmojis();
   const a=daeun.autoTask,autoKind=a?.kind,autoPractice=daeun.action==='autoFirePractice'?'fire':daeun.action==='autoBagPractice'?'bag':null;
   const icon={drink:'💧',forage:'🍓',branch:'🌿',wash:'💧',fire:'🔥',bag:'🧶'};
@@ -8871,11 +8883,19 @@ hinaRadialStyle.textContent+=`
  box-sizing:border-box!important
 }
 `;
+// Match the campfire interaction's pointer-first handling on mobile.
+hinaRadialStyle.textContent+=`
+#hinaFishStorageRoot,.hina-radial-storage,.hina-radial-storage *, .hina-radial-choice {
+ -webkit-user-select:none!important;user-select:none!important;
+ -webkit-touch-callout:none!important;touch-action:manipulation;
+ -webkit-tap-highlight-color:transparent;
+}
+`;
 document.head.appendChild(hinaRadialStyle);
 for(const line of fishStorageMenu.querySelectorAll('.hina-line'))line.setAttribute('pathLength','1');
 function closeFishStorageMenu(){fishStorageMenu.classList.remove('open');fishStorageMenu.style.display='none';}
-fishStoreChoice.addEventListener('click',e=>{e.stopPropagation();performFishStorageAction('store');});
-fishTakeChoice.addEventListener('click',e=>{e.stopPropagation();performFishStorageAction('take');});
+fishStoreChoice.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(performance.now()-storageTouchActionAt<700)return;performFishStorageAction('store');});
+fishTakeChoice.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(performance.now()-storageTouchActionAt<700)return;performFishStorageAction('take');});
 function openFishStorageMenu(){
  if(fishStoreButton.style.display==='none')return;
  const isD=observedId==='daeun';
@@ -8892,8 +8912,23 @@ function openFishStorageMenu(){
  void fishStorageMenu.offsetWidth;
  fishStorageMenu.classList.add('open');
 }
-fishStoreButton.addEventListener('mouseenter',e=>{fireHoverPointer.x=e.clientX;fireHoverPointer.y=e.clientY;openFishStorageMenu();});
-fishStoreButton.addEventListener('click',e=>{e.stopPropagation();if(fishStorageMenu.style.display==='block')closeFishStorageMenu();else openFishStorageMenu();});
+fishStoreButton.id='hinaFishStorageRoot';
+// Native Android selection/callout must not intercept game interaction.
+for(const element of [fishStoreButton,fishStorageMenu,fishStoreChoice,fishTakeChoice]){
+ element.style.webkitUserSelect='none';element.style.userSelect='none';
+ element.style.webkitTouchCallout='none';element.style.touchAction='manipulation';
+ element.addEventListener('contextmenu',e=>e.preventDefault());
+ element.addEventListener('selectstart',e=>e.preventDefault());
+ element.addEventListener('dragstart',e=>e.preventDefault());
+ element.addEventListener('touchstart',e=>{e.preventDefault();},{passive:false});
+}
+fishStoreButton.addEventListener('mouseenter',e=>{if(e.pointerType==='touch')return;fireHoverPointer.x=e.clientX;fireHoverPointer.y=e.clientY;openFishStorageMenu();});
+let storageTouchActionAt=0;
+fishStoreButton.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')return;e.preventDefault();e.stopPropagation();storageTouchActionAt=performance.now();if(fishStorageMenu.style.display==='block')closeFishStorageMenu();else openFishStorageMenu();});
+fishStoreButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(performance.now()-storageTouchActionAt<700)return;if(fishStorageMenu.style.display==='block')closeFishStorageMenu();else openFishStorageMenu();});
+for(const [el,action] of [[fishStoreChoice,'store'],[fishTakeChoice,'take']]){
+ el.addEventListener('pointerup',e=>{if(e.pointerType==='mouse')return;e.preventDefault();e.stopPropagation();storageTouchActionAt=performance.now();if(!el.disabled)performFishStorageAction(action);});
+}
 function fishStorageHoverActive(){
  const a=fishStoreButton.getBoundingClientRect(),b=fishStorageMenu.getBoundingClientRect();
  const x=fireHoverPointer.x,y=fireHoverPointer.y;
@@ -9021,4 +9056,190 @@ document.addEventListener('click',e=>{const el=e.target.closest('button,.daeunRe
 window.HinaInteractionSFX={play};
 })();
 </script>
-</body></html>
+<style id="mobileCompactV434">
+@media(max-width:700px){
+ #badge{width:auto!important;max-width:none!important;white-space:nowrap!important}
+ #badge #weather{display:none!important}
+ #mobileVitals{width:90px!important;padding:7px 4px!important;top:70px!important;transform:none!important}
+ #mobileVitals .mv-name{font-size:11px!important}
+ #mobileVitals .mv-row{grid-template-columns:25px minmax(0,1fr) 18px!important;gap:2px!important;font-size:10px!important}
+ #mobileVitals .mv-row>span:first-child{overflow:hidden;white-space:nowrap;font-size:9px}
+ #mobileVitals .mv-num{font-size:9px}
+ #characterBar{position:fixed!important;left:max(8px,env(safe-area-inset-left))!important;top:230px!important;bottom:auto!important;transform:none!important;width:64px!important;min-width:0!important;max-width:64px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:2px!important;padding:3px!important;border-radius:9px!important;box-sizing:border-box!important;z-index:22!important}
+ #characterBar button{font-size:11px!important;min-height:26px!important;line-height:1.1!important;padding:5px 2px!important;white-space:nowrap!important;text-align:center!important;box-sizing:border-box!important}
+ #characterBar #daeunAuto,#characterBar #hinaAuto{display:none!important}
+ #daeunActionButtons{right:max(8px,env(safe-area-inset-right))!important;bottom:calc(14px + env(safe-area-inset-bottom))!important;gap:5px!important}
+ #daeunActionButtons button{font-size:12px;padding:8px 10px}
+ #mobileMenu{z-index:52!important}
+ #ui{z-index:51!important}
+ #mobileMenuOverlay{display:none;position:fixed;inset:0;z-index:50;background:transparent;touch-action:manipulation}
+ body.menu-open #mobileMenuOverlay{display:block}
+ body.menu-open #mobileVitals,body.menu-open #characterBar{display:none!important}
+}
+</style><script id="mobileCompactLogicV434">
+(function(){
+ const overlay=document.createElement('div');overlay.id='mobileMenuOverlay';overlay.setAttribute('aria-label','메뉴 바깥 영역');document.body.appendChild(overlay);
+ function closeMenu(){document.body.classList.remove('menu-open');const b=document.getElementById('mobileMenu');if(b){b.setAttribute('aria-expanded','false');b.textContent='☰ 메뉴';}}
+ overlay.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();closeMenu();},{passive:false});
+ const bar=document.getElementById('characterBar');if(!bar)return;bar.dataset.lastSelected=document.getElementById('observeDaeun')?.getAttribute('aria-pressed')==='true'?'daeun':'hina';
+ const placeholderNames=['서연','지유','민아'];
+ for(const name of placeholderNames){const b=document.createElement('button');b.type='button';b.textContent=name+' 🔒';b.disabled=true;b.title='아직 만나지 않은 친구';bar.appendChild(b);}
+ for(const [id,autoId] of [['hina','hinaAuto'],['daeun','daeunAuto']]){
+  const b=document.getElementById(id==='hina'?'observeHina':'observeDaeun');
+  if(!b)continue;
+  b.addEventListener('click',()=>{
+   if(innerWidth>700)return;
+   if(document.getElementById('characterBar')?.dataset.lastSelected===id){
+    const toggle=document.getElementById(autoId);
+    if(toggle&&id==='hina')toggle.click();
+   }
+   document.getElementById('characterBar').dataset.lastSelected=id;
+  });
+ }
+ document.addEventListener('pointerdown',e=>{const a=document.getElementById('daeunActionButtons');if(a?.classList.contains('open')&&!a.contains(e.target))a.classList.remove('open');},true);
+ function syncCompact(){if(innerWidth>700)return;const v=document.getElementById('mobileVitals');const b=document.getElementById('characterBar');if(!v||!b)return;const rect=v.getBoundingClientRect();b.style.setProperty('top',Math.round(rect.bottom+5)+'px','important');
+  const d=document.getElementById('observeDaeun');const h=document.getElementById('observeHina');const da=document.getElementById('daeunAuto');const ha=document.getElementById('hinaAuto');
+  if(d&&da){if(!d.querySelector('.v440-border')){d.innerHTML='다은<svg class="v440-border" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><rect x="2.5" y="2.5" width="95" height="35" rx="9" pathLength="100"/></svg>';} d.classList.toggle('v435-manual',da.getAttribute('aria-pressed')==='false');d.classList.toggle('v440-auto',da.getAttribute('aria-pressed')==='true');}
+  if(h&&ha)h.textContent=ha.hidden?'히나 🔒':'히나';
+ }
+ setInterval(syncCompact,350);window.addEventListener('resize',syncCompact);syncCompact();
+})();
+</script><style id="v435-mobile-inventory">
+#daeunActionButtons .v435-legacy{display:none!important}\n#daeunActionButtons.open .invPanel{display:block!important}
+#daeunActionButtons .v435-inventory{min-width:205px}
+#daeunActionButtons .v435-inv-title{font-weight:700;font-size:13px;display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}
+#daeunActionButtons #v435InvMode{font-size:10px;opacity:.75;font-weight:400}
+#daeunActionButtons .v435-inv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+#daeunActionButtons .v435-slot{height:44px;border:1px solid #789d91;border-radius:9px;background:#102e2c;position:relative;display:flex;align-items:center;justify-content:center;font-size:23px}
+#daeunActionButtons .v435-slot small{position:absolute;bottom:1px;right:4px;font-size:10px;color:#fff}
+#daeunActionButtons .v435-empty{color:#59726b}
+#daeunActionButtons.v435-auto>button:not(#daeunItemToggle){display:none!important}
+#daeunActionButtons.v435-auto #daeunItemToggle{display:block!important}
+@media(max-width:700px){
+ #daeunActionButtons{display:flex!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;right:max(8px,env(safe-area-inset-right))!important;z-index:40!important}
+ #daeunActionButtons .invPanel{position:absolute;bottom:calc(100% + 8px);right:0;max-width:min(245px,85vw);box-sizing:border-box}
+ #daeunActionButtons>button{display:block;visibility:visible;opacity:1}
+ #characterBar #observeDaeun.v435-manual{background:#4c957b!important;border-color:#b9ffe0!important;color:white!important}
+ #characterBar #observeDaeun:not(.v435-manual){background:#24443e!important;border-color:#759b8e!important}
+}
+</style><style id="v436-patches">
+@media(max-width:700px){
+ #daeunActionButtons #daeunItemToggle{font-size:23px!important;min-width:43px!important;min-height:43px!important;display:flex!important;align-items:center;justify-content:center;padding:6px!important;align-self:flex-end}
+ body.cinematic-mode #daeunActionButtons{display:flex!important;position:fixed!important;right:max(8px,env(safe-area-inset-right))!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;z-index:100!important}
+ body.cinematic-mode #daeunActionButtons>button:not(#daeunItemToggle){display:none!important}
+ body.cinematic-mode #daeunActionButtons #daeunItemToggle{display:flex!important}
+ body.cinematic-mode #daeunActionButtons.open .invPanel{display:block!important}
+ #characterBar #observeDaeun.v435-manual{background:#53a687!important;border:2px solid #c2ffdd!important;color:white!important}
+ #characterBar #observeDaeun:not(.v435-manual){background:#294942!important;border:2px solid #6f9688!important;color:white!important}
+}
+</style>
+<style id="v439-mobile-day10">
+#v439Day10Wrap{display:none}
+@media(max-width:700px){
+ body.menu-open #ui[data-pane="settings"] #v439Day10Wrap{display:block!important;margin:14px 8px;padding:10px;background:#183b39;border:1px solid #7ba89a;border-radius:12px;color:white}
+ #v439Day10{display:block!important;width:100%;min-height:44px;border-radius:10px;background:#376d60;border:1px solid #9bd9b8;color:#fff;font-weight:700;font-size:14px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+ #v439Day10Note{font-size:11px;opacity:.8;margin-top:7px;line-height:1.5}
+}
+</style>
+<script id="v439-day10-handler">
+(()=>{
+ const ui=document.getElementById('ui');if(!ui||document.getElementById('v439Day10'))return;
+ const wrap=document.createElement('div');wrap.id='v439Day10Wrap';
+ wrap.innerHTML='<button type="button" id="v439Day10">🧪 10일 차 테스트 실행</button><div id="v439Day10Note">현재 진행을 DAY 10 테스트 상태로 바꿉니다. 테스트 전에 저장을 권장합니다.</div>';
+ ui.appendChild(wrap);
+ const btn=document.getElementById('v439Day10');
+ btn.addEventListener('click',e=>{
+  e.preventDefault();e.stopPropagation();
+  const original=document.getElementById('devDay10');
+  if(!original){document.getElementById('v439Day10Note').textContent='10일 차 테스트 버튼을 찾지 못했습니다.';return;}
+  original.click();
+  document.getElementById('v439Day10Note').textContent='✓ 10일 차 테스트 실행 요청 완료 · 화면 상단 DAY 표시를 확인하세요.';
+  const menu=document.getElementById('mobileMenu');
+  if(document.body.classList.contains('menu-open')&&menu)menu.click();
+ });
+})();
+</script>
+<style id="v440-reliable-animated-border">
+@media(max-width:700px){
+#characterBar #observeDaeun{position:relative!important;overflow:visible!important;isolation:isolate!important;box-sizing:border-box!important}
+#characterBar #observeDaeun.v440-auto{background:#294942!important;border:5px solid #416d5b!important;border-radius:13px!important;animation:none!important}
+#characterBar #observeDaeun.v440-auto::before,#characterBar #observeDaeun.v440-auto::after{content:none!important;display:none!important}
+#characterBar #observeDaeun .v440-border{display:none;position:absolute;inset:-5px;width:calc(100% + 10px);height:calc(100% + 10px);overflow:visible;pointer-events:none;z-index:3}
+#characterBar #observeDaeun.v440-auto .v440-border{display:block!important}
+#characterBar #observeDaeun .v440-border rect{fill:none;stroke:#baffd7;stroke-width:5;stroke-linecap:round;stroke-dasharray:22 78;animation:v440-border-flow 3s linear infinite}
+#characterBar #observeDaeun.v435-manual{border:5px solid #9ce7b7!important;background:#53a687!important;animation:none!important}
+#characterBar #observeDaeun.v435-manual .v440-border{display:none!important}
+@keyframes v440-border-flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
+#profileViewer,#daeunProfileViewer{padding:clamp(24px,5dvh,46px) 24px!important;align-items:center!important;justify-content:center!important}
+#profileViewer #profileCard,#daeunProfileViewer #profileCard{width:min(84vw,370px)!important;max-width:84vw!important;height:min(78dvh,720px)!important;max-height:78dvh!important;border-radius:16px!important}
+#profileViewer #profileCard .profileArt,#daeunProfileViewer #profileCard .profileArt{height:51dvh!important;max-height:51dvh!important;min-height:0!important}
+}
+@media(prefers-reduced-motion:reduce){#characterBar #observeDaeun .v440-border rect{animation:none!important}}
+</style><style id="v441-state-and-day10">
+@media(max-width:700px){
+ #characterBar #observeDaeun.v441-auto{
+  background:#468b70!important;color:#fff!important;
+  border:5px solid #8fe7b9!important;
+  border-radius:13px!important;
+ }
+ #characterBar #observeDaeun.v441-manual{
+  background:#2b403c!important;color:#fff!important;
+  border:5px solid #80968d!important;
+  border-radius:13px!important;
+ }
+ #characterBar #observeDaeun.v441-auto .v440-border{display:block!important;visibility:visible!important;opacity:1!important}
+ #characterBar #observeDaeun.v441-manual .v440-border{display:none!important}
+ #v441Day10{
+  display:block!important;width:100%;min-height:44px;padding:10px;
+  border:2px solid #9ce7b7;border-radius:10px;background:#356d59;
+  color:white;font-size:14px;font-weight:700;touch-action:manipulation;
+ }
+ #v441Day10Wrap{display:none;position:fixed;left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:99999;
+  background:#1c3935;padding:10px;border-radius:12px;box-shadow:0 5px 20px #0008}
+ body.menu-open #ui[data-pane="settings"]~#v441Day10Wrap{display:block!important}
+ body.menu-open:has(#ui[data-pane="settings"]) #v441Day10Wrap{display:block!important}
+ #v441Day10Status{color:#fff;font-size:11px;margin-top:6px}
+}
+</style>
+<script id="v441-stability">
+(()=>{
+ const bar=document.getElementById('characterBar');
+ const button=document.getElementById('observeDaeun');
+ const sync=()=>{
+  if(!button)return;
+  let automatic=true;
+  try{automatic=!!daeun.auto;}catch(e){automatic=document.getElementById('daeunAuto')?.getAttribute('aria-pressed')==='true';}
+  button.classList.toggle('v441-auto',automatic);
+  button.classList.toggle('v441-manual',!automatic);
+  button.classList.toggle('v440-auto',automatic);
+  button.classList.toggle('v435-manual',!automatic);
+  if(!button.querySelector('.v440-border')){
+   const ns='http://www.w3.org/2000/svg';
+   const svg=document.createElementNS(ns,'svg');svg.setAttribute('class','v440-border');
+   svg.setAttribute('viewBox','0 0 100 40');svg.setAttribute('preserveAspectRatio','none');
+   svg.setAttribute('aria-hidden','true');
+   const rect=document.createElementNS(ns,'rect');
+   for(const [k,v] of Object.entries({x:'2.5',y:'2.5',width:'95',height:'35',rx:'9',pathLength:'100'}))rect.setAttribute(k,v);
+   svg.appendChild(rect);button.appendChild(svg);
+  }
+ };
+ setInterval(sync,200);sync();
+ const wrap=document.createElement('div');wrap.id='v441Day10Wrap';
+ wrap.innerHTML='<button type="button" id="v441Day10">🧪 DAY 10 테스트 실행</button><div id="v441Day10Status">현재 진행 상태를 테스트 상태로 교체합니다.</div>';
+ document.body.appendChild(wrap);
+ const action=wrap.querySelector('button'),status=wrap.querySelector('#v441Day10Status');
+ action.addEventListener('click',(e)=>{
+  e.preventDefault();e.stopPropagation();
+  try{
+   if(typeof devJumpToDay10!=='function')throw Error('DAY 10 함수가 연결되지 않았습니다');
+   devJumpToDay10();
+   const actual=clockParts().day;
+   if(actual!==10)throw Error('날짜 확인 실패: DAY '+actual);
+   status.textContent='✓ DAY 10 적용 완료';
+   const menu=document.getElementById('mobileMenu');
+   if(document.body.classList.contains('menu-open')&&menu)menu.click();
+   sync();
+  }catch(err){status.textContent='실행 실패: '+err.message;console.error('[DAY10]',err);}
+ },{passive:false});
+})();
+</script></body></html>
