@@ -1666,17 +1666,18 @@ function updateSnakes(step){
 // Fish schools periodically surface for observation (2-4 in-game hours between visits).
 // Visibility and skill gains share the same real, timed encounter.
 const FISH_VISIT_MIN=2,FISH_VISIT_SPAN=2;
-let fishVisitEnd=-1,fishNextVisit=0,fishVisitId=0,hinaPondFishVisitEnd=-1;
+// Both ponds use Hina's longer encounter duration and the same shared visit cycle.
+let fishVisitEnd=-1,fishNextVisit=0,fishVisitId=0;
 function fishVisitActive(){return elapsed<fishVisitEnd;}
 function updateFishVisit(){
  const hour=DAY_SECONDS/24;
  if(elapsed>=fishNextVisit){
   fishVisitId++;
-  fishVisitEnd=elapsed+hour*(.8+Math.random()*.45);
-  hinaPondFishVisitEnd=elapsed+(fishVisitEnd-elapsed)*1.5;
+  fishVisitEnd=elapsed+hour*(1.2+Math.random()*.675);
   fishNextVisit=fishVisitEnd+hour*(FISH_VISIT_MIN+Math.random()*FISH_VISIT_SPAN);
  }
- for(const f of fishes)f.g.visible=fishVisitActive()||(f.hinaPond&&elapsed<hinaPondFishVisitEnd);
+ const visible=fishVisitActive();
+ for(const f of fishes)f.g.visible=visible;
 }
 function fishNearby(x,z,radius=8){
  return fishes.some(f=>f.g.visible&&Math.hypot(f.g.position.x-x,f.g.position.z-z)<radius);
