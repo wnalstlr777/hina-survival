@@ -10824,7 +10824,7 @@ class CharacterAnimation {
 characterAnimation=new CharacterAnimation();
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});init();
 window.__hinaClockAuditStart=performance.now();
-window.hinaClockDiagnostic=()=>({elapsed,day,computedDay:clockParts().day,speed,daySeconds:DAY_SECONDS,explicitTest:!!window.__hinaExplicitDayTest});
+window.hinaClockDiagnostic=()=>({elapsed,day,computedDay:clockParts().day,clock:clockParts(),speed,daySeconds:DAY_SECONDS,explicitTest:!!window.__hinaExplicitDayTest});
 window.__hinaExplicitDayTest=false;
 // Fresh sessions must begin on day one; persistence is intentionally disabled.
 if(elapsed!==0 || day!==1){console.warn('[HINA] unexpected initial clock', {elapsed,day});elapsed=0;day=1;}
@@ -12677,13 +12677,20 @@ let lastName='',lastImage='';
 function refresh(){
  const panel=document.getElementById('mobileVitals');if(!panel)return;
  let head=panel.querySelector('.v529-face-head');
- if(!head){head=document.createElement('div');head.className='v529-face-head';head.innerHTML='<div class="v529-title"></div><img class="v529-face" alt="현재 감정 표정" tabindex="0" role="button"><div class="v529-sub"></div>';panel.prepend(head)}
+ if(!head){head=document.createElement('div');head.className='v529-face-head';head.innerHTML='<div class="v529-title"></div><div class="v529-clock" role="timer" aria-label="게임 시간"></div><img class="v529-face" alt="현재 감정 표정" tabindex="0" role="button"><div class="v529-sub"></div>';panel.prepend(head)}
  const daeun=document.body.classList.contains('observing-daeun');
  const source=document.querySelector(daeun?'#daeunPane .hinaProfileHead img':'#vitalsPane .hinaProfileHead img');
  const image=head.querySelector('.v529-face');
  if(source&&image&&!image.src){image.src=source.src;lastImage=source.src} // Emotion controller exclusively owns subsequent image updates.
  const name=(daeun?'다은':'히나')+' · DAY '+String(Math.max(1,window.hinaClockDiagnostic?.().computedDay||1)).padStart(2,'0');
  const title=head.querySelector('.v529-title');if(title&&title.textContent!==name){title.textContent=name;lastName=name}
+ const clock=window.hinaClockDiagnostic?.().clock;
+ const clockLabel=head.querySelector('.v529-clock');
+ if(clock&&clockLabel){
+  const period=clock.h<6||clock.h>=19?'🌙 밤':clock.h<12?'🌅 오전':clock.h<16?'☀️ 오후':'🌇 저녁';
+  const text=String(clock.h).padStart(2,'0')+':'+String(clock.m).padStart(2,'0')+' '+period;
+  if(clockLabel.textContent!==text)clockLabel.textContent=text;
+ }
 }
 function init(){refresh();setInterval(refresh,1000)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
@@ -12890,7 +12897,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #v5213HudWrap #ui{padding-top:7px!important}
 </style>
 <script id="v5217PortraitOrderFix">(()=>{
-function reorder(){const h=document.querySelector('#mobileVitals .v529-face-head');if(!h)return;const t=h.querySelector('.v529-title'),i=h.querySelector('.v529-face'),n=h.querySelector('.v529-sub');if(t&&i&&n&&(h.firstElementChild!==t||t.nextElementSibling!==i||i.nextElementSibling!==n)){h.append(t,i,n)}}
+function reorder(){const h=document.querySelector('#mobileVitals .v529-face-head');if(!h)return;const t=h.querySelector('.v529-title'),c=h.querySelector('.v529-clock'),i=h.querySelector('.v529-face'),n=h.querySelector('.v529-sub');if(t&&c&&i&&n&&(h.firstElementChild!==t||t.nextElementSibling!==c||c.nextElementSibling!==i||i.nextElementSibling!==n)){h.append(t,c,i,n)}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',reorder,{once:true});else reorder();
 })();</script>
 
@@ -13129,6 +13136,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  html body #mobileVitals .v529-title{
   font-size:10px!important;line-height:12px!important;
   margin:0 0 2px!important;letter-spacing:-.2px!important;
+ }
+ html body #mobileVitals .v529-clock{
+  order:0!important;font-size:10px;line-height:14px;margin:0 0 3px;
+  color:#eaf4f1;white-space:nowrap;font-variant-numeric:tabular-nums;
  }
  html body #mobileVitals .v529-face{
   width:80px!important;height:80px!important;min-width:80px!important;
