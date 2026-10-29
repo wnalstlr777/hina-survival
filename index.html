@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>HINA SURVIVAL v5.2.84</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
+<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>HINA SURVIVAL v5.2.87</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media (max-width:700px), (pointer:coarse){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media (max-width:700px), (pointer:coarse){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}} 
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileCategories{display:none}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
  #ui{display:none;position:fixed;z-index:11;top:61px;left:auto;right:8px;width:min(285px,calc(100vw - 38px));max-height:calc(100dvh - 160px);overflow:auto;padding:12px;background:#101d24f2}
  body.menu-open #ui{display:block}
@@ -31,7 +31,7 @@
 #ambientBubble{position:fixed;pointer-events:none;z-index:3;opacity:0;transition:opacity .5s;transform:translate(-50%,-100%);padding:6px 11px;border-radius:15px;background:#172a30e8;color:#d3e7db;border:1px solid #668078;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 3px 12px #0007}
 #ambientBubble.show{opacity:1}
 @keyframes sleepFloat{0%,100%{margin-top:0}50%{margin-top:-6px}}
-#collisionPanel{display:none;position:fixed;z-index:20;right:12px;top:105px;max-width:300px;padding:12px;background:#10252bea;border:1px solid #86bdc3;border-radius:10px;font-size:12px;line-height:1.7;pointer-events:none}#collisionPanel .ok{color:#7ef0a4}#collisionPanel .bad{color:#ff9e8c}@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#collisionPanel{max-width:205px;font-size:11px}}
+#collisionPanel{display:none;position:fixed;z-index:20;right:12px;top:105px;max-width:300px;padding:12px;background:#10252bea;border:1px solid #86bdc3;border-radius:10px;font-size:12px;line-height:1.7;pointer-events:none}#collisionPanel .ok{color:#7ef0a4}#collisionPanel .bad{color:#ff9e8c}@media (max-width:700px), (pointer:coarse){#collisionPanel{max-width:205px;font-size:11px}}
 
 #memoryPanel{margin-top:10px}#memoryPanel summary{cursor:pointer;font-weight:750}
 #memoryContent{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;max-height:min(52dvh,480px);overflow-y:auto;overscroll-behavior:contain;padding:4px 6px 8px 2px;scrollbar-width:thin;scrollbar-color:#7aa69d #1c3036}#memoryContent::-webkit-scrollbar{width:7px}#memoryContent::-webkit-scrollbar-thumb{background:#7aa69d;border-radius:8px}#memoryContent::-webkit-scrollbar-track{background:#1c3036;border-radius:8px}
@@ -42,7 +42,7 @@
 #memoryViewer.open{display:flex}#memoryCard{width:min(800px,95vw);max-height:92dvh;overflow:auto;background:#17272d;border:1px solid #679097;border-radius:16px;padding:14px;box-sizing:border-box}
 #memoryCard img{display:block;width:100%;max-height:58dvh;object-fit:contain;border-radius:10px;background:#0d171c}
 #memoryCard p{line-height:1.6;white-space:pre-line}#memoryClose{float:right}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#memoryContent{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px), (pointer:coarse){#memoryContent{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* v8.8: skill meters, exploration rings, distraction-free view */
 #skillContent{font-size:12px;line-height:1.5!important}
@@ -52,8 +52,8 @@
 #hideAllUI{position:fixed;z-index:60;right:12px;bottom:82px;background:#264e54ed;border:1px solid #7ba9a5;color:#fff;padding:9px 12px;border-radius:12px;font-weight:700;box-shadow:0 3px 14px #0006}
 body.cinematic-mode #ui,body.cinematic-mode #badge,body.cinematic-mode #controls,body.cinematic-mode #mobileMenu,body.cinematic-mode #collisionPanel,body.cinematic-mode #memoryToast,body.cinematic-mode #perfHud,body.cinematic-mode #runtimeError{display:none!important}
 body.cinematic-mode #hideAllUI{opacity:.28}body.cinematic-mode #hideAllUI:hover,body.cinematic-mode #hideAllUI:focus{opacity:1}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#hideAllUI{bottom:calc(72px + env(safe-area-inset-bottom));right:8px;font-size:12px;padding:9px 10px}body.cinematic-mode #hideAllUI{bottom:calc(10px + env(safe-area-inset-bottom))}}
-.hinaProfileHead{display:flex;align-items:center;gap:10px;margin-bottom:8px}.hinaProfileHead img{width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:50% 33%;border:2px solid #b3c7a8;flex-shrink:0}.hinaProfileHead h2{margin:0}.hinaProfileSub{font-size:11px;color:#b7d5ca}.memoryNav{display:flex;justify-content:space-between;gap:12px;margin-top:10px}.memoryNav button{flex:1;padding:10px 12px;border-radius:9px;cursor:pointer}#memoryCard img{max-height:62dvh}@media (max-width:700px), (pointer:coarse) and (max-width:1366px){.hinaProfileHead img{width:44px;height:44px}}
+@media (max-width:700px), (pointer:coarse){#hideAllUI{bottom:calc(72px + env(safe-area-inset-bottom));right:8px;font-size:12px;padding:9px 10px}body.cinematic-mode #hideAllUI{bottom:calc(10px + env(safe-area-inset-bottom))}}
+.hinaProfileHead{display:flex;align-items:center;gap:10px;margin-bottom:8px}.hinaProfileHead img{width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:50% 33%;border:2px solid #b3c7a8;flex-shrink:0}.hinaProfileHead h2{margin:0}.hinaProfileSub{font-size:11px;color:#b7d5ca}.memoryNav{display:flex;justify-content:space-between;gap:12px;margin-top:10px}.memoryNav button{flex:1;padding:10px 12px;border-radius:9px;cursor:pointer}#memoryCard img{max-height:62dvh}@media (max-width:700px), (pointer:coarse){.hinaProfileHead img{width:44px;height:44px}}
 
 /* v12.2 profile portrait lightbox */
 .hinaProfileHead .profilePortrait{border:0;background:transparent;padding:0;cursor:zoom-in;flex-shrink:0;border-radius:50%}.hinaProfileHead .profilePortrait img{display:block}.hinaProfileHead .profilePortrait:focus-visible{outline:3px solid #a6d8d0;outline-offset:3px}
@@ -92,14 +92,14 @@ body.cinematic-mode #hideAllUI{opacity:.28}body.cinematic-mode #hideAllUI:hover,
  
 /* v26.7: always-visible survival day on compact screens */
 #mobileSurvivalDay{display:none;font-size:11px;font-weight:850;white-space:nowrap;color:#f8e7b0;margin-left:6px;letter-spacing:.2px}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#mobileSurvivalDay{display:inline-block}#badge{max-width:calc(100vw - 106px);white-space:nowrap}#dayNight{margin-left:3px;padding:4px 6px}}
+@media (max-width:700px), (pointer:coarse){#mobileSurvivalDay{display:inline-block}#badge{max-width:calc(100vw - 106px);white-space:nowrap}#dayNight{margin-left:3px;padding:4px 6px}}
 /* Floating skill feedback visible on small touch screens. */
 .skillGainFloat{position:fixed;z-index:90;left:50%;transform:translate(-50%,0);pointer-events:none;white-space:nowrap;font-size:clamp(14px,3.8vw,19px);font-weight:850;color:#e4ffd7;text-shadow:0 2px 7px #071b1e,0 0 12px #163e2e;padding:5px 11px;border-radius:12px;background:linear-gradient(90deg,#133c32d9,#1e5242c4);animation:skillGainRise 1.3s ease-out forwards}
 @keyframes skillGainRise{0%{opacity:0;transform:translate(-50%,13px) scale(.94)}15%{opacity:1;transform:translate(-50%,0) scale(1)}75%{opacity:.95}100%{opacity:0;transform:translate(-50%,-66px) scale(1.03)}}
 @media(prefers-reduced-motion:reduce){.skillGainFloat{animation-duration:.4s}}
 
 /* v28.64: Mobile header reflow; cinematic toggle is the centered top row. */
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #hideAllUI{top:calc(7px + env(safe-area-inset-top));bottom:auto!important;left:50%;right:auto;transform:translateX(-50%);z-index:65;display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:calc(100vw - 160px);height:36px!important;min-height:0!important;max-height:36px!important;box-sizing:border-box;white-space:nowrap;padding:0 12px;font-size:12px;line-height:1}
  #badge{top:calc(53px + env(safe-area-inset-top))}
  #mobileMenu{top:calc(53px + env(safe-area-inset-top))}
@@ -109,7 +109,7 @@ body.cinematic-mode #hideAllUI{opacity:.28}body.cinematic-mode #hideAllUI:hover,
 }
 
 /* v28.67: Mobile menu tabs must be centered and clear the floating close button. */
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  body.menu-open #ui{padding-top:49px;box-sizing:border-box;}
  #mobileCategories{grid-template-columns:repeat(3,minmax(0,1fr));width:100%;align-items:stretch;}
  #mobileCategories button{display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;line-height:1.2;min-height:33px;padding:7px 2px;box-sizing:border-box;}
@@ -119,7 +119,7 @@ body.cinematic-mode #hideAllUI{opacity:.28}body.cinematic-mode #hideAllUI:hover,
 /* v5.2.3 cinematic mode: one consistent bottom-left restore control. */
 #hideAllUI,body.cinematic-mode #hideAllUI{position:fixed!important;left:8px!important;right:auto!important;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;z-index:2147483000!important;opacity:1!important;display:block!important;visibility:visible!important;pointer-events:auto!important}
 body.cinematic-mode [data-hina-cinema-hide="1"]{display:none!important}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#hideAllUI,body.cinematic-mode #hideAllUI{left:8px!important;right:auto!important;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important}}
+@media (max-width:700px), (pointer:coarse){#hideAllUI,body.cinematic-mode #hideAllUI{left:8px!important;right:auto!important;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important}}
 </style><style>
 /* v4.04: centered mobile portrait, independently scrollable character details */
 @media (max-width:600px){
@@ -197,7 +197,7 @@ body.cinematic-mode [data-hina-cinema-hide="1"]{display:none!important}
 @media(prefers-reduced-motion:reduce){#characterBar .character-orbit-light{animation:none!important}}
 </style><style id="v4998-mobile-controls">
 #v4998Dock{display:none}
-@media(max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media(max-width:700px), (pointer:coarse){
  #v4998Dock{display:flex;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 9px);transform:translateX(-50%);z-index:45;gap:5px;padding:3px;border-radius:9px;background:rgba(26,33,37,.48);backdrop-filter:blur(7px);pointer-events:auto}
  #v4998Dock button{appearance:none;box-sizing:border-box;min-width:72px;min-height:28px;border-radius:7px;color:#fff;padding:5px 9px;white-space:nowrap;font:600 11px/1.1 sans-serif;touch-action:manipulation;text-shadow:0 1px 1px #0002;box-shadow:none}
  #v4998Mode{background:#779B8E;border:1px solid #A0BDB2}
@@ -210,7 +210,7 @@ body.cinematic-mode [data-hina-cinema-hide="1"]{display:none!important}
 .v502-progress-label{display:block;font-size:11px;margin:6px 0 4px;color:#b9e8bb}
 .v502-progress-track{height:7px;background:#344b3d;border-radius:8px;overflow:hidden}
 .v502-progress-fill{height:100%;width:0;background:#a3d0ae;border-radius:8px;transition:width .09s linear}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #v492Craft,#v498Skills{
   width:min(240px,calc(100vw - 100px))!important;
   min-width:0!important;
@@ -248,7 +248,7 @@ body.cinematic-mode [data-hina-cinema-hide="1"]{display:none!important}
 #v504CraftResult{position:fixed;z-index:2147483000;top:18%;left:50%;transform:translate(-50%,-15px) scale(.94);padding:12px 22px;background:rgba(19,42,34,.94);border:2px solid #c9e6b9;color:#fff7da;border-radius:22px;font-size:22px;font-weight:800;box-shadow:0 6px 30px #000a;opacity:0;pointer-events:none;transition:opacity .2s,transform .25s;text-align:center;max-width:85vw}
 #v504CraftResult.v504Show{opacity:1;transform:translate(-50%,0) scale(1)}
 #fishStoreButton{display:none!important;pointer-events:none!important}#v504MeditationButton{position:fixed;z-index:1250;left:50%;bottom:105px;transform:translateX(-50%);display:none;background:#324e4b;color:#fff;border:1px solid #a4c8ad;border-radius:18px;padding:10px 17px;font-weight:700;box-shadow:0 3px 14px #0008;cursor:pointer}
-@media (max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media (max-width:700px),(pointer:coarse){
  #v504CraftResult{font-size:19px;top:16%}
  #v504MeditationButton{bottom:100px;font-size:12px;padding:8px 12px}
  #v493CraftToggle{top:45%!important}
@@ -277,7 +277,7 @@ body.cinematic-mode #v517ObjectiveUI,body.ui-hidden #v517ObjectiveUI,body.hide-u
 .v521MapHint{font-size:11px;text-align:center;color:#aac4b8;margin-top:7px}
 #extraControls.v521ShowDev{display:flex!important;position:fixed;right:16px;top:280px;z-index:87;flex-wrap:wrap;max-width:350px;background:#182b2aee;padding:10px;border-radius:10px}#v521MobileMap{display:none}
 @media(min-width:701px){#v517ObjectiveUI{top:62px!important}#v521PcMenu{display:block}#ui #exploration{display:none}}
-@media(max-width:700px){#v521PcMenu,#v521Menu{display:none!important}#v521MobileMap{display:inline-flex}#v517ObjectiveUI{top:52px}}
+@media(max-width:700px),(pointer:coarse){#v521PcMenu,#v521Menu{display:none!important}#v521MobileMap{display:inline-flex}#v517ObjectiveUI{top:52px}}
 </style><style id="v522Layout">
 #v521PcMenu{top:10px!important;right:12px!important}#badge{top:58px!important;right:12px!important}
 #v521Menu{top:53px!important;max-height:78vh;overflow:auto}
@@ -309,7 +309,7 @@ body.cinematic-mode #v517ObjectiveUI,body.ui-hidden #v517ObjectiveUI,body.hide-u
 #v521Menu{right:12px!important;top:54px!important}
 #v523Bottom button:focus-visible{outline:3px solid #9ce9c0!important}
 }
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){#v523Bottom{display:none!important}}
+@media(max-width:700px),(pointer:coarse){#v523Bottom{display:none!important}}
 </style><style>@media(min-width:701px) and (pointer:fine){#v523PcPortrait{cursor:pointer}#v523PcPortrait:hover{outline:2px solid #9ce9c0}#v523DetailBackdrop.open{display:flex!important}}</style><style id="v523GoalBlueHighlight">
 #v517ObjectiveUI{background:linear-gradient(135deg,rgba(24,76,101,.93),rgba(28,91,111,.9))!important;border:2px solid rgba(149,224,242,.9)!important;box-shadow:0 5px 22px rgba(0,26,48,.4),inset 0 1px 0 rgba(255,255,255,.22)!important;padding:11px 22px!important;border-radius:14px!important;min-width:240px!important}
 #v517ObjectiveUI .v517Message{font-size:17px!important;font-weight:850!important;letter-spacing:.1px!important;text-shadow:0 2px 5px rgba(0,0,0,.45)!important}
@@ -414,7 +414,7 @@ body.cinematic-mode #v517ObjectiveUI,body.ui-hidden #v517ObjectiveUI,body.hide-u
     box-sizing:border-box!important; margin:0!important; }
   #v5213HudWrap #v523PcPortrait { width:100%!important; box-sizing:border-box!important; }
 }
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
   #mobileVitals { width:190px!important; max-width:calc(100vw - 12px)!important;
     box-sizing:border-box!important; }
   body.menu-open #ui { display:block!important; position:fixed!important;
@@ -432,7 +432,7 @@ body.cinematic-mode #v517ObjectiveUI,body.ui-hidden #v517ObjectiveUI,body.hide-u
 
 
 <style id="v533CompactEmotionHud">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #mobileVitals{width:175px!important;min-width:0!important;max-width:calc(100vw - 12px)!important;box-sizing:border-box!important;padding:9px 7px 11px!important;}
  #mobileVitals .v529-face{width:139px!important;height:139px!important;min-width:139px!important;flex-basis:139px!important;max-width:100%!important;}
  #mobileVitals .v529-title{font-size:14px!important;line-height:19px!important;margin-bottom:3px!important;white-space:nowrap!important;}
@@ -444,7 +444,7 @@ body.cinematic-mode #v517ObjectiveUI,body.ui-hidden #v517ObjectiveUI,body.hide-u
 </style>
 
 <style id="v5235ReadableStats">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
  #mobileVitals>.mv-stats>.mv-row {
    grid-template-columns:38px minmax(0,1fr) 21px!important;
    gap:3px!important;
@@ -490,7 +490,7 @@ body.cinematic-mode #v517ObjectiveUI,body.ui-hidden #v517ObjectiveUI,body.hide-u
  }
 }
 /* Apply the same soft frosted-glass treatment to both responsive HUDs. */
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #mobileVitals{
   background:rgba(0,0,0,.30)!important;
   -webkit-backdrop-filter:blur(9px) saturate(1.12)!important;
@@ -499,7 +499,7 @@ body.cinematic-mode #v517ObjectiveUI,body.ui-hidden #v517ObjectiveUI,body.hide-u
 }
 </style>
 <style id="v5240MobileHudScale">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #mobileVitals{
   transform:scale(0.265)!important;
   transform-origin:top left!important;
@@ -524,8 +524,8 @@ let characterAnimation=null;
 const bearPass={x:-117,halfWidth:3.8,minZ:17.5,maxZ:26.5};
 const DAEUN_ZONE=Object.freeze({center:{x:-215,z:25},spawn:{x:-211,z:37},cave:{x:-228,z:11},pond:{x:-222,z:29},radius:37});
 const WORLD_BOUNDS=Object.freeze({minX:-286,maxX:112,minZ:-95,maxZ:99});
-const isTabletTouch=matchMedia('(pointer:coarse) and (max-width:1366px)').matches;
-const mobileUILayout=()=>innerWidth<=700||matchMedia('(pointer:coarse) and (max-width:1366px)').matches;
+const isTabletTouch=matchMedia('(pointer:coarse)').matches;
+const mobileUILayout=()=>innerWidth<=700||matchMedia('(pointer:coarse)').matches;
 const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||isTabletTouch||matchMedia('(max-width:700px)').matches;
 let highQuality=true;
 let mobileTargetFPS=20;let lastRenderAt=0;let ultraLowPower=false;let nextUiFrame=0;
@@ -1435,37 +1435,7 @@ for(let i=0;i<95;i++){
  for(const [tx,tz,w,d,th] of terraces)if(Math.abs(x-tx)<w*.45&&Math.abs(z-tz)<d*.45)h=Math.max(h,th+.16);
  bush(x,h,z,.38+rand()*.85);
 }
-// v5.2.69 — ONE diagnostic flower only. All prior instanced flower clusters removed.
-// Independent, ordinary Mesh geometry to isolate visibility from InstancedMesh problems.
-{
- const flowerX=caveX+2.0, flowerZ=caveZ+8.5;
- const flowerY=groundHeightAt(flowerX,flowerZ,0);
- const flower=new THREE.Group();
- flower.name='HINA_SINGLE_CAVE_TEST_FLOWER';
- flower.position.set(flowerX,Number.isFinite(flowerY)?flowerY+.22:.22,flowerZ);
- const green=new THREE.MeshBasicMaterial({color:0x20b843,side:THREE.DoubleSide});
- const pink=new THREE.MeshBasicMaterial({color:0xff36ae,side:THREE.DoubleSide});
- const yellow=new THREE.MeshBasicMaterial({color:0xffdf18,side:THREE.DoubleSide});
- const stem=new THREE.Mesh(new THREE.CylinderGeometry(.055,.075,1.1,6),green);
- stem.position.y=.55;flower.add(stem);
- const leafGeo=new THREE.SphereGeometry(.23,8,6);
- for(const side of [-1,1]){
-  const leaf=new THREE.Mesh(leafGeo,green);
-  leaf.position.set(side*.20,.40,0);leaf.scale.set(1,.32,.42);flower.add(leaf);
- }
- const petalGeo=new THREE.SphereGeometry(.24,10,8);
- for(let i=0;i<5;i++){
-  const angle=i*Math.PI*2/5;
-  const petal=new THREE.Mesh(petalGeo,pink);
-  petal.position.set(Math.cos(angle)*.29,1.20+Math.sin(angle)*.29,0);
-  petal.scale.set(1,1,.42);flower.add(petal);
- }
- const center=new THREE.Mesh(new THREE.SphereGeometry(.16,10,8),yellow);
- center.position.set(0,1.2,.12);flower.add(center);
- flower.traverse(obj=>{if(obj.isMesh){obj.frustumCulled=false;obj.castShadow=false;obj.receiveShadow=false;}});
- scene.add(flower);
- console.info('[HINA] Single cave flower:',flower.name,'at',flower.position.toArray());
-}
+// v5.2.85: Removed the single diagnostic flower in front of Hina cave.
 // v5.2.74 — Three-color rooted reactive flower clusters across the island.
 const daeunFlowerBends=[];
 const flowerBeeFlights=[];
@@ -1501,7 +1471,7 @@ function makeFlowerButterfly(patch){
   wings.push({hinge,side});
  }
  butterfly.userData.wings=wings;butterfly.scale.setScalar(.9);
- butterfly.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;o.frustumCulled=false;}});
+ butterfly.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;o.frustumCulled=true;}});
  return butterfly;
 }
 {
@@ -1517,14 +1487,16 @@ function makeFlowerButterfly(patch){
  // Preserve six Daeun cave beds and add deterministic, separated beds island-wide.
  // A single flower factory and shared geometry/materials prevent duplicate legacy systems.
  const patches=[
-  ...[[-7.4,7.5],[-9.3,10.0],[-6.4,12.0],[7.4,7.5],[9.3,10.0],[6.4,12.0]]
-    .map(([dx,dz],i)=>[DAEUN_ZONE.cave.x+dx,DAEUN_ZONE.cave.z+dz,Math.floor(i/2)]),
+  ...[[-9.3,10.0],[-6.4,12.0],[7.4,7.5],[9.3,10.0],[6.4,12.0]]
+    .map(([dx,dz],i)=>[DAEUN_ZONE.cave.x+dx,DAEUN_ZONE.cave.z+dz,Math.floor((i+1)/2)])
+    .filter((_,i)=>i!==3), // v5.2.87: remove ivory flower cluster just inside Daeun cave, right of character
   [-21,-10,0],[-17,-4,0],[-14,11,1],[-20,16,2],
   [-6,18,1],[4,15,2],[13,12,0],[20,5,1],
   [16,-7,2],[10,-16,0],[-1,-21,1],[-17,-19,2],
   [24,-10,1],[-25,3,0],[2,23,2],[23,18,0],
   [-28,-12,1],[27,-2,2]
  ];
+ const rootedBaseGeo=new THREE.CylinderGeometry(.08,.095,.13,6);
  let planted=0,activePatches=0;
  for(let patch=0;patch<patches.length;patch++){
   const [cx,cz,colorIndex]=patches[patch];
@@ -1546,7 +1518,7 @@ function makeFlowerButterfly(patch){
    flower.position.set(x,y+.08,z);
    flower.scale.setScalar(.63+(i%4)*.09);
    // The root stays planted. Upper stem and flower head rotate around ground-level pivot.
-   const rootedBase=new THREE.Mesh(new THREE.CylinderGeometry(.08,.095,.13,6),green);
+   const rootedBase=new THREE.Mesh(rootedBaseGeo,green);
    rootedBase.position.y=.065;flower.add(rootedBase);
    const bendPivot=new THREE.Group();bendPivot.position.y=.12;flower.add(bendPivot);
    const stem=new THREE.Mesh(stemGeo,green);stem.position.y=.43;bendPivot.add(stem);
@@ -1563,7 +1535,7 @@ function makeFlowerButterfly(patch){
    const center=new THREE.Mesh(centerGeo,yellow);
    center.position.set(0,1.11,0);bendPivot.add(center);
    flower.rotation.y=angle;
-   flower.traverse(o=>{if(o.isMesh){o.frustumCulled=false;o.castShadow=false;o.receiveShadow=false;}});
+   flower.traverse(o=>{if(o.isMesh){o.frustumCulled=true;o.castShadow=false;o.receiveShadow=false;}});
    root.add(flower);
    const entry={flower,pivot:bendPivot,x,z,localX:x-cx,localZ:z-cz,phase:patch*.8+i*.67,vx:0,vz:0};
    patchFlowers.push(entry);daeunFlowerBends.push(entry);
@@ -1733,7 +1705,7 @@ function updateCameraFlowerPatches(){
    insect.active=valid;insect.bee.visible=valid;
    insect.cx=cx;insect.cz=cz;
    insect.baseY=terrainTopAt(cx,cz,0)+(insect.kind==='butterfly'?1.35:1.15);
-   insect.scatterAmount=0;insect.scared=false;insect.lastScatter=-999;
+   insect.scatterAmount=0;insect.scatterX=0;insect.scatterY=0;insect.scatterZ=0;insect.prevSeconds=undefined;insect.scared=false;insect.lastScatter=-999;
   }
  }
  // Unassigned pooled beds are hidden until a safe distant cell is available.
@@ -1780,7 +1752,7 @@ function updateFlowerBees(t){
   }else if(f.scared&&nearestDist>7.5){f.scared=false;}
   const dt=Math.min(.05,Math.max(0,seconds-(f.prevSeconds??seconds)));
   f.prevSeconds=seconds;
-  const rate=f.scared?(f.kind==='butterfly'?6:10):(f.kind==='butterfly'?1.2:2.4);
+  const rate=f.scared?(f.kind==='butterfly'?3:5):(f.kind==='butterfly'?1.2:2.4); // v5.2.85: half-speed escape
   f.scatterAmount+=(Number(f.scared)-f.scatterAmount)*(1-Math.exp(-rate*dt));
   f.bee.position.set(homeX+f.scatterX*f.scatterAmount,
    homeY+f.scatterY*f.scatterAmount,
@@ -1796,11 +1768,13 @@ function updateFlowerBees(t){
 function updateDaeunFlowerBends(dt,t){
  if(!daeunFlowerBends.length)return;
  const characters=[hana?.position,daeun?.mesh?.position].filter(Boolean);
+ const k=Math.min(.05,Math.max(0,dt)),damping=Math.exp(-9*k);
  for(const f of daeunFlowerBends){
   let tx=0,tz=0;
   for(const p of characters){
-   const dx=f.x-p.x,dz=f.z-p.z,dist=Math.hypot(dx,dz);
-   if(dist>0.001&&dist<2.8){
+   const dx=f.x-p.x,dz=f.z-p.z,distSq=dx*dx+dz*dz;
+   if(distSq>0.000001&&distSq<7.84){
+    const dist=Math.sqrt(distSq);
     const influence=(1-dist/2.8);const push=1.075*influence*influence/dist; // v5.2.73: character-driven bend 2.5x stronger
     tx+=dx*push;tz+=dz*push;
    }
@@ -1808,9 +1782,8 @@ function updateDaeunFlowerBends(dt,t){
   tx+=Math.sin(t*.0009+f.phase)*.016;
   tz+=Math.cos(t*.0008+f.phase)*.016;
   // Damped spring: bend the upper stem and head, never translate the roots.
-  const k=Math.min(.05,Math.max(0,dt));
-  f.vx+=(tx-f.pivot.rotation.z)*22*k;f.vx*=Math.exp(-9*k);
-  f.vz+=(tz-f.pivot.rotation.x)*22*k;f.vz*=Math.exp(-9*k);
+  f.vx+=(tx-f.pivot.rotation.z)*22*k;f.vx*=damping;
+  f.vz+=(tz-f.pivot.rotation.x)*22*k;f.vz*=damping;
   f.pivot.rotation.z+=f.vx*k;
   f.pivot.rotation.x+=f.vz*k;
  }
@@ -3460,13 +3433,13 @@ petBenefitStyle.textContent=`
 #petRabbitHud:hover,#petRabbitHud:focus-visible{background:#35594e;outline:2px solid #d5e6cb;outline-offset:2px}
 #petRabbitHud .petTooltip{display:none;position:absolute;top:calc(100% + 9px);right:0;left:auto;width:max-content;max-width:min(250px,80vw);padding:9px 11px;border:2px solid #cba7ff;border-radius:12px;background:rgba(36,25,55,.96);color:#f0dcff;font-size:12px;font-weight:700;line-height:1.6;text-align:left;white-space:normal;box-shadow:0 4px 15px #0009;pointer-events:none}
 #petRabbitHud:hover .petTooltip,#petRabbitHud:focus-visible .petTooltip{display:block}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#petRabbitHud{left:auto;right:9px;top:60px;width:37px;height:37px;font-size:22px}#petRabbitHud .petTooltip{left:auto;right:0}}
+@media (max-width:700px), (pointer:coarse){#petRabbitHud{left:auto;right:9px;top:60px;width:37px;height:37px;font-size:22px}#petRabbitHud .petTooltip{left:auto;right:0}}
 `;
 petBenefitStyle.textContent+=`
 #willShieldHud{position:fixed;right:16px;top:198px;z-index:49;width:43px;height:43px;border:2px solid #e7a5bc;border-radius:50%;background:#203a36;color:white;font-size:23px;display:none;align-items:center;justify-content:center;cursor:help;box-shadow:0 3px 12px #0008}
 #willShieldHud .petTooltip{display:none;position:absolute;top:calc(100% + 9px);right:0;width:max-content;max-width:min(270px,80vw);padding:10px 12px;background:#2d2434f5;color:#fff1f6;border:1px solid #e7a5bc;border-radius:11px;text-align:left;font-size:12px;line-height:1.65;white-space:normal;box-shadow:0 4px 16px #0009;pointer-events:none}
 #willShieldHud:hover .petTooltip,#willShieldHud:focus-visible .petTooltip,#willShieldHud.tip-open .petTooltip{display:block}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#willShieldHud{width:37px;height:37px;font-size:21px;right:9px}}
+@media (max-width:700px), (pointer:coarse){#willShieldHud{width:37px;height:37px;font-size:21px;right:9px}}
 #memoryClose,#profileClose{display:none!important}
 `;
 document.head.appendChild(petBenefitStyle);
@@ -6035,7 +6008,7 @@ function updateHinaWorldUIAndLighting(step,dt){
  weatherUpdate(step);updatePanningCloudShadows(step,hour);updateLightning(step);updateSound(dt,(hour>=20||hour<4));updateBonfireAmbience(dt);updateRainAudio(dt);updateNightAudio(dt,(hour>=20||hour<4));updateCampfire(elapsed);
  // WeatherUpdate modifies sunlight for rain and wet ground; keep its existing behavior.
  if(elapsed>=uiNextUpdate){uiNextUpdate=elapsed+.3;
- updateStableStatBars($('stats'),{체력:stats.energy,갈증:stats.thirst,허기:stats.hunger,의지력:stats.will,불유지:fireEverLit&&fireSuccess?Math.min(100,fireKnowledge):0},true);
+ // Selected-survivor HUD is updated by refreshCharacterUI().
  const hinaSupplies=`🏕 동굴 생선 ${storedFish.length}/${MAX_CAVE_FISH} · 휴대 ${carriedFish.length}/${MAX_CARRY_FISH} · 휴대 열매 ${carriedBerries}/${berryCarryCapacity()} · 동굴 열매 ${caveBerries}/${MAX_CAVE_BERRIES} · ${fishSpear?'작살 완성':'맨손 포획'} · 💧 빗물 ${rainWater}/4 · ${leafBed?'🛏️ 침상 완성':'침상 미제작'}${petRabbit?' · 🐇 펫 친밀도 '+Math.round(petBond):''}`;
  // PC HUD: do not create duplicate inventory/supply summary. Preserve underlying game state.
  let supplyRow=$('hinaSupplies');if(supplyRow) supplyRow.remove();
@@ -8829,14 +8802,14 @@ const dualStyle=document.createElement('style');dualStyle.textContent=`
 #daeunJoystick.active #daeunStickBase{opacity:1}#daeunStickBase span{position:absolute;font-size:11px;color:#e2fff0a6;pointer-events:none}#daeunStickBase .joy-n{top:6px;left:calc(50% - 5px)}#daeunStickBase .joy-s{bottom:6px;left:calc(50% - 5px)}#daeunStickBase .joy-w{left:7px;top:calc(50% - 7px)}#daeunStickBase .joy-e{right:7px;top:calc(50% - 7px)}#daeunStickKnob{position:absolute;left:0;top:0;width:53px;height:53px;border-radius:50%;opacity:0;transition:opacity .12s ease;background:rgba(206,255,231,.75);border:2px solid #e5fff2;transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 2px 8px #0004}
 @media(hover:hover) and (pointer:fine){#daeunJoystick{display:none!important}}
 @media(hover:none),(pointer:coarse){#daeunJoystick{display:block}}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#daeunJoystick{left:0;bottom:0;width:min(33vw,165px);height:min(29vh,190px)}}
+@media (max-width:700px), (pointer:coarse){#daeunJoystick{left:0;bottom:0;width:min(33vw,165px);height:min(29vh,190px)}}
 #controls{width:max-content;max-width:calc(100vw - 36px);flex-wrap:wrap;justify-content:center}#extraControls{flex-wrap:wrap;justify-content:center}#controls button{white-space:nowrap;flex-shrink:0}#extraControls>span{display:flex;align-items:center;gap:5px;flex-wrap:wrap}#characterBar{position:fixed;z-index:22;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;max-width:94vw;padding:7px;background:#142b30ed;border:1px solid #66877d;border-radius:12px;font-size:12px;box-sizing:border-box}#characterBar button{white-space:nowrap;padding:7px 10px}#characterBar button[aria-pressed=true]{outline:2px solid #b2eed3;background:#477b68}#daeunPane{display:none}.observing-daeun #daeunPane{display:block}.observing-daeun #vitalsPane,.observing-daeun #skillPanel,.observing-daeun #mindPanel,.observing-daeun #actionLogPanel,.observing-daeun #memoryPanel{display:none!important}.cinematic-mode #characterBar{display:none!important}#daeunLog{max-height:125px;overflow:auto;color:#b5d1c7;font-size:12px;line-height:1.8}
 @media(min-width:701px) and (max-width:1000px){#characterBar{top:auto;bottom:106px}}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#hideAllUI{bottom:118px}.observing-daeun #mobileCategories button[data-pane=skills],.observing-daeun #mobileCategories button[data-pane=mind],.observing-daeun #mobileCategories button[data-pane=memories]{display:none}.menu-open.observing-daeun #ui[data-pane=settings] #daeunPane{display:none}body.menu-open:has(#ui[data-pane=settings]) #characterBar{display:none}#controls{width:max-content}#characterBar{top:auto;bottom:66px;width:max-content;max-width:calc(100vw - 12px);gap:4px;padding:5px;font-size:10px}#characterBar button{padding:6px 7px;font-size:11px}#daeunPane h2{font-size:16px}}
+@media (max-width:700px), (pointer:coarse){#hideAllUI{bottom:118px}.observing-daeun #mobileCategories button[data-pane=skills],.observing-daeun #mobileCategories button[data-pane=mind],.observing-daeun #mobileCategories button[data-pane=memories]{display:none}.menu-open.observing-daeun #ui[data-pane=settings] #daeunPane{display:none}body.menu-open:has(#ui[data-pane=settings]) #characterBar{display:none}#controls{width:max-content}#characterBar{top:auto;bottom:66px;width:max-content;max-width:calc(100vw - 12px);gap:4px;padding:5px;font-size:10px}#characterBar button{padding:6px 7px;font-size:11px}#daeunPane h2{font-size:16px}}
 `;
 document.head.appendChild(dualStyle);
 const daeunSkillsMobileStyle=document.createElement('style');daeunSkillsMobileStyle.textContent=`
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  .observing-daeun #mobileCategories button[data-pane=skills]{display:inline-flex!important}
  body.menu-open.observing-daeun #ui[data-pane=skills] #daeunPane{display:block!important}
  body.menu-open.observing-daeun #ui[data-pane=skills] #daeunPane > :not(#daeunSkillPanel){display:none!important}
@@ -8863,7 +8836,7 @@ const mobileVitalsStyle=document.createElement('style');mobileVitalsStyle.textCo
 #mobileVitals .mv-fill{height:100%;border-radius:8px;background:#70d6ac}
 #mobileVitals .mv-num{text-align:right;color:#e3f4e8;font-variant-numeric:tabular-nums}
 @media(hover:none),(pointer:coarse){#mobileVitals{display:block}}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#mobileVitals{display:block;top:70px;left:max(8px,env(safe-area-inset-left));width:148px;padding:7px 8px}body.menu-open #mobileVitals{display:none}}
+@media (max-width:700px), (pointer:coarse){#mobileVitals{display:block;top:70px;left:max(8px,env(safe-area-inset-left));width:148px;padding:7px 8px}body.menu-open #mobileVitals{display:none}}
 @media(max-height:420px){#mobileVitals{top:48px;transform:scale(.82);transform-origin:top left}}
 body.cinematic-mode #mobileVitals{display:none!important}
 `;document.head.appendChild(mobileVitalsStyle);
@@ -8978,25 +8951,38 @@ $('observeHina').onclick=()=>{if(mobileUILayout()&&observedId==='hina'){if(hinaC
  v4998Dock.innerHTML='<button type="button" id="v4998Camera">자유뷰</button><button type="button" id="v4998Mode">자동</button>';
  document.body.appendChild(v4998Dock);
  const v4998ModeBtn=document.getElementById('v4998Mode');
- v4998ModeBtn.onclick=()=>{
-   if(observedId==='hina')setHinaAuto(hinaManual);
-   else setDaeunAuto(!daeun.auto);
-   v4998SyncDock();
- };
+ v4998ModeBtn.onclick=v5287ToggleSelectedAuto;
  document.getElementById('v4998Camera').onclick=v4998CycleCamera;
- function v4998SyncDock(){
-   const auto=observedId==='hina'?!hinaManual:daeun.auto;
-   const locked=observedId==='hina'&&!hinaControlUnlocked;
-   v4998ModeBtn.textContent=auto?'자동':'수동';
-   v4998ModeBtn.disabled=locked;
-   v4998ModeBtn.title=locked?'히나와 친구가 만난 뒤 수동 조작 가능':'자동·수동 전환';
-   v4998UpdateCameraLabel();
+function v5287SyncControls(){
+ const auto=observedId==='hina'?!hinaManual:!!daeun.auto;
+ const locked=observedId==='hina'&&!hinaControlUnlocked;
+ for(const id of ['v4998Mode','v523Auto']){
+  const b=document.getElementById(id);if(!b)continue;
+  const label=id==='v523Auto'?'자동 생존 '+(auto?'ON':'OFF'):(auto?'자동':'수동');
+  if(b.textContent!==label)b.textContent=label;
+  if(b.disabled!==locked)b.disabled=locked;
+  if(b.dataset.auto!==String(auto))b.dataset.auto=String(auto);
+  if(b.getAttribute('aria-pressed')!==String(auto))b.setAttribute('aria-pressed',String(auto));
+  const title=locked?'히나와 친구가 만난 뒤 수동 조작 가능':(observedId==='hina'?'히나':'다은')+' 자동·수동 전환';
+  if(b.title!==title)b.title=title;
  }
- setInterval(v4998SyncDock,250);v4998SyncDock();
+ v4998UpdateCameraLabel();
+}
+function v5287ToggleSelectedAuto(){
+ if(observedId==='hina'){if(hinaControlUnlocked)setHinaAuto(hinaManual);}
+ else setDaeunAuto(!daeun.auto);
+ v5287SyncControls();
+}
+function v5287InitPcControls(){
+ document.getElementById('v523Auto')?.addEventListener('click',v5287ToggleSelectedAuto);
+ document.getElementById('v523Camera')?.addEventListener('click',()=>$('cameraMode').click());
+ document.getElementById('v523Map')?.addEventListener('click',()=>v521OpenMap());
+ v5287SyncControls();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',v5287InitPcControls,{once:true});else v5287InitPcControls();
 
 const actionNames={autoFirePractice:'🔥 불 피우기 연습 중',autoBagPractice:'🧶 가방 엮는 중',autoStoreBranches:'🌿 동굴에 가지 보관 중',manualBag:'가방 엮는 중',manualStore:'동굴에 나뭇가지 보관 중',manualBranch:'나뭇가지 줍는 중',manualPick:'열매 채집 중',manualDrink:'물 마시는 중',manualEat:'열매 먹는 중',manualRest:'앉아서 쉬는 중',manualApproach:'상호작용 지점으로 이동',idle:'주변 살피기',travel:'목적지로 이동',manual:'직접 이동',drink:'물 마시러 이동',forage:'열매 채집',branch:'나뭇가지 모으기',explore:'근처 탐험',home:'자기 동굴로 귀환',rest:'휴식',sleep:'동굴에서 수면',exhausted:'제자리 회복 중'};
-function layoutCharacterBar(){ /* v5.2.14: layout belongs to HUD container */ }
-new ResizeObserver(layoutCharacterBar).observe($('controls'));window.addEventListener('resize',layoutCharacterBar);
+function layoutCharacterBar(){ /* Layout is owned by the stable HUD container. */ }
 // v4.48: One character UI implementation for every selectable survivor.
 const characterButtonIds={hina:'observeHina',daeun:'observeDaeun'};
 function syncCharacterLights(){
@@ -9025,7 +9011,10 @@ function syncCharacterLights(){
 }
 function refreshCharacterUI(now,force=false){
  if(!force&&now-dualLastUI<150)return;dualLastUI=now;const d=daeun;layoutCharacterBar();
- refreshMobileVitals();refreshManualActionUI();
+ refreshMobileVitals();refreshManualActionUI();v5287SyncControls();
+ const hudStats=observedId==='daeun'?d.stats:stats;
+ const hudFuel=observedId==='daeun'?daeunDisplayedFuel():(fireEverLit&&fireSuccess?Math.min(100,fireKnowledge):0);
+ updateStableStatBars($('stats'),{체력:hudStats.energy,갈증:hudStats.thirst,허기:hudStats.hunger,의지력:hudStats.will,불유지:hudFuel},observedId==='hina');
  watchSkillGains('daeun',{rabbit:{label:'🐰 토끼 숙련도',value:d.skills.rabbit},fish:{label:'🐟 물고기 숙련도',value:d.skills.fish},fire:{label:'🔥 불 숙련도',value:d.skills.fire},bag:{label:'🧶 제작 숙련도',value:d.bag.progress}});
  watchSkillGains('hina',{rabbit:{label:'🐰 토끼 친화력',value:rabbitPattern},fish:{label:'🐟 물고기 숙련도',value:fishSkill},fire:{label:'🔥 불 숙련도',value:fireSkill},plant:{label:'🌿 식물 연구',value:plantKnowledge},pet:{label:'🐾 펫 친밀도',value:petBond}});
  $('observeHina')?.querySelector('.character-label') && ($('observeHina').querySelector('.character-label').textContent='히나'); $('observeHina')?.classList.toggle('v523-locked',!hinaControlUnlocked);
@@ -9605,7 +9594,7 @@ button.v468-ground-hit::after{content:none!important}
 
 .daeunResourceEmoji>.cleanProgressRing{inset:0;width:100%;height:100%}.daeunResourceEmoji:hover,.daeunResourceEmoji:focus-visible{background:#355b4b;outline:none}.daeunResourceEmoji:active{background:#55765b}
 @keyframes daeunEmojiBob{0%,100%{margin-top:0}50%{margin-top:-4px}}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){.daeunResourceEmoji{width:58px;height:58px;font-size:34px}}
+@media (max-width:700px), (pointer:coarse){.daeunResourceEmoji{width:58px;height:58px;font-size:34px}}
 body.cinematic-mode .daeunResourceEmoji{display:none!important}
 #daeunWaterAction{position:fixed;z-index:38;display:none;transform:translate(-50%,-50%);border:2px solid #78dcb3;background:#233d33;border-radius:50%;width:55px;height:55px;color:white;font-size:32px;box-shadow:0 3px 12px #0006}
 #daeunTaskProgress{position:fixed;z-index:42;display:none;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;padding:0;pointer-events:none;align-items:center;justify-content:center;background:#263f38;box-shadow:0 3px 12px #0009,0 0 0 1px #eaffd7a0}
@@ -9617,12 +9606,12 @@ body.cinematic-mode .daeunResourceEmoji{display:none!important}
 #daeunTaskProgress::before{display:none}
 #daeunTaskProgress .taskEmoji{font-size:32px}
 #daeunTaskProgress .taskName{top:60px}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#daeunTaskProgress{width:58px;height:58px}#daeunTaskProgress .taskEmoji{font-size:34px}}
+@media (max-width:700px), (pointer:coarse){#daeunTaskProgress{width:58px;height:58px}#daeunTaskProgress .taskEmoji{font-size:34px}}
 #daeunBranchAction{position:fixed;z-index:38;display:none;transform:translate(-50%,-50%);border:2px solid #f5d58c;background:#594329e8;border-radius:50%;width:38px;height:38px;color:white;font-size:20px;box-shadow:0 0 12px #ffd17d8a;touch-action:manipulation}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#daeunActionButtons{bottom:160px;right:8px}#daeunActionButtons button{padding:9px 11px;font-size:12px}}
+@media (max-width:700px), (pointer:coarse){#daeunActionButtons{bottom:160px;right:8px}#daeunActionButtons button{padding:9px 11px;font-size:12px}}
 #hinaActionButtons{position:fixed;z-index:38;right:max(12px,env(safe-area-inset-right));bottom:152px;display:none;flex-direction:column;align-items:flex-end;gap:8px}
 #hinaActionButtons button{border:1px solid #b6e6c7a0;border-radius:24px;background:#183d39d9;color:#f0fff4;padding:10px 13px;font-size:13px;touch-action:manipulation}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#hinaActionButtons{bottom:160px;right:8px}#hinaActionButtons button{padding:9px 11px;font-size:12px}}
+@media (max-width:700px), (pointer:coarse){#hinaActionButtons{bottom:160px;right:8px}#hinaActionButtons button{padding:9px 11px;font-size:12px}}
 body.cinematic-mode #hinaActionButtons{display:none!important}
 body.cinematic-mode #daeunActionButtons,body.cinematic-mode #daeunWaterAction,body.cinematic-mode #daeunTaskProgress,body.cinematic-mode #daeunBranchAction{display:none!important}
 `;document.head.appendChild(manualUIStyle);
@@ -10275,6 +10264,16 @@ function v498RenderSkills(){
 function v498CloseSkills(){v498Skills.style.display='none';}
 v498SkillToggle.addEventListener('click',()=>{const opening=v498Skills.style.display!=='block';v498Skills.style.display=opening?'block':'none';if(opening){craftingV492Tab='inventory';craftingV492Render();v498RenderSkills();}});
 document.getElementById('v498SkillClose').addEventListener('click',v498CloseSkills);
+// Shared outside-pointer close: nodes exist here, unlike the old pre-module patch.
+document.addEventListener('pointerdown',e=>{
+ const target=e.target;
+ if(target.closest?.('#v465DropModal'))return; // Child modal closes before its inventory parent.
+ if(!manualButtons.contains(target))manualButtons.classList.remove('open');
+ if(!target.closest?.('#v498Skills,#v498SkillToggle'))v498CloseSkills();
+ if(craftingV492Tab==='craft'&&!target.closest?.('#v492Craft,#v493CraftToggle')){
+  craftingV492Tab='inventory';craftingV492Render();
+ }
+},true);
 const craftingV495Categories=[{id:'all',label:'전체'},{id:'living',label:'생활'},{id:'storage',label:'가방'}];
 const craftingV495RecipeCategories={mat:'living',bag:'storage'};
 function craftingV495UpdateProgress(){
@@ -10692,7 +10691,7 @@ const renderBatching=(()=>{
 initializeOcclusionGroups(); // Include original unbatched trees near the bear.
 // Read-only capture for repeatable diagnostics. CPU submission is not GPU time.
 const renderSamples=[];let previousSampleTime=0,renderSampleCursor=0;
-window.hinaPerformance={version:'4.0',snapshot:()=>({render:{...renderer.info.render},memory:{...renderer.info.memory},batching:renderBatching.stats(),gpuTiming:'not measured',jsHeapBytes:performance.memory?.usedJSHeapSize??null}),samples:()=>{const ordered=renderSamples.length<600?renderSamples:[...renderSamples.slice(renderSampleCursor),...renderSamples.slice(0,renderSampleCursor)];return ordered.map(s=>({...s}));}};
+window.hinaPerformance={version:'5.2.87',snapshot:()=>({render:{...renderer.info.render},memory:{...renderer.info.memory},batching:renderBatching.stats(),gpuTiming:'not measured',jsHeapBytes:performance.memory?.usedJSHeapSize??null}),samples:()=>{const ordered=renderSamples.length<600?renderSamples:[...renderSamples.slice(renderSampleCursor),...renderSamples.slice(0,renderSampleCursor)];return ordered.map(s=>({...s}));}};
 
 // v5.2.7: four distal joints per survivor. Original shoulder/hip pivots stay intact.
 class CharacterAnimation {
@@ -11401,9 +11400,8 @@ let v517LastObjective='';
 function v519PositionObjective(){
  v517ObjectiveUI.style.top='8px';v517ObjectiveUI.style.left='50%';v517ObjectiveUI.style.transform='translateX(-50%)';
 }
-window.addEventListener('resize',v519PositionObjective,{passive:true});
+v519PositionObjective();window.addEventListener('resize',v519PositionObjective,{passive:true});
 function v517UpdateObjectives(dt){
- v519PositionObjective();
  const id=observedId==='daeun'?'daeun':'hina';
  const p=id==='daeun'?daeun.mesh.position:hana.position;
  const inShelter=inCaveWalkZone(p.x,p.z);
@@ -11549,11 +11547,12 @@ v521Menu.addEventListener('click',e=>{
 document.getElementById('skillPanel')?.removeAttribute('open');
 document.getElementById('actionLogPanel')?.setAttribute('open','');
 /* v5.2.3 mobile repair: retain live skill/craft controls; do not hide them after initialization. */
+let v5287NextSkills=0;
 function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
  lastRenderAt=t;const frameCpuStart=performance.now();
  characterAnimation.beginFrame();
- let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);updateCameraFlowerPatches();updateDaeunFlowerBends(dt,t);updateFlowerBees(t);updateFlowerObservations(t);updateSurvivorSystems(dt);v517UpdateObjectives(dt);refreshCharacterUI(t);if(v498Skills.style.display==='block')v498RenderSkills();craftingV4993ApplyPoses();characterAnimation.endFrame(dt,t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina'&&!hinaSleepSpeechLock()&&survivorSpeech.companionOwns('hina'))$('bubble').textContent=meetingHinaLine;}if(!paused){updateTreeWind(t*.001);updateBerryPickingSway(t*.001);animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);v519AnimateSheep(t*.001);}if(followCamera){
+ let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);updateCameraFlowerPatches();updateDaeunFlowerBends(dt,t);updateFlowerBees(t);updateFlowerObservations(t);updateSurvivorSystems(dt);v517UpdateObjectives(dt);refreshCharacterUI(t);if(v498Skills.style.display==='block'&&t>=v5287NextSkills){v5287NextSkills=t+150;v498RenderSkills();}craftingV4993ApplyPoses();characterAnimation.endFrame(dt,t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina'&&!hinaSleepSpeechLock()&&survivorSpeech.companionOwns('hina'))$('bubble').textContent=meetingHinaLine;}if(!paused){updateTreeWind(t*.001);updateBerryPickingSway(t*.001);animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);v519AnimateSheep(t*.001);}if(followCamera){
   updateFollowDeadZone(dt);
   if(followView==='back')v4998CameraOffset();
    followDesired.copy(followFocus).add(followOffset);
@@ -11605,14 +11604,15 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  const cpuStart=performance.now();renderer.render(scene,camera);updateSubtleBloom(t);
  const submitMs=performance.now()-cpuStart;
  const sample=renderSamples[renderSampleCursor]||(renderSamples[renderSampleCursor]={});
- Object.assign(sample,{time:t,frameMs:previousSampleTime?t-previousSampleTime:0,cpuSubmitMs:submitMs,cpuFrameMs:performance.now()-frameCpuStart,...renderer.info.render,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures});
+ sample.time=t;sample.frameMs=previousSampleTime?t-previousSampleTime:0;sample.cpuSubmitMs=submitMs;sample.cpuFrameMs=performance.now()-frameCpuStart;
+ sample.calls=renderer.info.render.calls;sample.triangles=renderer.info.render.triangles;sample.points=renderer.info.render.points;sample.lines=renderer.info.render.lines;sample.frame=renderer.info.render.frame;sample.geometries=renderer.info.memory.geometries;sample.textures=renderer.info.memory.textures;
  renderSampleCursor=(renderSampleCursor+1)%600;previousSampleTime=t;
  perfFrames++;perfCpu+=performance.now()-cpuStart;
  if(t>=perfNext){const seconds=Math.max(.001,(t-perfLast)/1000);perfFps=Math.round(perfFrames/seconds);perfDraw=renderer.info.render.calls;perfTris=renderer.info.render.triangles;perfRenderMs=(perfCpu/Math.max(1,perfFrames)).toFixed(1);perfFrames=0;perfCpu=0;perfLast=t;perfNext=t+1500;refreshPerfHud();}
 }progressStore.initialize();requestAnimationFrame(animate);
 </script><!-- v3.92 mobile HUD layout -->
 <style>
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #badge{top:calc(7px + env(safe-area-inset-top))!important}
  #mobileMenu{top:calc(7px + env(safe-area-inset-top))!important}
  #mobileVitals{top:calc(72px + env(safe-area-inset-top))!important}
@@ -11683,7 +11683,7 @@ window.HinaInteractionSFX={play};
 })();
 </script>
 <style id="mobileCompactV434">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #badge{width:auto!important;max-width:none!important;white-space:nowrap!important}
  #badge #weather{display:none!important}
  #mobileVitals{width:90px!important;padding:7px 4px!important;top:70px!important;transform:none!important}
@@ -11713,12 +11713,8 @@ window.HinaInteractionSFX={play};
  const bar=document.getElementById('characterBar');if(!bar)return;bar.dataset.lastSelected=document.getElementById('observeDaeun')?.getAttribute('aria-pressed')==='true'?'daeun':'hina';
  const placeholderNames=['서연','지유','민아'];
  for(const name of placeholderNames){const b=document.createElement('button');b.type='button';b.textContent=name+' 🔒';b.disabled=true;b.title='아직 만나지 않은 친구';bar.appendChild(b);}
- document.addEventListener('pointerdown',e=>{const a=document.getElementById('daeunActionButtons');if(a?.classList.contains('open')&&!a.contains(e.target))a.classList.remove('open');},true);
- function syncCompact(){if(innerWidth>700)return;const v=document.getElementById('mobileVitals');const b=document.getElementById('characterBar');if(!v||!b)return;const rect=v.getBoundingClientRect();b.style.setProperty('top',Math.round(rect.bottom+5)+'px','important');
-  const d=document.getElementById('observeDaeun');const h=document.getElementById('observeHina');const da=document.getElementById('daeunAuto');const ha=document.getElementById('hinaAuto');
-  // Character labels and lock state are managed only by refreshCharacterUI().
- }
- setInterval(syncCompact,350);window.addEventListener('resize',syncCompact);syncCompact();
+
+
 })();
 </script><style id="v435-mobile-inventory">
 #daeunActionButtons .v435-legacy{display:none!important}\n#daeunActionButtons.open .invPanel{display:block!important}
@@ -11731,7 +11727,7 @@ window.HinaInteractionSFX={play};
 #daeunActionButtons .v435-empty{color:#59726b}
 #daeunActionButtons.v435-auto>button:not(#daeunItemToggle){display:none!important}
 #daeunActionButtons.v435-auto #daeunItemToggle{display:block!important}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #daeunActionButtons{display:flex!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;right:max(8px,env(safe-area-inset-right))!important;z-index:40!important}
  #daeunActionButtons .invPanel{position:absolute;bottom:calc(100% + 8px);right:0;max-width:min(245px,85vw);box-sizing:border-box}
  #daeunActionButtons>button{display:block;visibility:visible;opacity:1}
@@ -11739,13 +11735,13 @@ window.HinaInteractionSFX={play};
 </style><style id="v476-shared-ui">
 /* One shared manual HUD, including mobile where older rules forced it visible. */
 #hinaActionButtons{display:none!important}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #characterBar button[data-auto="true"]{background:#285d50!important;box-shadow:0 0 11px #78f0cb66,inset 0 0 12px #5fe6bc33!important;transition:background .24s ease-out,box-shadow .24s ease-out}
  #characterBar button[data-auto="true"][data-selected="true"]{background:#348e78!important;box-shadow:0 0 15px #78f0cb88,inset 0 0 14px #a3ffe044!important}
  #characterBar button[data-auto="true"] .character-orbit-light{filter:drop-shadow(0 0 4px #78f0cb) drop-shadow(0 0 3px #b4ffe8)!important}
 }
 </style><style id="v436-patches">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #daeunActionButtons #daeunItemToggle{font-size:23px!important;min-width:43px!important;min-height:43px!important;display:flex!important;align-items:center;justify-content:center;padding:6px!important;align-self:flex-end}
  body.cinematic-mode #daeunActionButtons{display:flex!important;position:fixed!important;right:max(8px,env(safe-area-inset-right))!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;z-index:100!important}
  body.cinematic-mode #daeunActionButtons>button:not(#daeunItemToggle){display:none!important}
@@ -11753,12 +11749,12 @@ window.HinaInteractionSFX={play};
  body.cinematic-mode #daeunActionButtons.open .invPanel{display:block!important}
 }
 </style>
-<style id="v445-profile-preserved">@media (max-width:700px), (pointer:coarse) and (max-width:1366px){#profileViewer,#daeunProfileViewer{padding:clamp(24px,5dvh,46px) 24px!important;align-items:center!important;justify-content:center!important}
+<style id="v445-profile-preserved">@media (max-width:700px), (pointer:coarse){#profileViewer,#daeunProfileViewer{padding:clamp(24px,5dvh,46px) 24px!important;align-items:center!important;justify-content:center!important}
 #profileViewer #profileCard,#daeunProfileViewer #profileCard{width:min(84vw,370px)!important;max-width:84vw!important;height:min(78dvh,720px)!important;max-height:78dvh!important;border-radius:16px!important}
 #profileViewer #profileCard .profileArt,#daeunProfileViewer #profileCard .profileArt{height:51dvh!important;max-height:51dvh!important;min-height:0!important}
 }</style>
 <style id="v448-unified-character-buttons">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #characterBar{gap:16px!important;row-gap:16px!important}
  #characterBar #observeHina,#characterBar #observeDaeun{
   position:relative!important;isolation:isolate!important;
@@ -11787,7 +11783,7 @@ window.HinaInteractionSFX={play};
 }
 </style><style id="v449-day10-mobile">
 #mobileDay10Test{display:none}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  body.menu-open #ui[data-pane="settings"] #mobileDay10Test{
   display:block!important;margin:14px 8px;padding:10px;
   background:#183b39;border:1px solid #7ba89a;border-radius:12px;
@@ -11833,7 +11829,7 @@ window.HinaInteractionSFX={play};
 @keyframes v481-orbit{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
 @media(prefers-reduced-motion:reduce){#characterBar .character-orbit-light{animation:none!important}}
 </style><style id="v501-mobile-right-buttons">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #v493CraftToggle,#v498SkillToggle{
   box-sizing:border-box!important;
   width:74px!important;min-width:74px!important;max-width:74px!important;
@@ -11857,8 +11853,23 @@ window.HinaInteractionSFX={play};
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',normalize,{once:true});else normalize();
 })();
-</script><script id="v523PcLogic">(()=>{const pc=()=>matchMedia('(min-width:701px) and (pointer:fine)').matches;const by=id=>document.getElementById(id);const click=id=>by(id)?.click();function autoTarget(){const nodes=[...document.querySelectorAll('button')];return nodes.find(e=>e.offsetWidth&&/자동|수동/.test(e.textContent||'')&&!['v523Auto'].includes(e.id)&&!e.closest('#v521Menu')&&!e.closest('#v523Bottom'));}function moveSettings(){if(!pc())return;const target=by('v522SettingItems');if(!target)return;['ambientVolumeControl','qualityToggle','perfToggle','collisionDebug','rainTest','devDay10'].forEach(id=>{const el=by(id);if(el&&el.parentElement!==target)target.append(el)});}document.addEventListener('DOMContentLoaded',()=>{by('v523Camera')?.addEventListener('click',()=>click('cameraMode'));by('v523Map')?.addEventListener('click',()=>{if(typeof v521OpenMap==='function')v521OpenMap()});by('v523Auto')?.addEventListener('click',()=>autoTarget()?.click());moveSettings();});})();</script>
-<style id="v523PcLayoutFinal">
+</script>
+
+<script id="v523PcLayoutLogic">(function(){function sync(){if(!matchMedia('(min-width:701px) and (pointer:fine)').matches)return;const log=document.getElementById('actionLogPanel');if(log)log.open=true;}document.addEventListener('DOMContentLoaded',sync);window.addEventListener('resize',sync)})();</script>
+
+<script id="v523PcCompletionLogic">(()=>{
+ const desktop=()=>matchMedia('(min-width:701px) and (pointer:fine)').matches;
+ function setup(){
+  const auto=document.getElementById('v523Auto');
+  if(auto){auto.setAttribute('aria-label','현재 선택 캐릭터 자동 수동 전환');}
+  const menu=document.getElementById('v521Menu');if(!menu)return;
+  const settings=document.getElementById('v522Settings');
+  menu.addEventListener('click',e=>{if(!desktop())return;const target=e.target;if(target.closest('#v522Settings,#v522MenuSkills,#v522MenuExplore'))e.stopPropagation();},false);
+  const map=document.getElementById('v523Map');if(map)map.setAttribute('aria-label','탐험 미니맵 열기');
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+})();</script><style id="v5287PcLayout">
+
 @media (min-width:701px) and (pointer:fine){
  #ui{width:260px!important;max-width:260px!important;max-height:none!important;overflow:visible!important;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;left:16px!important;top:16px!important}
  #ui .hinaProfileHeader,#ui .hinaProfileSub,#ui #phase,#ui #thought,#ui #skillPanel,#ui #mindPanel,#ui #memoryPanel{display:none!important}
@@ -11875,10 +11886,9 @@ window.HinaInteractionSFX={play};
  #v521Menu{right:16px!important;top:60px!important}
  #v523PcArchive{display:none!important}
 }
-@media (max-width:700px),(pointer:coarse) and (max-width:1366px){#v523PcArchive{display:none!important}}
-</style>
-<script id="v523PcLayoutLogic">(function(){function sync(){if(!matchMedia('(min-width:701px) and (pointer:fine)').matches)return;const log=document.getElementById('actionLogPanel');if(log)log.open=true;}document.addEventListener('DOMContentLoaded',sync);window.addEventListener('resize',sync)})();</script>
-<style id="v523PcCompletion">
+@media (max-width:700px),(pointer:coarse){#v523PcArchive{display:none!important}}
+
+
 @media (min-width:701px) and (pointer:fine){
  #ui{max-height:calc(100vh - 105px)!important;overflow:visible!important}
  #ui #vitalsPane{display:block!important;background:transparent!important}
@@ -11897,19 +11907,8 @@ window.HinaInteractionSFX={play};
  #v523Bottom{white-space:nowrap!important}
  #v523Bottom button{min-width:104px!important}
 }
-</style>
-<script id="v523PcCompletionLogic">(()=>{
- const desktop=()=>matchMedia('(min-width:701px) and (pointer:fine)').matches;
- function setup(){
-  const auto=document.getElementById('v523Auto');
-  if(auto){auto.setAttribute('aria-label','현재 선택 캐릭터 자동 수동 전환');}
-  const menu=document.getElementById('v521Menu');if(!menu)return;
-  const settings=document.getElementById('v522Settings');
-  menu.addEventListener('click',e=>{if(!desktop())return;const target=e.target;if(target.closest('#v522Settings,#v522MenuSkills,#v522MenuExplore'))e.stopPropagation();},false);
-  const map=document.getElementById('v523Map');if(map)map.setAttribute('aria-label','탐험 미니맵 열기');
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
-})();</script><style id="v523PcRepair20261028">
+
+
 @media (min-width:701px) and (pointer:fine){
 /* Keep the mobile character logic, remove only its duplicate PC profile surface. */
 body.observing-daeun #daeunPane{display:none!important}
@@ -11926,28 +11925,9 @@ body.observing-daeun #ui #stats{display:block!important}
 #v523Bottom #v523Auto[data-auto="false"]{background:#37464b!important}
 #ui{max-height:calc(100vh - 85px)!important}
 }
+
 </style>
-<script id="v523PcRepairLogic20261028">(()=>{
- const pc=()=>matchMedia('(min-width:701px) and (pointer:fine)').matches;
- const el=id=>document.getElementById(id);
- function selected(){return document.body.classList.contains('observing-daeun')?'daeun':'hina'}
- function source(){return el(selected()==='daeun'?'daeunAuto':'hinaAuto')}
- function sync(){if(!pc())return;const b=el('v523Auto'),src=source();if(!b)return;
-  const label=(src?.textContent||'').trim();const isAuto=src?.getAttribute('aria-pressed')==='true'||/\bON\b/i.test(label);
-  b.textContent=label&&/자동|수동/.test(label)?label:(isAuto?'자동 생존 ON':'자동 생존 OFF');
-  b.dataset.auto=String(isAuto);b.setAttribute('aria-pressed',String(isAuto));
-  b.setAttribute('title',(selected()==='daeun'?'다은':'히나')+' 자동 생존 전환');
- }
- function init(){const b=el('v523Auto');if(!b)return;
-  /* Capture click before the earlier generic button finder; use the actual selected survivor control. */
-  b.addEventListener('click',e=>{if(!pc())return;e.stopImmediatePropagation();const src=source();if(src&&!src.disabled){src.click();queueMicrotask(sync)}},true);
-  const observer=new MutationObserver(sync);
-  for(const id of ['daeunAuto','hinaAuto','observeHina','observeDaeun']){const node=el(id);if(node)observer.observe(node,{attributes:true,childList:true,characterData:true,subtree:true})}
-  observer.observe(document.body,{attributes:true,attributeFilter:['class']});sync();
-  document.addEventListener('click',e=>{if(e.target.closest?.('#characterBar'))queueMicrotask(sync)},true);
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();</script>
+
 <!-- v5.2.3 PC right-side controls and minimap event repair -->
 <style id="v523RightRestoreMapFix">
 @media (min-width:701px) and (pointer:fine){
@@ -11962,16 +11942,6 @@ body.observing-daeun #ui #stats{display:block!important}
 (function(){
  const isPc=()=>window.matchMedia('(min-width:701px) and (pointer:fine)').matches;
  function init(){
-  const map=document.getElementById('v523Map');
-  if(map)map.addEventListener('click',function(event){
-   if(!isPc())return;
-   // The original map-opening function is lexical, not global.
-   // Reuse the original mobile-map control, whose handler is wired in the game.
-   event.stopImmediatePropagation();
-   const original=document.getElementById('v521MobileMap');
-   if(original){original.click();}
-   else {console.warn('[HINA] Original map button unavailable');}
-  },true);
   for(const id of ['v493CraftToggle','v498SkillToggle']){
    const btn=document.getElementById(id);
    if(btn){btn.hidden=false;btn.removeAttribute('aria-hidden');}
@@ -12078,7 +12048,7 @@ body.observing-daeun #ui #stats{display:block!important}
  #characterBar{top:calc(94px + 200px)!important}
  #ui #stats #hinaSupplies{display:none!important}
 }
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){#v523PcPortrait{display:none!important}}
+@media(max-width:700px),(pointer:coarse){#v523PcPortrait{display:none!important}}
 </style>
 <script id="v523PcPortraitLogic20261028">(()=>{
  const pc=()=>matchMedia('(min-width:701px) and (pointer:fine)').matches;
@@ -12245,7 +12215,7 @@ body.observing-daeun #ui #stats{display:block!important}
 
 <style id="v523MobileHudRevision">
 /* Mobile-only layout; retain existing event handlers and game logic. */
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
   /* Move cinematic button to the lower-left, away from character controls. */
   body:not(.cinematic-mode) #hideAllUI {position:fixed!important;top:auto!important;bottom:calc(env(safe-area-inset-bottom,0px) + 14px)!important;left:8px!important;right:auto!important;transform:none!important;z-index:65!important;font-size:11px!important;padding:8px 10px!important;}
   /* Keep inventory as the lowest action on the right. */
@@ -12264,7 +12234,7 @@ body.observing-daeun #ui #stats{display:block!important}
 </style>
 
 <style id="v523MobileActualRepair">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
   #v498SkillToggle,#v493CraftToggle{
     display:flex!important;visibility:visible!important;opacity:1!important;
     position:fixed!important;left:auto!important;right:9px!important;
@@ -12285,7 +12255,7 @@ body.observing-daeun #ui #stats{display:block!important}
 }
 </style>
 <script id="v523MobileActualRepairRuntime">(()=>{
- const mobile=()=>window.matchMedia('(max-width:700px), (pointer:coarse) and (max-width:1366px)').matches;
+ const mobile=()=>window.matchMedia('(max-width:700px), (pointer:coarse)').matches;
  function restore(){if(!mobile())return;for(const id of ['v498SkillToggle','v493CraftToggle']){
   const el=document.getElementById(id);if(el){el.style.removeProperty('display');el.hidden=false;el.removeAttribute('aria-hidden');}
  }}
@@ -12293,7 +12263,7 @@ body.observing-daeun #ui #stats{display:block!important}
 })();</script>
 
 <style id="v523MobileColorAndHudCleanupFinal">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
  /* Remove only the character-button container; preserve both buttons and auto indicator. */
  #characterBar {background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;padding:0!important;outline:0!important;backdrop-filter:none!important;width:max-content!important;max-width:max-content!important;}
  #characterBar::before,#characterBar::after{content:none!important;display:none!important}
@@ -12320,7 +12290,7 @@ body.observing-daeun #ui #stats{display:block!important}
 </style>
 
 <style id="v523MobileLockAndTopBackgroundFix">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
  /* Keep the Hina button readable, with the lock completely outside its right edge. */
  #characterBar #observeHina,#characterBar #observeDaeun {
    width:64px!important;min-width:64px!important;max-width:64px!important;
@@ -12360,7 +12330,7 @@ body.observing-daeun #ui #stats{display:block!important}
 })();</script>
 
 <style id="v523MobileFinalSpacing">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
  /* 30% background alpha only: text and icon remain fully opaque. */
  #v517ObjectiveUI {background:rgba(115,205,239,.30)!important;opacity:1!important;border:1px solid rgba(190,237,252,.8)!important;}
  /* Keep the original name + lock INSIDE the button, as in the reference screenshot. */
@@ -12377,7 +12347,7 @@ body.observing-daeun #ui #stats{display:block!important}
 </style>
 
 <style id="v523MobileDayLockFinal">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
  /* Compact two-row badge; only the day label drops to row two. */
  #badge {display:grid!important;grid-template-columns:max-content max-content!important;
   grid-template-rows:auto auto!important;column-gap:6px!important;row-gap:3px!important;
@@ -12403,7 +12373,7 @@ body.observing-daeun #ui #stats{display:block!important}
 </style>
 
 <style id="v523MobileBadgeAndCharacterGapRefine">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
  /* Single, uniform surface with equal horizontal and vertical inset. */
  #badge {display:grid!important;grid-template-columns:max-content max-content!important;grid-template-rows:auto auto!important;column-gap:6px!important;row-gap:4px!important;align-items:center!important;justify-content:center!important;justify-items:center!important;box-sizing:border-box!important;width:94px!important;min-width:94px!important;max-width:94px!important;padding:8px 7px!important;background:rgba(19,36,43,.82)!important;background-image:none!important;border-radius:11px!important;}
  #badge #clock{grid-column:1!important;grid-row:1!important;margin:0!important;}
@@ -12507,7 +12477,7 @@ body.cinematic-mode #daeunItemToggle {display:flex!important;visibility:visible!
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();</script>
 <style id="v523-mobile-settings-complete">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  body.menu-open #ui[data-pane="settings"] #v523MobileSettings{display:flex!important;flex-direction:column;gap:9px;margin:10px 2px;padding:10px;border-radius:12px;background:rgba(26,58,58,.85);border:1px solid #608e87;position:relative;z-index:4}
  #v523MobileSettings{display:none}
  #v523MobileSettings button,#v523MobileSettings label{box-sizing:border-box;width:100%!important;max-width:100%!important;position:relative!important;display:flex!important;justify-content:space-between;align-items:center;gap:8px;margin:0!important;padding:9px!important;white-space:normal!important}
@@ -12516,24 +12486,7 @@ body.cinematic-mode #daeunItemToggle {display:flex!important;visibility:visible!
  #daeunJoystick:not(.active) #daeunStickKnob{opacity:0!important;visibility:hidden!important}
 }
 </style>
-<script id="v523-mobile-settings-bridge">
-(function(){
- const ids=['ambientVolumeControl','qualityToggle','perfToggle','collisionDebug','rainTest','devDay10'];
- const mobile=()=>window.matchMedia('(max-width:700px), (pointer:coarse) and (max-width:1366px)').matches;
- function ensure(){
-  const ui=document.getElementById('ui');if(!ui)return;
-  let panel=document.getElementById('v523MobileSettings');
-  if(!panel){panel=document.createElement('section');panel.id='v523MobileSettings';panel.setAttribute('aria-label','설정 기능');panel.innerHTML='<strong>⚙️ 설정</strong>';ui.appendChild(panel);}
-  if(!mobile())return;
-  for(const id of ids){const el=document.getElementById(id);if(el&&el.parentElement!==panel)panel.appendChild(el);}
- }
- document.addEventListener('DOMContentLoaded',()=>{ensure();
-  const nav=document.getElementById('mobileCategories');if(nav)nav.addEventListener('click',()=>setTimeout(ensure,0));
-  const menu=document.getElementById('mobileMenu');if(menu)menu.addEventListener('click',()=>setTimeout(ensure,0));
-  window.addEventListener('resize',ensure);
- });
-})();
-</script>
+
 <!-- v5.2.3 targeted regression repair -->
 <style id="v523-regression-20261028">
 /* Desktop: test controls must live in Settings, never float over the game. */
@@ -12551,12 +12504,7 @@ body.cinematic-mode #daeunItemToggle {display:flex!important;visibility:visible!
 <script id="v523-regression-20261028-script">
 (()=>{
   const ids=['ambientVolumeControl','qualityToggle','perfToggle','collisionDebug','rainTest','devDay10'];
-  const isMobile=()=>matchMedia('(max-width:700px), (pointer:coarse) and (max-width:1366px)').matches;
-  function moveSettings(){
-    const target=document.getElementById(isMobile()?'v523MobileSettings':'v522SettingItems');
-    if(!target)return;
-    for(const id of ids){const el=document.getElementById(id);if(el&&el.parentElement!==target)target.appendChild(el);}
-  }
+  const isMobile=()=>matchMedia('(max-width:700px), (pointer:coarse)').matches;
   function updateCinema(){
     if(isMobile())return;
     const cinema=document.body.classList.contains('cinematic-mode');
@@ -12566,10 +12514,10 @@ body.cinematic-mode #daeunItemToggle {display:flex!important;visibility:visible!
     if(bag&&cinema){bag.style.setProperty('display','flex','important');bag.style.setProperty('visibility','visible','important');}
   }
   document.addEventListener('DOMContentLoaded',()=>{
-    moveSettings();updateCinema();
+    updateCinema();
     new MutationObserver(updateCinema).observe(document.body,{attributes:true,attributeFilter:['class']});
-    document.addEventListener('click',e=>{if(e.target.closest('#v521PcMenu,#v521Menu,#mobileMenu,#hideAllUI'))queueMicrotask(()=>{moveSettings();updateCinema()});},true);
-    window.addEventListener('resize',()=>{moveSettings();updateCinema()});
+    document.addEventListener('click',e=>{if(e.target.closest('#v521PcMenu,#v521Menu,#mobileMenu,#hideAllUI'))queueMicrotask(updateCinema);},true);
+    window.addEventListener('resize',updateCinema);
   });
 })();
 </script>
@@ -12613,7 +12561,7 @@ body.cinematic-mode #hideAllUI {display:block!important;visibility:visible!impor
 /* One anchor for inventory in both viewing modes, on PC and mobile. */
 #daeunActionButtons,body.cinematic-mode #daeunActionButtons{right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;top:auto!important;left:auto!important;transform:none!important;}
 #daeunItemToggle,body.cinematic-mode #daeunItemToggle{position:relative!important;right:auto!important;bottom:auto!important;top:auto!important;left:auto!important;transform:none!important;margin:0!important;align-self:flex-end!important;}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #daeunActionButtons,body.cinematic-mode #daeunActionButtons{right:8px!important;bottom:calc(9px + env(safe-area-inset-bottom))!important;}
 }
 </style>
@@ -12709,7 +12657,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  #ui{top:215px!important;max-height:calc(100dvh - 245px)!important}
  #characterBar{top:unset}
 }
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media(max-width:700px),(pointer:coarse){
  #mobileVitals{width:260px!important;max-width:calc(100vw - 16px)!important;padding:12px!important;top:8px!important;pointer-events:auto!important;background:#11242aeb!important;border-radius:16px!important}
  #mobileVitals .v529-face-head{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:12px;text-align:center}
  #mobileVitals .v529-face{width:142px;height:142px;object-fit:cover;object-position:center 39%;border:3px solid #baf5df;border-radius:50%;background:#f8f8f8;box-sizing:border-box}
@@ -12743,7 +12691,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <style id="v5210UnifiedPortrait">
 /* Unified portrait and status HUD: rounded chamfered square, text above portrait. */
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media(max-width:700px),(pointer:coarse){
  #mobileVitals{box-sizing:border-box!important;width:260px!important;max-width:calc(100vw - 16px)!important;overflow:visible!important;background:rgba(16,31,32,.92)!important;border:1px solid rgba(130,177,156,.32)!important;border-radius:20px!important;box-shadow:0 8px 22px #0006!important}
  #mobileVitals .v529-face-head{display:flex!important;flex-direction:column!important;align-items:center!important;gap:6px!important;margin:0 0 12px!important}
  #mobileVitals .v529-title{order:0!important;font-size:18px!important;font-weight:850!important;line-height:1.2!important;white-space:normal!important;text-align:center!important}
@@ -12768,7 +12716,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 /* Rounded continuous (superellipse-like) portrait corners, never octagonal clipping. */
 #mobileVitals .v529-face,#v523PcPortrait img{clip-path:none!important;border-radius:27%!important;object-fit:cover!important;cursor:pointer!important;transition:filter .18s ease!important}
 #mobileVitals .v529-face:hover,#v523PcPortrait img:hover{filter:brightness(1.08)!important}
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media(max-width:700px),(pointer:coarse){
  #mobileVitals{width:260px!important;max-width:calc(100vw - 16px)!important;padding:13px 12px 14px!important;background:rgba(16,31,32,.93)!important;border-radius:22px!important;overflow:hidden!important}
  #mobileVitals .v529-face-head{margin-bottom:12px!important;padding-bottom:12px!important;border-bottom:1px solid rgba(175,213,198,.14)!important}
  #mobileVitals .v529-title{margin:0!important}
@@ -12785,7 +12733,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 
 <style id="v5212FinalHud">
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media(max-width:700px),(pointer:coarse){
  #mobileVitals{width:260px!important;max-width:calc(100vw - 16px)!important;box-sizing:border-box!important;left:4px!important;top:3px!important;padding:14px 12px 16px!important;border-radius:19px!important;background:rgba(16,31,32,.92)!important;overflow:hidden!important;border:1px solid rgba(140,182,165,.3)!important;box-shadow:0 8px 24px #0005!important}
  #mobileVitals .v529-face-head{display:flex!important;flex-direction:column!important;align-items:center!important;gap:0!important;margin:0 0 12px!important;padding:0 0 13px!important;border-bottom:1px solid rgba(180,215,200,.18)!important;width:100%!important}
  #mobileVitals .v529-title{order:0!important;font-size:17px!important;font-weight:850!important;line-height:1.3!important;margin:0 0 10px!important;text-align:center!important}
@@ -12808,7 +12756,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 
 <style id="v5213CleanHud">
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media(max-width:700px),(pointer:coarse){
  #mobileVitals{width:260px!important;max-width:calc(100vw - 16px)!important;box-sizing:border-box!important;left:8px!important;top:8px!important;padding:12px 12px 15px!important;background:rgba(16,31,32,.93)!important;border-radius:18px!important;overflow:visible!important}
  #mobileVitals .v529-face-head{margin:0 0 9px!important;padding:0 0 9px!important;border:0!important;background:none!important}
  #mobileVitals .v529-title{margin:0 0 8px!important}
@@ -12848,7 +12796,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #mobileVitals .mv-row{background:transparent!important}
 </style>
 <script id="v5214StableHudLogic">(()=>{
-function dock(){const bar=document.getElementById('characterBar');const mob=document.getElementById('mobileVitals');const pc=document.getElementById('v5213HudWrap');if(!bar)return;const mobile=matchMedia('(max-width:700px), (pointer:coarse) and (max-width:1366px)').matches;const parent=mobile?mob:pc;if(parent&&bar.parentElement!==parent)parent.appendChild(bar);for(const k of ['top','bottom','left','right','transform'])bar.style.removeProperty(k)}
+function dock(){const bar=document.getElementById('characterBar');const mob=document.getElementById('mobileVitals');const pc=document.getElementById('v5213HudWrap');if(!bar)return;const mobile=matchMedia('(max-width:700px), (pointer:coarse)').matches;const parent=mobile?mob:pc;if(parent&&bar.parentElement!==parent)parent.appendChild(bar);for(const k of ['top','bottom','left','right','transform'])bar.style.removeProperty(k)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',dock,{once:true});else dock();window.addEventListener('resize',dock,{passive:true});
 })();</script>
 <style id="v5215CircularUnifiedHud">
@@ -13040,7 +12988,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #v5213HudWrap #vitalsPane .stat .val{flex:0 0 30px!important;width:30px!important}
 #mobileVitals #characterBar,#v5213HudWrap #characterBar{position:absolute!important;top:calc(100% + 10px)!important;left:0!important;bottom:auto!important;transform:none!important}
 </style><style id="v5221MobileHudFinal">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #v5213HudWrap{display:none!important}
  #mobileVitals{display:block!important;position:fixed!important;top:10px!important;left:8px!important;right:auto!important;width:260px!important;max-width:calc(100vw - 88px)!important;height:auto!important;min-height:0!important;padding:14px 16px 17px!important;transform:none!important;background:rgba(19,34,33,.95)!important;border:1px solid rgba(163,201,184,.25)!important;border-radius:18px!important;box-shadow:0 5px 16px #0003!important;z-index:45!important}
  #mobileVitals .v529-face-head{display:flex!important;flex-direction:column!important;align-items:center!important;margin:0 0 15px!important;padding:0!important;background:transparent!important;gap:0!important}
@@ -13052,7 +13000,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  #mobileVitals #characterBar{position:absolute!important;top:calc(100% + 10px)!important;left:0!important;right:auto!important;bottom:auto!important;transform:none!important}
 }
 </style><style id="v5222MobileHudStability">
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media(max-width:700px),(pointer:coarse){
  #mobileVitals{display:block!important;position:fixed!important;top:8px!important;left:8px!important;right:auto!important;width:260px!important;max-width:calc(100vw - 90px)!important;height:auto!important;min-height:0!important;padding:14px 14px 17px!important;box-sizing:border-box!important;background:rgba(19,34,33,.96)!important;border:1px solid rgba(160,195,178,.28)!important;border-radius:18px!important;overflow:visible!important;transform:none!important;transition:none!important;animation:none!important}
  #mobileVitals .v529-face-head{display:flex!important;flex-direction:column!important;align-items:center!important;gap:0!important;margin:0 0 16px!important;padding:0!important;background:none!important;border:0!important;transition:none!important;animation:none!important}
  #mobileVitals .v529-title{order:0!important;margin:0 0 12px!important;font-size:20px!important;font-weight:900!important;line-height:1.3!important;white-space:nowrap!important}
@@ -13064,7 +13012,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  body.menu-open #mobileVitals,body.cinematic-mode #mobileVitals{display:none!important}
 }
 </style><style id="v5223MobileFinal">
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media(max-width:700px),(pointer:coarse){
  #mobileVitals>.mv-stats{display:block!important;width:100%!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
  #mobileVitals>.mv-stats>.mv-row{display:grid!important;grid-template-columns:48px minmax(0,1fr) 27px!important;gap:8px!important;margin:9px 0!important;align-items:center!important}
  #mobileVitals>.mv-name,#mobileVitals>.mv-row{display:none!important}
@@ -13073,7 +13021,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 <style id="v5224CompactUnifiedMobileHUD">
 /* Final mobile-only single surface. Keep portrait DOM and button positioning unchanged. */
-@media (max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media (max-width:700px),(pointer:coarse){
  #mobileVitals{width:252px!important;max-width:calc(100vw - 92px)!important;box-sizing:border-box!important;padding:12px 13px 14px!important;background:rgba(19,34,32,.94)!important;background-image:none!important;border:1px solid rgba(173,205,189,.22)!important;border-radius:18px!important;box-shadow:0 5px 15px rgba(0,0,0,.18)!important;overflow:visible!important;}
  #mobileVitals>.v529-face-head,#mobileVitals>.mv-stats,#mobileVitals>.mv-list,#mobileVitals>.mv-body,#mobileVitals>.mv-bars,#mobileVitals>.mv-name,#mobileVitals>.mv-row,#mobileVitals .v529-face-head,#mobileVitals .mv-stats,#mobileVitals .mv-row{background:transparent!important;background-color:transparent!important;background-image:none!important;border:0!important;outline:0!important;box-shadow:none!important;filter:none!important;}
  #mobileVitals>.mv-stats{width:100%!important;max-width:100%!important;box-sizing:border-box!important;padding:0!important;margin:0!important;border-radius:0!important;}
@@ -13089,7 +13037,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <style id="v525-mobile-hud-menu-final">
 /* v5.2.25: compact single-surface HUD, without altering emotion/character logic. */
-@media (max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media (max-width:700px),(pointer:coarse){
  #mobileVitals{width:218px!important;max-width:calc(100vw - 18px)!important;padding:10px 10px 12px!important;border-radius:16px!important;}
  #mobileVitals .v529-face-head{margin-bottom:11px!important;}
  #mobileVitals .v529-title{font-size:17px!important;line-height:22px!important;margin-bottom:8px!important;white-space:nowrap!important;}
@@ -13107,7 +13055,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <style id="v526NarrowHudBothViews">
 /* v5.2.26: presentation-only changes; do not touch DOM refresh or button docking. */
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media(max-width:700px),(pointer:coarse){
  #mobileVitals{width:204px!important;max-width:calc(100vw - 16px)!important;padding:10px 9px 12px!important;}
  #mobileVitals .v529-face{width:154px!important;height:154px!important;min-width:154px!important;flex-basis:154px!important;}
  #mobileVitals .v529-title{font-size:16px!important;line-height:21px!important;margin-bottom:8px!important;}
@@ -13128,7 +13076,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 }
 </style>
 <style id="v5234FinalCompactHUD">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  #mobileVitals{width:160px!important;min-width:0!important;max-width:160px!important;box-sizing:border-box!important;padding:9px 7px 11px!important;background:rgba(0,0,0,.30)!important;background-color:rgba(0,0,0,.30)!important;background-image:none!important;border:0!important;border-radius:15px!important;}
  #mobileVitals .v529-face{width:139px!important;height:139px!important;min-width:139px!important;max-width:139px!important;flex:0 0 139px!important;box-sizing:border-box!important;cursor:pointer!important;pointer-events:auto!important;}
  #mobileVitals .v529-title{font-size:15px!important;line-height:19px!important;letter-spacing:-.4px!important;margin-bottom:8px!important;}
@@ -13168,7 +13116,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 <style id="v5249RealMobileCompact">
 /* Actual layout dimensions rather than transform scaling (which was overridden). */
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  html body #mobileVitals{
   width:118px!important;max-width:118px!important;min-width:0!important;
   padding:5px 5px 6px!important;top:8px!important;left:3px!important;
@@ -13209,7 +13157,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 }
 </style>
 <style id="v5250MobileControlShapes">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
   /* Narrow side actions while preserving tap targets and animation. */
   body #characterBar {width:88px!important;max-width:88px!important;min-width:0!important;}
   body #characterBar button:is(#observeHina,#observeDaeun){
@@ -13242,7 +13190,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 }
 </style>
 <style id="v5251MobileButtonsAligned">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+@media (max-width:700px), (pointer:coarse) {
   /* Compact selection buttons: keep the HUD above them unchanged. */
   html body #characterBar {width:60px!important;min-width:0!important;max-width:60px!important;gap:3px!important;padding:2px!important;box-sizing:border-box!important;}
   html body #characterBar button:is(#observeHina,#observeDaeun) {width:56px!important;min-width:56px!important;max-width:56px!important;height:30px!important;min-height:30px!important;box-sizing:border-box!important;padding:3px 1px!important;font-size:10px!important;white-space:nowrap!important;}
@@ -13256,7 +13204,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 }
 </style>
 <style id="v5252CinemaBasketAlign">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
   html body #hideAllUI,html body.cinematic-mode #hideAllUI{
     position:fixed!important;left:8px!important;right:auto!important;top:auto!important;
     bottom:calc(10px + env(safe-area-inset-bottom))!important;transform:none!important;
@@ -13284,7 +13232,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 }
 </style>
 <style id="v5253BasketOpticalCenter">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  html body #daeunActionButtons #daeunItemToggle svg.v437-bag-icon,
  html body.cinematic-mode #daeunActionButtons #daeunItemToggle svg.v437-bag-icon{
   position:relative!important;left:6px!important;top:-2px!important;
@@ -13294,7 +13242,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 <style id="v5254BasketTrueCenter">
 /* Anchor the icon to the button itself, independent of flex layout and mode. */
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  html body #daeunActionButtons #daeunItemToggle,
  html body.cinematic-mode #daeunActionButtons #daeunItemToggle{
    position:relative!important;width:48px!important;height:48px!important;
@@ -13316,14 +13264,14 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <style id="v5255ObjectiveRaise">
 /* Raise the survival objective banner by one small step, without altering its size. */
 #v517ObjectiveUI{top:38px!important}
-@media(max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media(max-width:700px), (pointer:coarse){
  #v517ObjectiveUI{top:0px!important}
 }
 </style>
 <style id="v5258UnifiedMenuClosePhase1">
 /* Mobile: one original functional menu; no separate text-copy menu. */
 #v5232MenuPanel{display:none!important}
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
   #mobileCategories [data-close], #mobileCategories .close-btn,
   #ui button[aria-label="닫기"], #ui button[title="닫기"],
   #mobileMenu .close-btn {display:none!important}
@@ -13332,7 +13280,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 <script id="v5258UnifiedMenuOutsideTap">
 (function(){
- function isMobile(){return matchMedia('(max-width:700px), (pointer:coarse) and (max-width:1366px)').matches}
+ function isMobile(){return matchMedia('(max-width:700px), (pointer:coarse)').matches}
  function close(){document.body.classList.remove('menu-open');const b=document.getElementById('mobileMenu');if(b){b.setAttribute('aria-expanded','false');b.textContent='☰ 메뉴';}}
  document.addEventListener('pointerdown',function(e){
   if(!isMobile()||!document.body.classList.contains('menu-open'))return;
@@ -13343,7 +13291,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <style id="v5259MenuRecovery">
-@media(max-width:700px),(pointer:coarse) and (max-width:1366px){
+@media(max-width:700px),(pointer:coarse){
  body.menu-open:not(.cinematic-mode) #ui{
  display:block!important;visibility:visible!important;opacity:1!important;
  position:fixed!important;left:8px!important;right:8px!important;
@@ -13430,8 +13378,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  const shell=document.createElement('section');shell.id='v5261MenuShell';shell.dataset.open='0';
  shell.setAttribute('aria-label','게임 메뉴');document.body.appendChild(shell);
  const sources=[nav,...['vitalsPane','skillPanel','mindPanel','memoryPanel','actionLogPanel'].map(id=>document.getElementById(id)).filter(Boolean)];
- const parents=sources.map(el=>({el,parent:el.parentNode,next:el.nextSibling}));
- for(const el of sources){shell.appendChild(el);if(el!==nav)el.classList.add('v5261-pane');}
+ const homes=new Map();
+ let mountedMobile=false;
+ for(const el of sources)if(el!==nav)el.classList.add('v5261-pane');
  const settings=document.createElement('section');
  settings.id='v5264SettingsPane';settings.className='v5261-pane';
  settings.innerHTML='<strong>⚙️ 설정</strong><div id="v5264SettingsControls"></div>';
@@ -13439,17 +13388,41 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  const settingsControls=settings.querySelector('#v5264SettingsControls');
  const settingsIds=['ambientVolumeControl','qualityToggle','perfToggle','collisionDebug','rainTest','devDay10'];
  function attachSettings(){
+   if(!mobile())return;
    for(const id of settingsIds){
      const el=document.getElementById(id);
      if(el&&el.parentElement!==settingsControls)settingsControls.appendChild(el);
    }
  }
- document.addEventListener('DOMContentLoaded',attachSettings);
+ document.addEventListener('DOMContentLoaded',()=>queueMicrotask(reconcileLayout),{once:true});
 
  // Clone the button to discard all accumulated legacy target listeners.
  const button=old.cloneNode(true);old.replaceWith(button);
  let active=false;
- const mobile=()=>matchMedia('(max-width:700px),(pointer:coarse)').matches;
+ const mobile=()=>!matchMedia('(min-width:701px) and (pointer:fine)').matches;
+ function reconcileLayout(){
+  const on=mobile();
+  if(on!==mountedMobile){
+   show(false);
+   if(on){
+    for(const el of sources){const marker=document.createComment('mobile menu home');el.before(marker);homes.set(el,marker);shell.append(el);}
+   }else{
+    for(const el of sources){const marker=homes.get(el);if(marker?.parentNode){marker.after(el);marker.remove();}}
+    homes.clear();
+   }
+   mountedMobile=on;
+  }
+  shell.hidden=!on;
+  if(on)attachSettings();
+  else{
+   const target=document.getElementById('v522SettingItems');
+   if(target)for(const id of settingsIds){const el=document.getElementById(id);if(el&&el.parentNode!==target)target.append(el);}
+  }
+ }
+ // Run after older resize restorations so only the current layout owns each panel.
+ const layoutMedia=matchMedia('(min-width:701px) and (pointer:fine)');
+ layoutMedia.addEventListener('change',()=>queueMicrotask(reconcileLayout));
+ window.addEventListener('resize',()=>queueMicrotask(reconcileLayout),{passive:true});
  function show(open){active=open;shell.dataset.open=open?'1':'0';document.body.classList.toggle('v5261-menu-active',open);document.body.classList.remove('menu-open');button.setAttribute('aria-expanded',String(open));button.textContent='☰ 메뉴';if(open)select('skills');}
  function select(name){ui.dataset.pane=name;const map={vitals:'vitalsPane',skills:'skillPanel',mind:'mindPanel',memories:'memoryPanel',logs:'actionLogPanel',settings:'v5264SettingsPane'};if(name==='settings')attachSettings();shell.querySelectorAll('.v5261-pane').forEach(p=>p.dataset.active=p.id===map[name]?'1':'0');nav.querySelectorAll('[data-pane]').forEach(b=>b.classList.toggle('selected',b.dataset.pane===name));}
  button.addEventListener('pointerdown',e=>{if(!mobile())return;e.preventDefault();e.stopImmediatePropagation();show(!active);},true);
@@ -13557,7 +13530,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </style>
 <!-- v5.2.77: compact hamburger + offset objective HUD (mobile only). -->
 <style id="v5277TopHUDLayout">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
   html body #mobileMenu{
     font-size:0!important;line-height:0!important;
     width:36px!important;min-width:36px!important;height:34px!important;
@@ -13583,7 +13556,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <!-- v5.2.78: smaller hamburger (2/3), larger and lower objective -->
 <style id="v5278TopHUDRefinement">
-@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+@media (max-width:700px), (pointer:coarse){
  html body #mobileMenu{
   width:24px!important;min-width:24px!important;height:23px!important;
   top:calc(12px + env(safe-area-inset-top))!important;right:10px!important;
