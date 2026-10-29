@@ -1611,13 +1611,14 @@ let nextFlowerBeeBuzzAt=0;
 function updateFlowerBeeBuzz(seconds,daytime){
  if(!daytime||seconds<nextFlowerBeeBuzzAt||!soundEnabled||paused||
     !audioCtx||audioCtx.state!=='running'||document.hidden)return;
- const listener=hana?.position||daeun?.mesh?.position;
+ const listener=observedId==='daeun'?daeun?.mesh?.position:hana?.position;
  if(!listener)return;
  let nearest=Infinity;
  for(const f of flowerBeeFlights){
   if(f.kind!=='bee'||f.active===false)continue; // Butterfly-only beds remain silent.
   const dx=listener.x-f.bee.position.x,dz=listener.z-f.bee.position.z;
-  nearest=Math.min(nearest,Math.hypot(dx,dz));
+  const distance=Math.hypot(dx,dz);
+  if(Number.isFinite(distance))nearest=Math.min(nearest,distance);
  }
  if(nearest>8){nextFlowerBeeBuzzAt=seconds+1.2;return;}
  const proximity=Math.pow(Math.max(0,1-nearest/8),2);
@@ -1633,12 +1634,12 @@ function updateFlowerBeeBuzz(seconds,daytime){
  modGain.gain.value=19;
  mod.connect(modGain);modGain.connect(osc.frequency);
  filter.type='lowpass';filter.frequency.value=650;
- const peak=Math.min(.018, .018*proximity*ambientVolume);
+ const peak=.012*proximity;
  gain.gain.setValueAtTime(0,now);
  gain.gain.linearRampToValueAtTime(peak,now+.08);
  gain.gain.setValueAtTime(peak,now+duration-.12);
  gain.gain.linearRampToValueAtTime(0,now+duration);
- osc.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
+ osc.connect(filter);filter.connect(gain);gain.connect(gameAudioOutput());
  mod.start(now);osc.start(now);osc.stop(now+duration+.01);mod.stop(now+duration+.01);
  osc.onended=()=>{osc.disconnect();mod.disconnect();modGain.disconnect();filter.disconnect();gain.disconnect();};
  nextFlowerBeeBuzzAt=seconds+1.4+Math.random()*1.5;
@@ -4543,6 +4544,7 @@ document.getElementById('memoryViewer').onclick=e=>{if(e.target.id==='memoryView
 renderMemoryAlbum();
 
 function log(t){
+ if(observedId==='hina')window.HinaInteractionSFX?.event(t);
  if(elapsed>memoryToastUntil)document.getElementById('memoryToast').style.opacity='0';
  const key=clockParts();let e=document.createElement('div');
  e.textContent=`D${key.day} ${String(key.h).padStart(2,'0')}:${String(key.m).padStart(2,'0')}  ${t}`;
@@ -6102,9 +6104,29 @@ window.addEventListener('resize',statHelpHide);
 // Sound is enabled by default; browsers require an interaction to unlock playback.
 let ambientVolume=0.65;
 let soundEnabled=true,audioCtx=null,ambientTimer=0,chirpClock=0;
+// One shared, quiet mix for procedural ambience, dialogue and interaction sounds.
+let gameAudioGain=null,gameAudioLevel=-1;
+function gameAudioOutput(){
+ if(!audioCtx)return null;
+ if(!gameAudioGain){gameAudioGain=audioCtx.createGain();gameAudioGain.gain.value=0;gameAudioGain.connect(audioCtx.destination);}
+ return gameAudioGain;
+}
+function syncGameAudio(){
+ const output=gameAudioOutput();if(!output)return;
+ const level=soundEnabled&&!paused&&!document.hidden?ambientVolume*.3:0;
+ if(level===gameAudioLevel)return;
+ gameAudioLevel=level;
+ output.gain.cancelScheduledValues(audioCtx.currentTime);
+ output.gain.value=level;
+}
+window.HinaGameAudio={get context(){return audioCtx;},output:gameAudioOutput,
+ get enabled(){return soundEnabled&&!paused&&!document.hidden;},
+ unlock:()=>unlockAmbient(),
+ diagnose:()=>({state:audioCtx?.state,volume:ambientVolume,muted:!soundEnabled||paused||document.hidden,gain:gameAudioGain?.gain.value})};
+
 function setAmbientVolume(value){
  ambientVolume=Math.max(0,Math.min(1,Number(value)/100||0));
- soundEnabled=ambientVolume>0;
+ soundEnabled=ambientVolume>0;syncGameAudio();
  const label=document.getElementById('ambientVolumeValue');
  if(label)label.textContent=Math.round(ambientVolume*100)+'%';
  if(!soundEnabled){rainAudioGain=0;rainAudio.volume=0;rainAudio.pause();nightAudioGain=0;nightAudio.volume=0;nightAudio.pause();}
@@ -6129,7 +6151,7 @@ function unlockNightAudio(){
 }
 function updateNightAudio(dt,isNight){
  const rainDamp=1-Math.min(1,Math.max(0,rainVisualStrength))*.82;
- const target=soundEnabled&&!paused&&isNight?.34*rainDamp*ambientVolume:0;
+ const target=soundEnabled&&!paused&&!document.hidden&&isNight?.34*rainDamp*ambientVolume:0;
  const response=target>nightAudioGain?1.1:.75;
  nightAudioGain+=(target-nightAudioGain)*Math.min(1,Math.max(0,dt)*response);
  if(Math.abs(nightAudioGain-target)<.001)nightAudioGain=target;
@@ -6149,7 +6171,7 @@ function unlockRainAudio(){
  }
 }
 function updateRainAudio(dt){
- const target=soundEnabled&&!paused&&raining()?Math.min(.34,Math.max(0,rainVisualStrength)*.34)*ambientVolume/3:0;
+ const target=soundEnabled&&!paused&&!document.hidden&&raining()?Math.min(.34,Math.max(0,rainVisualStrength)*.34)*ambientVolume/3:0;
  const response=target>rainAudioGain?1.2:.8;
  rainAudioGain+= (target-rainAudioGain)*Math.min(1,Math.max(0,dt)*response);
  if(Math.abs(rainAudioGain-target)<.001)rainAudioGain=target;
@@ -6168,6 +6190,7 @@ async function unlockAmbient(){
  unlockNightAudio();
  if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C();}
  if(!audioCtx)return;
+ syncGameAudio();
  if(audioCtx.state!=='running'){
   if(!ambientResumePromise){
    ambientResumePromise=Promise.resolve(audioCtx.resume()).finally(()=>{ambientResumePromise=null;});
@@ -6181,16 +6204,18 @@ window.addEventListener('touchstart',firstInteractionUnlock,{passive:true,captur
 window.addEventListener('click',firstInteractionUnlock,{capture:true});
 window.addEventListener('keydown',firstInteractionUnlock);
 document.addEventListener('visibilitychange',()=>{
+ syncGameAudio();
+ if(document.hidden){nightAudio.pause();rainAudio.pause();}
  if(!document.hidden&&soundEnabled)unlockAmbient().catch(()=>{});
 });
-function tone(freq,duration,type='sine',volume=.035,delay=0){
+function tone(freq,duration,type='sine',volume=.035,delay=0,end=freq){
  if(!soundEnabled||!audioCtx)return;
- volume*=ambientVolume;
  const now=audioCtx.currentTime+delay,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
- osc.type=type;osc.frequency.setValueAtTime(freq,now);
+ osc.type=type;osc.frequency.setValueAtTime(freq,now);osc.frequency.exponentialRampToValueAtTime(end,now+duration);
  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),now+.035);
  gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
- osc.connect(gain);gain.connect(audioCtx.destination);osc.start(now);osc.stop(now+duration+.04);
+ osc.connect(gain);gain.connect(gameAudioOutput());osc.start(now);osc.stop(now+duration+.04);
+ osc.onended=()=>{osc.disconnect();gain.disconnect();};
 }
 // Very quiet, distant thunder: filtered low noise with a slow envelope.
 // Runs only for a lightning event and respects environment audio toggle.
@@ -6208,16 +6233,17 @@ function playSoftThunder(){
  const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=185;
  const gain=audioCtx.createGain(),now=audioCtx.currentTime+.45;
  gain.gain.setValueAtTime(.0001,now);
- gain.gain.linearRampToValueAtTime(.055,now+.65);
+ gain.gain.linearRampToValueAtTime(.024,now+.65);
  gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
- source.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
+ source.connect(filter);filter.connect(gain);gain.connect(gameAudioOutput());
  source.start(now);source.stop(now+duration);
+ source.onended=()=>{source.disconnect();filter.disconnect();gain.disconnect();};
 }
 function birdCall(){
  const base=randomBetween(1200,1900);
- tone(base,.11,'sine',.022);tone(base*1.23,.10,'sine',.018,.12);tone(base*.91,.16,'sine',.022,.25);
+ tone(base,.12,'sine',.014,0,base*1.28);tone(base*1.25,.10,'sine',.011,.16,base*.94);tone(base*.95,.16,'sine',.012,.31,base*1.1);
 }
-function owlCall(){tone(420,.43,'sine',.045);tone(335,.53,'sine',.037,.5);}
+function owlCall(){tone(420,.43,'sine',.018);tone(335,.53,'sine',.014,.5);}
 let forestTextureTimer=8;
 function forestCricket(){
  const base=randomBetween(3600,4300);
@@ -6236,7 +6262,7 @@ function forestFrog(){
 let bonfireCrackleTimer=.7;
 function softFireCrackle(level){
  if(!audioCtx||audioCtx.state!=='running'||!soundEnabled||level<=0)return;
- const duration=.022+Math.random()*.065;
+ const duration=.045+Math.random()*.1;
  const sampleRate=audioCtx.sampleRate;
  const buffer=audioCtx.createBuffer(1,Math.ceil(sampleRate*duration),sampleRate);
  const data=buffer.getChannelData(0);
@@ -6248,12 +6274,13 @@ function softFireCrackle(level){
  const source=audioCtx.createBufferSource();source.buffer=buffer;
  const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=650+Math.random()*750;
  const gain=audioCtx.createGain(),now=audioCtx.currentTime;
- const peak=(.0042+Math.random()*.0056)*level; // v3.78: +40%, still quiet beneath forest ambience
+ const peak=(.012+Math.random()*.016)*level; // Close crackles stay beneath the cricket reference after the quiet master mix.
  gain.gain.setValueAtTime(.00001,now);
  gain.gain.linearRampToValueAtTime(peak,now+.008);
  gain.gain.exponentialRampToValueAtTime(.00001,now+duration);
- source.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
+ source.connect(filter);filter.connect(gain);gain.connect(gameAudioOutput());
  source.start(now);source.stop(now+duration+.01);
+ source.onended=()=>{source.disconnect();filter.disconnect();gain.disconnect();};
 }
 function updateBonfireAmbience(dt){
  if(!soundEnabled||paused||document.hidden||!audioCtx||audioCtx.state!=='running')return;
@@ -6275,6 +6302,9 @@ function updateBonfireAmbience(dt){
  }
 }
 function updateSound(dt,isNight){
+ syncGameAudio();
+ window.HinaInteractionSFX?.movement(observedId,observedId==='daeun'?daeun.mesh.position:hana.position,observedId==='daeun'?daeun.action:state);
+ if(document.hidden)return;
  if(!soundEnabled||!audioCtx||audioCtx.state!=='running'||paused)return;
  ambientTimer-=dt;
  if(ambientTimer<=0){if(isNight)owlCall();else birdCall();ambientTimer=isNight?randomBetween(5,11):randomBetween(2,5);}
@@ -6783,11 +6813,11 @@ const companionSpeech={speaker:'',line:'',until:0};
 const v501DialogueVoice=(()=>{
  let ctx=null,lastAt=0,activeUntil=0;
  const tones={hina:650,daeun:540,seoyeon:720,jiyu:410,mina:580};
- function unlock(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!ctx)ctx=new C();if(ctx.state==='suspended')ctx.resume().catch(()=>{});}catch(_){}}
+ function unlock(){window.HinaGameAudio?.unlock().then(()=>{ctx=window.HinaGameAudio.context;}).catch(()=>{});}
  window.addEventListener('pointerdown',unlock,{passive:true});
  window.addEventListener('keydown',unlock,{passive:true});
  function speak(id,line){
-  if(!ctx||ctx.state!=='running'||!line||document.hidden)return;
+  if(!ctx||ctx.state!=='running'||!line||!window.HinaGameAudio?.enabled)return;
   const now=ctx.currentTime;
   if(now<activeUntil||now-lastAt<.25)return;
   const n=Math.min(11,Math.max(3,Math.ceil([...line].length/3)));
@@ -6797,9 +6827,9 @@ const v501DialogueVoice=(()=>{
    for(let i=0;i<n;i++){
     const t=start+i*step,osc=ctx.createOscillator(),gain=ctx.createGain();
     osc.type='sine';osc.frequency.setValueAtTime(base*(1+([0,.055,-.035,.025][i%4])),t);
-    gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(.0306,t+.008);
+    gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(.014,t+.008);
     gain.gain.exponentialRampToValueAtTime(.0001,t+.055);
-    osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+.06);
+    osc.connect(gain);gain.connect(window.HinaGameAudio.output());osc.start(t);osc.stop(t+.06);
     osc.onended=()=>{osc.disconnect();gain.disconnect();};
    }
    activeUntil=start+n*step;lastAt=now;
@@ -7844,6 +7874,7 @@ function daeunSay(text){
  if(firstDayPositiveSpeech(text))return;
  // DAY 1: observe and recover from the arrival, never announce resources as loot.
  if(clockParts().day===1 && /나뭇가지|가지가|채집|수집|주워|모으|열매를 먹|물고기 잡|토끼 잡|불을 피우/.test(text) && !/없|부족|필요|못|모자라/.test(text))return;
+ if(observedId==='daeun')window.HinaInteractionSFX?.event(text);
  survivorSpeech.post('daeun',text);daeun.thought=text;daeun.speechExpiresAt=performance.now()+3000;daeun.log.unshift({at:elapsed,text});if(daeun.log.length>28)daeun.log.length=28;}
 // Developer-friendly navigation diagnostics: visible in the action log and copyable from console.
 const daeunNavDiagnostics={lastX:NaN,lastZ:NaN,repeats:0,lastAt:-999};
@@ -8863,6 +8894,10 @@ const GAME_FLOAT_LABELS={hunger:'허기',thirst:'갈증',energy:'체력',will:'�
 function gameTransactionFloat(character,kind,key,amount){
  if(!Number.isFinite(amount)||Math.abs(amount)<.001||character!==observedId)return;
  if(kind==='item'&&amount<0)return;
+ if(amount>0){
+  const sound=kind==='food'?'eat':kind==='vital'&&key==='thirst'&&amount>1?'water':kind==='item'?({berries:'berry',branches:'wood',palmFronds:'berry',fish:'fish',cookedFish:'cook',fuel:'fire'}[key]):null;
+  if(sound)window.HinaInteractionSFX?.play(sound);
+ }
  const node=document.createElement('div');node.className='skillGainFloat';
  node.style.top=(Math.min(innerHeight*.47,250)+(document.querySelectorAll('.skillGainFloat').length%3)*28)+'px';
  if(kind==='item'&&(key==='branches'||key==='palmFronds')){
@@ -10042,6 +10077,7 @@ function craftingV492Finish(t){const {id,kind}=t,reason=craftingV492Check(id,kin
  const categoryKey=craftingV495RecipeCategories[kind];const success=(d.categories?.[categoryKey]||0)>=Number(recipe.requiredCategory||0);
  const category=craftingV495RecipeCategories[kind];if(category){if(!d.categories)d.categories={living:0,storage:0};d.categories[category]=Math.min(100,(d.categories[category]||0)+(success?8:5));}
  const categoryGain=success?8:5;if(typeof gameTransactionFloat==='function')gameTransactionFloat(id,'skill',kind==='bag'?'storage':'living',categoryGain);
+ if(success&&id===observedId)window.HinaInteractionSFX?.play('success');
  if(success){if(kind!=='mat')d[kind]=true;if(kind==='mat')craftingV492Place(id);if(kind==='bag'&&id==='daeun'){daeun.bag.crafted=true;daeun.bag.progress=100;updateDaeunBagVisual();}}
  craftingV492Message(success?recipe.name+' 제작 성공!':'제작 실패 · 재료 소비, 관련 숙련도 +5');refreshV435Inventory();craftingV492Render();v498RenderSkills();}
 const v503Beds=[];
@@ -11640,46 +11676,101 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
 })();
 </script>
 <script id="hina-interaction-sfx-v401">
-/* Additive interaction SFX. No gameplay state or save data is changed. */
+/* Quiet shared-context feedback. All output follows the environment volume. */
 (()=>{
-let ctx=null,noise=null;const last=new Map();
-function audio(){if(ctx)return ctx;const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ctx=new C();return ctx}
-function unlocked(){const a=audio();if(a&&a.state==='suspended')a.resume().catch(()=>{})}
-function enabled(){return !document.hidden && Number(document.getElementById('ambientVolume')?.value ?? 65)>0}
-function tone(a,t,f,d,vol,type='sine',end=f){const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,end),t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,vol),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.02)}
-function hiss(a,t,d,vol,filter=1100){const sr=a.sampleRate;const n=Math.ceil(sr*.24);if(!noise){noise=a.createBuffer(1,n,sr);const z=noise.getChannelData(0);for(let i=0;i<n;i++)z[i]=Math.random()*2-1}const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=noise;f.type='lowpass';f.frequency.value=filter;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+.014);g.gain.exponentialRampToValueAtTime(.0001,t+d);s.connect(f);f.connect(g);g.connect(a.destination);s.start(t);s.stop(t+d+.01)}
-function play(k){if(!enabled())return;const a=audio();if(!a||a.state!=='running')return;const now=performance.now(),limit=k==='ui'?90:420;if(now-(last.get(k)||-1e6)<limit)return;last.set(k,now);const t=a.currentTime+.005;
-switch(k){case 'water':hiss(a,t,.21,.055,1800);tone(a,t,390,.13,.025,'sine',240);break;
-case 'berry':tone(a,t,680,.075,.035,'sine',460);tone(a,t+.07,840,.095,.026);break;
-case 'wood':hiss(a,t,.11,.052,650);tone(a,t,190,.09,.038,'triangle',120);break;
-case 'fire':hiss(a,t,.23,.05,2500);tone(a,t,260,.19,.027,'triangle',130);break;
-case 'cook':hiss(a,t,.24,.045,3600);tone(a,t+.04,490,.13,.025);break;
-case 'craft':hiss(a,t,.12,.035,900);tone(a,t,340,.09,.034,'triangle',230);tone(a,t+.12,400,.10,.025,'triangle',280);break;
-case 'eat':tone(a,t,300,.095,.033,'triangle',230);tone(a,t+.12,250,.095,.024,'triangle',200);break;
-case 'sleep':tone(a,t,420,.24,.024,'sine',240);break;
-case 'rest':tone(a,t,360,.18,.022,'sine',300);break;
-case 'animal':tone(a,t,720,.12,.022,'sine',880);break;
-case 'wash':hiss(a,t,.24,.055,2400);break;
-case 'success':tone(a,t,530,.12,.035);tone(a,t+.13,790,.19,.029);break;
-default:tone(a,t,560,.065,.012,'sine',480)}}
-function classify(el){const raw=((el.id||'')+' '+(el.className?.baseVal||el.className||'')+' '+(el.getAttribute('title')||'')+' '+(el.getAttribute('aria-label')||'')+' '+(el.textContent||'').slice(0,65)).toLowerCase();
-if(/soundtoggle|환경음/.test(raw))return null;
-if(/물고기|낚시|fish|water|마시|물 뜨|물 긷/.test(raw))return 'water';
-if(/열매|berry|채집/.test(raw))return 'berry';
-if(/나뭇가지|장작|firewood|fuel|가지/.test(raw))return 'wood';
-if(/모닥불|불 피우|fire|torch|횃불|점화/.test(raw))return 'fire';
-if(/굽기|구운|cook/.test(raw))return 'cook';
-if(/가방|바구니|craft|제작/.test(raw))return 'craft';
-if(/먹기|먹어|eat|식사/.test(raw))return 'eat';
-if(/sleep|수면|잠자|잠들/.test(raw))return 'sleep';
-if(/rest|휴식|쉬기/.test(raw))return 'rest';
-if(/토끼|사슴|rabbit|deer|관찰/.test(raw))return 'animal';
-if(/씻기|wash/.test(raw))return 'wash';
-if(/resourceemoji|marker|interact|action|button|btn/.test(raw))return 'ui';return null}
-window.addEventListener('pointerdown',unlocked,{capture:true,passive:true});window.addEventListener('touchstart',unlocked,{capture:true,passive:true});window.addEventListener('click',unlocked,{capture:true});window.addEventListener('keydown',unlocked,{capture:true});
-document.addEventListener('click',e=>{const el=e.target.closest('button,.daeunResourceEmoji,[role="button"]');if(!el||el.disabled)return;const k=classify(el);if(k)play(k)},true);
-// Keyboard-activated controls also use click events; no duplicate pointer handlers.
-window.HinaInteractionSFX={play};
+const last=new Map(),counts={};let noise=null,lastAny=-Infinity,position=null,walker='',distance=0,lastAction='';
+function tone(a,t,f,d,vol,type='sine',end=f){
+ const o=a.createOscillator(),g=a.createGain();o.type=type;
+ o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,end),t+d);
+ g.gain.setValueAtTime(.00001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.00001,t+d);
+ o.connect(g);g.connect(window.HinaGameAudio.output());o.start(t);o.stop(t+d+.02);
+ o.onended=()=>{o.disconnect();g.disconnect();};
+}
+function hiss(a,t,d,vol,filter=1100){
+ if(!noise||noise.sampleRate!==a.sampleRate){noise=a.createBuffer(1,Math.ceil(a.sampleRate*.6),a.sampleRate);const z=noise.getChannelData(0);for(let i=0;i<z.length;i++)z[i]=Math.random()*2-1;}
+ const source=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();source.buffer=noise;
+ f.type='lowpass';f.frequency.value=filter;
+ g.gain.setValueAtTime(.00001,t);g.gain.linearRampToValueAtTime(vol,t+.014);g.gain.exponentialRampToValueAtTime(.00001,t+d);
+ source.connect(f);f.connect(g);g.connect(window.HinaGameAudio.output());source.start(t);source.stop(t+d+.01);
+ source.onended=()=>{source.disconnect();f.disconnect();g.disconnect();};
+}
+function play(kind){
+ const bus=window.HinaGameAudio,a=bus?.context;
+ if(!bus?.enabled||!a||a.state!=='running')return false;
+ const now=performance.now(),limit=kind==='step'?380:kind==='ui'?100:650;
+ if(now-lastAny<75||now-(last.get(kind)??-Infinity)<limit)return false;
+ last.set(kind,now);lastAny=now;counts[kind]=(counts[kind]||0)+1;
+ const t=a.currentTime+.005;
+ switch(kind){
+ case 'water':hiss(a,t,.25,.014,1700);tone(a,t,510,.13,.009,'sine',280);tone(a,t+.12,650,.12,.007,'sine',340);break;
+ case 'fish':hiss(a,t,.30,.016,2000);tone(a,t+.06,450,.15,.009,'sine',210);break;
+ case 'berry':hiss(a,t,.12,.009,1700);tone(a,t,760,.07,.009,'sine',570);break;
+ case 'wood':hiss(a,t,.12,.016,750);tone(a,t,180,.09,.010,'triangle',105);break;
+ case 'fire':hiss(a,t,.35,.016,2100);hiss(a,t+.16,.13,.010,950);break;
+ case 'cook':hiss(a,t,.4,.013,3200);hiss(a,t+.22,.13,.008,2300);break;
+ case 'craft':hiss(a,t,.12,.012,950);tone(a,t,260,.09,.009,'triangle',180);tone(a,t+.15,350,.1,.008,'triangle',240);break;
+ case 'eat':hiss(a,t,.12,.010,1000);tone(a,t,280,.085,.008,'triangle',190);hiss(a,t+.14,.1,.007,800);break;
+ case 'sleep':tone(a,t,390,.28,.008,'sine',240);tone(a,t+.18,290,.25,.006,'sine',200);break;
+ case 'rest':tone(a,t,340,.23,.008,'sine',280);break;
+ case 'animal':tone(a,t,840,.09,.009,'sine',1050);tone(a,t+.12,730,.12,.007,'sine',650);break;
+ case 'wash':hiss(a,t,.38,.015,2400);hiss(a,t+.19,.18,.009,1600);break;
+ case 'success':tone(a,t,530,.12,.012);tone(a,t+.14,790,.18,.010);break;
+ case 'inventory':hiss(a,t,.16,.009,1250);tone(a,t,330,.07,.005,'triangle',250);break;
+ case 'step':hiss(a,t,.075,.008,600+Math.random()*350);break;
+ default:tone(a,t,560,.065,.005,'sine',470);
+ }
+ return true;
+}
+function classify(el){
+ const raw=[el.id,el.getAttribute('title'),el.getAttribute('aria-label'),el.textContent?.slice(0,80)].join(' ').toLowerCase();
+ if(/soundtoggle|환경음|음량|볼륨/.test(raw))return null;
+ if(/먹기|먹어|eat|식사/.test(raw))return 'eat';
+ if(/굽기|구운|cook/.test(raw))return 'cook';
+ if(/씻기|wash/.test(raw))return 'wash';
+ if(/낚시|fish|물고기/.test(raw))return 'fish';
+ if(/마시|drink|water|물 뜨|물 긷/.test(raw))return 'water';
+ if(/열매|berry|채집/.test(raw))return 'berry';
+ if(/장작|firewood|fuel|나뭇가지/.test(raw))return 'wood';
+ if(/모닥불|불 피우|fire|torch|횃불|점화/.test(raw))return 'fire';
+ if(/craft|제작/.test(raw))return 'craft';
+ if(/가방|바구니|인벤토리|소지품|itemtoggle/.test(raw))return 'inventory';
+ if(/sleep|수면|잠자|잠들/.test(raw))return 'sleep';
+ if(/rest|휴식|쉬기/.test(raw))return 'rest';
+ if(/토끼|사슴|rabbit|deer|관찰/.test(raw))return 'animal';
+ return 'ui';
+}
+function event(text){
+ // Only completed actions: plans, failed attempts and thoughts stay silent.
+ if(/없|부족|필요|못|실패|중단|싶|보자|할까/.test(text))return false;
+ let kind=null;
+ if(/완성|제작 성공|발견했|해금/.test(text))kind='success';
+ else if(/씻.*완료|세안.*완료/.test(text))kind='wash';
+ else if(/마셨|물을 마심/.test(text))kind='water';
+ else if(/먹었|먹음|식사 완료/.test(text))kind='eat';
+ else if(/물고기.*잡|낚시 성공/.test(text))kind='fish';
+ else if(/채집|열매.*모았/.test(text))kind='berry';
+ else if(/장작.*추가|가지.*주웠|가지.*수집/.test(text))kind='wood';
+ else if(/불.*피웠|점화 성공/.test(text))kind='fire';
+ else if(/굽기 완료|요리 완료/.test(text))kind='cook';
+ return kind?play(kind):false;
+}
+function movement(id,pos,action){
+ if(!pos||![pos.x,pos.z].every(Number.isFinite))return;
+ const previous=position;position={x:pos.x,z:pos.z};
+ if(id!==walker){walker=id;distance=0;return;}
+ if(!window.HinaGameAudio?.enabled){distance=0;return;}
+ if(action!==lastAction){lastAction=action;if(/sleep/i.test(action))play('sleep');else if(/rest/i.test(action))play('rest');}
+ if(!previous)return;
+ const step=Math.hypot(pos.x-previous.x,pos.z-previous.z);
+ if(step>3){distance=0;return;} // No footsteps for teleport / developer day jumps.
+ distance+=step;
+ if(distance>.85){play('step');distance=0;}
+}
+function unlock(){window.HinaGameAudio?.unlock().catch(()=>{});}
+window.addEventListener('pointerdown',unlock,{capture:true,passive:true});
+document.addEventListener('pointerdown',e=>{if(e.target.closest('#mobileMenu'))play('ui');},true);
+document.addEventListener('click',e=>{const el=e.target.closest('button,.daeunResourceEmoji,[role="button"]');if(!el||el.disabled||el.getAttribute('aria-disabled')==='true')return;const kind=classify(el);if(kind)play(kind);},true);
+window.HinaInteractionSFX={play,event,movement,diagnose:()=>({...counts})};
 })();
 </script>
 <style id="mobileCompactV434">
