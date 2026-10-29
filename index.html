@@ -1583,18 +1583,132 @@ function makeFlowerButterfly(patch){
  }
  console.info('[HINA] Island reactive flower beds:',activePatches,'flowers:',planted);
 }
+// v5.2.79: Shared ambient flower / bee / butterfly observations for AI and manual play.
+// Uses existing speech arbitration, never creates separate bubbles or animation loops.
+const flowerObservationState={hina:{next:45,last:-1},daeun:{next:55,last:-1}};
+const flowerObservationLines={
+ flower:['꽃들이 참 예쁘다.','이렇게 꽃이 피어 있다니 신기해.','꽃들이 바람에 살랑거려.'],
+ bee:['벌이 꽃 사이를 날아다니네.','벌이 열심히 꿀을 모으고 있어.','꽃 근처에 벌이 있네. 조심해서 지나가자.'],
+ butterfly:['나비가 꽃 위를 날고 있어!','와, 나비 날개 색깔 좀 봐.','나비가 꽃 주변을 빙빙 도네.']
+};
+function updateFlowerObservations(t){
+ if(!flowerBeeFlights.length||!daeunFlowerBends.length||!flowerBeeRoot.visible)return;
+ const now=t*.001;
+ if(!Number.isFinite(now))return;
+ const candidates=[['hina',hana?.position],['daeun',daeun?.mesh?.position]];
+ for(const [id,pos] of candidates){
+  if(!pos)continue;
+  const st=flowerObservationState[id];if(now<st.next)continue;
+  let closest=null,distSq=Infinity;
+  for(const f of flowerBeeFlights){
+   const dx=pos.x-f.cx,dz=pos.z-f.cz,d=dx*dx+dz*dz;
+   if(d<distSq){distSq=d;closest=f;}
+  }
+  if(!closest||distSq>36)continue; // Within six meters of a planted flowerbed.
+  // Don't interrupt higher-priority survival, sleep, or companion dialogue.
+  if(id==='hina'){
+   if(hinaSleepSpeechLock()||performance.now()<hinaSpeechExpiresAt+2500||survivorSpeech.companionOwns('hina'))continue;
+  }else{
+   if(performance.now()<(daeun.speechExpiresAt||0)+2500||daeun.restLocked)continue;
+  }
+  const kinds=['flower',closest.kind];
+  const kind=kinds[Math.floor(Math.random()*kinds.length)];
+  // The first day is disorienting: observations remain cautious, not delighted.
+  const firstDayLines={
+   flower:['이런 곳에도 꽃이 피어 있네... 여긴 대체 어디지?','꽃이 이렇게 많은데... 주변부터 살펴봐야겠어.'],
+   bee:['벌이 있네... 가까이 가지 말아야겠다.','벌까지 있다니... 여기가 어떤 곳인지 모르겠어.'],
+   butterfly:['나비가 날아다니네... 여긴 어디일까?','나비가 있긴 한데... 지금은 정신이 없어.']
+  };
+  const lines=clockParts().day===1?firstDayLines[kind]:flowerObservationLines[kind];
+  let index=Math.floor(Math.random()*lines.length);
+  if(index===st.last)index=(index+1)%lines.length;
+  st.last=index;
+  if(id==='hina')say(lines[index]);else daeunSay(lines[index]);
+  st.next=now+65+Math.random()*85; // Natural occasional looping, not chatter spam.
+ }
+}
+// v5.2.81: Lightweight proximity-based bee wing buzzing. No speech bubble spam.
+let nextFlowerBeeBuzzAt=0;
+function updateFlowerBeeBuzz(seconds,daytime){
+ if(!daytime||seconds<nextFlowerBeeBuzzAt||!soundEnabled||paused||
+    !audioCtx||audioCtx.state!=='running'||document.hidden)return;
+ const listener=hana?.position||daeun?.mesh?.position;
+ if(!listener)return;
+ let nearest=Infinity;
+ for(const f of flowerBeeFlights){
+  if(f.kind!=='bee')continue; // Butterfly-only beds remain silent.
+  const dx=listener.x-f.bee.position.x,dz=listener.z-f.bee.position.z;
+  nearest=Math.min(nearest,Math.hypot(dx,dz));
+ }
+ if(nearest>8){nextFlowerBeeBuzzAt=seconds+1.2;return;}
+ const proximity=Math.pow(Math.max(0,1-nearest/8),2);
+ const now=audioCtx.currentTime;
+ const duration=.42+.17*Math.random();
+ const osc=audioCtx.createOscillator();
+ const mod=audioCtx.createOscillator();
+ const modGain=audioCtx.createGain();
+ const filter=audioCtx.createBiquadFilter();
+ const gain=audioCtx.createGain();
+ osc.type='sawtooth';osc.frequency.setValueAtTime(175+Math.random()*35,now);
+ mod.type='sine';mod.frequency.value=28+Math.random()*12;
+ modGain.gain.value=19;
+ mod.connect(modGain);modGain.connect(osc.frequency);
+ filter.type='lowpass';filter.frequency.value=650;
+ const peak=Math.min(.018, .018*proximity*ambientVolume);
+ gain.gain.setValueAtTime(0,now);
+ gain.gain.linearRampToValueAtTime(peak,now+.08);
+ gain.gain.setValueAtTime(peak,now+duration-.12);
+ gain.gain.linearRampToValueAtTime(0,now+duration);
+ osc.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
+ mod.start(now);osc.start(now);osc.stop(now+duration+.01);mod.stop(now+duration+.01);
+ osc.onended=()=>{osc.disconnect();mod.disconnect();modGain.disconnect();filter.disconnect();gain.disconnect();};
+ nextFlowerBeeBuzzAt=seconds+1.4+Math.random()*1.5;
+}
+// v5.2.82 — All flower insects scatter away from nearby characters and return to their home flower bed.
 function updateFlowerBees(t){
  const hour=clockParts().h;
  const daytime=hour>=6&&hour<19;
  flowerBeeRoot.visible=daytime;
  if(!daytime)return;
  const seconds=t*.001;
+ const characters=[hana?.position,daeun?.mesh?.position].filter(Boolean);
  for(const f of flowerBeeFlights){
   const a=seconds*f.speed+f.phase;
   const r=f.radius+.22*Math.sin(a*.77);
-  f.bee.position.set(f.cx+Math.cos(a)*r,
-   f.baseY+.19*Math.sin(a*2.3)+.1*Math.cos(a*.71),
-   f.cz+Math.sin(a)*r);
+  const homeX=f.cx+Math.cos(a)*r;
+  const homeY=f.baseY+.19*Math.sin(a*2.3)+.1*Math.cos(a*.71);
+  const homeZ=f.cz+Math.sin(a)*r;
+  if(f.scatterAmount===undefined){
+   f.scatterAmount=0;f.scatterX=0;f.scatterZ=0;f.scatterY=0;
+   f.scatterUntil=0;f.lastScatter=0;
+  }
+  let nearest=null,nearestDist=Infinity;
+  for(const p of characters){
+   const d=Math.hypot(homeX-p.x,homeZ-p.z);
+   if(d<nearestDist){nearestDist=d;nearest=p;}
+  }
+  // One avoidance event per approach; keep a short hold time to prevent flickering.
+  if(nearest&&nearestDist<2.5&&seconds>=f.lastScatter+1.0&&f.scatterAmount<.2){
+   const dx=homeX-nearest.x,dz=homeZ-nearest.z;
+   const len=Math.max(.01,Math.hypot(dx,dz));
+   const side=(Math.sin(f.phase*13.7)>0?1:-1);
+   const spread=f.kind==='butterfly'?3:2;
+   const sideways=side*(f.kind==='butterfly'?.65:.9);
+   f.scatterX=(dx/len+(-dz/len)*sideways)*spread;
+   f.scatterZ=(dz/len+(dx/len)*sideways)*spread;
+   f.scatterY=f.kind==='butterfly'?1.4:.45;
+   f.scatterUntil=seconds+(f.kind==='butterfly'?1.4:.8);
+   f.lastScatter=seconds;
+  }
+  const threatened=nearestDist<3.1||seconds<f.scatterUntil;
+  const dt=Math.min(.05,Math.max(0,seconds-(f.prevSeconds??seconds)));
+  f.prevSeconds=seconds;
+  const rate=threatened?(f.kind==='butterfly'?4.8:8):(f.kind==='butterfly'?1.1:2.2);
+  f.scatterAmount+=(Number(threatened)-f.scatterAmount)*(1-Math.exp(-rate*dt));
+  if(f.scatterAmount<.001)f.scatterAmount=0;
+  f.bee.position.set(homeX+f.scatterX*f.scatterAmount,
+   homeY+f.scatterY*f.scatterAmount,
+   homeZ+f.scatterZ*f.scatterAmount);
   f.bee.rotation.y=-a;
   if(f.kind==='butterfly'){
    f.bee.rotation.z=.12*Math.sin(seconds*1.8+f.phase);
@@ -1603,6 +1717,7 @@ function updateFlowerBees(t){
    }
   }
  }
+ updateFlowerBeeBuzz(seconds,daytime);
 }
 function updateDaeunFlowerBends(dt,t){
  if(!daeunFlowerBends.length)return;
@@ -4478,7 +4593,15 @@ function inspectBlockedSpeech(t){
  }
 }
 let hinaSpeechExpiresAt=0;
+// v5.2.80: Day-one speech tone shared by AI and manual-control dialogue.
+// Only suppress unmistakably cheerful/excited remarks; preserve urgent survival warnings.
+function firstDayPositiveSpeech(text){
+ if(clockParts().day!==1||typeof text!=='string')return false;
+ if(/없|부족|필요|위험|조심|무서|두려|아프|배고|목말|피곤|춥|덥|살아|어떡|어디|왜|모르|걱정|도망|못|힘들|불안|큰일/.test(text))return false;
+ return /예쁘|아름답|멋지|신기해|좋아[!~.]|좋네|좋겠다|행복|즐겁|재밌|재미있|귀엽|사랑스|기쁘|신나|반갑|대단해|최고|와[!,~ ]|우와|야호|훌륭|근사|평화롭|힐링|상쾌|기분 좋|멋있|괜찮아 보|멋진/.test(text);
+}
 function say(t){
+ if(firstDayPositiveSpeech(t))return;
  if(clockParts().day===1 && /나뭇가지를 모|나뭇가지가 있|가지가 있|열매를 채집|열매를 먹|불을 피워 봐|물고기를 잡|토끼를 잡/.test(t) && !/없|부족|필요|못|모자라/.test(t))return;
  inspectBlockedSpeech(t);
  if(elapsed<DAY_SECONDS && t.includes('또 하루가 시작됐네'))return;
@@ -7671,6 +7794,7 @@ let daeunBerrySelectionDay=0;
 let daeunPetRabbit=null;
 function dRandom(){daeun.aiRandom=(Math.imul(1664525,daeun.aiRandom)+1013904223)>>>0;return daeun.aiRandom/4294967296;}
 function daeunSay(text){
+ if(firstDayPositiveSpeech(text))return;
  // DAY 1: observe and recover from the arrival, never announce resources as loot.
  if(clockParts().day===1 && /나뭇가지|가지가|채집|수집|주워|모으|열매를 먹|물고기 잡|토끼 잡|불을 피우/.test(text) && !/없|부족|필요|못|모자라/.test(text))return;
  survivorSpeech.post('daeun',text);daeun.thought=text;daeun.speechExpiresAt=performance.now()+3000;daeun.log.unshift({at:elapsed,text});if(daeun.log.length>28)daeun.log.length=28;}
@@ -11355,7 +11479,7 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
  lastRenderAt=t;const frameCpuStart=performance.now();
  characterAnimation.beginFrame();
- let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);updateDaeunFlowerBends(dt,t);updateFlowerBees(t);updateSurvivorSystems(dt);v517UpdateObjectives(dt);refreshCharacterUI(t);if(v498Skills.style.display==='block')v498RenderSkills();craftingV4993ApplyPoses();characterAnimation.endFrame(dt,t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina'&&!hinaSleepSpeechLock()&&survivorSpeech.companionOwns('hina'))$('bubble').textContent=meetingHinaLine;}if(!paused){updateTreeWind(t*.001);updateBerryPickingSway(t*.001);animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);v519AnimateSheep(t*.001);}if(followCamera){
+ let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);updateDaeunFlowerBends(dt,t);updateFlowerBees(t);updateFlowerObservations(t);updateSurvivorSystems(dt);v517UpdateObjectives(dt);refreshCharacterUI(t);if(v498Skills.style.display==='block')v498RenderSkills();craftingV4993ApplyPoses();characterAnimation.endFrame(dt,t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina'&&!hinaSleepSpeechLock()&&survivorSpeech.companionOwns('hina'))$('bubble').textContent=meetingHinaLine;}if(!paused){updateTreeWind(t*.001);updateBerryPickingSway(t*.001);animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);v519AnimateSheep(t*.001);}if(followCamera){
   updateFollowDeadZone(dt);
   if(followView==='back')v4998CameraOffset();
    followDesired.copy(followFocus).add(followOffset);
@@ -13356,4 +13480,49 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  #v5264SettingsControls label,#v5264SettingsControls span,#v5264SettingsControls button,#v5264SettingsControls select{font-size:11px!important;text-align:center!important;max-width:100%!important;white-space:normal!important}
  #v5264SettingsControls input[type=range]{width:90%!important;max-width:100%!important;margin:2px auto!important;align-self:center!important}
 }
-</style></body></html>
+</style>
+<!-- v5.2.77: compact hamburger + offset objective HUD (mobile only). -->
+<style id="v5277TopHUDLayout">
+@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+  html body #mobileMenu{
+    font-size:0!important;line-height:0!important;
+    width:36px!important;min-width:36px!important;height:34px!important;
+    padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;
+    top:calc(5px + env(safe-area-inset-top))!important;right:7px!important;left:auto!important;
+  }
+  html body #mobileMenu::after{
+    content:"☰"!important;display:block!important;position:static!important;
+    font-size:23px!important;line-height:1!important;font-weight:700!important;
+  }
+  html body #v517ObjectiveUI{
+    left:56%!important;right:auto!important;top:calc(5px + env(safe-area-inset-top))!important;
+    transform:translateX(-50%)!important;
+    width:max-content!important;max-width:min(56vw,330px)!important;min-width:0!important;
+    padding:5px 9px!important;box-sizing:border-box!important;
+  }
+  html body #v517ObjectiveUI .v517Message{font-size:12px!important;line-height:1.25!important;}
+}
+</style>
+<script id="v5277MenuAccessibleLabel">
+(()=>{const b=document.getElementById('mobileMenu');if(b){b.setAttribute('aria-label','메뉴 열기 및 닫기');b.setAttribute('title','메뉴');}})();
+</script>
+
+<!-- v5.2.78: smaller hamburger (2/3), larger and lower objective -->
+<style id="v5278TopHUDRefinement">
+@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+ html body #mobileMenu{
+  width:24px!important;min-width:24px!important;height:23px!important;
+  top:calc(12px + env(safe-area-inset-top))!important;right:10px!important;
+  padding:0!important;border-radius:6px!important;
+ }
+ html body #mobileMenu::after{font-size:16px!important;line-height:1!important;}
+ html body #v517ObjectiveUI{
+  left:56%!important;right:auto!important;top:calc(13px + env(safe-area-inset-top))!important;
+  transform:translateX(-50%)!important;
+  width:max-content!important;max-width:min(63vw,380px)!important;
+  padding:8px 12px!important;border-radius:10px!important;
+ }
+ html body #v517ObjectiveUI .v517Message{font-size:15px!important;line-height:1.35!important;}
+}
+</style>
+</body></html>
