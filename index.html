@@ -1469,6 +1469,7 @@ for(let i=0;i<95;i++){
 // v5.2.74 — Three-color rooted reactive flower clusters across the island.
 const daeunFlowerBends=[];
 const flowerBeeFlights=[];
+const cameraFlowerPatches=[];
 const flowerBeeRoot=new THREE.Group();flowerBeeRoot.name='DAYTIME_FLOWER_BEES';scene.add(flowerBeeRoot);
 const beeBodyGeo=new THREE.SphereGeometry(.13,7,5);
 const beeWingGeo=new THREE.SphereGeometry(.095,6,4);
@@ -1529,6 +1530,7 @@ function makeFlowerButterfly(patch){
   const [cx,cz,colorIndex]=patches[patch];
   if(!landAt(cx,cz)||deepPondAt(cx,cz)||caveEntrancePortal(cx,cz))continue;
   const petalMat=petalMaterials[colorIndex];
+  const patchFlowers=[];
   let plantedInPatch=0;
   for(let i=0;i<17;i++){
    const angle=i*2.399963+patch*.43;
@@ -1563,21 +1565,25 @@ function makeFlowerButterfly(patch){
    flower.rotation.y=angle;
    flower.traverse(o=>{if(o.isMesh){o.frustumCulled=false;o.castShadow=false;o.receiveShadow=false;}});
    root.add(flower);
-   daeunFlowerBends.push({flower,pivot:bendPivot,x,z,phase:patch*.8+i*.67,vx:0,vz:0});
+   const entry={flower,pivot:bendPivot,x,z,localX:x-cx,localZ:z-cz,phase:patch*.8+i*.67,vx:0,vz:0};
+   patchFlowers.push(entry);daeunFlowerBends.push(entry);
    planted++;plantedInPatch++;
   }
   if(plantedInPatch){
    activePatches++;
+   const patchData={cx,cz,flowers:patchFlowers,insects:[],seed:patch};
+   cameraFlowerPatches.push(patchData);
    // Each bed has only bees OR butterflies, never both.
    const butterflyPatch=(patch%2===1);
    const insectCount=(patch%3===0)?2:1;
    for(let b=0;b<insectCount;b++){
     const insect=butterflyPatch?makeFlowerButterfly(patch):makeFlowerBee();
     flowerBeeRoot.add(insect);
-    flowerBeeFlights.push({bee:insect,kind:butterflyPatch?'butterfly':'bee',cx,cz,
+    const flight={bee:insect,kind:butterflyPatch?'butterfly':'bee',cx,cz,
       baseY:terrainTopAt(cx,cz,0)+(butterflyPatch?1.35:1.15),
       phase:patch*1.81+b*2.7,radius:.55+b*.32,
-      speed:(butterflyPatch?.39:.65)+(patch%4)*.08});
+      speed:(butterflyPatch?.39:.65)+(patch%4)*.08};
+    flowerBeeFlights.push(flight);patchData.insects.push(flight);
    }
   }
  }
@@ -1601,6 +1607,7 @@ function updateFlowerObservations(t){
   const st=flowerObservationState[id];if(now<st.next)continue;
   let closest=null,distSq=Infinity;
   for(const f of flowerBeeFlights){
+   if(f.active===false)continue;
    const dx=pos.x-f.cx,dz=pos.z-f.cz,d=dx*dx+dz*dz;
    if(d<distSq){distSq=d;closest=f;}
   }
@@ -1636,7 +1643,7 @@ function updateFlowerBeeBuzz(seconds,daytime){
  if(!listener)return;
  let nearest=Infinity;
  for(const f of flowerBeeFlights){
-  if(f.kind!=='bee')continue; // Butterfly-only beds remain silent.
+  if(f.kind!=='bee'||f.active===false)continue; // Butterfly-only beds remain silent.
   const dx=listener.x-f.bee.position.x,dz=listener.z-f.bee.position.z;
   nearest=Math.min(nearest,Math.hypot(dx,dz));
  }
@@ -1664,7 +1671,44 @@ function updateFlowerBeeBuzz(seconds,daytime){
  osc.onended=()=>{osc.disconnect();mod.disconnect();modGain.disconnect();filter.disconnect();gain.disconnect();};
  nextFlowerBeeBuzzAt=seconds+1.4+Math.random()*1.5;
 }
-// v5.2.82 — All flower insects scatter away from nearby characters and return to their home flower bed.
+// v5.2.83: camera-centered, reusable flowerbeds. Recycle existing flower meshes
+// instead of adding unbounded meshes. Faraway beds are fully hidden.
+let flowerGridCellX=NaN,flowerGridCellZ=NaN;
+function updateCameraFlowerPatches(){
+ const focus=orbit.target;
+ const cellX=Math.round(focus.x/12),cellZ=Math.round(focus.z/12);
+ if(cellX===flowerGridCellX&&cellZ===flowerGridCellZ)return;
+ flowerGridCellX=cellX;flowerGridCellZ=cellZ;
+ const grid=[];
+ // Camera-centered grid; stagger to avoid a mechanical flower lattice.
+ for(let iz=-3;iz<=3;iz++)for(let ix=-3;ix<=3;ix++){
+  if(Math.abs(ix)<=0&&Math.abs(iz)<=0)continue;
+  const hash=Math.sin((cellX+ix)*127.1+(cellZ+iz)*311.7)*43758.5453;
+  const frac=hash-Math.floor(hash);
+  grid.push({x:(cellX+ix)*12+(frac-.5)*5,z:(cellZ+iz)*12+((frac*7.3)%1-.5)*5,order:Math.abs(ix)+Math.abs(iz)});
+ }
+ grid.sort((a,b)=>a.order-b.order);
+ for(let i=0;i<cameraFlowerPatches.length;i++){
+  const patch=cameraFlowerPatches[i],slot=grid[i];
+  const cx=slot.x,cz=slot.z;
+  const valid=landAt(cx,cz)&&!deepPondAt(cx,cz)&&!onHinaCaveRoof(cx,cz)&&!caveEntrancePortal(cx,cz)&&!blocksCaveEntranceView(cx,cz);
+  patch.active=valid;
+  patch.cx=cx;patch.cz=cz;
+  for(const f of patch.flowers){
+   const x=cx+f.localX,z=cz+f.localZ;
+   const ok=valid&&landAt(x,z)&&!deepPondAt(x,z)&&!caveEntrancePortal(x,z)&&!onHinaCaveRoof(x,z)&&!blocksCaveEntranceView(x,z);
+   f.flower.visible=ok;
+   if(!ok)continue;
+   f.x=x;f.z=z;f.flower.position.set(x,terrainTopAt(x,z,0)+.08,z);
+  }
+  for(const insect of patch.insects){
+   insect.active=valid;insect.bee.visible=valid;
+   insect.cx=cx;insect.cz=cz;
+   insect.baseY=terrainTopAt(cx,cz,0)+(insect.kind==='butterfly'?1.35:1.15);
+   insect.scatterAmount=0;insect.scared=false;insect.lastScatter=-999;
+  }
+ }
+}
 function updateFlowerBees(t){
  const hour=clockParts().h;
  const daytime=hour>=6&&hour<19;
@@ -1673,6 +1717,7 @@ function updateFlowerBees(t){
  const seconds=t*.001;
  const characters=[hana?.position,daeun?.mesh?.position].filter(Boolean);
  for(const f of flowerBeeFlights){
+  if(f.active===false)continue;
   const a=seconds*f.speed+f.phase;
   const r=f.radius+.22*Math.sin(a*.77);
   const homeX=f.cx+Math.cos(a)*r;
@@ -1680,41 +1725,36 @@ function updateFlowerBees(t){
   const homeZ=f.cz+Math.sin(a)*r;
   if(f.scatterAmount===undefined){
    f.scatterAmount=0;f.scatterX=0;f.scatterZ=0;f.scatterY=0;
-   f.scatterUntil=0;f.lastScatter=0;
+   f.scared=false;f.lastScatter=-999;
   }
   let nearest=null,nearestDist=Infinity;
   for(const p of characters){
-   const d=Math.hypot(homeX-p.x,homeZ-p.z);
+   // Detect distance to the flowerbed, not to a rapidly moving insect.
+   const d=Math.hypot(f.cx-p.x,f.cz-p.z);
    if(d<nearestDist){nearestDist=d;nearest=p;}
   }
-  // One avoidance event per approach; keep a short hold time to prevent flickering.
-  if(nearest&&nearestDist<2.5&&seconds>=f.lastScatter+1.0&&f.scatterAmount<.2){
-   const dx=homeX-nearest.x,dz=homeZ-nearest.z;
-   const len=Math.max(.01,Math.hypot(dx,dz));
-   const side=(Math.sin(f.phase*13.7)>0?1:-1);
-   const spread=f.kind==='butterfly'?3:2;
-   const sideways=side*(f.kind==='butterfly'?.65:.9);
-   f.scatterX=(dx/len+(-dz/len)*sideways)*spread;
-   f.scatterZ=(dz/len+(dx/len)*sideways)*spread;
-   f.scatterY=f.kind==='butterfly'?1.4:.45;
-   f.scatterUntil=seconds+(f.kind==='butterfly'?1.4:.8);
-   f.lastScatter=seconds;
-  }
-  const threatened=nearestDist<3.1||seconds<f.scatterUntil;
+  // Hysteresis: approach once, fly apart, and return only after the visitor leaves.
+  if(!f.scared&&nearest&&nearestDist<5.0){
+   f.scared=true;
+   const dx=f.cx-nearest.x,dz=f.cz-nearest.z;
+   const len=Math.max(.1,Math.hypot(dx,dz));
+   const sideways=Math.sin(f.phase*7.13)*.85;
+   const spread=f.kind==='butterfly'?3.4:2.7;
+   f.scatterX=(dx/len-dz/len*sideways)*spread;
+   f.scatterZ=(dz/len+dx/len*sideways)*spread;
+   f.scatterY=f.kind==='butterfly'?1.8:.75;
+  }else if(f.scared&&nearestDist>7.5){f.scared=false;}
   const dt=Math.min(.05,Math.max(0,seconds-(f.prevSeconds??seconds)));
   f.prevSeconds=seconds;
-  const rate=threatened?(f.kind==='butterfly'?4.8:8):(f.kind==='butterfly'?1.1:2.2);
-  f.scatterAmount+=(Number(threatened)-f.scatterAmount)*(1-Math.exp(-rate*dt));
-  if(f.scatterAmount<.001)f.scatterAmount=0;
+  const rate=f.scared?(f.kind==='butterfly'?6:10):(f.kind==='butterfly'?1.2:2.4);
+  f.scatterAmount+=(Number(f.scared)-f.scatterAmount)*(1-Math.exp(-rate*dt));
   f.bee.position.set(homeX+f.scatterX*f.scatterAmount,
    homeY+f.scatterY*f.scatterAmount,
    homeZ+f.scatterZ*f.scatterAmount);
   f.bee.rotation.y=-a;
   if(f.kind==='butterfly'){
    f.bee.rotation.z=.12*Math.sin(seconds*1.8+f.phase);
-   for(const w of f.bee.userData.wings){
-    w.hinge.rotation.z=w.side*(.35+.7*Math.sin(seconds*12+f.phase));
-   }
+   for(const w of f.bee.userData.wings){w.hinge.rotation.z=w.side*(.35+.7*Math.sin(seconds*12+f.phase));}
   }
  }
  updateFlowerBeeBuzz(seconds,daytime);
@@ -11479,7 +11519,7 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
  lastRenderAt=t;const frameCpuStart=performance.now();
  characterAnimation.beginFrame();
- let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);updateDaeunFlowerBends(dt,t);updateFlowerBees(t);updateFlowerObservations(t);updateSurvivorSystems(dt);v517UpdateObjectives(dt);refreshCharacterUI(t);if(v498Skills.style.display==='block')v498RenderSkills();craftingV4993ApplyPoses();characterAnimation.endFrame(dt,t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina'&&!hinaSleepSpeechLock()&&survivorSpeech.companionOwns('hina'))$('bubble').textContent=meetingHinaLine;}if(!paused){updateTreeWind(t*.001);updateBerryPickingSway(t*.001);animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);v519AnimateSheep(t*.001);}if(followCamera){
+ let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);updateCameraFlowerPatches();updateDaeunFlowerBends(dt,t);updateFlowerBees(t);updateFlowerObservations(t);updateSurvivorSystems(dt);v517UpdateObjectives(dt);refreshCharacterUI(t);if(v498Skills.style.display==='block')v498RenderSkills();craftingV4993ApplyPoses();characterAnimation.endFrame(dt,t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina'&&!hinaSleepSpeechLock()&&survivorSpeech.companionOwns('hina'))$('bubble').textContent=meetingHinaLine;}if(!paused){updateTreeWind(t*.001);updateBerryPickingSway(t*.001);animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);v519AnimateSheep(t*.001);}if(followCamera){
   updateFollowDeadZone(dt);
   if(followView==='back')v4998CameraOffset();
    followDesired.copy(followFocus).add(followOffset);
