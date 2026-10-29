@@ -1451,7 +1451,7 @@ function makeFlowerBee(){
  const body=new THREE.Mesh(beeBodyGeo,beeYellow);body.scale.set(1.2,.8,.8);bee.add(body);
  for(const x of [-.05,.08]){const band=new THREE.Mesh(beeBodyGeo,beeBlack);band.scale.set(.15,.81,.83);band.position.x=x;bee.add(band);}
  for(const side of [-1,1]){const wing=new THREE.Mesh(beeWingGeo,beeWing);wing.position.set(-.025,.12,side*.105);wing.scale.set(.9,.23,1.25);bee.add(wing);}
- bee.scale.setScalar(.75);bee.frustumCulled=false;return bee;
+ bee.scale.setScalar(1.5);bee.frustumCulled=false;return bee;
 }
 // v5.2.76: Butterfly and bee populations are mutually exclusive per flower bed.
 const butterflyWingGeo=new THREE.SphereGeometry(.20,8,6);
@@ -1495,7 +1495,7 @@ function makeFlowerButterfly(patch){
   [16,-7,2],[10,-16,0],[-1,-21,1],[-17,-19,2],
   [24,-10,1],[-25,3,0],[2,23,2],[23,18,0],
   [-28,-12,1],[27,-2,2]
- ];
+ ].filter((_,index)=>index%3!==2); // Keep about two thirds of the flower beds.
  const rootedBaseGeo=new THREE.CylinderGeometry(.08,.095,.13,6);
  let planted=0,activePatches=0;
  for(let patch=0;patch<patches.length;patch++){
@@ -13575,12 +13575,21 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  }
  html body #mobileMenu::after{font-size:16px!important;line-height:1!important;}
  html body #v517ObjectiveUI{
-  left:56%!important;right:auto!important;top:calc(13px + env(safe-area-inset-top))!important;
-  transform:translateX(-50%)!important;
-  width:max-content!important;max-width:min(63vw,380px)!important;
+  left:130px!important;right:46px!important;top:calc(13px + env(safe-area-inset-top))!important;
+  transform:none!important;
+  width:auto!important;max-width:380px!important;
   padding:8px 12px!important;border-radius:10px!important;
  }
  html body #v517ObjectiveUI .v517Message{font-size:15px!important;line-height:1.35!important;}
+}
+</style>
+<style id="mobileMenuButtonAnchor">
+@media (max-width:700px),(pointer:coarse){
+ html body #v5261MenuShell{
+  top:calc(43px + env(safe-area-inset-top))!important;
+  right:10px!important;left:auto!important;transform:none!important;
+  max-height:calc(100dvh - 53px - env(safe-area-inset-top))!important;
+ }
 }
 </style>
 </body></html>
