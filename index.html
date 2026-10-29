@@ -6113,7 +6113,7 @@ function gameAudioOutput(){
 }
 function syncGameAudio(){
  const output=gameAudioOutput();if(!output)return;
- const level=soundEnabled&&!paused&&!document.hidden?ambientVolume*.3:0;
+ const level=soundEnabled&&!paused&&!document.hidden?ambientVolume:0;
  if(level===gameAudioLevel)return;
  gameAudioLevel=level;
  output.gain.cancelScheduledValues(audioCtx.currentTime);
@@ -6188,11 +6188,15 @@ async function unlockAmbient(){
  // HTMLMediaElement.play() must be invoked synchronously inside the user gesture.
  unlockRainAudio();
  unlockNightAudio();
- if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C();}
+ if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C({latencyHint:'interactive'});}
  if(!audioCtx)return;
  syncGameAudio();
  if(audioCtx.state!=='running'){
   if(!ambientResumePromise){
+   // Start the output inside the touch gesture, not only after an async resume.
+   const primer=audioCtx.createBufferSource();
+   primer.buffer=audioCtx.createBuffer(1,1,audioCtx.sampleRate);
+   primer.connect(gameAudioOutput());primer.start();primer.onended=()=>primer.disconnect();
    ambientResumePromise=Promise.resolve(audioCtx.resume()).finally(()=>{ambientResumePromise=null;});
   }
   await ambientResumePromise;
@@ -11676,13 +11680,13 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
 })();
 </script>
 <script id="hina-interaction-sfx-v401">
-/* Quiet shared-context feedback. All output follows the environment volume. */
+/* Phone-audible short feedback; one master volume, with no extra global attenuation. */
 (()=>{
 const last=new Map(),counts={};let noise=null,lastAny=-Infinity,position=null,walker='',distance=0,lastAction='';
 function tone(a,t,f,d,vol,type='sine',end=f){
  const o=a.createOscillator(),g=a.createGain();o.type=type;
  o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,end),t+d);
- g.gain.setValueAtTime(.00001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.00001,t+d);
+ g.gain.setValueAtTime(.00001,t);g.gain.exponentialRampToValueAtTime(vol*1.4,t+.012);g.gain.exponentialRampToValueAtTime(.00001,t+d);
  o.connect(g);g.connect(window.HinaGameAudio.output());o.start(t);o.stop(t+d+.02);
  o.onended=()=>{o.disconnect();g.disconnect();};
 }
@@ -11690,13 +11694,21 @@ function hiss(a,t,d,vol,filter=1100){
  if(!noise||noise.sampleRate!==a.sampleRate){noise=a.createBuffer(1,Math.ceil(a.sampleRate*.6),a.sampleRate);const z=noise.getChannelData(0);for(let i=0;i<z.length;i++)z[i]=Math.random()*2-1;}
  const source=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();source.buffer=noise;
  f.type='lowpass';f.frequency.value=filter;
- g.gain.setValueAtTime(.00001,t);g.gain.linearRampToValueAtTime(vol,t+.014);g.gain.exponentialRampToValueAtTime(.00001,t+d);
+ g.gain.setValueAtTime(.00001,t);g.gain.linearRampToValueAtTime(vol*1.7,t+.014);g.gain.exponentialRampToValueAtTime(.00001,t+d);
  source.connect(f);f.connect(g);g.connect(window.HinaGameAudio.output());source.start(t);source.stop(t+d+.01);
  source.onended=()=>{source.disconnect();f.disconnect();g.disconnect();};
 }
-function play(kind){
+function play(kind,resumed=false){
  const bus=window.HinaGameAudio,a=bus?.context;
- if(!bus?.enabled||!a||a.state!=='running')return false;
+ if(!bus?.enabled)return false;
+ if(!a||a.state!=='running'){
+  // The very first tap can arrive while resume() is still pending on Android.
+  // Retry only that fresh interaction, never replay a backlog after returning.
+  if(!resumed){const requested=performance.now();bus.unlock().then(()=>{
+   if(performance.now()-requested<400&&bus.enabled)play(kind,true);
+  }).catch(()=>{});}
+  return false;
+ }
  const now=performance.now(),limit=kind==='step'?380:kind==='ui'?100:650;
  if(now-lastAny<75||now-(last.get(kind)??-Infinity)<limit)return false;
  last.set(kind,now);lastAny=now;counts[kind]=(counts[kind]||0)+1;
@@ -11705,7 +11717,7 @@ function play(kind){
  case 'water':hiss(a,t,.25,.014,1700);tone(a,t,510,.13,.009,'sine',280);tone(a,t+.12,650,.12,.007,'sine',340);break;
  case 'fish':hiss(a,t,.30,.016,2000);tone(a,t+.06,450,.15,.009,'sine',210);break;
  case 'berry':hiss(a,t,.12,.009,1700);tone(a,t,760,.07,.009,'sine',570);break;
- case 'wood':hiss(a,t,.12,.016,750);tone(a,t,180,.09,.010,'triangle',105);break;
+ case 'wood':hiss(a,t,.16,.016,1400);tone(a,t,320,.11,.010,'triangle',190);break;
  case 'fire':hiss(a,t,.35,.016,2100);hiss(a,t+.16,.13,.010,950);break;
  case 'cook':hiss(a,t,.4,.013,3200);hiss(a,t+.22,.13,.008,2300);break;
  case 'craft':hiss(a,t,.12,.012,950);tone(a,t,260,.09,.009,'triangle',180);tone(a,t+.15,350,.1,.008,'triangle',240);break;
@@ -11716,8 +11728,8 @@ function play(kind){
  case 'wash':hiss(a,t,.38,.015,2400);hiss(a,t+.19,.18,.009,1600);break;
  case 'success':tone(a,t,530,.12,.012);tone(a,t+.14,790,.18,.010);break;
  case 'inventory':hiss(a,t,.16,.009,1250);tone(a,t,330,.07,.005,'triangle',250);break;
- case 'step':hiss(a,t,.075,.008,600+Math.random()*350);break;
- default:tone(a,t,560,.065,.005,'sine',470);
+ case 'step':hiss(a,t,.10,.014,1100+Math.random()*450);break;
+ default:tone(a,t,680,.09,.010,'sine',540);
  }
  return true;
 }
