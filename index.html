@@ -12876,4 +12876,116 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  html body #characterBar button{min-height:24px!important;padding:3px 2px!important;font-size:10px!important;}
 }
 </style>
+<style id="v5250MobileControlShapes">
+@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+  /* Narrow side actions while preserving tap targets and animation. */
+  body #characterBar {width:88px!important;max-width:88px!important;min-width:0!important;}
+  body #characterBar button:is(#observeHina,#observeDaeun){
+    width:84px!important;max-width:84px!important;min-width:0!important;
+    box-sizing:border-box!important;min-height:30px!important;height:30px!important;
+    padding:3px 5px!important;margin:0!important;font-size:11px!important;
+    white-space:nowrap!important;
+  }
+  body #v498SkillToggle,body #v493CraftToggle{
+    width:64px!important;min-width:64px!important;max-width:64px!important;
+    height:34px!important;min-height:34px!important;max-height:34px!important;
+    box-sizing:border-box!important;padding:5px 4px!important;
+    font-size:12px!important;line-height:20px!important;text-align:center!important;
+    border-radius:10px!important;right:7px!important;
+  }
+  /* Same circular bag appearance in normal play and cinematic mode. */
+  body #daeunActionButtons #daeunItemToggle,
+  body.cinematic-mode #daeunActionButtons #daeunItemToggle{
+    width:48px!important;height:48px!important;min-width:48px!important;
+    max-width:48px!important;min-height:48px!important;max-height:48px!important;
+    flex:0 0 48px!important;aspect-ratio:1/1!important;
+    box-sizing:border-box!important;border-radius:50%!important;
+    padding:0!important;margin:0!important;display:flex!important;
+    justify-content:center!important;align-items:center!important;
+    overflow:hidden!important;
+  }
+  body #daeunActionButtons #daeunItemToggle svg{
+    width:28px!important;height:28px!important;flex:none!important;
+  }
+}
+</style>
+<style id="v5251MobileButtonsAligned">
+@media (max-width:700px), (pointer:coarse) and (max-width:1366px) {
+  /* Compact selection buttons: keep the HUD above them unchanged. */
+  html body #characterBar {width:60px!important;min-width:0!important;max-width:60px!important;gap:3px!important;padding:2px!important;box-sizing:border-box!important;}
+  html body #characterBar button:is(#observeHina,#observeDaeun) {width:56px!important;min-width:56px!important;max-width:56px!important;height:30px!important;min-height:30px!important;box-sizing:border-box!important;padding:3px 1px!important;font-size:10px!important;white-space:nowrap!important;}
+  /* Keep enough width for the three Hangul characters in 숙련도. */
+  html body #v498SkillToggle,html body #v493CraftToggle {width:50px!important;min-width:50px!important;max-width:50px!important;height:34px!important;min-height:34px!important;box-sizing:border-box!important;padding:4px 1px!important;font-size:11px!important;line-height:24px!important;white-space:nowrap!important;}
+  /* Cinematic and normal modes use the same bottom reference line. */
+  html body #hideAllUI,html body.cinematic-mode #hideAllUI {top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;left:8px!important;right:auto!important;transform:none!important;}
+  /* Force the bag SVG's visual center, independent of mode-specific button rules. */
+  html body #daeunActionButtons #daeunItemToggle,html body.cinematic-mode #daeunActionButtons #daeunItemToggle {width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;max-width:48px!important;max-height:48px!important;aspect-ratio:1!important;box-sizing:border-box!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;line-height:1!important;}
+  html body #daeunActionButtons #daeunItemToggle svg.v437-bag-icon {position:static!important;display:block!important;width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;max-width:28px!important;max-height:28px!important;flex:0 0 28px!important;margin:0!important;padding:0!important;transform:none!important;vertical-align:middle!important;}
+}
+</style>
+<style id="v5252CinemaBasketAlign">
+@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+  html body #hideAllUI,html body.cinematic-mode #hideAllUI{
+    position:fixed!important;left:8px!important;right:auto!important;top:auto!important;
+    bottom:calc(10px + env(safe-area-inset-bottom))!important;transform:none!important;
+    width:82px!important;min-width:82px!important;max-width:82px!important;
+    height:38px!important;min-height:38px!important;max-height:38px!important;
+    box-sizing:border-box!important;padding:0 5px!important;border-radius:12px!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    font-size:11px!important;line-height:1!important;text-align:center!important;white-space:nowrap!important;
+    opacity:1!important;visibility:visible!important;
+  }
+  html body #daeunActionButtons #daeunItemToggle,
+  html body.cinematic-mode #daeunActionButtons #daeunItemToggle{
+    width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;
+    max-width:48px!important;max-height:48px!important;box-sizing:border-box!important;
+    padding:0!important;border-radius:50%!important;display:flex!important;
+    align-items:center!important;justify-content:center!important;line-height:0!important;
+  }
+  html body #daeunActionButtons #daeunItemToggle svg.v437-bag-icon,
+  html body.cinematic-mode #daeunActionButtons #daeunItemToggle svg.v437-bag-icon{
+    display:block!important;position:relative!important;top:2px!important;left:0!important;
+    transform:none!important;width:28px!important;height:28px!important;
+    min-width:28px!important;min-height:28px!important;max-width:28px!important;max-height:28px!important;
+    flex:none!important;margin:0!important;padding:0!important;vertical-align:middle!important;
+  }
+}
+</style>
+<style id="v5253BasketOpticalCenter">
+@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+ html body #daeunActionButtons #daeunItemToggle svg.v437-bag-icon,
+ html body.cinematic-mode #daeunActionButtons #daeunItemToggle svg.v437-bag-icon{
+  position:relative!important;left:6px!important;top:-2px!important;
+  transform:none!important;
+ }
+}
+</style>
+<style id="v5254BasketTrueCenter">
+/* Anchor the icon to the button itself, independent of flex layout and mode. */
+@media (max-width:700px), (pointer:coarse) and (max-width:1366px){
+ html body #daeunActionButtons #daeunItemToggle,
+ html body.cinematic-mode #daeunActionButtons #daeunItemToggle{
+   position:relative!important;width:48px!important;height:48px!important;
+   min-width:48px!important;min-height:48px!important;
+   box-sizing:border-box!important;border-radius:50%!important;
+   padding:0!important;overflow:hidden!important;
+ }
+ html body #daeunActionButtons #daeunItemToggle > svg.v437-bag-icon,
+ html body.cinematic-mode #daeunActionButtons #daeunItemToggle > svg.v437-bag-icon{
+   position:absolute!important;left:50%!important;top:50%!important;
+   right:auto!important;bottom:auto!important;
+   transform:translate(-50%,-50%)!important;
+   width:28px!important;height:28px!important;min-width:28px!important;
+   min-height:28px!important;max-width:28px!important;max-height:28px!important;
+   margin:0!important;padding:0!important;display:block!important;
+ }
+}
+</style>
+<style id="v5255ObjectiveRaise">
+/* Raise the survival objective banner by one small step, without altering its size. */
+#v517ObjectiveUI{top:38px!important}
+@media(max-width:700px), (pointer:coarse) and (max-width:1366px){
+ #v517ObjectiveUI{top:0px!important}
+}
+</style>
 </body></html>
