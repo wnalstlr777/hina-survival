@@ -4624,8 +4624,15 @@ function inspectBlockedSpeech(t){
 let hinaSpeechExpiresAt=0;
 // v5.2.80: Day-one speech tone shared by AI and manual-control dialogue.
 // Only suppress unmistakably cheerful/excited remarks; preserve urgent survival warnings.
-function firstDayPositiveSpeech(text){
- if(clockParts().day!==1||typeof text!=='string')return false;
+function firstDayPositiveSpeech(text,id='hina'){
+ if(typeof text!=='string')return false;
+ const today=clockParts().day;
+ if(today!==1){
+  const ch=characters.get(id);if(!ch)return false;
+  if(today>2&&ch.stats.will>=35)return false;
+  if(today===2&&ch.stats.will>=35&&survivorNearbyFriends(id).length>0)return false;
+  if(survivalFlower.mesh?.visible&&(text===flowerCompliments[id]||(id==='hina'&&/헤헤, 예쁘다|헤헤, 고마워/.test(text))))return false;
+ }
  if(/없|부족|필요|위험|조심|무서|두려|아프|배고|목말|피곤|춥|덥|살아|어떡|어디|왜|모르|걱정|도망|못|힘들|불안|큰일/.test(text))return false;
  return /예쁘|아름답|멋지|신기해|좋아[!~.]|좋네|좋겠다|행복|즐겁|재밌|재미있|귀엽|사랑스|기쁘|신나|반갑|대단해|최고|와[!,~ ]|우와|야호|훌륭|근사|평화롭|힐링|상쾌|기분 좋|멋있|괜찮아 보|멋진/.test(text);
 }
@@ -4697,7 +4704,7 @@ let memoryFirstInit=true;
 function init(){
  characterAnimation?.reset();
  sharedDaeunResourceTask=null;
- survivorSpeech.clear();
+ survivorSpeech.clear();resetSurvivalPresentation();
  if(memoryFirstInit){memoryFirstInit=false;}unlockedMemories={};renderMemoryAlbum();memoryClose();document.getElementById('memoryToast').style.opacity='0';
  for(const [mesh,original] of fadedMeshes){mesh.material=original;}fadedMeshes.clear();
  // Restore both simulation data and visuals. A reset must match a fresh page load.
@@ -6211,8 +6218,7 @@ function updateSound(dt,isNight){
  window.HinaInteractionSFX?.movement(observedId,observedId==='daeun'?daeun.mesh.position:hana.position,observedId==='daeun'?daeun.action:state);
  if(document.hidden)return;
  if(!soundEnabled||paused)return;
- ambientTimer-=dt;
- if(ambientTimer<=0){if(isNight)owlCall();else birdCall();ambientTimer=isNight?randomBetween(5,11):randomBetween(2,5);}
+ window.HinaInteractionSFX?.wildlife(isNight);
  forestTextureTimer-=dt;
  if(forestTextureTimer<=0){
   // The listener follows the currently viewed survivor, including Daeun's area.
@@ -6743,6 +6749,7 @@ const v501DialogueVoice=(()=>{
  return {speak};
 })();
 function showCompanionSpeech(speaker,line,duration=6500){
+ if(firstDayPositiveSpeech(line,speaker))return;
   v501DialogueVoice.speak(speaker,line);
  survivorSpeech.post(speaker,line,'companion',duration);
  companionSpeech.speaker=speaker;companionSpeech.line=line;companionSpeech.until=performance.now()+duration;
@@ -7776,7 +7783,7 @@ let daeunBerrySelectionDay=0;
 let daeunPetRabbit=null;
 function dRandom(){daeun.aiRandom=(Math.imul(1664525,daeun.aiRandom)+1013904223)>>>0;return daeun.aiRandom/4294967296;}
 function daeunSay(text){
- if(firstDayPositiveSpeech(text))return;
+ if(firstDayPositiveSpeech(text,'daeun'))return;
  // DAY 1: observe and recover from the arrival, never announce resources as loot.
  if(clockParts().day===1 && /나뭇가지|가지가|채집|수집|주워|모으|열매를 먹|물고기 잡|토끼 잡|불을 피우/.test(text) && !/없|부족|필요|못|모자라/.test(text))return;
  if(observedId==='daeun')window.HinaInteractionSFX?.event(text);
@@ -8940,10 +8947,19 @@ function syncCharacterLights(){
   const selected=id===observedId;
   const controlLocked=id==='hina'&&!hinaControlUnlocked;
   // Lock concerns manual control, not camera observation.
+  const orbit=b.querySelector('.character-orbit'),rect=orbit.querySelector('rect');
+  const width=b.offsetWidth,height=b.offsetHeight;
+  if(width>0&&height>0&&orbit.dataset.size!==width+':'+height){
+   orbit.dataset.size=width+':'+height;orbit.setAttribute('viewBox',`0 0 ${width+5} ${height+5}`);
+   const buttonStyle=getComputedStyle(b),radius=parseFloat(buttonStyle.borderTopLeftRadius)||8;
+   orbit.style.setProperty('--orbit-width',(width+5)+'px');orbit.style.setProperty('--orbit-height',(height+5)+'px');
+   orbit.style.setProperty('--orbit-left',(-2.5-parseFloat(buttonStyle.borderLeftWidth))+'px');orbit.style.setProperty('--orbit-top',(-2.5-parseFloat(buttonStyle.borderTopWidth))+'px');
+   for(const [key,value] of Object.entries({x:2.5,y:2.5,width,height,rx:radius,ry:radius}))rect.setAttribute(key,String(value));
+  }
   b.dataset.selected=String(selected);
   b.dataset.locked='false';
   b.dataset.controlLocked=String(controlLocked);
-  b.dataset.auto=String(selected&&mode[id]);
+  b.dataset.auto=String(mode[id]);
   b.setAttribute('aria-pressed',String(selected));
   b.setAttribute('aria-disabled','false');
   b.setAttribute('aria-label',id==='hina'&&controlLocked?'히나 관찰 가능, 수동 조작 잠금':(id==='hina'?'히나':'다은'));
@@ -10635,6 +10651,152 @@ const renderSamples=[];let previousSampleTime=0,renderSampleCursor=0;
 window.hinaPerformance={version:'5.2.87',snapshot:()=>({render:{...renderer.info.render},memory:{...renderer.info.memory},batching:renderBatching.stats(),gpuTiming:'not measured',jsHeapBytes:performance.memory?.usedJSHeapSize??null}),samples:()=>{const ordered=renderSamples.length<600?renderSamples:[...renderSamples.slice(renderSampleCursor),...renderSamples.slice(0,renderSampleCursor)];return ordered.map(s=>({...s}));}};
 
 // v5.2.7: four distal joints per survivor. Original shoulder/hip pivots stay intact.
+// Shared presentation only: never changes paths, destinations, resources or AI decisions.
+const survivorHomeCaves=new Map([['hina',{x:caveX,z:caveZ}],['daeun',DAEUN_ZONE.cave]]);
+const survivalGuide=document.createElement('div');
+survivalGuide.id='firstNightCaveGuide';survivalGuide.hidden=true;
+survivalGuide.innerHTML='<span class="cave-guide-arrow" aria-hidden="true">↑</span><span class="cave-guide-distance"></span>';
+survivalGuide.setAttribute('role','img');
+const earlySurvivalLines={
+ hina:{fear:['오늘 밤은 무사히 보낼 수 있을까...','어둠 속에서 무슨 소리가 난 것 같아...'],alone:['다들 무사한 거겠지...?','혼자 남겨진 건 아니겠지...?'],worry:['어떻게 해야 돌아갈 수 있을까...','친구들은 다치지 않았으면 좋겠어...'],safe:['같이 있으니까 조금은 마음이 놓여.','안전한 곳에서 잠깐 숨을 돌리자.']},
+ daeun:{fear:['혼자 있으니까 너무 무서워...','오늘 밤에 무슨 일이 생기면 어떡하지...'],alone:['엄마... 보고 싶다...','여기서 계속 살아야 하는 건 아니겠지...?'],worry:['다른 애들도 무사해야 할 텐데...','집에서는 우리를 기다리고 있겠지...'],safe:['함께 있으니 조금 덜 무서워.','여기서 쉬면서 다음 일을 생각해 보자.']},
+ seoyeon:{fear:['밤에는 더 조심해야겠어...','무슨 소리인지 알 수가 없어...'],alone:['이 상황을 설명할 방법이 있을 텐데...','다른 애들은 어디에 있는 걸까...'],worry:['일단 안전한 곳부터 찾아야겠어...','모두 무사히 돌아갈 방법을 찾아야 해...'],safe:['안전한 곳에서 차근차근 생각하자.','같이 방법을 찾아보자.']},
+ jiyu:{fear:['젠장... 밤에는 아무것도 안 보이잖아...','이 어둠 속에서 길을 잃으면 안 돼...'],alone:['젠장... 대체 여긴 어디야?','다른 애들은 괜찮겠지...?'],worry:['다들 무사해야 할 텐데...','돌아갈 방법이 정말 있는 거겠지...?'],safe:['일단 같이 버텨보자.','여기서는 조금 쉬어도 되겠지.']},
+ mina:{fear:['다치지만 않았으면 좋겠는데...','밤이 되니까 더 무서워...'],alone:['다른 애들은 괜찮을까...?','모두 보고 싶어...'],worry:['친구들이 많이 놀랐을 텐데...','다 같이 무사히 집으로 돌아가고 싶어...'],safe:['같이 있으니 조금 안심이 돼.','서로 잘 챙겨주자.']}
+};
+const flowerCompliments={daeun:'히나! 머리에 꽃 꽂았네? 귀엽다~!',seoyeon:'그 꽃, 너한테 잘 어울린다.',jiyu:'오~ 히나 오늘 좀 예쁜데?',mina:'히나야, 꽃 너무 예쁘다!'};
+const survivalFlower={mesh:null,expiresAt:0,generation:0,motion:null,patch:null,nextCheck:0,seen:new Set(),reply:null};
+const survivalMood=new Map();
+let survivalSocialUntil=0,survivalSocialTick=0,survivalLastElapsed=0;
+const extraSurvivorBubble=document.createElement('div');
+extraSurvivorBubble.className='survival-extra-bubble';extraSurvivorBubble.hidden=true;document.body.append(extraSurvivorBubble);
+const extraSurvivorScreen=new THREE.Vector3();let extraSurvivorSpeaker=null;
+function survivorData(id){const ch=characters.get(id);return ch?.mesh&&ch.stats?ch:null;}
+function survivorNearbyFriends(id,radius=12){
+ const ch=survivorData(id);if(!ch)return [];
+ return [...characters.values()].filter(friend=>friend.id!==id&&friend.mesh&&!friend.dead&&Math.hypot(friend.mesh.position.x-ch.mesh.position.x,friend.mesh.position.z-ch.mesh.position.z)<=radius);
+}
+function survivorUrgent(id){
+ const ch=survivorData(id);if(!ch||ch.dead)return true;
+ const st=ch.stats,p=ch.mesh.position;
+ if(st.health<=35||st.energy<=20||st.hunger<=20||st.thirst<=20)return true;
+ if(Math.hypot(p.x-middleBear.position.x,p.z-middleBear.position.z)<bearTerritory.detectRadius)return true;
+ if([...snakes,...daeunSnakes].some(snake=>snake.active!==false&&Math.hypot(p.x-snake.g.position.x,p.z-snake.g.position.z)<5))return true;
+ const action=id==='hina'?state:ch.action||'';
+ return /dead|exhaust|flee|retreat|escape/i.test(action);
+}
+function survivorCanSpeakSoftly(id){
+ const ch=survivorData(id);if(!ch||survivorUrgent(id))return false;
+ if(id==='hina'?hinaSleepSpeechLock():id==='daeun'?daeunSleepSpeechLock():ch.sleeping)return false;
+ if(characterAnimation?.byId[id]&&(characterAnimation.active(id)||characterAnimation.busy(id)))return false;
+ if(survivorSpeech.current(id)||[...characters.keys()].some(key=>{const speech=survivorSpeech.current(key);return speech&&speech.rank<=3;}))return false;
+ return performance.now()>=meetingFollowUntil&&performance.now()>=companionSpeech.until&&!companionChat.pending;
+}
+function showSurvivalLine(id,text){
+ if(!survivorCanSpeakSoftly(id)||firstDayPositiveSpeech(text,id))return false;
+ if(id==='hina')say(text);else if(id==='daeun')daeunSay(text);
+ else{survivorSpeech.post(id,text);extraSurvivorSpeaker=id;}
+ survivalSocialUntil=performance.now()+3300;
+ // Existing important or pending dialogue wins; only defer a new idle conversation.
+ companionChat.nextAt=Math.max(companionChat.nextAt,survivalSocialUntil);
+ return true;
+}
+function selectSurvivalMoodLine(id,context,last=''){
+ const data=earlySurvivalLines[id];if(!data)return null;
+ const category=context.night?'fear':context.day<=2?(context.alone&&!context.met?'alone':'worry'):context.will<35?'worry':context.sheltered||!context.alone?'safe':'worry';
+ const pool=data[category].filter(line=>line!==last);return pool[Math.floor(Math.random()*pool.length)]||data[category][0];
+}
+function updateSurvivalMoods(now){
+ if(now<survivalSocialUntil)return;
+ const clock=clockParts();
+ for(const [id,ch] of characters){
+  if(!earlySurvivalLines[id]||!ch.mesh||!ch.stats)continue;
+  let memory=survivalMood.get(id);
+  if(!memory){memory={nextAt:now+12000+survivalMood.size*7000,last:''};survivalMood.set(id,memory);}
+  if(now<memory.nextAt||!survivorCanSpeakSoftly(id))continue;
+  const p=ch.mesh.position,near=survivorNearbyFriends(id);
+  const context={day:clock.day,night:clock.h>=19||clock.h<6,alone:near.length===0,met:hinaControlUnlocked||sharedHomeActive||!!ch.metFriends?.size,will:ch.stats.will,sheltered:inCaveWalkZone(p.x,p.z)};
+  const line=selectSurvivalMoodLine(id,context,memory.last);
+  if(line&&showSurvivalLine(id,line)){
+   memory.last=line;memory.nextAt=now+(clock.day<=2?30000:ch.stats.will<35?40000:80000)+Math.random()*25000;break;
+  }
+ }
+}
+function flowerSurvivalSafe(){
+ return !survivorUrgent('hina')&&stats.energy>=45&&stats.hunger>=45&&stats.thirst>=45&&stats.will>=35&&!characterAnimation.busy('hina')&&!characterAnimation.active('hina')&&!hinaSleepSpeechLock();
+}
+function beginHinaFlower(patch,now){
+ if(clockParts().day<2||hinaManual||survivalFlower.mesh?.visible||survivalFlower.motion||!flowerSurvivalSafe())return false;
+ const sample=patch.flowers[0]?.pivot.children.find(mesh=>mesh.isMesh&&[0xff57ad,0xa97aff,0xfff4e5].includes(mesh.material?.color?.getHex()));
+ if(!sample)return false;
+ if(!survivalFlower.mesh){survivalFlower.mesh=new THREE.Mesh(sample.geometry,sample.material);survivalFlower.mesh.name='HinaHairFlower';survivalFlower.mesh.scale.set(.36,.45,.36);survivalFlower.mesh.position.set(.40,.18,.04);survivalFlower.mesh.castShadow=false;head.add(survivalFlower.mesh);}
+ survivalFlower.mesh.material=sample.material;survivalFlower.mesh.visible=false;
+ survivalFlower.motion={start:now,attached:false};return true;
+}
+function updateHinaFlower(now){
+ const flower=survivalFlower;
+ if(flower.mesh?.visible&&elapsed>=flower.expiresAt){flower.mesh.visible=false;flower.motion=null;flower.reply=null;flower.patch=null;flower.seen.clear();flower.nextCheck=now+5000;}
+ if(flower.motion){
+  if(!flowerSurvivalSafe()){if(!flower.motion.attached)flower.mesh.visible=false;flower.motion=null;return;}
+  const age=now-flower.motion.start;
+  if(age>=850&&!flower.motion.attached){
+   flower.motion.attached=true;flower.mesh.visible=true;flower.expiresAt=elapsed+DAY_SECONDS;flower.generation++;flower.seen.clear();
+   if(now>=survivalSocialUntil)showSurvivalLine('hina','헤헤, 예쁘다.');
+  }
+  if(age>=1800)flower.motion=null;
+ }
+ if(now<flower.nextCheck)return;flower.nextCheck=now+4000;
+ if(clockParts().day<2||hinaManual||flower.mesh?.visible||flower.motion||!flowerSurvivalSafe())return;
+ const p=hana.position;
+ const patch=cameraFlowerPatches.find(patch=>Math.hypot(p.x-patch.cx,p.z-patch.cz)<4);
+ if(!patch){flower.patch=null;return;}
+ if(flower.patch===patch)return;flower.patch=patch;
+ // One low-probability roll per approach, never one roll per rendered frame.
+ if(Math.random()<.18)beginHinaFlower(patch,now);
+}
+function survivalFlowerPose(id,now){return id==='hina'&&survivalFlower.motion?Math.sin(Math.PI*Math.min(1,Math.max(0,(now-survivalFlower.motion.start)/1800))):0;}
+function updateFlowerCompliments(now){
+ const flower=survivalFlower;if(!flower.mesh?.visible||now<survivalSocialUntil)return;
+ if(flower.reply){
+  if(flower.reply.generation!==flower.generation||now>flower.reply.expiresAt){flower.reply=null;return;}
+  if(showSurvivalLine('hina','헤헤, 고마워!'))flower.reply=null;return;
+ }
+ if(!survivorCanSpeakSoftly('hina'))return;
+ for(const friend of survivorNearbyFriends('hina',5)){
+  if(!flowerCompliments[friend.id]||flower.seen.has(friend.id)||!survivorCanSpeakSoftly(friend.id))continue;
+  if(showSurvivalLine(friend.id,flowerCompliments[friend.id])){flower.seen.add(friend.id);flower.reply={generation:flower.generation,expiresAt:now+15000};break;}
+ }
+}
+function updateFirstNightGuide(){
+ const id=observedId,ch=survivorData(id),home=ch?.startCave||survivorHomeCaves.get(id),clock=clockParts();
+ const dist=ch&&home?Math.hypot(home.x-ch.mesh.position.x,home.z-ch.mesh.position.z):0;
+ const visible=clock.day===1&&(clock.h>=20||clock.h<6)&&dist>10;
+ survivalGuide.hidden=!visible;
+ if(survivalGuide.parentNode!==v517ObjectiveUI)v517ObjectiveUI.append(survivalGuide);
+ v517ObjectiveUI.classList.toggle('tutorial-pulse-active',visible||v517ObjectiveUI.classList.contains('tutorial-cave-hint')||v517ObjectiveUI.classList.contains('tutorial-night-warning'));
+ if(!visible)return;
+ const dx=home.x-ch.mesh.position.x,dz=home.z-ch.mesh.position.z,e=camera.matrixWorld.elements;
+ const right=dx*e[0]+dz*e[2],upLength=Math.hypot(e[4],e[6]);
+ const up=upLength>.0001?(dx*e[4]+dz*e[6])/upLength:dx*e[8]+dz*e[10];
+ const angle=Math.atan2(right,up)*180/Math.PI;
+ survivalGuide.querySelector('.cave-guide-arrow').style.transform=`rotate(${angle}deg)`;
+ survivalGuide.querySelector('.cave-guide-distance').textContent=Math.ceil(dist)+'m';
+ survivalGuide.setAttribute('aria-label',`${ch.name||id}의 시작 동굴 방향, ${Math.ceil(dist)}미터`);
+}
+function resetSurvivalPresentation(){
+ if(survivalFlower.mesh)survivalFlower.mesh.visible=false;
+ survivalFlower.motion=null;survivalFlower.expiresAt=0;survivalFlower.patch=null;survivalFlower.nextCheck=0;survivalFlower.reply=null;survivalFlower.seen.clear();
+ survivalMood.clear();survivalSocialUntil=0;survivalSocialTick=0;survivalLastElapsed=elapsed;extraSurvivorSpeaker=null;
+}
+function updateSurvivalPresentation(now){
+ if(elapsed<survivalLastElapsed)resetSurvivalPresentation();survivalLastElapsed=elapsed;
+ updateFirstNightGuide();
+ if(paused||document.hidden)return;
+ updateHinaFlower(now);
+ if(now>=survivalSocialTick){survivalSocialTick=now+500;updateFlowerCompliments(now);updateSurvivalMoods(now);}
+ if(extraSurvivorSpeaker){const ch=survivorData(extraSurvivorSpeaker),speech=survivorSpeech.current(extraSurvivorSpeaker);extraSurvivorBubble.hidden=!ch||!speech;if(ch&&speech)drawOneCompanionBubble(extraSurvivorBubble,extraSurvivorScreen,ch.mesh,speech.text,true);}
+}
+
 class CharacterAnimation {
  constructor(){
   this.rigs=[this.createRig('hina',hana,arms,legs,head,body),this.createRig('daeun',daeun.mesh,daeun.arms,daeun.legs,daeun.head,daeun.mesh.children.find(o=>o.isMesh&&o.geometry===body.geometry))];
@@ -10750,6 +10912,8 @@ class CharacterAnimation {
    r.head.rotation.x+=.035*chew;r.head.rotation.z+=.012*chew;
    if(r.body)r.body.rotation.x+=.012*chew;
   }
+  const flowerPose=survivalFlowerPose(r.id,now);
+  if(flowerPose>0&&!sleeping){r.arms[1].rotation.x=THREE.MathUtils.lerp(r.arms[1].rotation.x,-1.35,flowerPose);r.arms[1].rotation.z=THREE.MathUtils.lerp(r.arms[1].rotation.z,-.75,flowerPose);e1=THREE.MathUtils.lerp(e1,-1.8,flowerPose);}
   // Pause freezes joint interpolation; sleeping snaps distal joints neutral to avoid jitter.
   const blend=paused?0:1-Math.exp(-Math.min(.1,Math.max(0,dt))*18);
   if(sleeping){r.elbow0=r.elbow1=r.knee0=r.knee1=r.lean=0;}
@@ -11371,12 +11535,14 @@ function v517UpdateObjectives(dt){
  else if(rec.nightSurvived){
   message=v507FireLit(id)?'✅ 모닥불을 피우는 데 성공했어!':'🔥 이제 모닥불을 피워보자';
  }else if(night){
-  message=inShelter?'🌙 동굴에서 안전하게 첫날밤을 보내자':'🌙 야외에서는 의지력이 빠르게 감소해! 동굴로 돌아가자';
+  message=inShelter?'🌙 동굴에서 안전하게 첫날밤을 보내자':clock.day===1?'밤에 동굴을 벗어나면 의지력이 빠르게 감소합니다.':'🌙 야외에서는 의지력이 빠르게 감소해! 동굴로 돌아가자';
  }else if(dusk){
-  message='🌇 밤이 오기 전에 동굴을 찾자';
+  message=clock.day===1?'동굴로 가야합니다.':'🌇 밤이 오기 전에 동굴을 찾자';
  }else{
   message=rec.nightSeconds>=DAY_SECONDS*2/24?'☀️ 첫날밤을 무사히 보냈어!':'🌿 주변을 탐험하며 생존하자';
  }
+ v517ObjectiveUI.classList.toggle('tutorial-cave-hint',clock.day===1&&message==='동굴로 가야합니다.');
+ v517ObjectiveUI.classList.toggle('tutorial-night-warning',clock.day===1&&message==='밤에 동굴을 벗어나면 의지력이 빠르게 감소합니다.');
  if(message!==v517LastObjective){
   v517LastObjective=message;
   v517ObjectiveMessage.textContent=message;
@@ -11502,6 +11668,7 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
   camera.position.lerp(followDesired,lerp);
   camera.lookAt(orbit.target);
  }else orbit.update();
+ updateSurvivalPresentation(t);
  v504MeditationTick(dt);v508UpdateMeditateIcon();
  // Move the small sun shadow frustum with Hina; snap to texels to reduce shimmer.
  const shadowRadius=ultraLowPower?16:highQuality?48:28;
@@ -11586,6 +11753,9 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
 const soundNames=['ui','berry','water','fish','wood','fire','cook','craft','eat','sleep','rest','animal','wash','success','inventory','step','bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder'];
 const ambience=new Set(['bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder']);
 const pools=new Map(),last=new Map(),counts={},attempts={},failures={};
+// Preserve assets and call sites, but deny all foot/sand feedback centrally.
+const soundPolicy={footsteps:false,inventoryRustle:false};
+const wildlifeSchedule={phase:null,nextAt:0,waiting:false};
 let unlocked=false,paused=false,position=null,walker='',distance=0,lastAction='',previewVoice=null;
 const previewButton=document.getElementById('interactionSoundPreview');
 function interactionLevel(){return document.hidden||paused?0:Math.max(0,Math.min(1,Number(document.getElementById('ambientVolume')?.value??65)/100));}
@@ -11607,7 +11777,7 @@ function voice(kind){
  });
  return slot;
 }
-for(const kind of soundNames)pools.set(kind,[voice(kind)]);
+for(const kind of soundNames)if(kind!=='step'&&kind!=='inventory')pools.set(kind,[voice(kind)]);
 const primer=new Audio(new URL('sounds/unlock.wav',document.baseURI).href);primer.preload='auto';primer.volume=0;
 function unlock(){
  if(unlocked)return;
@@ -11625,9 +11795,10 @@ function syncVolume(){
  for(const pool of pools.values())for(const slot of pool)slot.audio.volume=Math.min(1,volume*mix(slot.kind)*slot.level);
 }
 function play(kind,level=1,force=false){
+ if((/^(step|footstep|sand|walk|run)$/.test(kind)&&!soundPolicy.footsteps)||(kind==='inventory'&&!soundPolicy.inventoryRustle))return false;
  if(!unlocked||interactionLevel()<=0||!Number.isFinite(level)||level<=0)return false;
  const pool=pools.get(kind);if(!pool)return false;
- const now=performance.now(),limit=kind==='step'?380:kind==='ui'?90:ambience.has(kind)?650:350;
+ const now=performance.now(),limit=kind==='step'?380:kind==='ui'?90:(kind==='bird'||kind==='owl')?15000:ambience.has(kind)?650:350;
  if(!force&&now-(last.get(kind)??-Infinity)<limit)return false;
  let slot=pool.find(slot=>!slot.busy);
  if(!slot&&pool.length<2){slot=voice(kind);pool.push(slot);}
@@ -11694,7 +11865,7 @@ function movement(id,pos,action){
  const step=Math.hypot(pos.x-previous.x,pos.z-previous.z);
  if(step>3){distance=0;return;} // No footsteps for teleport / developer day jumps.
  distance+=step;
- if(distance>.85){play('step');distance=0;}
+ if(distance>.85){if(soundPolicy.footsteps)play('step');distance=0;}
 }
 
 window.addEventListener('pointerdown',unlock,{capture:true,passive:true});
@@ -11711,10 +11882,22 @@ previewButton?.addEventListener('click',e=>{
  previewButton.disabled=true;previewButton.textContent='🔊 불러오는 중';
  if(!play('berry',1,true))resetPreview('다시 눌러 효과음 확인');
 });
-window.HinaInteractionSFX={play,event,movement,
+function scheduleWildlife(isNight,now=performance.now()){
+ if(!unlocked||interactionLevel()<=0)return;
+ const phase=isNight?'owl':'bird';
+ if(wildlifeSchedule.phase!==phase){wildlifeSchedule.phase=phase;wildlifeSchedule.waiting=false;wildlifeSchedule.nextAt=now+(15+Math.random()*20)*1000;return;}
+ // Schedule from completion, not clip start; the two wildlife voices never overlap.
+ if(wildlifeSchedule.waiting){
+  if(pools.get(phase).some(slot=>slot.busy))return;
+  wildlifeSchedule.waiting=false;wildlifeSchedule.nextAt=now+(15+Math.random()*20)*1000;return;
+ }
+ if(now<wildlifeSchedule.nextAt||['bird','owl'].some(kind=>pools.get(kind).some(slot=>slot.busy)))return;
+ if(play(phase)){wildlifeSchedule.waiting=true;}else wildlifeSchedule.nextAt=now+1000;
+}
+window.HinaInteractionSFX={play,event,movement,wildlife:scheduleWildlife,
  setPaused(value){if(paused!==!!value){paused=!!value;syncVolume();}},
  diagnose:()=>({...counts}),
- audioStatus:()=>({backend:'html-audio-wav',unlocked,volume:interactionLevel(),playing:[...pools.values()].flat().filter(s=>s.busy&&!s.audio.paused).map(s=>s.kind),attempts:{...attempts},started:{...counts},errors:{...failures}})
+ audioStatus:()=>({backend:'html-audio-wav',policy:{...soundPolicy},wildlife:{...wildlifeSchedule},unlocked,volume:interactionLevel(),playing:[...pools.values()].flat().filter(s=>s.busy&&!s.audio.paused).map(s=>s.kind),attempts:{...attempts},started:{...counts},errors:{...failures}})
 };
 })();
 </script>
@@ -13627,5 +13810,38 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   max-height:calc(100dvh - 53px - env(safe-area-inset-top))!important;
  }
 }
+</style>
+<style id="survivalPresentationStyle">
+@property --tutorial-opacity{syntax:'<number>';inherits:true;initial-value:1}
+@property --tutorial-warning{syntax:'<color>';inherits:true;initial-value:rgba(0,0,0,.55)}
+@keyframes survivalTutorialPulse{
+ 0%,100%{--tutorial-opacity:1;--tutorial-warning:rgba(0,0,0,.55)}
+ 50%{--tutorial-opacity:.35;--tutorial-warning:rgba(210,40,40,.55)}
+}
+#v517ObjectiveUI.tutorial-pulse-active{animation:survivalTutorialPulse 1.2s ease-in-out infinite;}
+#v517ObjectiveUI.tutorial-cave-hint .v517Message{opacity:var(--tutorial-opacity)!important;animation:none!important;}
+html body #v517ObjectiveUI.tutorial-night-warning{background:var(--tutorial-warning)!important;color:white!important;}
+#v517ObjectiveUI.tutorial-night-warning .v517Message{color:white!important;opacity:1!important;animation:none!important;}
+#firstNightCaveGuide{position:absolute;top:calc(100% + 8px);left:50%;margin-left:-24px;width:48px;text-align:center;pointer-events:none;color:#ffe668;text-shadow:0 2px 4px #000;}
+#firstNightCaveGuide[hidden]{display:none!important}
+#firstNightCaveGuide .cave-guide-arrow{display:block;font-size:38px;font-weight:900;line-height:40px;opacity:var(--tutorial-opacity);transform-origin:center;}
+#firstNightCaveGuide .cave-guide-distance{display:block;font-size:11px;font-weight:700;}
+body.cinematic-mode #firstNightCaveGuide{display:none!important}
+.survival-extra-bubble[hidden]{display:none!important}
+.survival-extra-bubble{position:fixed;z-index:42;max-width:220px;padding:10px 13px;border-radius:14px;background:#fffdf1;color:#20332d;border:2px solid #304a45;font-weight:600;transform:translate(-50%,-100%);pointer-events:none;}
+html body #characterBar button:is(#observeHina,#observeDaeun){overflow:visible!important;}
+html body #characterBar button:is(#observeHina,#observeDaeun)[data-auto="true"][data-selected][data-locked]{background:#468B70!important;color:white!important;}
+html body #characterBar button:is(#observeHina,#observeDaeun) .character-orbit{
+ display:none!important;left:var(--orbit-left,-4.5px)!important;top:var(--orbit-top,-4.5px)!important;right:auto!important;bottom:auto!important;width:var(--orbit-width)!important;height:var(--orbit-height)!important;
+ overflow:visible!important;transform:none!important;pointer-events:none!important;
+}
+html body #characterBar button:is(#observeHina,#observeDaeun)[data-auto="true"] .character-orbit{display:block!important;}
+html body #characterBar button:is(#observeHina,#observeDaeun)[data-auto="false"] .character-orbit{display:none!important;}
+html body #characterBar button:is(#observeHina,#observeDaeun) .character-orbit-light{
+ stroke:#9CE9C0!important;stroke-width:5px!important;vector-effect:non-scaling-stroke;stroke-dasharray:18 82!important;
+ animation:survivorBorderOrbit 3s linear infinite!important;filter:none!important;
+}
+@keyframes survivorBorderOrbit{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
+
 </style>
 </body></html>
