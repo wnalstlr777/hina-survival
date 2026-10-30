@@ -29,4 +29,6 @@ def clip(name, duration, events, crackles=()):
 clip('branch-pickup.wav', .38, [(0,.08,740,220,.5),(.13,.07,530,180,.35),(.23,.06,890,290,.25)], [(0,.014,.7),(.13,.012,.5),(.23,.01,.3)])
 clip('drink-gulp.wav', 1.05, [(t,.18,390,95,g) for t,g in [(0,.8),(.34,1),(.70,.75)]])
 clip('fish-splash.wav', .48, [(0,.15,1450,210,.6),(.07,.18,700,115,.8),(.21,.19,560,160,.4)], [(0,.035,1),(.018,.025,.6),(.06,.02,.35)])
-print('Generated branch pickup, drinking cycle and capture splash WAVs')
+
+clip('fish-chew.wav', .7, [(0,.10,240,120,.3),(.32,.12,310,140,.25)], [(0,.04,.9),(.035,.025,.6),(.10,.02,.3),(.32,.035,1),(.37,.025,.5),(.44,.018,.3)])
+print('Generated branch pickup, drinking cycle, capture splash and fish chewing WAVs')

@@ -559,45 +559,8 @@ function updateSubtleBloom(now){
 const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(-4,1,-3);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI/2.08;orbit.minDistance=5;orbit.maxDistance=400;const ambient=new THREE.HemisphereLight(0xffffff,0x516d4b,2.2);scene.add(ambient);const sun=new THREE.DirectionalLight(0xffe4aa,2.4);sun.position.set(-12,25,14);sun.castShadow=true;sun.shadow.mapSize.set(isMobile?512:2048,isMobile?512:2048);sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.025;sun.shadow.camera.left=isMobile?-38:-155;sun.shadow.camera.right=isMobile?38:155;sun.shadow.camera.top=isMobile?38:155;sun.shadow.camera.bottom=isMobile?-38:-155;scene.add(sun);const fill=new THREE.DirectionalLight(0xa4d9ff,.65);fill.position.set(14,10,-18);scene.add(fill);
 // v15.1 — panning organic cloud silhouettes, projected by the existing sun shadow map.
 // No additional shadow-casting lights or per-frame geometry rebuilds.
-const cloudShadowCanvas=document.createElement('canvas');
-cloudShadowCanvas.width=256;cloudShadowCanvas.height=128;
-const cloudShadowCtx=cloudShadowCanvas.getContext('2d');
-cloudShadowCtx.clearRect(0,0,256,128);
-// Smooth horizontally stretched clusters; never a hard rectangular footprint.
-for(const [cx,cy,rx,ry,a] of [[69,67,55,32,.65],[112,50,65,35,.84],[159,62,58,34,.79],[198,70,40,25,.57],[126,80,68,23,.55]]){
- cloudShadowCtx.save();cloudShadowCtx.translate(cx,cy);cloudShadowCtx.scale(rx,ry);
- const grad=cloudShadowCtx.createRadialGradient(0,0,.16,0,0,1);
- grad.addColorStop(0,'rgba(255,255,255,'+a+')');
- grad.addColorStop(.58,'rgba(255,255,255,'+(a*.86)+')');
- grad.addColorStop(1,'rgba(255,255,255,0)');
- cloudShadowCtx.fillStyle=grad;cloudShadowCtx.beginPath();cloudShadowCtx.arc(0,0,1,0,Math.PI*2);cloudShadowCtx.fill();cloudShadowCtx.restore();
-}
-const cloudShadowTexture=new THREE.CanvasTexture(cloudShadowCanvas);
-const cloudShadowMaterial=new THREE.MeshBasicMaterial({
- color:0xffffff,transparent:true,opacity:1,alphaMap:cloudShadowTexture,
- alphaTest:.25,side:THREE.DoubleSide,depthWrite:false,colorWrite:false
-});
 const cloudShadowCasters=[];
-for(let i=0;i<4;i++){
- const cloudCaster=new THREE.Mesh(new THREE.PlaneGeometry(28+i%2*11,13+i%3*3),cloudShadowMaterial);
- cloudCaster.rotation.x=-Math.PI/2;
- cloudCaster.position.set(-50+i*26,18,((i*23)%65)-34);
- cloudCaster.castShadow=true;cloudCaster.receiveShadow=false;
- cloudCaster.frustumCulled=false;
- scene.add(cloudCaster);cloudShadowCasters.push(cloudCaster);
-}
-function updatePanningCloudShadows(dt,hour){
- // Suppress under overcast/rain and in the dark; preserve smooth daylight motion.
- const dayFactor=THREE.MathUtils.smoothstep(hour,6.4,8.1)*(1-THREE.MathUtils.smoothstep(hour,17.4,19));
- const active=dayFactor>.08&&!groundWet()&&rainVisualStrength<.05;
- for(let i=0;i<cloudShadowCasters.length;i++){
-  const caster=cloudShadowCasters[i];caster.visible=active;
-  if(!active)continue;
-  const span=180;
-  caster.position.x=-90+((elapsed*(.31+i*.023)+i*43)%span);
-  caster.position.z=-45+((elapsed*(.095+i*.016)+i*29)%90);
- }
-}
+
 
 let terrainGrid=null;const vegetationRoots=[];const groundPlatforms=[];const wildlifeSurfaces=[];const solidObstacles=[];const detailMeshes=[];const cameraOccluders=[];const mat=(c)=>new THREE.MeshLambertMaterial({color:c});const sand=mat(0xe3d29a),grass=mat(0x6fa65b),sea=mat(0x217db5),riverMat=mat(0x4aafd9),wood=mat(0x8a633b),leaf=mat(0x4d9758),stone=mat(0x87938c);function box(w,h,d,m,x,y,z){
  // v3.78: clear the cave cavity of overlapping green/brown voxel ledges completely.
@@ -1548,6 +1511,7 @@ function makeFlowerButterfly(patch){
    activePatches++;
    const patchData={cx,cz,flowers:patchFlowers,insects:[],seed:patch};
    cameraFlowerPatches.push(patchData);
+   for(const f of patchFlowers)if(coastalFlowerSite(cx,cz)||coastalFlowerSite(f.x,f.z))f.flower.visible=false;
    // Each bed has only bees OR butterflies, never both.
    const butterflyPatch=(patch%2===1);
    const insectCount=(patch%3===0)?2:1;
@@ -1559,6 +1523,7 @@ function makeFlowerButterfly(patch){
       phase:patch*1.81+b*2.7,radius:.55+b*.32,
       speed:(butterflyPatch?.39:.65)+(patch%4)*.08};
     flowerBeeFlights.push(flight);patchData.insects.push(flight);
+    if(coastalFlowerSite(cx,cz)){flight.active=false;insect.visible=false;}
    }
   }
  }
@@ -1640,6 +1605,13 @@ function flowerCellLocation(gx,gz){
  const f=h-Math.floor(h);
  return {x:gx*12+(f-.5)*5,z:gz*12+((f*7.3)%1-.5)*5};
 }
+function coastalFlowerSite(x,z){
+ if(!landAt(x,z))return true;
+ const cell=shoreCells.get(Math.round((x+155)/shoreStep)+':'+Math.round((z+90)/shoreStep));
+ if(cell?.h<.5)return true;
+ for(let i=0;i<12;i++){const angle=i*Math.PI/6;if(!landAt(x+Math.cos(angle)*3,z+Math.sin(angle)*3))return true;}
+ return false;
+}
 function updateCameraFlowerPatches(){
  const focus=orbit.target;
  const cellX=Math.round(focus.x/12),cellZ=Math.round(focus.z/12);
@@ -1676,11 +1648,11 @@ function updateCameraFlowerPatches(){
   patch.worldKey=slot.key;
   flowerWorldAssignments.set(slot.key,patch);
   const cx=slot.x,cz=slot.z;
-  const valid=landAt(cx,cz)&&!deepPondAt(cx,cz)&&!onHinaCaveRoof(cx,cz)&&!caveEntrancePortal(cx,cz)&&!blocksCaveEntranceView(cx,cz);
+  const valid=landAt(cx,cz)&&!coastalFlowerSite(cx,cz)&&!deepPondAt(cx,cz)&&!onHinaCaveRoof(cx,cz)&&!caveEntrancePortal(cx,cz)&&!blocksCaveEntranceView(cx,cz);
   patch.active=valid;patch.cx=cx;patch.cz=cz;
   for(const f of patch.flowers){
    const x=cx+f.localX,z=cz+f.localZ;
-   const ok=valid&&landAt(x,z)&&!deepPondAt(x,z)&&!caveEntrancePortal(x,z)&&!onHinaCaveRoof(x,z)&&!blocksCaveEntranceView(x,z);
+   const ok=valid&&landAt(x,z)&&!coastalFlowerSite(x,z)&&!deepPondAt(x,z)&&!caveEntrancePortal(x,z)&&!onHinaCaveRoof(x,z)&&!blocksCaveEntranceView(x,z);
    f.flower.visible=ok;
    if(!ok)continue;
    f.x=x;f.z=z;f.flower.position.set(x,terrainTopAt(x,z,0)+.08,z);
@@ -1774,13 +1746,9 @@ function updateDaeunFlowerBends(dt,t){
 }
 // v21.1: Removed 32 floating green vine spikes from Hina's cave walls and interior.
 // Warm sky clouds, stylized distant rock spires and sea foam streaks.
-const cloudMat=new THREE.MeshBasicMaterial({color:0xfff3de,transparent:true,opacity:.72,depthWrite:false});
 const clouds=[];
-for(let i=0;i<13;i++){
- const g=new THREE.Group();scene.add(g);g.position.set(-50+rand()*100,24+rand()*15,-40+rand()*75);
- for(let j=0;j<4;j++)groupCube(g,3+rand()*4,.55+rand()*.7,1.3+rand()*2,cloudMat,(j-1.5)*2,rand()*.6,0);
- clouds.push(g);
-}
+for(let i=0;i<247;i++)rand(); // Keep all other scenery placements deterministic.
+
 for(let i=0;i<22;i++){
  const x=-22+rand()*44,z=-18+rand()*36;
  if(!landAt(x,z)||(x>-11&&x<3&&z>-16&&z<-5))continue;
@@ -2054,8 +2022,8 @@ for(let i=0;i<4;i++){
 }
 const flames=[];
 for(let i=0;i<6;i++){
- const flame=new THREE.Mesh(new THREE.ConeGeometry(.19+i%2*.065,.75+(i%3)*.18,5),i%2?flameOrange:flameYellow);
- flame.position.set(Math.sin(i*2.4)*.22,.52,Math.cos(i*2.4)*.20);
+ const flame=new THREE.Mesh(new THREE.ConeGeometry((.19+i%2*.065)*1.6,(.75+(i%3)*.18)*1.6,5),i%2?flameOrange:flameYellow);
+ flame.position.set(Math.sin(i*2.4)*.22*1.6,-.035+(.52+.035)*1.6,Math.cos(i*2.4)*.20*1.6);
  campfire.add(flame);flames.push(flame);
 }
 const ember=new THREE.Mesh(new THREE.SphereGeometry(.30,8,6),emberMaterial);ember.position.y=.2;campfire.add(ember);
@@ -3071,7 +3039,7 @@ let leafBed=false,leafStock=0,plantKnowledge=0,petBond=0,friendClue=0;
 let lastBuildDay=0,lastPlantDay=0,lastPetCareDay=0,lastClueDay=0,lastRainCollectionDay=0;
 function storeFish(){
  if(carriedFish.length>=MAX_CARRY_FISH)return false;
- carriedFish.push({at:elapsed,life:DAY_SECONDS*1.4,cooked:false});interactionSuccessSound('hina','fish');
+ const caught={at:elapsed,life:DAY_SECONDS*1.4,cooked:false};carriedFish.push(caught);notifyFishCapture('hina',caught);
  log(`🐟 물고기 휴대 · ${carriedFish.length}/${MAX_CARRY_FISH}마리 · 동굴로 가져가 보관 예정`);return true;
 }
 function edibleFish(){return carriedFish.findIndex(f=>elapsed-f.at<f.life);}
@@ -3083,21 +3051,20 @@ function v516ApplyFoodRecovery(characterStats,requestedHunger){
  characterStats.energy=Math.min(100,Math.max(0,characterStats.energy)+actualGain*0.10);
  return actualGain;
 }
-function eatFish(fromCave=false){
- if(characterAnimation?.active('hina'))return false;
- // Fish must be roasted beside a maintained campfire; raw fish is never eaten.
- if(!fireSuccess||distanceTo('shelter')>=3.3)return false;
- const list=fromCave?storedFish:carriedFish;
- const i=list.findIndex(f=>elapsed-f.at<f.life);if(i<0)return false;
- list.splice(i,1);
- const h=stats.hunger,e=stats.energy;
- v516ApplyFoodRecovery(stats,100-stats.hunger);
- /* fish recovery included in shared food rule */
- hungerDelayUntil=elapsed+27;food=true;
- characterAnimation?.fish('hina');
- log(`🔥🐟 모닥불에 구운 생선 섭취 · 허기 +${Math.round(stats.hunger-h)} · 체력 +${Math.round(stats.energy-e)} · ${fromCave?'동굴 비축':'휴대'}`);
- return true;
+const BERRY_MEAL_SECONDS=2,COOKED_MEAL_SECONDS=BERRY_MEAL_SECONDS*3;
+let hinaLeafFish=0;
+function consumeCookedMeal(id,kind='cookedFish',options={}){
+ const s=characters.get(id)?.stats;if(!s||s.hunger>=95||survivorIncapacitated(id))return false;
+ const available=options.available||(()=>manualInventoryCount(kind,id));
+ return characterAnimation.eat(id,{foodKind:kind,duration:COOKED_MEAL_SECONDS,gain:100,available,take:options.take||(()=>manualInventoryTake(kind,1,id)),done:options.done});
 }
+function eatFish(fromCave=false){
+ if(characterAnimation?.active('hina')||!fireSuccess||distanceTo('shelter')>=3.3)return false;
+ const list=fromCave?storedFish:carriedFish,f=list.find(f=>f.cooked&&elapsed-f.at<f.life)||list.find(f=>elapsed-f.at<f.life);if(!f)return false;
+ if(!f.cooked){if(hinaCookingTask)return false;hinaCookingTask={fish:f,age:0,duration:SHARED_FISH_INTERACTION_SECONDS,auto:!hinaManual};return true;}
+ return consumeCookedMeal('hina','cookedFish',{available:()=>list.includes(f)&&f.cooked&&elapsed-f.at<f.life?1:0,take:()=>list.splice(list.indexOf(f),1),done:()=>{hungerDelayUntil=elapsed+27;food=true;log('🔥🐟 구운 생선 섭취 완료');}});
+}
+
 const SHARED_FISH_INTERACTION_SECONDS=8; // Both fishing and cooking use the same duration.
 let hinaCookingTask=null;
 // v28.11: fire-hover fish roasting shortcut (Hina). Keep AI's existing food loop intact.
@@ -4035,7 +4002,7 @@ let walkAnimationTime=0;
 function walkPose(step,moving){
  // Keep identical real-time gait at 1x, 2x, 4x even though simulation accelerates.
  const realStep=step/Math.max(1,speed);
- if(moving)walkAnimationTime+=realStep;
+ if(moving)walkAnimationTime+=realStep*survivorMovementMultiplier(stats,isManualHina()?'hinaManual':'hinaAuto');
  // Sample visual gait at 12 poses/sec, independent of simulation speed.
  // World-space movement, navigation and collision remain frame-smooth.
  const poseTime=Math.floor(walkAnimationTime*12)/12;
@@ -4709,6 +4676,7 @@ function init(){
  lightningNext=0;lightningPatternStart=-1;lightningPower=0;lightningOverlay.style.opacity='0';rainAudioGain=0;rainAudio.volume=0;nightAudioGain=0;nightAudio.volume=0;nightAudio.pause();
  leafWaterDay=0;leafWaterDrinks=0;lastLeafWaterAt=-999;lastDeerRemarkAt=-999;deerRemarkDay.clear();
  paused=false;speed=4;prev=0;elapsed=0;day=1;resetSleepLedger();walkAnimationTime=0;torchCarried=false;outdoorTorchAttemptAt=-Infinity;outdoorTorchBurnoutAt=-Infinity;resetSnakes();petRabbitSnakeEncounters=0;nextSnakeSpawn=DAY_SECONDS*2+randomBetween(50,100);lastSnakeWarning=-999;
+ hinaExhausted=false;hinaLeafFish=0;
  palmFrondsCollected=0;hinaPalmFronds=0;daeunPalmFronds=0;palmFrondSites.forEach(p=>{p.available=true;p.respawnAt=0;p.group.visible=true;});
  if(typeof craftingV492!=="undefined"){for(const id of ["hina","daeun"]){if(craftingV492[id].matMesh){scene.remove(craftingV492[id].matMesh);craftingV492[id].matMesh=null;}craftingV492[id].skills={branches:0,palmFronds:0};craftingV492[id].categories={living:0,storage:0};craftingV492[id].mat=false;craftingV492[id].bag=false;}craftingV492Tasks.hina=null;craftingV492Tasks.daeun=null;v504MeditationStop();for(const b of v503Beds)scene.remove(b.mesh);v503Beds.length=0;v503BedClaims.clear();v503LastBedElapsed=null;}
  branchPiles.forEach(p=>{p.x=p.homeX;p.z=p.homeZ;p.group.position.set(p.x,wildlifeGroundY(p.x,p.z)+.03,p.z);p.group.rotation.y=rand()*Math.PI*2;p.available=true;p.respawnAt=0;p.group.visible=true;});
@@ -4875,6 +4843,8 @@ function dayOneDecide(){
 }
 let lastWashDay=0,lastWashAttemptDay=0;
 function chooseNextDayAction(){
+ if(survivorIncapacitated('hina'))return;
+ if(stats.hunger<=0&&stats.energy>0&&emergencyFood('hina'))return;
  dailyMindPlan();
  const washClock=clockParts();
  if(washClock.day>=2&&lastWashDay!==washClock.day&&lastWashAttemptDay!==washClock.day&&
@@ -4948,6 +4918,7 @@ function chooseNextDayAction(){
  if(shouldAddressNeed('thirst')){
   setState('drinkTravel','갈증 해소 · 물가로 이동','water',stats.thirst<20?'너무 멀리 왔나 봐... 목이 바짝 말라! 물가로 돌아가야겠어.':'슬슬 물을 마셔야겠어. 물가로 돌아가자.');return;
  }
+ if(shouldAddressNeed('hunger')&&hinaLeafFish>0&&consumeCookedMeal('hina','leafFish'))return;
  if(shouldAddressNeed('hunger')&&fireSuccess&&storedFish.length>0&&distanceTo('shelter')<3.3){
   if(eatFish(true)){setState('recover','동굴 비축 생선으로 허기 회복',null,'동굴에 모아둔 생선을 먹으니까 든든해.');return;}
  }
@@ -5625,6 +5596,28 @@ function updateNatureEncounters(){
  }
 }
 const manualMovementScratch={forward:new THREE.Vector3(),right:new THREE.Vector3(),movement:new THREE.Vector3()};
+let hinaExhausted=false;
+function survivorIncapacitated(id){const ch=characters.get(id);return !!ch&&(ch.stats.energy<=0||(id==='hina'?hinaExhausted:ch.restLocked)||ch.dead);}
+function tickSurvivalCondition(id,step){
+ const ch=characters.get(id),s=ch?.stats;if(!s)return;
+ if(s.hunger<=0&&!(id==='hina'?hinaExhausted:ch.restLocked))s.energy=Math.max(0,s.energy-step*.10); // Existing Daeun starvation loss, now shared and not movement-dependent.
+ if(s.energy<=0){
+  characterAnimation?.cancel(id);craftingV492Tasks[id]=null;if(v504Meditation.active&&v504Meditation.id===id)v504MeditationStop();
+  if(id==='hina'){hinaExhausted=true;state='exhausted';target=null;navReset();hinaManualTask=null;hinaCookingTask=null;}
+  else{ch.restLocked=true;ch.path=[];ch.destination=null;ch.action='exhausted';ch.manualTask=null;ch.autoTask=null;ch.fuelFeed=null;sharedDaeunResourceTask=null;}
+ }
+}
+function emergencyFood(id){
+ if(id==='hina'){
+  if(characterAnimation.active(id))return true;
+  if(hinaLeafFish>0)return consumeCookedMeal(id,'leafFish');
+  if(carriedBerries>0)return characterAnimation.eat(id,{gain:11});
+  if(carriedFish.some(f=>f.cooked)&&eatFish())return true;
+  const tree=closestFruitTree();if(!tree)return false;sites.berries.copy(hinaBerryApproach(tree));setState('eatTravel','굶주림 · 음식 확보 우선','berries',null);return true;
+ }
+ if(daeun.inventory.cookedFish>0)return consumeCookedMeal(id,'cookedFish');
+ return false;
+}
 function update(dt){
  if(paused)return;
  if(target&&target.x< -108){target=null;navReset();state='recover';phaseAt=elapsed;}
@@ -5644,6 +5637,14 @@ function update(dt){
  if(clockParts().day>=2){dailyMindPlan();mindReflect();}
  // Coastal sunset memory is granted only at the physical shoreline (see onBeachArrival).
  if(elapsed>mind.lastMindUI+3){mind.lastMindUI=elapsed;renderMind();}
+ tickSurvivalCondition('hina',step);
+ if(hinaExhausted){
+  stats.thirst=Math.max(0,stats.thirst-step*thirstRate);stats.hunger=Math.max(0,stats.hunger-step*hungerRate);
+  stats.energy=Math.min(100,stats.energy+step*survivorRecoveryPerSecond({hunger:stats.hunger,thirst:stats.thirst,quality:DAEUN_RULES.exhaustionMinRecovery}));
+  const previousState=state;state='fieldRest';updateCharacterPose();state=previousState;
+  if(stats.energy>=DAEUN_RULES.exhaustionResume){hinaExhausted=false;state='recover';phaseAt=elapsed;if(!hinaManual&&stats.hunger<=0)emergencyFood('hina');}
+  tickHinaCampfireFuel(step);updateHinaWorldUIAndLighting(step,dt);return;
+ }
  refreshBranches();
  refreshPalmFronds();
  updateNatureEncounters();
@@ -5656,7 +5657,7 @@ function update(dt){
   recoverHinaDuringRest(step,state);moraleUpdate(step);tickHinaCampfireFuel(step);updateHinaWorldUIAndLighting(step,dt);return;
  }
  if(hinaManualTask?.auto&&!(hinaManualTask.rainCare?rainyFireEligible('hina'):craftingV492AutoSafe('hina')))hinaManualTask=null;
- if(isManualHina()||hinaManualTask?.auto||craftingV492Tasks.hina?.auto){
+ if(isManualHina()||hinaManualTask?.auto||craftingV492Tasks.hina?.auto||hinaCookingTask?.auto){
   const forward=manualMovementScratch.forward;camera.getWorldDirection(forward);forward.y=0;forward.normalize();
   const right=manualMovementScratch.right.set(-forward.z,0,forward.x);
   const movement=manualMovementScratch.movement.set(0,0,0);
@@ -5671,18 +5672,18 @@ function update(dt){
    if(state==='rest'||state==='resting'||state==='sleep'){
     state='recover';goal='플레이어 직접 이동';sleepingPose=false;
    }
-   movement.normalize().multiplyScalar(step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(stats,'hinaManual'));
+   movement.normalize().multiplyScalar(step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(mesh===hana?stats:daeun.stats,mesh===hana?'hinaManual':'daeun'));
    moved=moveManualWithAssist(hana,movement.x,movement.z,step);
    if(moved){
     hana.rotation.y=Math.atan2(movement.x,movement.z);
-    stats.energy=Math.max(5,stats.energy-step*.17);
+    stats.energy=Math.max(0,stats.energy-step*.17);
    }
   }
   if(moved&&hinaManualTask){hinaManualTask=null;}
   updateHinaManualTask(step);
   updateHinaCookingTask(step);
   const hinaTaskWalking=!!(hinaManualTask?.phase==='approach'&&hinaManualTask.walking);
-  if(!isManualHina())stats.energy=Math.max(5,stats.energy-step*(.018+(hinaTaskWalking?.16:0)));
+  if(!isManualHina())stats.energy=Math.max(0,stats.energy-step*(.018+(hinaTaskWalking?.16:0)));
   updateExploration(); // Reveal Hina-region tiles even when the AI update returns early.
   // Same 16.8Hz alternating-leg gait used by Daeun, with Hina's torch/held-item pose preserved.
   walkPose(step,moved||hinaTaskWalking);
@@ -5733,7 +5734,7 @@ function update(dt){
  if(stats.thirst<35)fatigue+=.08;
  if(stats.will<25)fatigue+=.035;
  if(state==='rest'||state==='night'||state==='outdoorSleep'||state==='fieldRest'||state==='mentalRest')fatigue=0;
- stats.energy=Math.max(5,stats.energy-step*fatigue);
+ stats.energy=Math.max(0,stats.energy-step*fatigue);
  // If pathfinding cannot reach a destination, stop exhausting the character.
  if(target){
   if(!progressAnchor){progressAnchor=hana.position.clone();progressAnchorAt=elapsed;}
@@ -5776,7 +5777,7 @@ function update(dt){
  }
  // Any active travel can be interrupted before exhaustion makes the return trip impossible.
  // Do not interrupt the introductory Day 1 sequence or actions that are already resting.
- if(day>=2&&stats.energy<=20&&!['fieldRest','rest','outdoorSleep','night','drinking','eating','sleepTravel'].includes(state)){
+ if(day>=2&&stats.hunger>0&&stats.energy<=20&&!['fieldRest','rest','outdoorSleep','night','drinking','eating','sleepTravel'].includes(state)){
   if(stats.energy>=15&&distanceTo('shelter')<14&&Math.random()<.8){
    setState('sleepTravel','피곤해서 동굴로 귀환','shelter',
     '이제 힘이 없네... 동굴로 돌아가서 쉬자.');
@@ -6002,7 +6003,7 @@ function updateHinaWorldUIAndLighting(step,dt){
  pondRippleMat.opacity=.025+.49*lightLevel;
  waterSurface.material.opacity=.77;
  animateFireflies();
- weatherUpdate(step);updatePanningCloudShadows(step,hour);updateLightning(step);updateSound(dt,(hour>=20||hour<4));updateBonfireAmbience(dt);updateRainAudio(dt);updateNightAudio(dt,(hour>=20||hour<4));updateCampfire(elapsed);
+ weatherUpdate(step);updateLightning(step);updateSound(dt,(hour>=20||hour<4));updateBonfireAmbience(dt);updateRainAudio(dt);updateNightAudio(dt,(hour>=20||hour<4));updateCampfire(elapsed);
  // WeatherUpdate modifies sunlight for rain and wet ground; keep its existing behavior.
  if(elapsed>=uiNextUpdate){uiNextUpdate=elapsed+.3;
  // Selected-survivor HUD is updated by refreshCharacterUI().
@@ -6710,7 +6711,7 @@ function devDay10Daeun(){
  d.auto=true;d.path=[];d.destination=null;d.action='idle';d.actionAge=0;
  d.manualTask=null;d.restLocked=false;d.failedRoute=null;d.seatedEating=0;d.lastCraftActiveAt=-1e9;
  d.stats={energy:81,hunger:69,thirst:72,will:77};
- d.inventory={berries:3,caveBerries:4,branches:10,caveBranches:0,fuel:55,rabbits:0,fish:1,cookedFish:0};
+ d.inventory={berries:3,caveBerries:4,branches:10,caveBranches:0,fuel:55,rabbits:0,fish:1,cookedFish:0,leafFish:0};
  d.bag={crafted:true,days:[6,7,8],practiceDay:10,today:0,progress:100};
  d.skills={fire:100,rabbit:90,fish:100};
  d.firePracticeDays=[6,7,8,9];
@@ -6817,7 +6818,7 @@ const meetingTalk=[
 function meetingFollowStep(mesh,leader,step){
  const dx=leader.position.x-mesh.position.x,dz=leader.position.z-mesh.position.z,dist=Math.hypot(dx,dz);
  if(dist<2.1||dist>18)return false;
- const amount=Math.min(Math.max(0,dist-2.1),step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(stats,'hinaManual'));
+ const amount=Math.min(Math.max(0,dist-2.1),step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(mesh===hana?stats:daeun.stats,mesh===hana?'hinaManual':'daeun'));
  const moved=moveManualWithAssist(mesh,dx/dist*amount,dz/dist*amount,step);
  if(moved)mesh.rotation.y=Math.atan2(dx,dz);
  return moved;
@@ -6969,8 +6970,9 @@ function setHinaAuto(on){
 // v4.0: progressStore below owns persistence for both survivors.
 // Character-specific profiles keep existing balance; zero will consistently slows travel.
 function survivorMovementMultiplier(values,profile='daeun'){
- if(profile==='hinaAuto')return (values.energy<25?.52:values.energy<45?.76:1)*(values.will<=0?.12:1);
- if(profile==='hinaManual')return values.will<=0?.12:1;
+ if(values.energy<=0)return 0;
+ if(profile==='hinaAuto')return Math.max(.06,(values.energy<25?.52:values.energy<45?.76:1)*(values.will<=0?.12:1)*(values.hunger<=0?.32:1));
+ if(profile==='hinaManual')return Math.max(.06,(values.will<=0?.12:1)*(values.energy<=20?.45:1)*(values.hunger<=0?.32:1));
  const r=DAEUN_RULES;
  const penalty=(values.energy<=r.lowEnergy?r.lowEnergySpeed:1)*(values.will<=0?r.zeroWillSpeed:1)*(values.hunger===0?r.hungerEmptySpeed:1)*(values.thirst===0?r.thirstEmptySpeed:1);
  return Math.max(values.will<=0?.06:r.minSpeed,penalty);
@@ -7059,6 +7061,7 @@ function applyDownhillHop(mesh,dt,groundY){
  return hop.amplitude*Math.pow(Math.sin(Math.PI*Math.pow(p,.50)),.58);
 }
 function moveCharacterOnGround(mesh,x,z){
+ if(survivorIncapacitated(mesh===hana?'hina':mesh===daeun.mesh?'daeun':''))return false;
  if(snakeFearLocked(mesh===hana?'hina':mesh===daeun.mesh?'daeun':''))return false;
  const ox=mesh.position.x,oz=mesh.position.z,dx=x-ox,dz=z-oz;
  const length=Math.hypot(dx,dz);if(length<1e-7)return false;
@@ -7406,8 +7409,8 @@ function buildDaeunWorld(){
  }
  const daeunFlames=[];
  for(let i=0;i<6;i++){
-  const flame=new THREE.Mesh(new THREE.ConeGeometry(.19+i%2*.065,.75+(i%3)*.18,5),i%2?flameOrange:flameYellow);
-  flame.position.set(Math.sin(i*2.4)*.22,.52,Math.cos(i*2.4)*.20);
+  const flame=new THREE.Mesh(new THREE.ConeGeometry((.19+i%2*.065)*1.6,(.75+(i%3)*.18)*1.6,5),i%2?flameOrange:flameYellow);
+  flame.position.set(Math.sin(i*2.4)*.22*1.6,-.035+(.52+.035)*1.6,Math.cos(i*2.4)*.20*1.6);
   fire.add(flame);daeunFlames.push(flame);
  }
  const ember=new THREE.Mesh(new THREE.SphereGeometry(.30,8,6),emberMaterial);ember.position.y=.2;fire.add(ember);
@@ -7980,7 +7983,7 @@ function resetDaeun(){
  daeun.sites.shelter=new THREE.Vector3(DAEUN_ZONE.cave.x,.4,DAEUN_ZONE.cave.z+1.7);
  daeun.sites.water=new THREE.Vector3(DAEUN_ZONE.pond.x,.4,DAEUN_ZONE.pond.z);
  daeun.mesh.position.set(DAEUN_ZONE.spawn.x,terrainTopAt(DAEUN_ZONE.spawn.x,DAEUN_ZONE.spawn.z)+.1,DAEUN_ZONE.spawn.z);daeun.mesh.rotation.set(0,0,0);
- clearGroundDrops();selectedQuickFood=null;daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,caveBranches:0,fuel:0,rabbits:0,fish:0,cookedFish:0};daeun.bag={crafted:false,days:[],practiceDay:1,today:0,progress:0};updateDaeunBagVisual();daeun.skills={fire:0,rabbit:0,fish:0};daeun.firePracticeDays=[];daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.speechExpiresAt=performance.now()+3000;daeun.log=[];daeun.memory=[];daeun.lastWashDay=0;daeun.nextWashRetryAt=0;daeun.lastNightNeedsTalkDay=0;daeun.lastNightNeedsTalkKey='';daeun.nextNightNeedsTalkAt=0;daeun.timers={nextThink:elapsed+18,stuck:0,introStart:elapsed,introStage:0,introMoveAt:0,introAnchorX:daeun.mesh.position.x,introAnchorZ:daeun.mesh.position.z,seenFirstRabbit:false,seenFirstFish:false};daeun.restLocked=false;daeun.failedRoute=null;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeun.seatedEating=0;daeun.torchExpiresAt=0;resetDaeunSnakes();resetMiddleBear();daeunExplored.clear();
+ clearGroundDrops();selectedQuickFood=null;daeun.stats={energy:90,hunger:82,thirst:84,will:82};daeun.inventory={berries:0,caveBerries:0,branches:0,caveBranches:0,fuel:0,rabbits:0,fish:0,cookedFish:0,leafFish:0};daeun.bag={crafted:false,days:[],practiceDay:1,today:0,progress:0};updateDaeunBagVisual();daeun.skills={fire:0,rabbit:0,fish:0};daeun.firePracticeDays=[];daeun.attempts={fire:0,rabbit:0,fish:0};daeun.practiceDay=1;daeun.dailyPractice={fire:0,rabbit:0,fish:0};daeun.auto=true;daeun.path=[];daeun.destination=null;daeun.action='idle';daeun.actionAge=0;daeun.thought='어…? 방금까지 졸업식이었는데…';daeun.speechExpiresAt=performance.now()+3000;daeun.log=[];daeun.memory=[];daeun.lastWashDay=0;daeun.nextWashRetryAt=0;daeun.lastNightNeedsTalkDay=0;daeun.lastNightNeedsTalkKey='';daeun.nextNightNeedsTalkAt=0;daeun.timers={nextThink:elapsed+18,stuck:0,introStart:elapsed,introStage:0,introMoveAt:0,introAnchorX:daeun.mesh.position.x,introAnchorZ:daeun.mesh.position.z,seenFirstRabbit:false,seenFirstFish:false};daeun.restLocked=false;daeun.failedRoute=null;daeun.walkTime=0;daeun.aiRandom=8713;daeun.manualTask=null;daeun.seatedEating=0;daeun.torchExpiresAt=0;resetDaeunSnakes();resetMiddleBear();daeunExplored.clear();
  daeunBerrySelectionDay=clockParts().day;
  randomizeBerryDay(daeunResources.berries,daeunBerrySelectionDay,dRandom,true);
  for(const b of daeunResources.branches){b.x=b.homeX;b.z=b.homeZ;b.group.position.set(b.x,terrainTopAt(b.x,b.z)+.03,b.z);b.available=true;b.respawnAt=0;b.group.visible=true;}
@@ -8210,7 +8213,7 @@ class DaeunAIController{
  think(){
   if(characterAnimation?.active('daeun'))return;
   const d=daeun,s=d.stats,inv=d.inventory,pos=d.mesh.position;
-  if(d.restLocked)return;
+  if(d.restLocked||s.energy<=0)return;
   if(sharedHomeActive&&meetingFollowUntil&&performance.now()<meetingFollowUntil)return;
   // Needs are evaluated immediately after waking, before exploration detours.
   const urgentWater=s.thirst<57,urgentFood=s.hunger<57;
@@ -8280,6 +8283,8 @@ class DaeunAIController{
    return;
   }
   if(urgentFood){
+   if((inv.leafFish||0)>0&&consumeCookedMeal('daeun','leafFish'))return;
+   if(inv.cookedFish>0&&consumeCookedMeal('daeun','cookedFish'))return;
    if(inv.berries){characterAnimation.eat('daeun',{gain:34,energy:false,done:()=>daeunSay('가지고 있던 열매를 먹었어.')});return;}
    if(inv.caveBerries&&pos.distanceTo(d.sites.shelter)<4){characterAnimation.eat('daeun',{source:'cave',gain:34,energy:false});return;}
    const tree=(sharedHomeActive?berryTrees:daeunResources.berries).filter(t=>t.stock>0).sort((a,b)=>a.group.position.distanceToSquared(pos)-b.group.position.distanceToSquared(pos))[0];
@@ -8347,6 +8352,7 @@ class DaeunAIController{
     const rabbit=critters.find(r=>r.originalHomeX!==undefined&&!r.caught&&r.g.visible&&Math.hypot(pos.x-r.g.position.x,pos.z-r.g.position.z)<7);
     if(rabbit){d.action='autoRabbitObserve';d.actionAge=0;daeunSay('🐰 토끼가 어떻게 움직이는지 살펴보자.');return;}
    }
+   if(d.skills.fish>=100&&d.dailyPractice.fish<DAEUN_DAILY_PRACTICE_LIMIT.fish&&inv.fish<daeunFishCap()&&Math.hypot(pos.x-d.sites.water.x,pos.z-d.sites.water.z)<5.5&&fishNearby(pos.x,pos.z,9)&&activeWildlifeChance('fish')>=0&&consumeWildlifeChance('fish')){d.manualTask={type:'fish',phase:'perform',age:0,auto:true};d.action='manualFish';d.actionAge=0;return;}
    if(d.skills.fish<100&&d.dailyPractice.fish<DAEUN_DAILY_PRACTICE_LIMIT.fish&&Math.hypot(pos.x-d.sites.water.x,pos.z-d.sites.water.z)<8&&fishNearby(pos.x,pos.z,9)){
     d.action='autoFishObserve';d.actionAge=0;daeunSay('🐟 물고기 움직임을 관찰해 보자.');return;
    }
@@ -8499,6 +8505,7 @@ function updateDaeunFuelFeed(){
  gameVitalFloat('daeun','fuel',40);
 }
 function updateDaeun(step,realDt){
+ tickSurvivalCondition('daeun',step);
  updateDaeunFuelFeed();
  updateDaeunSnakes(step);
  if(snakeFearLocked('daeun')){daeun.stats.hunger=Math.max(0,daeun.stats.hunger-step*DAEUN_RULES.hungerRate*.5);daeun.stats.thirst=Math.max(0,daeun.stats.thirst-step*(raining()?.035:DAEUN_RULES.thirstRate)*.5);return;}
@@ -8654,7 +8661,7 @@ function updateDaeun(step,realDt){
     }
    }}
   }
-  s.energy=Math.max(0,s.energy-step*(moving?.26+(s.thirst===0?.20:0)+(s.hunger===0?.10:0):.025));const distanceFromHome=Math.hypot(d.mesh.position.x-d.home.x,d.mesh.position.z-d.home.z);
+  s.energy=Math.max(0,s.energy-step*(moving?.26+(s.thirst===0?.20:0):.025));const distanceFromHome=Math.hypot(d.mesh.position.x-d.home.x,d.mesh.position.z-d.home.z);
   const sheltered=inCaveWalkZone(d.mesh.position.x,d.mesh.position.z)||caveEntrancePortal(d.mesh.position.x,d.mesh.position.z);
   const fear=nightFearFactor(d.mesh.position.x,d.mesh.position.z,{moving,exploring:d.action==='explore'||d.action==='travel'});
   const drain=sheltered?0:DAEUN_RULES.willBaseDrain+(moving?DAEUN_RULES.willMoveDrain:0)+(distanceFromHome>DAEUN_RULES.autoRadius*.75?DAEUN_RULES.willDistanceDrain:0)+DAEUN_RULES.willNightDrain*fear+(s.hunger<25||s.thirst<25?DAEUN_RULES.willLowNeedsDrain:0);
@@ -8713,7 +8720,7 @@ function updateDaeun(step,realDt){
   }else if(inv.branches<DAEUN_BAG_BRANCH_COST)daeunSay('나뭇가지 최소 2개가 필요합니다.');
   d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed+2;
  }
- if(isManualDaeun()&&d.manualTask&&d.manualTask.phase==='perform'){
+ if((isManualDaeun()||d.manualTask?.auto)&&d.manualTask&&d.manualTask.phase==='perform'){
   const task=d.manualTask;task.age+=step;
   if(task.type==='storeBranches'&&task.age>=3.6){
    daeunSay('나뭇가지는 가방에 보관하고 있어.');cancelManualTask();
@@ -8736,9 +8743,8 @@ function updateDaeun(step,realDt){
    else daeunSay('물고기, 모닥불 연료 또는 소지품 공간이 부족해.');
    cancelManualTask();
   }
-  else if(task.type==='eatFish'&&task.age>=4){
-   if(inv.cookedFish>0&&s.hunger<95){const old=s.hunger;inv.cookedFish--;s.hunger=100;gameVitalFloat('daeun','hunger',s.hunger-old);}cancelManualTask();
-  }
+  else if(task.type==='eatFish'){cancelManualTask();consumeCookedMeal('daeun','cookedFish');}
+
   else if(task.type==='eat'){cancelManualTask();if(inv.berries>0&&s.hunger<95)characterAnimation.eat('daeun',{gain:12,energy:false});}
   else if(['fire','rabbit','fish'].includes(task.type)&&task.age>=(task.type==='fire'?10:task.type==='rabbit'?7:8)){
    refreshDaeunDailyPractice();
@@ -8752,7 +8758,7 @@ function updateDaeun(step,realDt){
     const success=mastered&&dRandom()<(kind==='fire'?(raining()?.24:.75):kind==='rabbit'?.32:.48);
     if(success&&kind==='fire'){const wasBurning=inv.fuel>0;inv.fuel=Math.max(inv.fuel,65);awardIgnitionMorale('daeun',wasBurning);daeunSay('🔥 모닥불 점화 성공! 나뭇가지를 더 모아 유지하자.');}
     else if(success&&kind==='rabbit'){const r=critters[task.index];if(r&&r.g.visible&&!r.caught&&!daeunPetRabbit){rabbitCaptureHold(r,'daeun');daeunPetRabbit=r;daeunSay(rabbitLine(rabbitSuccessLines));}else {if(r)scareRabbit(r,d.mesh.position);daeunSay(rabbitLine(rabbitFailLines));}}
-    else if(success&&kind==='fish'){inv.fish++;inventoryPickupFloat('daeun','fish',1);interactionSuccessSound('daeun','fish');}
+    else if(success&&kind==='fish'){inv.fish++;inventoryPickupFloat('daeun','fish',1);notifyFishCapture('daeun',{});}
     else {if(kind==='rabbit'){const r=critters[task.index];if(r)scareRabbit(r,d.mesh.position);daeunSay(rabbitLine(rabbitFailLines));}else daeunSay(mastered?'아쉽다… 이번엔 실패했어.':'조금씩 감이 잡히는 것 같아.');}
     cancelManualTask();
    }
@@ -8849,7 +8855,7 @@ function updateDaeun(step,realDt){
  const daeunHop=applyDownhillHop(d.mesh,Math.min(.05,Math.max(0,realDt)),daeunGround);
  d.mesh.position.y=daeunGround+(!sleep&&!seat?daeunHop:0);
  if(daeunHop>0&&!sleep&&!seat)d.mesh.rotation.x=-.16;
- d.walkTime+=moving?realDt:0;
+ d.walkTime+=moving?realDt*survivorMovementMultiplier(s):0;
  // Match Hina's 12 fps sampled walk pose; never quantize actual movement.
  const dPoseTime=Math.floor(d.walkTime*12)/12;
  const stride=moving?Math.sin(dPoseTime*16.8)*.34:0;
@@ -8941,14 +8947,19 @@ const BRANCH_INVENTORY_ICON = '<svg viewBox="0 0 40 40" width="28" height="28" a
 // Unified transaction notices: the same class, position and animation as skill gains.
 // v4.56: Shared floating feedback. Inventory consumption is reflected by inventory counters,
 // not by duplicate negative item floats. Always use the same animation as skill gains.
-const GAME_FLOAT_ICONS={living:'⚒️',storage:'🎒',berries:'🍓',fish:'🐟',cookedFish:'🍖',rabbits:'🐇',hunger:'🍖',thirst:'💧',energy:'⚡',will:'💗',fuel:'🔥'};
-const GAME_FLOAT_LABELS={hunger:'허기',thirst:'갈증',energy:'체력',will:'의지력',fuel:'불유지'};
+const GAME_FLOAT_ICONS={cooking:'🍳',leafFish:'🍃🐟',living:'⚒️',storage:'🎒',berries:'🍓',fish:'🐟',cookedFish:'🍖',rabbits:'🐇',hunger:'🍖',thirst:'💧',energy:'⚡',will:'💗',fuel:'🔥'};
+const GAME_FLOAT_LABELS={cooking:'요리 숙련도',leafFish:'야자잎에 익힌 물고기',hunger:'허기',thirst:'갈증',energy:'체력',will:'의지력',fuel:'불유지'};
+function notifyFishCapture(id,transaction){
+ const source=characters.get(id)?.mesh.position,listener=characters.get(observedId)?.mesh.position;
+ if(!source||!listener||id!==observedId&&source.distanceTo(listener)>15)return false;
+ return window.HinaInteractionSFX?.capture(id,transaction)||false;
+}
 function interactionSuccessSound(id,kind){return id===observedId?window.HinaInteractionSFX?.play(kind)||false:false;}
 function gameTransactionFloat(character,kind,key,amount){
  if(!Number.isFinite(amount)||Math.abs(amount)<.001||character!==observedId)return;
  if(kind==='item'&&amount<0)return;
  if(amount>0){
-  const sound=kind==='food'?(key==='berries'?null:'eat'):kind==='vital'&&key==='thirst'?null:kind==='item'?({berries:'berry',branches:'branchPickup',palmFronds:'berry',fish:null,cookedFish:'cook',fuel:'fire'}[key]):null;
+  const sound=kind==='food'?null:kind==='vital'&&key==='thirst'?null:kind==='item'?({berries:'berry',branches:'branchPickup',palmFronds:'berry',fish:null,cookedFish:'cook',fuel:'fire'}[key]):null;
   if(sound)window.HinaInteractionSFX?.play(sound);
  }
  const node=document.createElement('div');node.className='skillGainFloat';
@@ -9272,6 +9283,8 @@ function refreshDaeunDailyPractice(){
  if(daeun.practiceDay!==today){daeun.practiceDay=today;daeun.dailyPractice={fire:0,rabbit:0,fish:0};}
 }
 function manualAction(type,point,index=-1){
+ if(survivorIncapacitated(isManualHina()?'hina':'daeun'))return false;
+ if(type==='eatLeafFish')return consumeCookedMeal(isManualHina()?'hina':'daeun','leafFish');
  if(!isManualDaeun()||daeun.restLocked)return false;
  if(type!=='eat'&&type!=='eatFish')characterAnimation?.cancel('daeun');
  if((type==='eat'||type==='eatFish')&&characterAnimation?.active('daeun'))return false;
@@ -9286,9 +9299,8 @@ function manualAction(type,point,index=-1){
   daeunSay('오늘 '+(type==='fire'?'불 피우기':type==='rabbit'?'토끼잡기':'물고기잡기')+' 연습은 충분히 했어. 내일 다시 해보자.');return false;
  }
  if(type==='eat'||type==='eatFish'){
-  const inv=daeun.inventory;if(type==='eatFish'){if(inv.cookedFish<1){daeunSay('구운 물고기가 없어.');return false;}const before=daeun.stats.hunger;inv.cookedFish--;v516ApplyFoodRecovery(daeun.stats,100-daeun.stats.hunger);showFoodConsumption('daeun','cookedFish',before,daeun.stats.hunger);}
-  else{if(inv.berries<1){daeunSay('먹을 열매가 없어.');return false;}return characterAnimation.eat('daeun',{gain:12});}
-  characterAnimation.fish('daeun');return true; // Fish timing/reward remains unchanged; reuse the arm gesture.
+  if(type==='eatFish')return consumeCookedMeal('daeun','cookedFish');
+  if(daeun.inventory.berries<1){daeunSay('먹을 열매가 없어.');return false;}return characterAnimation.eat('daeun',{gain:12});
  }
  if(v504Meditation.active&&v504Meditation.id==='daeun')v504MeditationStop();
  cancelManualTask();daeun.path=[];daeun.destination=null;
@@ -9305,7 +9317,7 @@ function manualAction(type,point,index=-1){
  if(type==='bag'&&daeun.inventory.branches<DAEUN_BAG_BRANCH_COST){daeunSay('나뭇가지 최소 2개가 필요합니다.');return false;}
  if(type==='fire'&&daeun.inventory.fuel>0){daeunSay('불을 유지해야 해. 나뭇가지를 모닥불에 넣자.');return false;}
  if(type==='fire'&&daeun.inventory.branches<1){daeunSay('불을 피우려면 나뭇가지가 필요해.');return false;}
- if(type==='eatFish'){if(daeun.stats.hunger>=95){daeunSay(fullLine(FULL_FOOD_LINES));return false;}if(daeun.inventory.cookedFish<1)return false;const before=daeun.stats.hunger;daeun.inventory.cookedFish--;v516ApplyFoodRecovery(daeun.stats,100-daeun.stats.hunger);showFoodConsumption('daeun','cookedFish',before,daeun.stats.hunger);return true;}
+ if(type==='eatFish')return consumeCookedMeal('daeun','cookedFish');
  if(type==='eat'){
   if(daeun.stats.hunger>=95){daeunSay(fullLine(FULL_FOOD_LINES));return false;}
   if(daeun.inventory.berries<=0){daeunSay('먹을 열매가 없어.');return false;}
@@ -9449,7 +9461,7 @@ function approachResourceTask(task,mesh,step,who){
  if(d<=resourceReach(task.type)){task.phase='perform';task.age=0;task.walking=false;return false;}
  if(task.approachAge===undefined){task.approachAge=0;task.bestDistance=d;task.stalled=0;}
  task.approachAge+=step;
- const travel=Math.min(Math.max(0,d-resourceReach(task.type)+.12),step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(who==='hina'?stats:daeun.stats,who==='hina'?'hinaManual':'daeun'));
+ const travel=Math.min(Math.max(0,d-resourceReach(task.type)+.12),step*DAEUN_RULES.walkSpeed*survivorMovementMultiplier(who==='hina'||who==='히나'?stats:daeun.stats,who==='hina'||who==='히나'?'hinaManual':'daeun'));
  const moved=moveManualWithAssist(mesh,dx/d*travel,dz/d*travel,step);
  task.walking=!!moved;
  if(moved)mesh.rotation.y=Math.atan2(dx,dz);
@@ -9463,6 +9475,7 @@ function approachResourceTask(task,mesh,step,who){
  return moved;
 }
 function sharedHinaResourceInteract(type,item){
+ if(survivorIncapacitated('daeun'))return false;
  if(isManualHina()){hinaManualInteract(type,item);return;}
  if(!isManualDaeun()||daeun.restLocked)return;
  if(sharedDaeunResourceTask||daeun.manualTask){daeunSay('먼저 하던 일을 마치자.');return;}
@@ -9495,7 +9508,7 @@ function updateSharedCampfireBonus(){
 }
 function updateSharedDaeunResourceTask(step){
  const t=sharedDaeunResourceTask;
- if(!t||snakeFearLocked('daeun')||(!isManualDaeun()&&!t.auto))return;
+ if(!t||survivorIncapacitated('daeun')||snakeFearLocked('daeun')||(!isManualDaeun()&&!t.auto))return;
  if(t.auto&&!(t.rainCare?rainyFireEligible('daeun'):craftingV492AutoSafe('daeun'))){sharedDaeunResourceTask=null;return;}
  if(t.phase==='approach'){approachResourceTask(t,daeun.mesh,step,'다은');if(t.invalid)sharedDaeunResourceTask=null;return;}
  t.age+=step;if(t.age<t.duration)return;
@@ -9555,6 +9568,7 @@ const hinaManualMarkers={
 Object.values(hinaManualMarkers).flat().forEach(marker=>{marker._hinaOwned=true;});
 function hideHinaManualMarkers(){Object.values(hinaManualMarkers).flat().forEach(m=>{m.style.display='none';m.onclick=null;m.classList.remove('interacting');clearCleanProgressRing(m);});}
 function hinaManualInteract(type,item){
+ if(survivorIncapacitated('hina'))return false;
  if(v504Meditation.active&&v504Meditation.id==='hina')v504MeditationStop();
  if(!isManualHina())return;
  if(type!=='eat')characterAnimation?.cancel('hina');
@@ -9581,7 +9595,7 @@ function hinaManualInteract(type,item){
 }
 function updateHinaCookingTask(step){
  if(!hinaCookingTask)return;
- if(!isManualHina()){hinaCookingTask=null;return;}
+ if(!isManualHina()&&!hinaCookingTask.auto){hinaCookingTask=null;return;}
  if(!fireSuccess||!campfire.visible||distanceTo('shelter')>=4){hinaCookingTask=null;return;}
  const task=hinaCookingTask;
  task.age+=step;
@@ -9861,18 +9875,20 @@ document.getElementById('daeunEatButton').onclick=()=>{manualAction('eat');manua
 // Character-owned survival state remains separate; unsupported item types cannot be conjured.
 function manualInventoryActor(){return isManualHina()?'hina':isManualDaeun()?'daeun':null;}
 function manualInventoryCount(kind,actor=manualInventoryActor()){
+ if(kind==='leafFish'&&actor==='hina')return hinaLeafFish;
  if(kind==='palmFronds')return actor==='daeun'?daeunPalmFronds:actor==='hina'?hinaPalmFronds:0;
  if(actor==='daeun')return Math.max(0,daeun.inventory[kind]||0);
  if(actor==='hina'){
   if(kind==='berries')return carriedBerries;
   if(kind==='branches')return fireDryStock;
-  if(kind==='fish')return carriedFish.length;
+  if(kind==='fish')return carriedFish.filter(f=>!f.cooked).length;
   if(kind==='cookedFish')return carriedFish.filter(f=>f.cooked).length;
  }
  return 0;
 }
 function manualInventoryTake(kind,n,actor=manualInventoryActor()){
  if(n<=0||manualInventoryCount(kind,actor)<n)return false;
+ if(kind==='leafFish'&&actor==='hina'){hinaLeafFish-=n;return true;}
  if(kind==='palmFronds'){if(actor==='daeun')daeunPalmFronds-=n;else if(actor==='hina')hinaPalmFronds-=n;return true;}
  if(actor==='daeun'){daeun.inventory[kind]-=n;return true;}
  if(actor==='hina'){
@@ -9891,6 +9907,7 @@ function manualInventoryTake(kind,n,actor=manualInventoryActor()){
 }
 function manualInventoryAdd(kind,n,actor=manualInventoryActor()){
  if(n<=0)return;
+ if(kind==='leafFish'&&actor==='hina'){hinaLeafFish+=n;return;}
  if(kind==='palmFronds'){if(actor==='daeun')daeunPalmFronds+=n;else if(actor==='hina')hinaPalmFronds+=n;return;}
  if(actor==='daeun'){daeun.inventory[kind]=(daeun.inventory[kind]||0)+n;return;}
  if(actor==='hina'){
@@ -9911,7 +9928,7 @@ function manualInventorySay(line,actor=manualInventoryActor()){
 // v4.55: One explicit food slot; never auto-switch the player's selected food.
 let selectedQuickFood=null; // Daeun food slot
 let selectedHinaQuickFood=null; // independent Hina food slot
-const QUICK_FOODS={berries:{action:'eat',label:'열매',icon:'🍓'},cookedFish:{action:'eatFish',label:'구운 물고기',icon:'🍖'}};
+const QUICK_FOODS={berries:{action:'eat',label:'열매',icon:'🍓'},cookedFish:{action:'eatFish',label:'구운 물고기',icon:'🍖'},leafFish:{action:'eatLeafFish',label:'야자잎에 익힌 물고기',icon:'🍃🐟'}};
 function v503IsSleeping(id){
  return id==='hina'?hinaSleepSpeechLock():daeunSleepSpeechLock();
 }
@@ -9922,7 +9939,7 @@ function quickEatDaeun(){
   if(stats.hunger>=95){say(fullLine(FULL_FOOD_LINES));return;}
   if(manualInventoryCount(selectedHinaQuickFood,'hina')<=0){say('선택한 음식이 없어.');return;}
   if(selectedHinaQuickFood==='berries')hinaManualInteract('eat',null);
-  else say('이 음식은 아직 히나의 수동 섭취 동작과 연결되지 않았어.');
+  else consumeCookedMeal('hina',selectedHinaQuickFood);
   return;
  }
  if(!isManualDaeun())return;
@@ -9934,11 +9951,12 @@ function quickEatDaeun(){
 // A single pointer-based drag path for mouse and touch. The inventory grid is
 // re-rendered frequently, so gesture listeners live on its stable parent.
 // v4.65: one shared inventory gesture for quick-food equip and ground dropping.
-const DROP_KINDS={berries:{label:'열매',icon:'🍓'},branches:{label:'나뭇가지',icon:BRANCH_INVENTORY_ICON},fish:{label:'물고기',icon:'🐟'},cookedFish:{label:'구운 물고기',icon:'🐟'},rabbits:{label:'토끼',icon:'🐇'},palmFronds:{label:'야자잎',icon:PALM_FROND_ICON}};
+const DROP_KINDS={leafFish:{label:'야자잎에 익힌 물고기',icon:'🍃🐟'},berries:{label:'열매',icon:'🍓'},branches:{label:'나뭇가지',icon:BRANCH_INVENTORY_ICON},fish:{label:'물고기',icon:'🐟'},cookedFish:{label:'구운 물고기',icon:'🐟'},rabbits:{label:'토끼',icon:'🐇'},palmFronds:{label:'야자잎',icon:PALM_FROND_ICON}};
 const groundDrops=[];
 const groundDropGroup=new THREE.Group();scene.add(groundDropGroup);
 // v4.66: reuse the actual collectible/carry meshes, never placeholder spheres.
 function groundDropVisual(kind){
+ if(kind==='leafFish')return groundDropVisual('cookedFish');
  const g=new THREE.Group();
  if(kind==='palmFronds'){
   const sample=palmFrondSites.find(p=>p.group)?.group;
@@ -10196,14 +10214,18 @@ function projectToScreen(point){const p=screenProjectionScratch.copy(point).proj
 // v4.94 unified material proficiency crafting: shared by both playable characters.
 const craftingV492={hina:{skills:{branches:0,palmFronds:0},categories:{living:0,storage:0},mat:false,bag:false},daeun:{skills:{branches:0,palmFronds:0},categories:{living:0,storage:0},mat:false,bag:false}};
 const craftingV492Tasks={hina:null,daeun:null};let craftingV492Tab='inventory',craftingV494Selected='mat',craftingV495Category='all',craftingV495ListSignature='';
-const craftingV494Recipes={mat:{name:'야자잎 잠자리',icon:PALM_FROND_ICON,materials:{palmFronds:6},requiredCategory:15,duration:12,description:'동굴 또는 모닥불 주변에 설치 · 내구도 100%'},bag:{name:'나뭇가지 백팩',icon:'🧶',materials:{branches:DAEUN_BAG_BRANCH_COST},requiredCategory:15,duration:8,exclusive:'daeun',description:'다은 고유 제작 · 기존 백팩 모델과 수납 기능 유지'}};
+const craftingV494Recipes={mat:{name:'야자잎 잠자리',icon:PALM_FROND_ICON,materials:{palmFronds:6},requiredCategory:15,duration:12,description:'동굴 또는 모닥불 주변에 설치 · 내구도 100%'},bag:{name:'나뭇가지 백팩',icon:'🧶',materials:{branches:DAEUN_BAG_BRANCH_COST},requiredCategory:15,duration:8,exclusive:'daeun',description:'다은 고유 제작 · 기존 백팩 모델과 수납 기능 유지'},leafFish:{name:'야자잎에 익힌 물고기',icon:'🍃🐟',materials:{fish:1,palmFronds:1},requiredCategory:0,duration:8,repeatable:true,result:{kind:'leafFish',count:1},description:'켜진 모닥불 4m 이내 · 일반 구운 물고기와 같은 회복량'}};
 function craftingV492Actor(){return observedId==='daeun'?'daeun':'hina';} // UI always follows the selected/observed character
 function craftingV492State(id){return id==='hina'?stats:daeun.stats;}
 function craftingV492Mode(id){return id==='hina'?isManualHina():isManualDaeun();}
 function craftingV492Eligible(id){const st=craftingV492State(id);return st.energy>=35&&st.hunger>=25&&st.thirst>=25&&st.will>=15&&clockParts().day>=2;}
 function craftingV494Inventory(id,kind){return manualInventoryCount(kind,id);}
 function craftingV494NearCave(id){const pos=id==='hina'?hana.position:daeun.mesh.position;return id==='hina'?Math.hypot(pos.x-caveX,pos.z-caveZ)<=8:daeunNearCave();}
-function craftingV492Check(id,kind){const d=craftingV492[id],recipe=craftingV494Recipes[kind];if(!recipe)return '알 수 없는 제작법';if(recipe.exclusive&&recipe.exclusive!==id)return '이 캐릭터의 제작법이 아니야';if((kind==='bag'&&id==='daeun'&&daeun.bag.crafted)||(kind!=='mat'&&d[kind]))return '이미 완성했어';if(!craftingV492Eligible(id))return '생존 상태를 먼저 회복해야 해';if(kind==='mat'&&!craftingV494NearCave(id)&&Math.hypot((id==='hina'?hana.position:daeun.mesh.position).x-campfire.position.x,(id==='hina'?hana.position:daeun.mesh.position).z-campfire.position.z)>10)return '야외에서는 모닥불 근처에 잠자리를 만들어야 해';if(kind==='mat'&&!v503BedSite(id))return '침대를 놓을 공간이 없어';for(const [material,n] of Object.entries(recipe.materials)){if(craftingV494Inventory(id,material)<n)return (material==='branches'?'나뭇가지':'야자잎')+' '+n+'개 필요';}return '';}
+function nearLitCookingFire(id){
+ const p=characters.get(id)?.mesh.position;if(!p)return false;
+ return [[campfire.position,fireSuccess&&fireKnowledge>0],[daeunResources.fire.group.position,!sharedHomeActive&&daeun.inventory.fuel>0]].some(([f,lit])=>lit&&Math.hypot(p.x-f.x,p.z-f.z)<=4);
+}
+function craftingV492Check(id,kind){const d=craftingV492[id],recipe=craftingV494Recipes[kind];if(!recipe)return '알 수 없는 제작법';if(recipe.exclusive&&recipe.exclusive!==id)return '이 캐릭터의 제작법이 아니야';if(!recipe.repeatable&&((kind==='bag'&&id==='daeun'&&daeun.bag.crafted)||(kind!=='mat'&&d[kind])))return '이미 완성했어';if(recipe.result?survivorIncapacitated(id):!craftingV492Eligible(id))return '생존 상태를 먼저 회복해야 해';if(recipe.result&&!nearLitCookingFire(id))return '켜진 모닥불 가까이 가야 해';if(kind==='mat'&&!craftingV494NearCave(id)&&Math.hypot((id==='hina'?hana.position:daeun.mesh.position).x-campfire.position.x,(id==='hina'?hana.position:daeun.mesh.position).z-campfire.position.z)>10)return '야외에서는 모닥불 근처에 잠자리를 만들어야 해';if(kind==='mat'&&!v503BedSite(id))return '침대를 놓을 공간이 없어';for(const [material,n] of Object.entries(recipe.materials)){if(craftingV494Inventory(id,material)<n)return ({branches:'나뭇가지',palmFronds:'야자잎',fish:'물고기'}[material]||material)+' '+n+'개 필요';}return '';}
 let v504ResultTimer=0;
 function v504CraftResult(message){
  let el=document.getElementById('v504CraftResult');
@@ -10225,9 +10247,9 @@ function craftingV492Finish(t){const {id,kind}=t,reason=craftingV492Check(id,kin
  for(const [material,n] of Object.entries(recipe.materials))manualInventoryTake(material,n,id);
  const categoryKey=craftingV495RecipeCategories[kind];const success=(d.categories?.[categoryKey]||0)>=Number(recipe.requiredCategory||0);
  const category=craftingV495RecipeCategories[kind];if(category){if(!d.categories)d.categories={living:0,storage:0};d.categories[category]=Math.min(100,(d.categories[category]||0)+(success?8:5));}
- const categoryGain=success?8:5;if(typeof gameTransactionFloat==='function')gameTransactionFloat(id,'skill',kind==='bag'?'storage':'living',categoryGain);
+ const categoryGain=success?8:5;if(typeof gameTransactionFloat==='function')gameTransactionFloat(id,'skill',category||'living',categoryGain);
  if(success&&id===observedId)window.HinaInteractionSFX?.play('success');
- if(success){if(kind!=='mat')d[kind]=true;if(kind==='mat')craftingV492Place(id);if(kind==='bag'&&id==='daeun'){daeun.bag.crafted=true;daeun.bag.progress=100;updateDaeunBagVisual();}}
+ if(success){if(recipe.result){manualInventoryAdd(recipe.result.kind,recipe.result.count,id);inventoryPickupFloat(id,recipe.result.kind,recipe.result.count);}else if(kind!=='mat')d[kind]=true;if(kind==='mat')craftingV492Place(id);if(kind==='bag'&&id==='daeun'){daeun.bag.crafted=true;daeun.bag.progress=100;updateDaeunBagVisual();}}
  craftingV492Message(success?recipe.name+' 제작 성공!':'제작 실패 · 재료 소비, 관련 숙련도 +5',id,t.auto);refreshV435Inventory();craftingV492Render();v498RenderSkills();}
 const v503Beds=[];
 const v503BedClaims=new Map();
@@ -10305,6 +10327,7 @@ v504KeepFireGazeButtonWidth();window.addEventListener('resize',v504KeepFireGazeB
 function v504ActorPosition(id){return characters.get(id)?.mesh.position;}
 function v504ActorSleeping(id){return id==='hina'||id==='daeun'?v503IsSleeping(id):!!characters.get(id)?.sleeping;}
 function v504MeditationEligible(id){
+ if(survivorIncapacitated(id))return false;
  const p=v504ActorPosition(id),fire=v507FirePos(id);
  if(!p||!fire||!v507FireLit(id)||Math.hypot(p.x-fire.x,p.z-fire.z)>7||v504ActorSleeping(id))return false;
  // These were the existing Daeun manual-rest restrictions, not new tuning.
@@ -10459,7 +10482,7 @@ function craftingV492Tick(){
   const t=craftingV492Tasks[id];if(!t||snakeFearLocked(id))continue;
   const pos=id==='hina'?hana.position:daeun.mesh.position;
   const moved=Math.hypot(pos.x-t.startX,pos.z-t.startZ)>.22;
-  if(moved||!craftingV492Eligible(id)||(t.auto&&!craftingV492AutoSafe(id))||(!t.auto&&!craftingV492Mode(id))){
+  if(moved||(craftingV494Recipes[t.kind].result?survivorIncapacitated(id):!craftingV492Eligible(id))||(t.auto&&!craftingV492AutoSafe(id))||(!t.auto&&!craftingV492Mode(id))){
    craftingV492Tasks[id]=null;
    craftingV492Message((id==='hina'?'히나':'다은')+' · '+(moved?'이동으로 제작 취소 · 재료 유지':'제작 중단 · 재료 유지'),id,t.auto);
    if(craftingV492Actor()===id)craftingV492Render();
@@ -10514,8 +10537,8 @@ document.addEventListener('pointerdown',e=>{
   craftingV492Tab='inventory';craftingV492Render();
  }
 },true);
-const craftingV495Categories=[{id:'all',label:'전체'},{id:'living',label:'생활'},{id:'storage',label:'가방'}];
-const craftingV495RecipeCategories={mat:'living',bag:'storage'};
+const craftingV495Categories=[{id:'all',label:'전체'},{id:'living',label:'생활'},{id:'storage',label:'가방'},{id:'cooking',label:'요리'}];
+const craftingV495RecipeCategories={mat:'living',bag:'storage',leafFish:'cooking'};
 function craftingV495UpdateProgress(){
  const t=craftingV492Tasks[craftingV492Actor()],el=document.getElementById('v492Task');
  if(!el||craftingV492Tab!=='craft')return;
@@ -10539,8 +10562,8 @@ function craftingV492Render(){
  categoryHost.querySelectorAll('[data-category]').forEach(b=>{b.style.display='';const active=b.dataset.category===craftingV495Category;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));b.title=b.textContent;const old=b.querySelector('.v496-skillbar');if(old)old.remove();});
  // One full-width profession gauge per visible category; identical for all actors.
  const skillHost=document.getElementById('v497CategorySkills');const categoryValues=d.categories||{living:0,storage:0};
- const shown=craftingV495Category==='all'?['living','storage']:[craftingV495Category];
- const categoryLabels={living:'생활 숙련도',storage:'가방 숙련도'};
+ const shown=craftingV495Category==='all'?['living','storage','cooking']:[craftingV495Category];
+ const categoryLabels={living:'생활 숙련도',storage:'가방 숙련도',cooking:'요리 숙련도'};
  const categoryHTML=shown.map(cat=>{const value=Math.max(0,Math.min(100,Number(categoryValues[cat])||0));return '<div class="v497-skill-row"><div class="v497-skill-label"><span>'+categoryLabels[cat]+'</span><span>'+value+' / 100</span></div><div class="v497-track" role="progressbar" aria-label="'+categoryLabels[cat]+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+value+'"><div class="v497-fill" style="width:'+value+'%"></div></div></div>';}).join('');
  if(skillHost.innerHTML!==categoryHTML)skillHost.innerHTML=categoryHTML;
  const visible=Object.entries(craftingV494Recipes).filter(([key,r])=>(!r.exclusive||r.exclusive===id)&&(craftingV495Category==='all'||craftingV495RecipeCategories[key]===craftingV495Category));
@@ -10553,7 +10576,7 @@ function craftingV492Render(){
  const recipe=craftingV494Recipes[craftingV494Selected];if(!recipe){document.getElementById('v495Details').style.display='none';return;}document.getElementById('v495Details').style.display='block';
  document.getElementById('v495Title').textContent=recipe.name;
  document.getElementById('v494Description').textContent=recipe.description+(d[craftingV494Selected]?' · 완성':'');
- const ingredients=Object.entries(recipe.materials).map(([material,n])=>{const label=material==='branches'?'나뭇가지':'야자잎',icon=material==='branches'?BRANCH_INVENTORY_ICON:PALM_FROND_ICON,owned=craftingV494Inventory(id,material);return '<div class="material"><span>'+icon+' '+label+'</span><span>재료 <strong class="'+(owned<n?'v497-short':'v497-enough')+'">'+owned+'</strong> / '+n+'</span></div>';}).join('');
+ const ingredients=Object.entries(recipe.materials).map(([material,n])=>{const label={branches:'나뭇가지',palmFronds:'야자잎',fish:'물고기'}[material],icon=material==='fish'?'🐟':material==='branches'?BRANCH_INVENTORY_ICON:PALM_FROND_ICON,owned=craftingV494Inventory(id,material);return '<div class="material"><span>'+icon+' '+label+'</span><span>재료 <strong class="'+(owned<n?'v497-short':'v497-enough')+'">'+owned+'</strong> / '+n+'</span></div>';}).join('');
  const ingredientHost=document.getElementById('v494Ingredients');if(ingredientHost.innerHTML!==ingredients)ingredientHost.innerHTML=ingredients;
  const reason=craftingV492Check(id,craftingV494Selected),button=document.getElementById('v494Attempt');button.disabled=!!(craftingV492Tasks[id]||!craftingV492Mode(id)||reason);button.textContent=d[craftingV494Selected]?'제작 완료':reason||'제작 시도 (실패해도 재료 소비)';
  craftingV495UpdateProgress();
@@ -10570,9 +10593,9 @@ function refreshV435Inventory(){
  if(actor==='hina'&&selectedHinaQuickFood===null&&carriedBerries>0)selectedHinaQuickFood='berries';
  const grid=document.getElementById('v435InvGrid');
  if(!grid)return;
- const inv=actor==='hina'?{berries:carriedBerries,branches:fireDryStock,fish:carriedFish.filter(f=>!f.cooked).length,cookedFish:carriedFish.filter(f=>f.cooked).length,rabbits:0}:daeun.inventory||{};
- const slots=[['🍓','열매',inv.berries,'berries'],[BRANCH_INVENTORY_ICON,'나뭇가지',inv.branches,'branches'],['🐟','물고기',inv.fish,'fish'],['🍖','구운 물고기',inv.cookedFish,'cookedFish'],['🐇','토끼',inv.rabbits,'rabbits'],[PALM_FROND_ICON,'야자잎',actor==='hina'?hinaPalmFronds:daeunPalmFronds,'palmFronds'],['🔥','횃불',actor==='hina'?0:daeun.torchExpiresAt>elapsed?1:0,null],[actor==='daeun'?'🧶':'🧺',actor==='daeun'?'나뭇가지 백팩':'바구니',actor==='hina'?(basketCrafted?1:0):(daeun.bag?.crafted?1:0),null],['','빈 칸',0,null]];
- const html=slots.map(([emoji,label,amount,kind])=>'<div class="v435-slot" title="'+label+'"'+(kind?' data-drop-kind="'+kind+'"':'')+(kind==='berries'||kind==='cookedFish'?' data-food-kind="'+kind+'"':'')+'>'+(amount?'<span>'+emoji+'</span><small>×'+amount+'</small>':'<span class="v435-empty">·</span>')+'</div>').join('');
+ const inv=actor==='hina'?{berries:carriedBerries,branches:fireDryStock,fish:carriedFish.filter(f=>!f.cooked).length,cookedFish:carriedFish.filter(f=>f.cooked).length,rabbits:0,leafFish:hinaLeafFish}:daeun.inventory||{};
+ const slots=[['🍓','열매',inv.berries,'berries'],[BRANCH_INVENTORY_ICON,'나뭇가지',inv.branches,'branches'],['🐟','물고기',inv.fish,'fish'],['🍖','구운 물고기',inv.cookedFish,'cookedFish'],['🐇','토끼',inv.rabbits,'rabbits'],[PALM_FROND_ICON,'야자잎',actor==='hina'?hinaPalmFronds:daeunPalmFronds,'palmFronds'],['🔥','횃불',actor==='hina'?0:daeun.torchExpiresAt>elapsed?1:0,null],[actor==='daeun'?'🧶':'🧺',actor==='daeun'?'나뭇가지 백팩':'바구니',actor==='hina'?(basketCrafted?1:0):(daeun.bag?.crafted?1:0),null],['🍃🐟','야자잎에 익힌 물고기',inv.leafFish||0,'leafFish']];
+ const html=slots.map(([emoji,label,amount,kind])=>'<div class="v435-slot" title="'+label+'"'+(kind?' data-drop-kind="'+kind+'"':'')+(QUICK_FOODS[kind]?' data-food-kind="'+kind+'"':'')+'>'+(amount?'<span>'+emoji+'</span><small>×'+amount+'</small>':'<span class="v435-empty">·</span>')+'</div>').join('');
  if(grid.innerHTML!==html)grid.innerHTML=html;
  craftingV492Render();
  const mode=document.getElementById('v435InvMode');if(mode)mode.textContent=actor==='hina'?(hinaManual?'수동':'자동 관찰'):(daeun.auto?'자동 관찰':'수동');
@@ -11131,16 +11154,16 @@ class CharacterAnimation {
   if(v504Meditation.active&&v504Meditation.id===id)v504MeditationStop();
   if(id==='hina'){target=null;navReset();}else{daeun.path=[];daeun.destination=null;}
   r.fishUntil=0;r.release=0;
-  r.meal={time:0,last:performance.now(),source,available,take:options.take||null,gain:options.gain??12,
+  r.meal={time:0,last:performance.now(),foodKind:options.foodKind||'berries',duration:options.duration||BERRY_MEAL_SECONDS,source,available,take:options.take||null,gain:options.gain??12,
    energy:options.energy!==false,remaining:Math.max(1,Math.floor(options.count||1)),done:options.done||null,
    each:options.each||null,cancel:options.cancel||null,manual:this.manual(id),x:r.root.position.x,z:r.root.position.z};
-  if(id===observedId)window.HinaInteractionSFX?.play('eat');
+  if(id===observedId){if(r.meal.foodKind==='berries')window.HinaInteractionSFX?.play('eat');}
   return true;
  }
- cancel(id){const r=this.byId[id],m=r.meal;if(!m)return;r.release=this.amount(m.time);r.releaseAge=0;r.meal=null;if(m.cancel)m.cancel();}
- reset(){for(const r of this.rigs){this.restore(r);this.cancel(r.id);r.fishUntil=0;r.release=0;r.elbow0=r.elbow1=r.knee0=r.knee1=r.lean=0;for(const j of r.elbows)j.rotation.set(0,0,0);for(const j of r.knees)j.rotation.set(0,0,0);r.lastX=r.root.position.x;r.lastZ=r.root.position.z;}}
+ cancel(id){const r=this.byId[id],m=r.meal;if(!m)return;r.release=this.amount(m.time*BERRY_MEAL_SECONDS/m.duration);r.releaseAge=0;r.meal=null;window.HinaInteractionSFX?.action(id,'chew',false);if(m.cancel)m.cancel();}
+ reset(){for(const r of this.rigs){r.root.position.y-=r.gazeOffset||0;r.gazeOffset=0;r.gazeBlend=0;this.restore(r);this.cancel(r.id);r.fishUntil=0;r.release=0;r.elbow0=r.elbow1=r.knee0=r.knee1=r.lean=0;for(const j of r.elbows)j.rotation.set(0,0,0);for(const j of r.knees)j.rotation.set(0,0,0);r.lastX=r.root.position.x;r.lastZ=r.root.position.z;}}
  restore(r){if(!r.applied)return;let k=0;for(const n of r.nodes){n.rotation.set(r.base[k++],r.base[k++],r.base[k++]);n.position.set(r.base[k++],r.base[k++],r.base[k++]);}if(r.cargo){r.cargo.visible=r.propVisible[0];r.berry.visible=r.propVisible[1];r.branch.visible=r.propVisible[2];}r.applied=false;}
- beginFrame(){for(const r of snakeFearReactions.values())restoreSnakeFearOverlay(r);for(const r of this.rigs)this.restore(r);}
+ beginFrame(){for(const r of snakeFearReactions.values())restoreSnakeFearOverlay(r);for(const r of this.rigs){r.root.position.y-=r.gazeOffset||0;r.gazeOffset=0;this.restore(r);}}
  fish(id){const r=this.byId[id];if(!r.meal&&!this.unavailable(r))r.fishUntil=performance.now()+800;}
  updateMeal(r,now){
   const m=r.meal;if(!m)return;
@@ -11149,14 +11172,14 @@ class CharacterAnimation {
   const delta=Math.max(0,(now-m.last)/1000);m.last=now;
   if(paused||document.hidden)return;
   m.time+=delta;
-  if(m.time+1e-8<2)return;
+  if(m.time+1e-8<m.duration)return;
   // Commit exactly one berry only after all four phases have finished.
   const s=this.stats(r.id),before=s.hunger;
   if(m.take)m.take();
   else if(r.id==='hina'){if(m.source==='cave')caveBerries--;else carriedBerries--;}
   else daeun.inventory[m.source==='cave'?'caveBerries':'berries']--;
   if(m.energy)v516ApplyFoodRecovery(s,m.gain);else s.hunger=Math.min(100,s.hunger+m.gain);
-  showFoodConsumption(r.id,'berries',before,s.hunger);
+  showFoodConsumption(r.id,m.foodKind,before,s.hunger);
   if(m.each)m.each();
   if(--m.remaining>0&&m.available()>0){m.time=0;m.last=now;}
   else{r.meal=null;if(m.done)m.done();}
@@ -11194,10 +11217,10 @@ class CharacterAnimation {
   if(this.drinking(r)){r.arms[1].rotation.x=-1.25-.06*Math.sin(elapsed*8);e1=-1.45;}
   const m=r.meal;
   let amount=0,chew=0;
-  if(m){const t=m.time;amount=this.amount(t);chew=t>=.8&&t<1.6?Math.sin((t-.8)*Math.PI*10):0;}
+  if(m){const t=m.time*BERRY_MEAL_SECONDS/m.duration;amount=this.amount(t);chew=t>=.8&&t<1.6?(m.foodKind==='berries'?Math.sin((t-.8)*Math.PI*10):Math.sin(m.time*Math.PI*6)):0;}
   else if(r.release>0&&!moving&&!sleeping&&!this.busy(r.id)){if(!paused)r.releaseAge+=dt;amount=r.release*(1-this.ease(r.releaseAge/.25));if(r.releaseAge>=.25)r.release=0;}
   else if(r.fishUntil>now&&!sleeping){amount=Math.sin(Math.PI*(1-(r.fishUntil-now)/800));}
-  if(r.cargo&&m){r.cargo.visible=m.time<1.6;r.berry.visible=true;r.branch.visible=false;}
+  if(r.cargo&&m){r.cargo.visible=m.foodKind==='berries'&&m.time<1.6;r.berry.visible=true;r.branch.visible=false;}
   if(amount>0){
    // Fold the right arm inward in shoulder Z, then bend the elbow toward local +Z.
    // No IK, wrist joint or skeleton replacement: the same target angles suit both rigs.
@@ -11207,6 +11230,13 @@ class CharacterAnimation {
    r.head.rotation.x+=.035*chew;r.head.rotation.z+=.012*chew;
    if(r.body)r.body.rotation.x+=.012*chew;
   }
+  if(m&&m.foodKind!=='berries'){
+   if(!r.mealFish){r.mealFish=groundDropVisual('cookedFish');r.mealFish.scale.setScalar(.65);r.root.add(r.mealFish);}
+   r.mealFish.visible=true;r.mealFish.position.set(0,1.55+amount*.48,.58+amount*.03);r.mealFish.rotation.z=chew*.045;
+   for(let i=0;i<2;i++){r.arms[i].rotation.x=-.7-amount*.4;r.arms[i].rotation.z=(i?-.8:.8)*amount;}e0=e1=-1.25*amount;
+   if(!r.mealGauge)r.mealGauge=makeResourceMarker('🍖','구운 물고기 먹기');
+   positionEmojiMarker(r.mealGauge,r.root.position.clone().add(new THREE.Vector3(0,3.5,0)),null);updateCleanProgressRing(r.mealGauge,m.time/m.duration);
+  }else{if(r.mealFish)r.mealFish.visible=false;if(r.mealGauge)r.mealGauge.style.display='none';}
   const flowerPose=survivalFlowerPose(r.id,now);
   if(flowerPose>0&&!sleeping){r.arms[1].rotation.x=THREE.MathUtils.lerp(r.arms[1].rotation.x,-1.35,flowerPose);r.arms[1].rotation.z=THREE.MathUtils.lerp(r.arms[1].rotation.z,-.75,flowerPose);e1=THREE.MathUtils.lerp(e1,-1.8,flowerPose);}
   // Pause freezes joint interpolation; sleeping snaps distal joints neutral to avoid jitter.
@@ -11216,9 +11246,21 @@ class CharacterAnimation {
   if(m)r.elbow1=THREE.MathUtils.clamp(e1,-2.05,0);
   r.elbows[0].rotation.x=THREE.MathUtils.clamp(r.elbow0,-2.05,0);r.elbows[1].rotation.x=THREE.MathUtils.clamp(r.elbow1,-2.05,0);
   r.knees[0].rotation.x=THREE.MathUtils.clamp(r.knee0,0,1.35);r.knees[1].rotation.x=THREE.MathUtils.clamp(r.knee1,0,1.35);
+  const automaticGazing=r.id==='hina'?!hinaManual&&state==='mentalRest':daeun.auto&&daeun.action==='rest'&&daeun.stats.will<45;
+  const gazing=!sleeping&&!snakeFearLocked(r.id)&&((v504Meditation.active&&v504Meditation.id===r.id)||automaticGazing)&&v504MeditationEligible(r.id);
+  r.gazeBlend=THREE.MathUtils.damp(r.gazeBlend||0,gazing?1:0,9,paused?0:Math.min(.1,dt));
+  if(r.gazeBlend>.001){
+   const k=r.gazeBlend,p=r.root.position,f=v507FirePos(r.id),floor=terrainTopAt(p.x,p.z,p.y);
+   r.gazeOffset=(floor-.60-p.y)*k;p.y+=r.gazeOffset;
+   if(gazing)r.root.rotation.y=Math.atan2(f.x-p.x,f.z-p.z);
+   r.root.rotation.x*=1-k;
+   for(const leg of r.legs)leg.rotation.x=THREE.MathUtils.lerp(leg.rotation.x,-Math.PI/2,k);
+   for(const knee of r.knees)knee.rotation.x=THREE.MathUtils.lerp(knee.rotation.x,.05,k);
+   if(!m){for(const arm of r.arms){arm.rotation.x=THREE.MathUtils.lerp(arm.rotation.x,-.15,k);arm.rotation.z*=1-k;}for(const elbow of r.elbows)elbow.rotation.x*=1-k;}
+  }
   if(r.lean&&r.body){r.body.rotation.x+=r.lean;r.head.position.z+=r.lean*.65;r.head.position.y-=r.lean*.22;for(const a of r.arms){a.position.z+=r.lean*.55;a.position.y-=r.lean*.30;}}
  }
- endFrame(dt,now){for(const r of this.rigs){window.HinaInteractionSFX?.action(r.id,'drink',r.id===observedId&&!paused&&this.drinking(r),speed);this.updateMeal(r,now);this.apply(r,dt,now);}updateSnakeFearOverlay(dt);}
+ endFrame(dt,now){for(const r of this.rigs){this.updateMeal(r,now);const fish=!!r.meal&&r.meal.foodKind!=='berries',biting=fish&&r.meal.time>=r.meal.duration*.4&&r.meal.time<r.meal.duration*.8;window.HinaInteractionSFX?.action(r.id,fish?'chew':'drink',r.id===observedId&&!paused&&(biting||this.drinking(r)),fish?1:speed);this.apply(r,dt,now);}updateSnakeFearOverlay(dt);}
 }
 
 characterAnimation=new CharacterAnimation();
@@ -11387,6 +11429,8 @@ const progressBindings={
  hungerTrigger:{get:()=>hungerTrigger,set:v=>{hungerTrigger=v;}},
  thirstRate:{get:()=>thirstRate,set:v=>{thirstRate=v;}},
  hungerRate:{get:()=>hungerRate,set:v=>{hungerRate=v;}},
+ hinaLeafFish:{get:()=>hinaLeafFish,set:v=>{hinaLeafFish=v;}},
+ hinaExhausted:{get:()=>hinaExhausted,set:v=>{hinaExhausted=v;}},
  carriedBerries:{get:()=>carriedBerries,set:v=>{carriedBerries=v;}},
  caveBerries:{get:()=>caveBerries,set:v=>{caveBerries=v;}},
  lastBerryStorageAt:{get:()=>lastBerryStorageAt,set:v=>{lastBerryStorageAt=v;}},
@@ -12061,13 +12105,13 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
 <script id="hina-interaction-sfx-v401">
 (()=>{
 // Use the same HTMLAudioElement playback path as the working cricket recording.
-const soundNames=['ui','berry','water','fish','wood','fire','cook','craft','eat','sleep','rest','animal','wash','success','inventory','step','bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder','threat','branchPickup','drink','washClean'];
+const soundNames=['ui','berry','water','fish','wood','fire','cook','craft','eat','sleep','rest','animal','wash','success','inventory','step','bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder','threat','branchPickup','drink','washClean','chew'];
 const ambience=new Set(['bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder']);
 const pools=new Map(),last=new Map(),counts={},attempts={},failures={};
 // Preserve assets and call sites, but deny all foot/sand feedback centrally.
 const soundPolicy={footsteps:false,inventoryRustle:false,fireAmbience:false};
 const swooshSounds=new Set(['step','inventory','water','wood','craft','rustle','wash']);
-const soundFiles={eat:'eat-start.wav',fish:'fish-splash.wav',branchPickup:'branch-pickup.wav',drink:'drink-gulp.wav',washClean:'fish-splash.wav'};
+const soundFiles={eat:'eat-start.wav',fish:'fish-splash.wav',branchPickup:'branch-pickup.wav',drink:'drink-gulp.wav',washClean:'fish-splash.wav',chew:'fish-chew.wav'};
 const actionVoices=new Map();
 const wildlifeSchedule={phase:null,nextAt:0,waiting:false};
 let unlocked=false,paused=false,position=null,walker='',distance=0,lastAction='',previewVoice=null;
@@ -12109,14 +12153,15 @@ function syncVolume(){
  if(volume===0){stopAll();return;}
  for(const pool of pools.values())for(const slot of pool)slot.audio.volume=Math.min(1,volume*mix(slot.kind)*slot.level);
 }
-function play(kind,level=1,force=false){
+function play(kind,level=1,force=false,critical=false){
  if(swooshSounds.has(kind)||/^(footstep|sand|walk|run)$/.test(kind)||(kind==='fireAmbient'&&!soundPolicy.fireAmbience))return false;
  if(!unlocked||interactionLevel()<=0||!Number.isFinite(level)||level<=0)return false;
  const pool=pools.get(kind);if(!pool)return false;
  const now=performance.now(),limit=kind==='drink'?0:kind==='threat'?2500:kind==='step'?380:kind==='ui'?90:(kind==='bird'||kind==='owl')?15000:ambience.has(kind)?650:350;
- if(!force&&now-(last.get(kind)??-Infinity)<limit)return false;
+ if(!force&&!critical&&now-(last.get(kind)??-Infinity)<limit)return false;
  let slot=pool.find(slot=>!slot.busy);
  if(!slot&&pool.length<2){slot=voice(kind);pool.push(slot);}
+ if(!slot&&critical){slot=pool[0];slot.audio.pause();slot.busy=false;}
  if(!slot)return false;
  const active=[...pools.values()].flat().filter(s=>s.busy);
  if(active.length>=6){
@@ -12138,8 +12183,14 @@ function play(kind,level=1,force=false){
  });
  return true;
 }
+const captureEvents=new WeakSet();
+function capture(id,transaction){
+ if(!transaction||typeof transaction!=='object'||captureEvents.has(transaction))return false;
+ captureEvents.add(transaction);return play('fish',1,false,true);
+}
 function action(id,kind,active,rate=1){
  let slot=actionVoices.get(id);
+ if(slot&&slot.kind!==kind){slot.audio.pause();slot.audio.loop=false;slot.busy=false;actionVoices.delete(id);slot=null;}
  if(!active||interactionLevel()<=0){if(slot){slot.audio.pause();slot.audio.currentTime=0;slot.audio.loop=false;slot.busy=false;actionVoices.delete(id);}return false;}
  if(!slot){if(!play(kind))return false;slot=pools.get(kind).find(s=>s.busy&&![...actionVoices.values()].includes(s));if(!slot)return false;slot.audio.loop=true;actionVoices.set(id,slot);}
  slot.audio.playbackRate=Math.max(.25,Math.min(16,Number(rate)||1));return true;
@@ -12239,7 +12290,7 @@ function scheduleWildlife(isNight,now=performance.now()){
  if(now<wildlifeSchedule.nextAt||['bird','owl'].some(kind=>pools.get(kind).some(slot=>slot.busy)))return;
  if(play(phase)){wildlifeSchedule.waiting=true;}else wildlifeSchedule.nextAt=now+1000;
 }
-window.HinaInteractionSFX={play,event,movement,action,ui:playUITransition,wildlife:scheduleWildlife,
+window.HinaInteractionSFX={play,event,movement,action,capture,ui:playUITransition,wildlife:scheduleWildlife,
  setPaused(value){if(paused!==!!value){paused=!!value;syncVolume();}},
  diagnose:()=>({...counts}),
  audioStatus:()=>({backend:'html-audio-wav',policy:{...soundPolicy,disabled:[...swooshSounds,'fireAmbient']},wildlife:{...wildlifeSchedule},unlocked,volume:interactionLevel(),playing:[...pools.values()].flat().filter(s=>s.busy&&!s.audio.paused).map(s=>s.kind),attempts:{...attempts},started:{...counts},errors:{...failures}})
