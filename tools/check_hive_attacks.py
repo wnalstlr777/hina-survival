@@ -10,20 +10,30 @@ BASE = runpy.run_path(str(ROOT / 'tools/check_stabilization.py'))
 FIXTURE = r'''
 window.__hiveCheck={
  setup(){
-  paused=false;wildHiveLastSting.clear();
+  paused=false;wildHiveLastSting.clear();this.now=1000;this.events=[];
+  for(const r of snakeFearReactions.values()){restoreSnakeFearOverlay(r);for(const p of r.parts)for(const m of Array.isArray(p.white)?p.white:[p.white])m.dispose();}snakeFearReactions.clear();
   const p=wildHives[0].position;
-  for(const [id,ch] of characters){if(ch.mesh)ch.mesh.position.set(p.x+100,0,p.z+100);}
-  for(const id of ['hina','daeun']){const ch=characters.get(id);ch.mesh.position.set(p.x+1,p.y-1,p.z);Object.assign(ch.stats,{health:100,will:100});}
-  for(const hive of wildHives)hive.scatter=0;
+  for(const ch of characters.values())if(ch.mesh)ch.mesh.position.set(p.x+100,0,p.z+100);
+  for(const id of ['hina','daeun'])Object.assign(characters.get(id).stats,{health:100,will:100});
+  characters.get('hina').mesh.position.set(p.x+3,p.y-1,p.z);
+  for(const hive of wildHives)hive.attack=null;
   camera.position.set(p.x+1000,p.y+1000,p.z+1000);
  },
- step(now,n=1){for(let i=0;i<n;i++)updateWildHives(now+i*50,.05);return this.stats();},
+ step(n=1){for(let i=0;i<n;i++){
+  this.now+=50;for(const r of snakeFearReactions.values())restoreSnakeFearOverlay(r);updateSnakeFearOverlay(.05);
+  const before=stats.health;updateWildHives(this.now,.05);
+  if(stats.health<before)this.events.push({now:this.now,bee:wildHives[0].attack.beeIndex,blink:snakeFearReactions.has('hina'),locked:snakeFearLocked('hina')});
+ }return this.stats();},
  stats(){return ['hina','daeun'].map(id=>{const s=characters.get(id).stats;return [s.health,s.will];});},
- move(id,near){const p=wildHives[0].position;characters.get(id).mesh.position.set(p.x+(near?1:100),p.y-1,p.z);},
- low(){for(const ch of characters.values())if(ch.stats)Object.assign(ch.stats,{health:2,will:3});},
+ state(){const a=wildHives[0].attack;return {phase:a?.phase,hits:a?.hits,bee:a?.beeIndex,tip:a?.tip.toArray(),events:this.events};},
+ move(id,distance){const p=wildHives[0].position;characters.get(id).mesh.position.set(p.x+distance,p.y-1,p.z);},
  pause(value){paused=value;},
- reset(){resetSurvivalPresentation();},
- nest(){const p=wildHives[0].position;camera.position.copy(p).add(new THREE.Vector3(0,1,8));camera.lookAt(p);camera.updateMatrixWorld(true);updateWildHives(30000,.05);const matrix=new THREE.Matrix4();wildHivePools.get('nest').getMatrixAt(0,matrix);const scale=new THREE.Vector3().setFromMatrixScale(matrix);return scale.toArray();},
+ reset(){resetSurvivalPresentation();return wildHives.every(h=>h.attack===null)&&wildHiveLastSting.size===0;},
+ low(){stats.health=2;stats.will=3;},
+ blink(){const r=snakeFearReactions.get("hina");restoreSnakeFearOverlay(r);updateSnakeFearOverlay(.001);return {white:r.parts.every(p=>p.mesh.material===p.white),jump:r.jump,locked:snakeFearLocked("hina")};},
+ sting(id,now){return wildHiveSting(id,now);},
+ snake(){const started=startSnakeFearReaction("hina");return {started,locked:snakeFearLocked("hina"),blinkOnly:snakeFearReactions.get("hina").blinkOnly};},
+ nest(){const p=wildHives[0].position;camera.position.copy(p).add(new THREE.Vector3(0,1,8));camera.lookAt(p);camera.updateMatrixWorld(true);updateWildHives(this.now,.05);const matrix=new THREE.Matrix4();wildHivePools.get('nest').getMatrixAt(0,matrix);return new THREE.Vector3().setFromMatrixScale(matrix).toArray();},
  meditation(id){__stable.setup(id,false);observedId=id;const started=v504MeditationStart(id);refreshHinaManualEmojis();if(id==='daeun')refreshManualActionUI();return {started,hina: getComputedStyle(hinaManualMarkers.fire).display,daeun:getComputedStyle(fireEmojiMarker).display};},
  stop(){v504MeditationStop();},
  layout(){v519PositionObjective();const el=v517ObjectiveUI,s=getComputedStyle(el);return {left:parseFloat(s.left),right:parseFloat(s.right),width:innerWidth};}
@@ -44,21 +54,52 @@ def run():
    page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded',timeout=90000)
    page.wait_for_function('!!window.__hiveCheck',timeout=90000)
    page.evaluate('__hiveCheck.setup()')
-   assert page.evaluate('__hiveCheck.step(1000,10)')==[[97,95],[97,95]]
-   assert page.evaluate('__hiveCheck.step(4999)')==[[97,95],[97,95]]
-   # First hit occurs at 1300 after swarm approach; 5300 is the exact boundary.
-   assert page.evaluate('__hiveCheck.step(5300)')==[[94,90],[94,90]]
-   page.evaluate('__hiveCheck.move("hina",false)')
-   assert page.evaluate('__hiveCheck.step(9300)')==[[94,90],[91,85]]
-   page.evaluate('__hiveCheck.pause(true)')
-   assert page.evaluate('__hiveCheck.step(14000)')==[[94,90],[91,85]]
-   page.evaluate('__hiveCheck.pause(false);__hiveCheck.move("hina",true);__hiveCheck.low()')
-   assert page.evaluate('__hiveCheck.step(18000)')==[[0,0],[0,0]]
-   page.evaluate('__hiveCheck.setup();__hiveCheck.step(20000,10);__hiveCheck.reset()')
-   assert page.evaluate('__hiveCheck.step(21000)')==[[94,90],[94,90]]
+   assert page.evaluate('__hiveCheck.step(30)')==[[100,100],[100,100]]
+   assert page.evaluate('__hiveCheck.state().phase')=='watch'
+   page.evaluate('__hiveCheck.step(6)')
+   assert page.evaluate('__hiveCheck.state().phase')=='dive'
+   # Compare early and late equal-duration segments of the actual flight path.
+   samples=page.evaluate("""()=>{const result=[];for(let i=0;i<6;i++){__hiveCheck.step(5);result.push(__hiveCheck.state().tip);}return result;}""")
+   from math import dist
+   assert dist(samples[0],samples[1]) < dist(samples[3],samples[4]),samples
+   page.evaluate('__hiveCheck.step(400)')
+   state=page.evaluate('__hiveCheck.state()')
+   assert page.evaluate('__hiveCheck.stats()')==[[91,85],[100,100]]
+   assert state['phase']=='idle' and state['hits']==3,state
+   assert [e['bee'] for e in state['events']]==[0,1,2],state
+   assert all(e['blink'] and not e['locked'] for e in state['events']),state
+   assert all(b['now']-a['now']>=4000 for a,b in zip(state['events'],state['events'][1:])),state
+   assert page.evaluate('__hiveCheck.step(400)')==[[91,85],[100,100]]
+   page.evaluate('__hiveCheck.move("hina",9);__hiveCheck.step();__hiveCheck.move("hina",3);__hiveCheck.step(400)')
+   assert page.evaluate('__hiveCheck.stats()')==[[82,70],[100,100]]
+   print('PASS watch, accelerating curved single-bee dives, three sequential hits, blink without stun, cooldown and return',mobile,flush=True)
+   # Escape during a dive aborts contact, returns the bee, and permits a new encounter after re-entry.
+   page.evaluate('__hiveCheck.setup();__hiveCheck.step(45);__hiveCheck.move("hina",9);__hiveCheck.step()')
+   assert page.evaluate('__hiveCheck.state().phase')=='return'
+   assert page.evaluate('__hiveCheck.step(50)')==[[100,100],[100,100]]
+   assert page.evaluate('__hiveCheck.state().phase')=='idle'
+   page.evaluate('__hiveCheck.move("hina",3);__hiveCheck.step(30)')
+   before=page.evaluate('__hiveCheck.state()')
+   page.evaluate('__hiveCheck.pause(true);__hiveCheck.step(100)')
+   assert page.evaluate('__hiveCheck.state()')==before
+   page.evaluate('__hiveCheck.pause(false);__hiveCheck.step(50)')
+   assert page.evaluate('__hiveCheck.stats()')==[[97,95],[100,100]]
+   # Cooldown is global across hives but independent per survivor, with an exact boundary.
+   page.evaluate('__hiveCheck.setup()')
+   assert page.evaluate('__hiveCheck.sting("hina",10000)')
+   assert not page.evaluate('__hiveCheck.sting("hina",13999)')
+   assert page.evaluate('__hiveCheck.sting("daeun",10000)')
+   assert page.evaluate('__hiveCheck.sting("hina",14000)')
+   assert page.evaluate('__hiveCheck.stats()')==[[94,90],[97,95]]
+   page.evaluate('__hiveCheck.low()')
+   assert page.evaluate('__hiveCheck.sting("hina",18000)')
+   assert page.evaluate('__hiveCheck.stats()[0]')==[0,0]
+   assert page.evaluate('__hiveCheck.blink()')=={'white':True,'jump':0,'locked':False}
+   assert page.evaluate('__hiveCheck.snake()')=={'started':True,'locked':True,'blinkOnly':False}
+   assert page.evaluate('__hiveCheck.reset()')
    scale=page.evaluate('__hiveCheck.nest()')
    assert all(abs(a-b)<1e-5 for a,b in zip(scale,[1.35,1.65,1.35])),scale
-   print('PASS swarm approach, offscreen damage, per-character 4s cooldown, pause, floors, reset and 1.5x hive',mobile,flush=True)
+   print('PASS escape cancels sting, retreat/re-entry, pause, independent cooldowns, stat floors, reset and hive scale',mobile,flush=True)
    for actor in ['hina','daeun']:
     result=page.evaluate('(id)=>__hiveCheck.meditation(id)',actor)
     assert result=={'started':True,'hina':'none','daeun':'none'},result

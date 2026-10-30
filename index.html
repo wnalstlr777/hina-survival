@@ -8950,16 +8950,22 @@ function showFoodConsumption(character,item,oldHunger,newHunger){
 }
 // Continuous threats: show the real accumulated change at a readable cadence.
 const snakeFearReactions=new Map();
-function snakeFearLocked(id){return snakeFearReactions.has(id);}
-function startSnakeFearReaction(id){
- if(snakeFearLocked(id)||!characters.has(id))return false;
+function snakeFearLocked(id){const r=snakeFearReactions.get(id);return !!r&&!r.blinkOnly;}
+function startSnakeFearReaction(id,blinkOnly=false){
+ if(!characters.has(id))return false;
+ const existing=snakeFearReactions.get(id);
+ if(existing){
+  // A bee blink must never suppress the stronger reaction to a newly encountered snake.
+  if(!blinkOnly&&existing.blinkOnly){existing.blinkOnly=false;existing.time=0;if(id===observedId)clearPlayerInput();return true;}
+  return false;
+ }
  const root=characters.get(id).mesh,parts=[];
  root.traverse(mesh=>{if(!mesh.isMesh)return;const original=mesh.material;
   const white=(Array.isArray(original)?original:[original]).map(m=>{const c=m.clone();c.color?.set(0xffffff);if(c.emissive)c.emissive.set(0xffffff);c.map=null;return c;});
   parts.push({mesh,original,white:Array.isArray(original)?white:white[0]});
  });
- snakeFearReactions.set(id,{root,parts,time:0,jump:0});
- if(id===observedId)clearPlayerInput();return true;
+ snakeFearReactions.set(id,{root,parts,time:0,jump:0,blinkOnly});
+ if(!blinkOnly&&id===observedId)clearPlayerInput();return true;
 }
 function restoreSnakeFearOverlay(r){
  r.root.position.y-=r.jump;r.jump=0;for(const p of r.parts)p.mesh.material=p.original;
@@ -8968,9 +8974,9 @@ function updateSnakeFearOverlay(dt){
  for(const [id,r] of snakeFearReactions){
   if(!paused&&!document.hidden)r.time+=Math.max(0,Math.min(.05,dt))*1.5;
   if(r.time>=1){restoreSnakeFearOverlay(r);for(const p of r.parts)for(const m of Array.isArray(p.white)?p.white:[p.white])m.dispose();snakeFearReactions.delete(id);continue;}
-  r.jump=1.35*Math.sin(Math.PI*r.time);r.root.position.y+=r.jump;
+  r.jump=r.blinkOnly?0:1.35*Math.sin(Math.PI*r.time);r.root.position.y+=r.jump;
   const rig=characterAnimation?.byId[id],lift=Math.sin(Math.PI*Math.min(1,r.time/.22)/2)*(1-THREE.MathUtils.smoothstep(r.time,.65,1));
-  if(rig){for(const arm of rig.arms)arm.rotation.x=THREE.MathUtils.lerp(arm.rotation.x,-2.9,lift);for(const elbow of rig.elbows)elbow.rotation.x*=1-lift;}
+  if(rig&&!r.blinkOnly){for(const arm of rig.arms)arm.rotation.x=THREE.MathUtils.lerp(arm.rotation.x,-2.9,lift);for(const elbow of rig.elbows)elbow.rotation.x*=1-lift;}
   if(Math.floor(r.time*12)%2===0)for(const p of r.parts)p.mesh.material=p.white;
  }
 }
@@ -11084,7 +11090,7 @@ function updateFirstNightGuide(){
  survivalGuide.setAttribute('aria-label',`${ch.name||id}의 시작 동굴 방향, ${Math.ceil(dist)}미터`);
 }
 function resetSurvivalPresentation(){
- wildHiveLastSting.clear();
+ wildHiveLastSting.clear();for(const hive of wildHives)hive.attack=null;
  if(survivalFlower.mesh)survivalFlower.mesh.visible=false;
  survivalFlower.motion=null;survivalFlower.expiresAt=0;survivalFlower.patch=null;survivalFlower.nextCheck=0;survivalFlower.reply=null;survivalFlower.seen.clear();
  survivalMood.clear();survivalSocialUntil=0;survivalSocialTick=0;survivalLastElapsed=elapsed;extraSurvivorSpeaker=null;
@@ -11100,7 +11106,8 @@ function updateSurvivalPresentation(now){
 
 // Wild hives: shared meshes/instance pools, one central update, no honey interaction.
 const wildHives=[],wildHivePools=new Map(),wildHiveObservations=new Map(),wildHiveLastSting=new Map();
-const WILD_HIVE_ATTACK_RADIUS=5,WILD_HIVE_STING_COOLDOWN=4000;
+const WILD_HIVE_ATTACK_RADIUS=5,WILD_HIVE_LEASH_RADIUS=8,WILD_HIVE_STING_COOLDOWN=4000;
+const WILD_HIVE_WATCH_SECONDS=1.8,WILD_HIVE_DIVE_SECONDS=1.5,WILD_HIVE_RETURN_SECONDS=1.2,WILD_HIVE_MAX_STINGS=3;
 const wildHiveBeeTemplate=makeFlowerBee(),wildHiveDummy=new THREE.Object3D(),wildHiveMatrix=new THREE.Matrix4(),wildHiveBounds=new THREE.Box3(),wildHiveProjected=new THREE.Vector3();
 const wildHiveBeesPerNest=isMobile?5:8,WILD_HIVE_LIMIT=14;
 let nextWildHiveObservation=0;
@@ -11124,7 +11131,7 @@ function initializeWildHives(){
    wildHiveBounds.setFromObject(chosen);
    const position=new THREE.Vector3(wildHiveBounds.max.x+.22,(wildHiveBounds.min.y+wildHiveBounds.max.y)/2,(wildHiveBounds.min.z+wildHiveBounds.max.z)/2);
    if(position.y-tree.position.y<.6)position.y=tree.position.y+1.3;
-   wildHives.push({id:wildHives.length,position,tree,phase:random()*Math.PI*2,scatter:0,scared:false,discoveredBy:new Set()});count++;
+   wildHives.push({id:wildHives.length,position,tree,phase:random()*Math.PI*2,attack:null,discoveredBy:new Set()});count++;
   }
  }
  const profile=[];for(let i=0;i<=20;i++){const y=-.42+i*.042,r=.06+.28*Math.sin(Math.PI*i/20)+.018*Math.cos(i*Math.PI);profile.push(new THREE.Vector2(Math.max(.045,r),y));}
@@ -11132,26 +11139,68 @@ function initializeWildHives(){
  wildHivePool('entrance',new THREE.SphereGeometry(.085,7,5),beeBlack,WILD_HIVE_LIMIT);
  const parts=wildHiveBeeTemplate.children;for(const part of parts){const key=part.geometry.uuid+':'+part.material.uuid;if(!wildHivePools.has(key))wildHivePool(key,part.geometry,part.material,WILD_HIVE_LIMIT*wildHiveBeesPerNest*2);}
 }
+function wildHiveIdleBeePosition(hive,index,seconds,out){
+ const a=seconds*(.65+(index%3)*.08)+hive.phase+index*2.399963,r=.65+(index%4)*.16+.2*Math.sin(a*.77),p=hive.position;
+ return out.set(p.x+Math.cos(a)*r,p.y+.15+Math.sin(a*2.3)*.22,p.z+.32+Math.sin(a)*r);
+}
+function wildHiveTargetInRange(hive,id,radius){
+ const ch=characters.get(id);return !!ch?.mesh&&!!ch.stats&&ch.stats.health>0&&Math.hypot(ch.mesh.position.x-hive.position.x,ch.mesh.position.z-hive.position.z)<radius;
+}
+function wildHiveSting(id,now){
+ const ch=characters.get(id);
+ // Shared by all hives, so overlapping encounters cannot stack hits on one character.
+ if(!ch?.stats||ch.stats.health<=0||now-(wildHiveLastSting.get(id)??-Infinity)<WILD_HIVE_STING_COOLDOWN)return false;
+ wildHiveLastSting.set(id,now);
+ const health=ch.stats.health,will=ch.stats.will;
+ ch.stats.health=Math.max(0,health-3);ch.stats.will=Math.max(0,will-5);
+ gameVitalFloat(id,'health',ch.stats.health-health);gameVitalFloat(id,'will',ch.stats.will-will);
+ startSnakeFearReaction(id,true); // Same white blink, without the snake's jump or movement lock.
+ threatWillLossSound(id,'bee',will,ch.stats.will);
+ showSurvivalLine(id,'아야! 벌에 쏘였어! 벌통에서 떨어져야겠어.');
+ log('🐝 '+(ch.name||id)+' 벌 쏘임 · 체력 −3 · 의지력 −5');
+ return true;
+}
 function updateWildHiveThreats(hive,now,dt){
- const p=hive.position;let target=null,nearest=Infinity;
- for(const [id,ch] of characters){
-  if(!ch.mesh||!ch.stats||ch.stats.health<=0)continue;
-  const d=Math.hypot(ch.mesh.position.x-p.x,ch.mesh.position.z-p.z);
-  if(d>=WILD_HIVE_ATTACK_RADIUS)continue;
-  if(d<nearest){nearest=d;target=ch.mesh.position;}
-  // One cooldown per character across every hive, independent of camera and game speed.
-  if(hive.scatter<.75||now-(wildHiveLastSting.get(id)??-Infinity)<WILD_HIVE_STING_COOLDOWN)continue;
-  wildHiveLastSting.set(id,now);
-  const health=ch.stats.health,will=ch.stats.will;
-  ch.stats.health=Math.max(0,health-3);ch.stats.will=Math.max(0,will-5);
-  gameVitalFloat(id,'health',ch.stats.health-health);gameVitalFloat(id,'will',ch.stats.will-will);
-  threatWillLossSound(id,'bee',will,ch.stats.will);
-  showSurvivalLine(id,'아야! 벌에 쏘였어! 벌통에서 떨어져야겠어.');
-  log('🐝 '+(ch.name||id)+' 벌 쏘임 · 체력 −3 · 의지력 −5');
+ const step=Math.min(.05,Math.max(0,dt)),seconds=now*.001;
+ const a=hive.attack||(hive.attack={phase:'idle',age:0,targetId:null,hits:0,beeIndex:0,blockedIds:new Set(),retreat:false,tip:new THREE.Vector3(),from:new THREE.Vector3(),control:new THREE.Vector3()});
+ for(const id of a.blockedIds)if(!wildHiveTargetInRange(hive,id,WILD_HIVE_LEASH_RADIUS))a.blockedIds.delete(id);
+ if(a.phase==='idle'){
+  let nearest=Infinity,targetId=null;
+  for(const [id,ch] of characters){
+   if(a.blockedIds.has(id)||!wildHiveTargetInRange(hive,id,WILD_HIVE_ATTACK_RADIUS))continue;
+   const d=ch.mesh.position.distanceToSquared(hive.position);if(d<nearest){nearest=d;targetId=id;}
+  }
+  if(!targetId)return a;
+  Object.assign(a,{phase:'watch',age:0,targetId,hits:0,beeIndex:0,retreat:false});
  }
- hive.scared=!!target;
- hive.scatter=THREE.MathUtils.damp(hive.scatter,target?1:0,target?5:2.4,Math.min(.05,Math.max(0,dt)));
- return target;
+ a.age+=step;
+ if(a.phase!=='return'&&!wildHiveTargetInRange(hive,a.targetId,WILD_HIVE_LEASH_RADIUS)){
+  a.retreat=true;
+  if(a.phase==='watch'){a.phase='idle';a.targetId=null;return a;}
+  a.phase='return';a.age=0;a.from.copy(a.tip);
+ }
+ if(a.phase==='watch'){
+  wildHiveIdleBeePosition(hive,a.beeIndex,seconds,a.tip);
+  if(a.age>=WILD_HIVE_WATCH_SECONDS&&now-(wildHiveLastSting.get(a.targetId)??-Infinity)>=WILD_HIVE_STING_COOLDOWN){
+   a.phase='dive';a.age=0;a.from.copy(a.tip);
+   const target=characters.get(a.targetId).mesh.position,dx=target.x-a.from.x,dz=target.z-a.from.z,len=Math.max(.1,Math.hypot(dx,dz)),side=a.beeIndex%2?1:-1;
+   a.control.set((a.from.x+target.x)/2-dz/len*1.8*side,Math.max(a.from.y,target.y+1.1)+1.2,(a.from.z+target.z)/2+dx/len*1.8*side);
+  }
+ }else if(a.phase==='dive'){
+  const target=characters.get(a.targetId).mesh.position,t=Math.min(1,a.age/WILD_HIVE_DIVE_SECONDS),u=t*t*t,v=1-u;
+  // Cubic time easing accelerates a single bee along a bowed quadratic Bezier path.
+  a.tip.set(v*v*a.from.x+2*v*u*a.control.x+u*u*target.x,v*v*a.from.y+2*v*u*a.control.y+u*u*(target.y+1.1),v*v*a.from.z+2*v*u*a.control.z+u*u*target.z);
+  if(t>=1){if(wildHiveSting(a.targetId,now))a.hits++;a.phase='return';a.age=0;a.from.copy(a.tip);}
+ }else if(a.phase==='return'){
+  wildHiveIdleBeePosition(hive,a.beeIndex,seconds,a.tip);
+  const t=THREE.MathUtils.smoothstep(a.age/WILD_HIVE_RETURN_SECONDS,0,1);a.tip.lerpVectors(a.from,a.tip,t);
+  if(a.age>=WILD_HIVE_RETURN_SECONDS){
+   if(a.hits>=WILD_HIVE_MAX_STINGS||a.retreat){if(a.hits>=WILD_HIVE_MAX_STINGS)a.blockedIds.add(a.targetId);a.phase='idle';a.targetId=null;}
+   else{a.phase='watch';a.beeIndex=(a.beeIndex+1)%wildHiveBeesPerNest;}
+   a.age=0;
+  }
+ }
+ return a;
 }
 function updateWildHives(now,dt){
  if(!wildHives.length||paused||document.hidden)return;
@@ -11161,20 +11210,26 @@ function updateWildHives(now,dt){
  for(let i=3;i<5;i++)wildHiveBeeTemplate.children[i].rotation.x=Math.sin(seconds*70)*(i===3?1:-1)*.35;
  wildHiveBeeTemplate.updateMatrixWorld(true);
  for(const hive of wildHives){
-  const p=hive.position,attackTarget=updateWildHiveThreats(hive,now,dt),dist=camera.position.distanceTo(p);if(listener)buzzing=Math.min(buzzing,Math.hypot(listener.x-p.x,listener.z-p.z));
+  const p=hive.position,attack=updateWildHiveThreats(hive,now,dt),dist=camera.position.distanceTo(p);if(listener)buzzing=Math.min(buzzing,Math.hypot(listener.x-p.x,listener.z-p.z));
   wildHiveProjected.copy(p).project(camera);
   if(dist>(isMobile?58:80)||wildHiveProjected.z< -1||wildHiveProjected.z>1||Math.abs(wildHiveProjected.x)>1.25||Math.abs(wildHiveProjected.y)>1.3)continue;
   const nest=wildHivePools.get('nest'),entry=wildHivePools.get('entrance');
   wildHiveDummy.position.copy(p);wildHiveDummy.rotation.set(0,0,-.06);wildHiveDummy.scale.set(1.35,1.65,1.35);wildHiveDummy.updateMatrix();nest.setMatrixAt(nest.count++,wildHiveDummy.matrix);
   wildHiveDummy.position.set(p.x,p.y-.15,p.z+.4275);wildHiveDummy.rotation.set(0,0,0);wildHiveDummy.scale.set(1.5,1.2,.375);wildHiveDummy.updateMatrix();entry.setMatrixAt(entry.count++,wildHiveDummy.matrix);
-  if(!daytime&&!attackTarget&&hive.scatter<.01)continue;
+  if(!daytime&&attack.phase==='idle')continue;
   for(let i=0;i<wildHiveBeesPerNest;i++){
    const phase=hive.phase+i*2.399963,a=seconds*(.65+(i%3)*.08)+phase,cycle=(seconds*.12+i*.17+hive.id*.11)%1;
-   let emergence=THREE.MathUtils.smoothstep(cycle,.04,.20)*(1-THREE.MathUtils.smoothstep(cycle,.84,1));if(hive.scared)emergence=1;
-   const r=(.65+(i%4)*.16+.2*Math.sin(a*.77))*emergence;
-   const swarmX=THREE.MathUtils.lerp(p.x,attackTarget?.x??p.x,hive.scatter),swarmY=THREE.MathUtils.lerp(p.y+.15,(attackTarget?.y??p.y)+1.2,hive.scatter),swarmZ=THREE.MathUtils.lerp(p.z+.32,attackTarget?.z??p.z,hive.scatter);
-   wildHiveDummy.position.set(swarmX+Math.cos(a)*r,swarmY+Math.sin(a*2.3)*.22,swarmZ+Math.sin(a)*r);
-   wildHiveDummy.rotation.set(0,-a,Math.sin(a*1.3)*.10);wildHiveDummy.scale.setScalar(emergence<.03?0:emergence);wildHiveDummy.updateMatrix();
+   let emergence=THREE.MathUtils.smoothstep(cycle,.04,.20)*(1-THREE.MathUtils.smoothstep(cycle,.84,1));if(attack.phase!=='idle')emergence=1;
+   wildHiveIdleBeePosition(hive,i,seconds,wildHiveDummy.position);
+   if(attack.phase!=='idle'&&i===attack.beeIndex){
+    wildHiveDummy.position.copy(attack.tip);
+    const toward=attack.phase==='dive'?characters.get(attack.targetId)?.mesh.position:hive.position;
+    wildHiveDummy.rotation.set(0,toward?Math.atan2(toward.x-attack.tip.x,toward.z-attack.tip.z):-a,Math.sin(a*1.3)*.10);
+   }else{
+    wildHiveDummy.position.sub(p).multiplyScalar(emergence).add(p);
+    wildHiveDummy.rotation.set(0,-a,Math.sin(a*1.3)*.10);
+   }
+   wildHiveDummy.scale.setScalar(emergence<.03?0:emergence);wildHiveDummy.updateMatrix();
    for(const part of wildHiveBeeTemplate.children){const pool=wildHivePools.get(part.geometry.uuid+':'+part.material.uuid);wildHiveMatrix.multiplyMatrices(wildHiveDummy.matrix,part.matrixWorld);pool.setMatrixAt(pool.count++,wildHiveMatrix);}
   }
  }
