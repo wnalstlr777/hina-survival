@@ -3058,7 +3058,7 @@ let leafBed=false,leafStock=0,plantKnowledge=0,petBond=0,friendClue=0;
 let lastBuildDay=0,lastPlantDay=0,lastPetCareDay=0,lastClueDay=0,lastRainCollectionDay=0;
 function storeFish(){
  if(carriedFish.length>=MAX_CARRY_FISH)return false;
- carriedFish.push({at:elapsed,life:DAY_SECONDS*1.4,cooked:false});
+ carriedFish.push({at:elapsed,life:DAY_SECONDS*1.4,cooked:false});interactionSuccessSound('hina','fish');
  log(`🐟 물고기 휴대 · ${carriedFish.length}/${MAX_CARRY_FISH}마리 · 동굴로 가져가 보관 예정`);return true;
 }
 function edibleFish(){return carriedFish.findIndex(f=>elapsed-f.at<f.life);}
@@ -3186,7 +3186,7 @@ const roastFireProjection=new THREE.Vector3();
 // v5.0.8: Meditation is a sibling action of fish roasting, not a replacement for firewood.
 const v508MeditateIcon=document.createElement('button');
 v508MeditateIcon.type='button';v508MeditateIcon.id='v508MeditateIcon';
-v508MeditateIcon.textContent='🧘';v508MeditateIcon.title='모닥불 명상하기';
+v508MeditateIcon.textContent='🔥';v508MeditateIcon.title='모닥불 명상하기';
 v508MeditateIcon.setAttribute('aria-label','모닥불 명상하기');
 v508MeditateIcon.className='linked-fire-action hina-fire-pop';
 Object.assign(v508MeditateIcon.style,{position:'fixed',zIndex:'32',display:'none',width:'40px',height:'40px',padding:'0',alignItems:'center',justifyContent:'center',lineHeight:'1',borderRadius:'50%',border:'5px solid #e7a26c',background:'#243338',fontSize:'24px',cursor:'pointer',touchAction:'manipulation',boxSizing:'border-box'});
@@ -3196,15 +3196,36 @@ document.body.appendChild(v508MeditateLine);document.body.appendChild(v508Medita
 // v5.1.0: persistent right-side indicator exposes the actual meditation state.
 const v510MeditationStatus=document.createElement('button');
 v510MeditationStatus.type='button';v510MeditationStatus.id='v510MeditationStatus';
-v510MeditationStatus.setAttribute('aria-label','명상 상태');
+v510MeditationStatus.setAttribute('aria-label','불멍 상태 · 효과 안내');
 v510MeditationStatus.title='명상 중 · 누르면 종료';
-v510MeditationStatus.textContent='🧘';
+v510MeditationStatus.textContent='🔥';
 Object.assign(v510MeditationStatus.style,{position:'fixed',right:'16px',top:'145px',width:'46px',height:'46px',zIndex:'80',display:'none',borderRadius:'50%',border:'4px solid #9ce9c0',background:'#468b70',color:'#fff',fontSize:'25px',boxShadow:'0 0 15px 4px rgba(156,233,192,.65)',cursor:'pointer',touchAction:'manipulation'});
 document.body.appendChild(v510MeditationStatus);
 v510MeditationStatus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(v504Meditation.active||v504AutomaticMeditation(observedId))v504MeditationStop();});
+function layoutFireGazeStatus(){
+ if(!matchMedia('(min-width:701px) and (pointer:fine)').matches){v510MeditationStatus.style.top='145px';return;}
+ const icon=v510MeditationStatus,base=document.getElementById('badge').getBoundingClientRect();let top=Math.max(165,base.bottom+12);
+ const rect=icon.getBoundingClientRect(),height=rect.height||46,width=rect.width||46,right=innerWidth-16;
+ const blocks=['petRabbitHud','willShieldHud','v498SkillToggle','v493CraftToggle'].map(id=>document.getElementById(id)).filter(el=>el&&getComputedStyle(el).display!=='none').map(el=>el.getBoundingClientRect()).sort((a,b)=>a.top-b.top);
+ for(const b of blocks)if(b.right>right-width&&b.left<right&&top<b.bottom+10&&top+height>b.top-10)top=b.bottom+10;
+ icon.style.top=top+'px';
+}
+function fireGazeHelp(){
+ const id=observedId,s=characters.get(id).stats;
+ if(v504AutomaticMeditation(id)&&id==='hina')return ['불멍 · 자동 마음 회복','의지력 32 미만일 때 선택하는 기존 휴식입니다. 게임 시간 38초 후 의지력 +7, 재선택 간격 115초입니다.','기존 휴식 체력 회복도 적용됩니다. 직접 실행하는 불멍의 +6 보상은 겹쳐 지급하지 않습니다.'];
+ const energy=survivorRecoveryPerSecond({sleeping:false,hunger:s.hunger,thirst:s.thirst,outdoorBlocked:(clockParts().h>=22||clockParts().h<4)&&!daeunInsideSafeShelter()});
+ const p=daeun.mesh.position,sheltered=inCaveWalkZone(p.x,p.z)||caveEntrancePortal(p.x,p.z),exposed=!sheltered&&nightFearIntensity()>.05;
+ const will=exposed?0:DAEUN_RULES.willRestRecovery*(s.will>=85?.12:s.will>=70?.45:1)*(s.hunger<20||s.thirst<20?.38:1)*(sheltered?1:.45);
+ const restDetail=' 기존 앉기 의지력 회복은 현재 게임 시간 초당 +'+will.toFixed(4)+'(최대 100)입니다. 야외 야간 공포 중에는 이 회복이 중지되며 기존 공포 감소가 별도로 적용됩니다.';
+ if(v504AutomaticMeditation(id)&&id==='daeun')return ['불멍 · 자동 휴식','의지력 45 미만일 때의 기존 휴식입니다. 현재 체력 회복은 게임 시간 초당 +'+energy.toFixed(3)+'이며 최대 체력은 100입니다.',restDetail+' 직접 실행하는 불멍의 +6 보상은 겹쳐 지급하지 않습니다.'];
+ return ['불멍 효과','켜진 모닥불 7m 안에서 게임 내 25분을 채우면 의지력 +6(최대 100)을 한 번 받습니다.'+(id==='daeun'?' 다은은 기존 앉기 체력 회복도 적용됩니다: 현재 게임 시간 초당 +'+energy.toFixed(3)+'(최대 100).'+restDetail:' 히나는 시작 전 상태의 기존 회복 규칙을 유지하며 별도의 체력 보너스는 없습니다.'),'불 꺼짐·0.7m 초과 이동·다른 행동·자동/수동 모드 변경·관찰 캐릭터 변경 시 취소됩니다. 다은은 안전하게 앉을 수 있고 탈진 잠금 및 가방 없이 생선을 든 상태가 아니어야 합니다.'];
+}
+v510MeditationStatus.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch'&&matchMedia('(min-width:701px) and (pointer:fine)').matches)statHelpShow(v510MeditationStatus,fireGazeHelp());});
+v510MeditationStatus.addEventListener('pointerleave',statHelpHide);
 function v510SyncMeditationUI(){
  const automatic=v504AutomaticMeditation(observedId),active=!!v504Meditation.active||automatic;
- v510MeditationStatus.title=automatic?'마음 추스르는 중 · 기존 자동 회복':active?(v504Meditation.completed?'명상 완료 · 누르면 일어나기':'명상 중 · 누르면 종료'):'명상';
+ v510MeditationStatus.removeAttribute('title');
+ if(active)layoutFireGazeStatus();
  v510MeditationStatus.style.display=active?'flex':'none';
  v510MeditationStatus.style.alignItems='center';v510MeditationStatus.style.justifyContent='center';
  v508MeditateIcon.classList.toggle('v510-meditating',active);
@@ -5207,7 +5228,7 @@ function dayTwoPlusDecide(step){
  if(state==='branchGather'){
   if(elapsed-phaseAt<6.5)return;
   const branchLoot=Math.random()<.2?2:1;
-  fireDryStock=Math.min(8,fireDryStock+branchLoot);
+  const previousStock=fireDryStock;fireDryStock=Math.min(8,fireDryStock+branchLoot);if(fireDryStock>previousStock)interactionSuccessSound('hina','branchPickup');
   if(branchLoot===2)log('🍀 운 좋게 나뭇가지 2개 발견!');
   noticeBasketIdea();
   // Gathering only adds inventory. Never refuel or relight at the pickup site.
@@ -6024,9 +6045,9 @@ function statHelpHide(){
  clearTimeout(statHelpTimer);statHelpTimer=null;statHelpTarget=null;statHelpStart=null;
  statHelpPopup.classList.remove('visible');
 }
-function statHelpShow(el){
- const entry=STAT_HELP[el?.dataset?.statHelp];if(!entry)return;
- const character=el.closest('#daeunStats')?'다은':'히나';
+function statHelpShow(el,customEntry=null){
+ const entry=customEntry||STAT_HELP[el?.dataset?.statHelp];if(!entry)return;
+ const character=el.id==='v510MeditationStatus'?(observedId==='daeun'?'다은':'히나'):el.closest('#daeunStats')?'다은':'히나';
  const description=entry[1].replaceAll('히나가',character+'가').replaceAll('히나는',character+'는');
  const detail=character==='다은'&&entry[0]==='의지력'?'의지력이 낮아지면 탐험을 줄이고 동굴에서 쉬면서 회복해요.':entry[2].replaceAll('히나는',character+'는');
  statHelpPopup.innerHTML=`<strong>${entry[0]}</strong>${description}<small>${detail}</small>`;
@@ -6496,7 +6517,9 @@ function v4998UpdateCameraLabel(){
  const b=$('cameraMode');if(!b)return;
  b.textContent=followCamera?(followView==='back'?'카메라: 백뷰':'카메라: 쿼터뷰'):'카메라: 자유뷰';
  b.setAttribute('aria-pressed',String(followCamera));
- const mobile=document.getElementById('v4998Camera');if(mobile)mobile.textContent=followCamera?(followView==='back'?'백뷰':'쿼터뷰'):'자유뷰';
+ const label=followCamera?(followView==='back'?'백뷰':'쿼터뷰'):'자유뷰';
+ const mobile=document.getElementById('v4998Camera');if(mobile)mobile.textContent=label;
+ const pc=document.getElementById('v523Camera');if(pc)pc.textContent=label;
 }
 function v4998CycleCamera(){
  // Quarter -> free -> back -> quarter; both characters share this camera.
@@ -8617,7 +8640,7 @@ function updateDaeun(step,realDt){
     const success=mastered&&dRandom()<(kind==='fire'?(raining()?.24:.75):kind==='rabbit'?.32:.48);
     if(success&&kind==='fire'){const wasBurning=inv.fuel>0;inv.fuel=Math.max(inv.fuel,65);awardIgnitionMorale('daeun',wasBurning);daeunSay('🔥 모닥불 점화 성공! 나뭇가지를 더 모아 유지하자.');}
     else if(success&&kind==='rabbit'){const r=critters[task.index];if(r&&r.g.visible&&!r.caught&&!daeunPetRabbit){rabbitCaptureHold(r,'daeun');daeunPetRabbit=r;daeunSay(rabbitLine(rabbitSuccessLines));}else {if(r)scareRabbit(r,d.mesh.position);daeunSay(rabbitLine(rabbitFailLines));}}
-    else if(success&&kind==='fish'){inv.fish++;inventoryPickupFloat('daeun','fish',1);}
+    else if(success&&kind==='fish'){inv.fish++;inventoryPickupFloat('daeun','fish',1);interactionSuccessSound('daeun','fish');}
     else {if(kind==='rabbit'){const r=critters[task.index];if(r)scareRabbit(r,d.mesh.position);daeunSay(rabbitLine(rabbitFailLines));}else daeunSay(mastered?'아쉽다… 이번엔 실패했어.':'조금씩 감이 잡히는 것 같아.');}
     cancelManualTask();
    }
@@ -8808,11 +8831,12 @@ const BRANCH_INVENTORY_ICON = '<svg viewBox="0 0 40 40" width="28" height="28" a
 // not by duplicate negative item floats. Always use the same animation as skill gains.
 const GAME_FLOAT_ICONS={living:'⚒️',storage:'🎒',berries:'🍓',fish:'🐟',cookedFish:'🍖',rabbits:'🐇',hunger:'🍖',thirst:'💧',energy:'⚡',will:'💗',fuel:'🔥'};
 const GAME_FLOAT_LABELS={hunger:'허기',thirst:'갈증',energy:'체력',will:'의지력',fuel:'불유지'};
+function interactionSuccessSound(id,kind){return id===observedId?window.HinaInteractionSFX?.play(kind)||false:false;}
 function gameTransactionFloat(character,kind,key,amount){
  if(!Number.isFinite(amount)||Math.abs(amount)<.001||character!==observedId)return;
  if(kind==='item'&&amount<0)return;
  if(amount>0){
-  const sound=kind==='food'?(key==='berries'?null:'eat'):kind==='vital'&&key==='thirst'&&amount>1?'water':kind==='item'?({berries:'berry',branches:'wood',palmFronds:'berry',fish:'fish',cookedFish:'cook',fuel:'fire'}[key]):null;
+  const sound=kind==='food'?(key==='berries'?null:'eat'):kind==='vital'&&key==='thirst'?null:kind==='item'?({berries:'berry',branches:'branchPickup',palmFronds:'berry',fish:null,cookedFish:'cook',fuel:'fire'}[key]):null;
   if(sound)window.HinaInteractionSFX?.play(sound);
  }
  const node=document.createElement('div');node.className='skillGainFloat';
@@ -8856,9 +8880,11 @@ function restoreSnakeFearOverlay(r){
 }
 function updateSnakeFearOverlay(dt){
  for(const [id,r] of snakeFearReactions){
-  if(!paused&&!document.hidden)r.time+=Math.max(0,Math.min(.05,dt));
+  if(!paused&&!document.hidden)r.time+=Math.max(0,Math.min(.05,dt))*1.5;
   if(r.time>=1){restoreSnakeFearOverlay(r);for(const p of r.parts)for(const m of Array.isArray(p.white)?p.white:[p.white])m.dispose();snakeFearReactions.delete(id);continue;}
   r.jump=1.35*Math.sin(Math.PI*r.time);r.root.position.y+=r.jump;
+  const rig=characterAnimation?.byId[id],lift=Math.sin(Math.PI*Math.min(1,r.time/.22)/2)*(1-THREE.MathUtils.smoothstep(r.time,.65,1));
+  if(rig){for(const arm of rig.arms)arm.rotation.x=THREE.MathUtils.lerp(arm.rotation.x,-2.9,lift);for(const elbow of rig.elbows)elbow.rotation.x*=1-lift;}
   if(Math.floor(r.time*12)%2===0)for(const p of r.parts)p.mesh.material=p.white;
  }
 }
@@ -9002,7 +9028,7 @@ function v5287ToggleSelectedAuto(){
 }
 function v5287InitPcControls(){
  document.getElementById('v523Auto')?.addEventListener('click',v5287ToggleSelectedAuto);
- document.getElementById('v523Camera')?.addEventListener('click',()=>$('cameraMode').click());
+ document.getElementById('v523Camera')?.addEventListener('click',v4998CycleCamera);
  document.getElementById('v523Map')?.addEventListener('click',()=>v521OpenMap());
  v5287SyncControls();
 }
@@ -9283,7 +9309,7 @@ function attachIdleRing(btn){
 const berryEmojiMarkers=Array.from({length:5},()=>makeResourceMarker('🍓','열매 채집'));
 const branchEmojiMarkers=Array.from({length:4},()=>makeResourceMarker('🌿','나뭇가지 줍기'));
 const fireEmojiMarker=makeResourceMarker('🔥','나뭇가지를 비벼 모닥불 피우기');
-const meditationEmojiMarker=makeResourceMarker('🧘','모닥불 명상하기');
+const meditationEmojiMarker=makeResourceMarker('🔥','불멍하기');
 fireEmojiMarker.style.touchAction='none';
 fireEmojiMarker.classList.add('linked-fire-action');
 const rabbitEmojiMarkers=Array.from({length:3},()=>makeResourceMarker('🐰','토끼잡기 시도'));
@@ -9471,8 +9497,8 @@ function updateHinaManualTask(step){
  }else if(task.type==='branch'){
   if(!o?.available)return;
   o.available=false;o.group.visible=false;o.respawnAt=elapsed+90+Math.random()*80;
-  const count=Math.random()<.2?2:1;fireDryStock=Math.min(8,fireDryStock+count);
-  inventoryPickupFloat('hina','branches',count);
+  const count=Math.random()<.2?2:1,previousStock=fireDryStock;fireDryStock=Math.min(8,fireDryStock+count);
+  inventoryPickupFloat('hina','branches',fireDryStock-previousStock);
  }else if(task.type==='water'){
   const old=stats.thirst;stats.thirst=Math.min(100,stats.thirst+55);water=true;gameVitalFloat('hina','thirst',stats.thirst-old);
  }else if(task.type==='fish'){
@@ -10498,7 +10524,7 @@ function refreshV435Inventory(){
  document.getElementById('daeunCookFishButton').disabled=!nearCave||daeun.inventory.fish===0||daeun.inventory.fuel<=0||daeun.inventory.cookedFish>=daeunFishCap();
  refreshDaeunDailyPractice();document.getElementById('daeunSkills').textContent='숙련도 · 🔥 불 '+daeun.skills.fire+'% ('+daeun.dailyPractice.fire+'/3) · 🐰 토끼 '+daeun.skills.rabbit+'% ('+daeun.dailyPractice.rabbit+'/3) · 🐟 물고기 '+daeun.skills.fish+'% ('+daeun.dailyPractice.fish+'/4)'+' · 🐰🐟 기회는 하루 중 랜덤 등장';
  document.getElementById('daeunSleepButton').textContent=daeun.action==='manualSleep'?'☀ 일어나기':'☾ 잠자기';
- document.getElementById('daeunRestButton').textContent=v504Meditation.active&&v504Meditation.id==='daeun'?'🧘 명상 중':daeun.action==='manualRest'?'↥ 일어나기':'♧ 앉아서 쉬기';
+ document.getElementById('daeunRestButton').textContent=v504Meditation.active&&v504Meditation.id==='daeun'?'🔥 불멍 중':daeun.action==='manualRest'?'↥ 일어나기':'♧ 앉아서 쉬기';
  const pos=daeun.mesh.position,fishSelected=daeun.manualTask?.type==='fish',sharedPond=new THREE.Vector3(-9,terrainTopAt(-9,4),4),useSharedPond=sharedHomeActive&&Math.hypot(pos.x, pos.z-4)<28,fishPond=useSharedPond?sharedPond:daeunResources.pondMesh.getWorldPosition(new THREE.Vector3()),nearWater=Math.hypot(pos.x-fishPond.x,pos.z-fishPond.z)<10;
  waterButton.style.display='none';branchButton.style.display='none';
  // The water marker sits over the center of the pond, not on the shoreline.
@@ -10969,6 +10995,12 @@ class CharacterAnimation {
  count(id,source){return id==='hina'?(source==='cave'?caveBerries:carriedBerries):daeun.inventory[source==='cave'?'caveBerries':'berries'];}
  unavailable(r){const s=this.stats(r.id);return !Number.isFinite(s.energy)||s.energy<=0||s.health<=0||v503IsSleeping(r.id)||(r.id==='daeun'?(daeun.restLocked||daeun.dead):(state==='dead'||state==='exhausted'));}
  busy(id){return !!(snakeFearLocked(id)||craftingV492Tasks[id]||(id==='hina'?(hinaManualTask||hinaCookingTask):(daeun.fuelFeed||sharedDaeunResourceTask||(daeun.manualTask&&daeun.manualTask.type!=='rest'))));}
+ drinking(r){
+  if(snakeFearLocked(r.id)||v503IsSleeping(r.id))return false;
+  const task=r.id==='hina'?hinaManualTask:(sharedDaeunResourceTask||daeun.manualTask);
+  if(task?.phase==='perform'&&task.type==='water')return true;
+  return r.id==='hina'?state==='drinking':daeun.action==='autoPerform'&&daeun.autoTask?.kind==='drink';
+ }
  amount(t){return t<.3?0:t<.8?this.ease((t-.3)/.5):t<1.6?1:1-this.ease((t-1.6)/.4);}
  eat(id,options={}){
   const r=this.byId[id],source=options.source||'carry',available=options.available||(()=>this.count(id,source));
@@ -11021,10 +11053,10 @@ class CharacterAnimation {
   const manualTask=r.id==='hina'?hinaManualTask:(sharedDaeunResourceTask||daeun.manualTask);
   const task=manualTask?.phase==='perform'?manualTask:null;
   const automatic=r.id==='hina'?state:daeun.action==='autoPerform'?daeun.autoTask?.kind:daeun.action;
-  const pickup=!sleeping&&!moving&&((task&&(task.type==='branch'||task.type==='frond'))||automatic==='branchGather'||automatic==='branch');
-  const feed=!sleeping&&!moving&&((task?.type==='fire'&&(r.id==='hina'?fireSuccess:daeunDisplayedFuel()>0))||automatic==='branchFeed'||automatic==='feedFuel');
-  const craft=!sleeping&&!moving&&!!craftingV492Tasks[r.id];
-  const cooking=!sleeping&&!moving&&(task?.type==='cookFish'||(r.id==='hina'&&hinaCookingTask));
+  const pickup=!snakeFearLocked(r.id)&&!sleeping&&!moving&&((task&&(task.type==='branch'||task.type==='frond'))||automatic==='branchGather'||automatic==='branch');
+  const feed=!snakeFearLocked(r.id)&&!sleeping&&!moving&&((task?.type==='fire'&&(r.id==='hina'?fireSuccess:daeunDisplayedFuel()>0))||automatic==='branchFeed'||automatic==='feedFuel');
+  const craft=!snakeFearLocked(r.id)&&!sleeping&&!moving&&!!craftingV492Tasks[r.id];
+  const cooking=!snakeFearLocked(r.id)&&!sleeping&&!moving&&(task?.type==='cookFish'||(r.id==='hina'&&hinaCookingTask));
   let e0=0,e1=0,n0=0,n1=0,lean=0;
   if(!sleeping){
    if(sitting){n0=n1=1.22;e0=e1=-.18;}
@@ -11040,6 +11072,7 @@ class CharacterAnimation {
    if(feed){const reach=.5+.5*Math.sin(elapsed*5);e0=e1=-.65+.5*reach;r.arms[0].rotation.x=r.arms[1].rotation.x=-.65-.30*reach;lean=.12;}
    if(craft||cooking){e0=-.35-.18*Math.sin(elapsed*7);e1=-.35-.18*Math.sin(elapsed*7+1.5);}
   }
+  if(this.drinking(r)){r.arms[1].rotation.x=-1.25-.06*Math.sin(elapsed*8);e1=-1.45;}
   const m=r.meal;
   let amount=0,chew=0;
   if(m){const t=m.time;amount=this.amount(t);chew=t>=.8&&t<1.6?Math.sin((t-.8)*Math.PI*10):0;}
@@ -11066,7 +11099,7 @@ class CharacterAnimation {
   r.knees[0].rotation.x=THREE.MathUtils.clamp(r.knee0,0,1.35);r.knees[1].rotation.x=THREE.MathUtils.clamp(r.knee1,0,1.35);
   if(r.lean&&r.body){r.body.rotation.x+=r.lean;r.head.position.z+=r.lean*.65;r.head.position.y-=r.lean*.22;for(const a of r.arms){a.position.z+=r.lean*.55;a.position.y-=r.lean*.30;}}
  }
- endFrame(dt,now){for(const r of this.rigs){this.updateMeal(r,now);this.apply(r,dt,now);}updateSnakeFearOverlay(dt);}
+ endFrame(dt,now){for(const r of this.rigs){window.HinaInteractionSFX?.action(r.id,'drink',r.id===observedId&&!paused&&this.drinking(r),speed);this.updateMeal(r,now);this.apply(r,dt,now);}updateSnakeFearOverlay(dt);}
 }
 
 characterAnimation=new CharacterAnimation();
@@ -11894,13 +11927,14 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
 <script id="hina-interaction-sfx-v401">
 (()=>{
 // Use the same HTMLAudioElement playback path as the working cricket recording.
-const soundNames=['ui','berry','water','fish','wood','fire','cook','craft','eat','sleep','rest','animal','wash','success','inventory','step','bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder','threat'];
+const soundNames=['ui','berry','water','fish','wood','fire','cook','craft','eat','sleep','rest','animal','wash','success','inventory','step','bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder','threat','branchPickup','drink','washClean'];
 const ambience=new Set(['bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder']);
 const pools=new Map(),last=new Map(),counts={},attempts={},failures={};
 // Preserve assets and call sites, but deny all foot/sand feedback centrally.
 const soundPolicy={footsteps:false,inventoryRustle:false,fireAmbience:false};
 const swooshSounds=new Set(['step','inventory','water','wood','craft','rustle','wash']);
-const soundFiles={eat:'eat-start.wav',fish:'fish-clean.wav'};
+const soundFiles={eat:'eat-start.wav',fish:'fish-splash.wav',branchPickup:'branch-pickup.wav',drink:'drink-gulp.wav',washClean:'fish-splash.wav'};
+const actionVoices=new Map();
 const wildlifeSchedule={phase:null,nextAt:0,waiting:false};
 let unlocked=false,paused=false,position=null,walker='',distance=0,lastAction='',previewVoice=null;
 const previewButton=document.getElementById('interactionSoundPreview');
@@ -11932,7 +11966,8 @@ function unlock(){
  const request=primer.play();request?.catch(()=>{});
 }
 function stopAll(){
- for(const pool of pools.values())for(const slot of pool){slot.audio.pause();slot.busy=false;}
+ actionVoices.clear();
+ for(const pool of pools.values())for(const slot of pool){slot.audio.pause();slot.audio.loop=false;slot.busy=false;}
  if(previewVoice)resetPreview();
 }
 function syncVolume(){
@@ -11944,7 +11979,7 @@ function play(kind,level=1,force=false){
  if(swooshSounds.has(kind)||/^(footstep|sand|walk|run)$/.test(kind)||(kind==='fireAmbient'&&!soundPolicy.fireAmbience))return false;
  if(!unlocked||interactionLevel()<=0||!Number.isFinite(level)||level<=0)return false;
  const pool=pools.get(kind);if(!pool)return false;
- const now=performance.now(),limit=kind==='threat'?2500:kind==='step'?380:kind==='ui'?90:(kind==='bird'||kind==='owl')?15000:ambience.has(kind)?650:350;
+ const now=performance.now(),limit=kind==='drink'?0:kind==='threat'?2500:kind==='step'?380:kind==='ui'?90:(kind==='bird'||kind==='owl')?15000:ambience.has(kind)?650:350;
  if(!force&&now-(last.get(kind)??-Infinity)<limit)return false;
  let slot=pool.find(slot=>!slot.busy);
  if(!slot&&pool.length<2){slot=voice(kind);pool.push(slot);}
@@ -11963,10 +11998,17 @@ function play(kind,level=1,force=false){
  // Do not defer the real play() call outside the user's click gesture.
  const request=slot.audio.play();
  request?.catch(error=>{
+  if(error.name==='AbortError')return; // Expected when an action or pause stops pending playback.
   slot.busy=false;failures[kind]=error.name||'play';
   if(slot===previewVoice)resetPreview('다시 눌러 효과음 확인');
  });
  return true;
+}
+function action(id,kind,active,rate=1){
+ let slot=actionVoices.get(id);
+ if(!active||interactionLevel()<=0){if(slot){slot.audio.pause();slot.audio.currentTime=0;slot.audio.loop=false;slot.busy=false;actionVoices.delete(id);}return false;}
+ if(!slot){if(!play(kind))return false;slot=pools.get(kind).find(s=>s.busy&&![...actionVoices.values()].includes(s));if(!slot)return false;slot.audio.loop=true;actionVoices.set(id,slot);}
+ slot.audio.playbackRate=Math.max(.25,Math.min(16,Number(rate)||1));return true;
 }
 // Observe actual panel transitions once, including outside-tap/Escape/programmatic closes.
 // No sound is attached to a craft/inventory button's text or translated label.
@@ -12018,11 +12060,10 @@ function event(text){
  if(/없|부족|필요|못|실패|중단|싶|보자|할까/.test(text))return false;
  let kind=null;
  if(/완성|제작 성공|발견했|해금/.test(text))kind='success';
- else if(/씻.*완료|세안.*완료/.test(text))kind='wash';
- else if(/마셨|물을 마심/.test(text))kind='water';
- else if(/물고기.*잡|낚시 성공/.test(text))kind='fish';
+ else if(/씻.*완료|세안.*완료/.test(text))kind='washClean';
+ // Drinking is synchronized to its animation; capture has an actual-success hook.
  else if(/채집|열매.*모았/.test(text))kind='berry';
- else if(/장작.*추가|가지.*주웠|가지.*수집/.test(text))kind='wood';
+ // Branch sounds are emitted only by the committed inventory transaction.
  else if(/불.*피웠|점화 성공/.test(text))kind='fire';
  else if(/굽기 완료|요리 완료/.test(text))kind='cook';
  return kind?play(kind):false;
@@ -12064,7 +12105,7 @@ function scheduleWildlife(isNight,now=performance.now()){
  if(now<wildlifeSchedule.nextAt||['bird','owl'].some(kind=>pools.get(kind).some(slot=>slot.busy)))return;
  if(play(phase)){wildlifeSchedule.waiting=true;}else wildlifeSchedule.nextAt=now+1000;
 }
-window.HinaInteractionSFX={play,event,movement,ui:playUITransition,wildlife:scheduleWildlife,
+window.HinaInteractionSFX={play,event,movement,action,ui:playUITransition,wildlife:scheduleWildlife,
  setPaused(value){if(paused!==!!value){paused=!!value;syncVolume();}},
  diagnose:()=>({...counts}),
  audioStatus:()=>({backend:'html-audio-wav',policy:{...soundPolicy,disabled:[...swooshSounds,'fireAmbient']},wildlife:{...wildlifeSchedule},unlocked,volume:interactionLevel(),playing:[...pools.values()].flat().filter(s=>s.busy&&!s.audio.paused).map(s=>s.kind),attempts:{...attempts},started:{...counts},errors:{...failures}})
@@ -14023,5 +14064,12 @@ body:has(#profileViewer.open,#daeunProfileViewer.open,#v523DetailBackdrop.open) 
 
 html body #characterBar button:is(#observeHina,#observeDaeun)[data-selected="false"][data-auto][data-locked]{background:#354c47!important;border-color:#718a80!important;box-shadow:none!important;outline:none!important;}
 html body #characterBar button:is(#observeHina,#observeDaeun)[data-selected="true"][data-auto][data-locked]{background:#468B70!important;color:white!important;box-shadow:inset 0 0 8px #a6ffe01f,0 0 7px #78f0cb38!important;}
+</style>
+<style id="pcInteractionLayout">
+@media(min-width:701px) and (pointer:fine){
+ #v521PcMenu{transform:scale(1.5)!important;transform-origin:top right!important;}
+ html body #badge{top:88px!important;}
+ html body #v521Menu{top:84px!important;}
+}
 </style>
 </body></html>
