@@ -3061,7 +3061,7 @@ function consumeCookedMeal(id,kind='cookedFish',options={}){
 function eatFish(fromCave=false){
  if(characterAnimation?.active('hina')||!fireSuccess||distanceTo('shelter')>=3.3)return false;
  const list=fromCave?storedFish:carriedFish,f=list.find(f=>f.cooked&&elapsed-f.at<f.life)||list.find(f=>elapsed-f.at<f.life);if(!f)return false;
- if(!f.cooked){if(hinaCookingTask)return false;hinaCookingTask={fish:f,age:0,duration:SHARED_FISH_INTERACTION_SECONDS,auto:!hinaManual};return true;}
+ if(!f.cooked){if(fromCave){if(carriedFish.length>=MAX_CARRY_FISH)return false;storedFish.splice(storedFish.indexOf(f),1);carriedFish.push(f);}const started=craftingV492Start('hina','roastFish',!hinaManual);if(started){target=null;navReset();state='recover';phaseAt=elapsed;}return started;}
  return consumeCookedMeal('hina','cookedFish',{available:()=>list.includes(f)&&f.cooked&&elapsed-f.at<f.life?1:0,take:()=>list.splice(list.indexOf(f),1),done:()=>{hungerDelayUntil=elapsed+27;food=true;log('🔥🐟 구운 생선 섭취 완료');}});
 }
 
@@ -3070,7 +3070,7 @@ let hinaCookingTask=null;
 // v28.11: fire-hover fish roasting shortcut (Hina). Keep AI's existing food loop intact.
 const roastFishButton=document.createElement('button');
 roastFishButton.type='button';roastFishButton.id='roastFishAction';roastFishButton.textContent='🐟';roastFishButton.title='물고기 굽기';
-roastFishButton.setAttribute('aria-label','모닥불에서 물고기 굽기');
+roastFishButton.setAttribute('aria-label','모닥불에서 물고기 굽기');roastFishButton.disabled=true;roastFishButton.tabIndex=-1;roastFishButton.setAttribute('aria-hidden','true');
 roastFishButton.classList.add('linked-fire-action');
 Object.assign(roastFishButton.style,{position:'fixed',zIndex:'29',display:'none',width:'40px',height:'40px',padding:'0',alignItems:'center',justifyContent:'center',lineHeight:'1',textAlign:'center',borderRadius:'50%',border:'5px solid #e7a26c',background:'#243338',color:'#fff',fontSize:'25px',cursor:'pointer',boxSizing:'border-box',boxShadow:'none'});
 document.body.appendChild(roastFishButton);
@@ -3186,7 +3186,7 @@ v510MeditationStatus.addEventListener('click',e=>{e.preventDefault();e.stopPropa
 function fireGazeHelp(){
  const id=observedId,s=characters.get(id).stats;
  if(v504AutomaticMeditation(id)&&id==='hina')return ['불멍 · 자동 마음 회복','의지력 32 미만일 때 선택하는 기존 휴식입니다. 게임 시간 38초 후 의지력 +7, 재선택 간격 115초입니다.','기존 휴식 체력 회복도 적용됩니다. 직접 실행하는 불멍의 +6 보상은 겹쳐 지급하지 않습니다.'];
- const energy=survivorRecoveryPerSecond({sleeping:false,hunger:s.hunger,thirst:s.thirst,outdoorBlocked:(clockParts().h>=22||clockParts().h<4)&&!daeunInsideSafeShelter()});
+ const energy=survivorRecoveryPerSecond({character:id,sleeping:false,hunger:s.hunger,thirst:s.thirst,outdoorBlocked:(clockParts().h>=22||clockParts().h<4)&&!daeunInsideSafeShelter()});
  const p=daeun.mesh.position,sheltered=inCaveWalkZone(p.x,p.z)||caveEntrancePortal(p.x,p.z),exposed=!sheltered&&nightFearIntensity()>.05;
  const will=exposed?0:DAEUN_RULES.willRestRecovery*(s.will>=85?.12:s.will>=70?.45:1)*(s.hunger<20||s.thirst<20?.38:1)*(sheltered?1:.45);
  const restDetail=' 기존 앉기 의지력 회복은 현재 게임 시간 초당 +'+will.toFixed(4)+'(최대 100)입니다. 야외 야간 공포 중에는 이 회복이 중지되며 기존 공포 감소가 별도로 적용됩니다.';
@@ -3260,49 +3260,7 @@ document.addEventListener('pointerdown',e=>{
  v509HideMeditation();hideRoastFishShortcut();
 },true);
 
-function updateRoastFishButton(){
- // Meditation owns the campfire interaction until it is explicitly cancelled.
- // Guard the update itself: other frame updates can otherwise show a faded fish icon again.
- if(v504Meditation.active){cancelRoastTouch();hideRoastFishShortcut();return;}
- const isDaeun=observedId==='daeun';
- const firePos=isDaeun?daeunDisplayedFirePosition():campfire.position;
- const eligible=isDaeun
-  ? daeun.inventory.fish>0&&daeun.inventory.fuel>0&&daeun.inventory.cookedFish<daeunFishCap()
-    &&Math.hypot(daeun.mesh.position.x-firePos.x,daeun.mesh.position.z-firePos.z)<7
-  : fireSuccess&&campfire.visible&&hinaFireDistance(hana.position)<4
-    &&[...storedFish,...carriedFish].some(f=>!f.cooked&&elapsed-f.at<f.life);
- roastTouchEligible=eligible;
- if(!eligible){cancelRoastTouch();hideRoastFishShortcut();return;}
- roastFireProjection.copy(firePos);roastFireProjection.y+=1.8;roastFireProjection.project(camera);
- if(roastFireProjection.z>1||roastFireProjection.z< -1){hideRoastFishShortcut();return;}
- const rect=renderer.domElement.getBoundingClientRect();
- const x=rect.left+(roastFireProjection.x+1)*rect.width/2;
- const y=rect.top+(1-roastFireProjection.y)*rect.height/2;
- roastTouchFireCenter={x,y};
- const buttonX=x+42,buttonY=y-45;
- const pointerNear=Math.hypot(fireHoverPointer.x-x,fireHoverPointer.y-y)<94
-  ||Math.hypot(fireHoverPointer.x-buttonX,fireHoverPointer.y-buttonY)<34;
- // v4.62: On mobile, show the roast-fish affordance automatically when a survivor
- // carrying raw fish approaches a usable campfire. Cooking still requires
- // holding the campfire icon and dragging onto this fish icon; visibility alone
- // must never trigger the action. Desktop retains the existing hover behavior.
- const discoverableOnMobile=isMobile&&eligible;
- if(!discoverableOnMobile&&!roastTouch?.ready&&!pointerNear&&performance.now()>fireHoverKeepUntil){hideRoastFishShortcut();return;}
- // Use the icon center as the anchor, so the connector reads as one interaction group.
- const ux=(buttonX-x)/Math.hypot(buttonX-x,buttonY-y),uy=(buttonY-y)/Math.hypot(buttonX-x,buttonY-y);
- const anchorX=x+ux*21,anchorY=y+uy*21;
- const dx=buttonX-anchorX,dy=buttonY-anchorY;
- roastFishConnector.style.left=Math.round(anchorX)+'px';
- roastFishConnector.style.top=Math.round(anchorY-3.5)+'px';
- roastFishConnector.style.width=Math.hypot(dx,dy)+'px';
- roastFishConnector.style.setProperty('--hina-fire-angle',Math.atan2(dy,dx)+'rad');
- if(!roastFishConnector.classList.contains('hina-fire-line'))roastFishConnector.style.transform='rotate('+Math.atan2(dy,dx)+'rad)';
- roastFishConnector.style.display='block';
- roastFishButton.style.left=Math.round(buttonX-20)+'px';
- roastFishButton.style.top=Math.round(buttonY-20)+'px';
- if(roastFishButton.style.display==='none'){roastFishButton.classList.remove('hina-fire-pop');void roastFishButton.offsetWidth;roastFishButton.classList.add('hina-fire-pop');roastFishConnector.classList.remove('hina-fire-line');void roastFishConnector.offsetWidth;roastFishConnector.classList.add('hina-fire-line');}
- roastFishButton.style.display='flex';
-}
+function updateRoastFishButton(){cancelRoastTouch();roastTouchEligible=false;hideRoastFishShortcut();}
 function depositCaveFood(){
  if(distanceTo('shelter')>=3.3||!carriedFish.length)return 0;
  const room=Math.max(0,MAX_CAVE_FISH-storedFish.length);
@@ -4145,7 +4103,8 @@ function updateNightSoundBubble(){
 // Shared by Hina and Daeun now; future survivors call the same pure function.
 // Hunger/thirst slow recovery but never completely disable it.
 const SURVIVOR_RECOVERY=Object.freeze({sleepPerSecond:.425,restPerSecond:.45,emptyHunger:.32,emptyThirst:.45,outdoorBlocked:.08});
-function survivorRecoveryPerSecond({sleeping=false,hunger=100,thirst=100,outdoorBlocked=false,quality=1}){
+function survivorRecoveryPerSecond({sleeping=false,hunger=100,thirst=100,outdoorBlocked=false,quality=1,character=null}){
+ if(character&&rainNightColdBlocked(character))return 0;
  const base=sleeping?SURVIVOR_RECOVERY.sleepPerSecond:SURVIVOR_RECOVERY.restPerSecond;
  // v4.58: hunger-dependent sleep efficiency, evaluated every simulation tick.
  // Applies equally to automatic/manual sleep for every survivor via this shared function.
@@ -4167,7 +4126,7 @@ function recoverHinaDuringRest(step, restState){
  const quality=restState==='rest'||restState==='sleep'||restState==='night'?
   (sheltered&&leafBed?1.12:1):restState==='mentalRest'?.65:.75;
  stats.energy=Math.min(100,stats.energy+step*survivorRecoveryPerSecond({
-  sleeping,hunger:stats.hunger,thirst:stats.thirst,outdoorBlocked:blocked,quality
+  character:'hina',sleeping,hunger:stats.hunger,thirst:stats.thirst,outdoorBlocked:blocked,quality
  }));
 }
 // Shared sleep presentation rules for all five survivors (future AI included).
@@ -4211,6 +4170,7 @@ function daeunSleepSpeechLock(){
  return ['sleep','manualSleep'].includes(daeun.action) && daeun.path.length===0;
 }
 function updateBubble(){
+ if(drawRainColdWarning(observedId))return;
  if(observedId==='daeun'){drawDaeunBubble();return;}
  const el=$('bubble');
  // The character's companion dialogue owns the speech slot until it expires.
@@ -5599,6 +5559,7 @@ const manualMovementScratch={forward:new THREE.Vector3(),right:new THREE.Vector3
 let hinaExhausted=false;
 function survivorIncapacitated(id){const ch=characters.get(id);return !!ch&&(ch.stats.energy<=0||(id==='hina'?hinaExhausted:ch.restLocked)||ch.dead);}
 function tickSurvivalCondition(id,step){
+ rainNightColdFeedback(id);
  const ch=characters.get(id),s=ch?.stats;if(!s)return;
  if(s.hunger<=0&&!(id==='hina'?hinaExhausted:ch.restLocked))s.energy=Math.max(0,s.energy-step*.10); // Existing Daeun starvation loss, now shared and not movement-dependent.
  if(s.energy<=0){
@@ -5640,7 +5601,7 @@ function update(dt){
  tickSurvivalCondition('hina',step);
  if(hinaExhausted){
   stats.thirst=Math.max(0,stats.thirst-step*thirstRate);stats.hunger=Math.max(0,stats.hunger-step*hungerRate);
-  stats.energy=Math.min(100,stats.energy+step*survivorRecoveryPerSecond({hunger:stats.hunger,thirst:stats.thirst,quality:DAEUN_RULES.exhaustionMinRecovery}));
+  stats.energy=Math.min(100,stats.energy+step*survivorRecoveryPerSecond({character:'hina',hunger:stats.hunger,thirst:stats.thirst,quality:DAEUN_RULES.exhaustionMinRecovery}));
   const previousState=state;state='fieldRest';updateCharacterPose();state=previousState;
   if(stats.energy>=DAEUN_RULES.exhaustionResume){hinaExhausted=false;state='recover';phaseAt=elapsed;if(!hinaManual&&stats.hunger<=0)emergencyFood('hina');}
   tickHinaCampfireFuel(step);updateHinaWorldUIAndLighting(step,dt);return;
@@ -5777,7 +5738,7 @@ function update(dt){
  }
  // Any active travel can be interrupted before exhaustion makes the return trip impossible.
  // Do not interrupt the introductory Day 1 sequence or actions that are already resting.
- if(day>=2&&stats.hunger>0&&stats.energy<=20&&!['fieldRest','rest','outdoorSleep','night','drinking','eating','sleepTravel'].includes(state)){
+ if(day>=2&&stats.hunger>0&&stats.energy<=20&&!(rainNightColdBlocked('hina')&&['fireTravel','fireTry','branchReturn','branchTravel','branchGather','branchFeed'].includes(state))&&!['fieldRest','rest','outdoorSleep','night','drinking','eating','sleepTravel'].includes(state)){
   if(stats.energy>=15&&distanceTo('shelter')<14&&Math.random()<.8){
    setState('sleepTravel','피곤해서 동굴로 귀환','shelter',
     '이제 힘이 없네... 동굴로 돌아가서 쉬자.');
@@ -8285,6 +8246,7 @@ class DaeunAIController{
   if(urgentFood){
    if((inv.leafFish||0)>0&&consumeCookedMeal('daeun','leafFish'))return;
    if(inv.cookedFish>0&&consumeCookedMeal('daeun','cookedFish'))return;
+   if(inv.fish>0&&nearLitCookingFire('daeun')&&craftingV492Start('daeun','roastFish',true)){d.path=[];d.destination=null;d.action='projectCraft';d.actionAge=0;return;}
    if(inv.berries){characterAnimation.eat('daeun',{gain:34,energy:false,done:()=>daeunSay('가지고 있던 열매를 먹었어.')});return;}
    if(inv.caveBerries&&pos.distanceTo(d.sites.shelter)<4){characterAnimation.eat('daeun',{source:'cave',gain:34,energy:false});return;}
    const tree=(sharedHomeActive?berryTrees:daeunResources.berries).filter(t=>t.stock>0).sort((a,b)=>a.group.position.distanceToSquared(pos)-b.group.position.distanceToSquared(pos))[0];
@@ -8580,7 +8542,7 @@ function updateDaeun(step,realDt){
  if(s.energy<=0&&!d.restLocked){cancelManualTask();d.restLocked=true;d.path=[];d.destination=null;d.action='exhausted';d.actionAge=0;}
  const resting=d.restLocked||['rest','sleep','sleepPrepare','manualRest','manualSleep'].includes(d.action)&&!d.path.length;
  if(resting){s.energy=Math.min(100,s.energy+step*survivorRecoveryPerSecond({
-  sleeping:['sleep','manualSleep'].includes(d.action),hunger:s.hunger,thirst:s.thirst,
+  character:'daeun',sleeping:['sleep','manualSleep'].includes(d.action),hunger:s.hunger,thirst:s.thirst,
   outdoorBlocked:(clockParts().h>=22||clockParts().h<4)&&!daeunInsideSafeShelter(),
   quality:d.restLocked?DAEUN_RULES.exhaustionMinRecovery:1
  }));
@@ -8872,6 +8834,7 @@ function updateDualExploration(){
  if(changed)fogMesh.instanceMatrix.needsUpdate=true;
 }
 function drawDaeunBubble(){
+ if(observedId==='daeun'&&drawRainColdWarning('daeun'))return;
  const isSleeping=daeunSleepSpeechLock();
  const el=$('bubble'),p=daeun.mesh.position.clone().add(new THREE.Vector3(0,isSleeping?1.8:3.3,0)).project(camera);
  const visibleSpeech=survivorSpeech.current('daeun')?.text||daeunVisibleSpeech();
@@ -9014,11 +8977,29 @@ function updateSnakeFearOverlay(dt){
 for(const event of ['pointerdown','pointermove','click','keydown'])window.addEventListener(event,e=>{
  if(!snakeFearLocked(observedId))return;e.preventDefault();e.stopImmediatePropagation();
 },{capture:true,passive:false});
+const RAIN_NIGHT_FIRE_RECOVERY_TEST=true;
+const rainColdWarnings=new Map();
+function rainNightColdBlocked(id){
+ if(!RAIN_NIGHT_FIRE_RECOVERY_TEST||!raining()||!darkHours())return false;
+ const p=characters.get(id)?.mesh.position;if(!p)return false;
+ return ![[campfire.position,fireSuccess&&fireKnowledge>0],[daeunResources.fire.group.position,!sharedHomeActive&&daeun.inventory.fuel>0]].some(([f,lit])=>lit&&Math.hypot(p.x-f.x,p.z-f.z)<7);
+}
+function rainNightColdFeedback(id){
+ if(!rainNightColdBlocked(id))return;
+ const text='비 오는 밤이라 너무 추워… 불이 없으면 동굴에서도 체력이 회복되지 않아.';
+ if(rainyFireLine(id,text))rainColdWarnings.set(id,{text,until:performance.now()+3000});
+}
+const rainColdScreen=new THREE.Vector3();
+function drawRainColdWarning(id){
+ const warning=rainColdWarnings.get(id);if(!warning||performance.now()>=warning.until||!rainNightColdBlocked(id))return false;
+ const ch=characters.get(id);rainColdScreen.copy(ch.mesh.position).add(new THREE.Vector3(0,3.5,0));const xy=projectToScreen(rainColdScreen);if(!xy)return false;
+ const el=$('bubble');el.textContent=warning.text;el.classList.remove('sleep-bubble');el.classList.add('show');el.style.display='block';el.style.left=xy.x+'px';el.style.top=xy.y+'px';return true;
+}
 const rainyFireClaims=new Map(),rainyFireSpeech=new Map();
 function rainyFireKey(id){return sharedHomeActive?'shared':id;}
 function rainyFireEligible(id){
  const st=id==='hina'?stats:daeun.stats,p=id==='hina'?hana.position:daeun.mesh.position,fire=id==='hina'?campfire.position:daeunDisplayedFirePosition();
- return raining()&&(id==='hina'?!hinaManual:daeun.auto)&&st.energy>35&&st.hunger>58&&st.thirst>58&&st.will>20&&!snakeFearLocked(id)&&!v503IsSleeping(id)&&Math.hypot(p.x-fire.x,p.z-fire.z)<12&&!bearNearRoute(p.x,p.z);
+ return raining()&&(id==='hina'?!hinaManual:daeun.auto)&&!survivorIncapacitated(id)&&(rainNightColdBlocked(id)?st.energy>0&&st.hunger>35&&st.thirst>35:st.energy>35&&st.hunger>58&&st.thirst>58&&st.will>20)&&!snakeFearLocked(id)&&(rainNightColdBlocked(id)||!v503IsSleeping(id))&&Math.hypot(p.x-fire.x,p.z-fire.z)<12&&!bearNearRoute(p.x,p.z);
 }
 function rainyFireOwnedByOther(id){
  if(!raining()){rainyFireClaims.delete(rainyFireKey(id));return false;}
@@ -9029,11 +9010,13 @@ function rainyFireOwnedByOther(id){
 function rainyFireLine(id,text){
  const now=performance.now(),last=rainyFireSpeech.get(id);if(last&&now-last.at<18000)return;
  if(survivorSpeech.current(id))return;
- rainyFireSpeech.set(id,{at:now,text});if(id==='hina')say(text);else daeunSay(text);
+ rainyFireSpeech.set(id,{at:now,text});if(id==='hina')say(text);else if(id==='daeun')daeunSay(text);else survivorSpeech.post(id,text);return true;
 }
 function rainyFireCare(id){
  if(!rainyFireEligible(id)||rainyFireOwnedByOther(id))return false;
+ if(rainNightColdBlocked(id)){if(id==='hina'&&['rest','night','sleep','fieldRest','mentalRest','outdoorSleep'].includes(state)){state='recover';target=null;navReset();sleepingPose=false;}else if(id==='daeun'&&['rest','sleep','sleepPrepare'].includes(daeun.action)){daeun.action='idle';daeun.path=[];daeun.destination=null;}}
  const fuel=id==='hina'||sharedHomeActive?(fireSuccess?fireKnowledge:0):daeunDisplayedFuel();
+ if(rainNightColdBlocked(id)&&fuel>0){if(id==='hina'){setState('sleepTravel','비 오는 밤 · 불 가까이로 이동','shelter',null);return true;}return setDaeunDestination(daeun.sites.shelter,'home');}
  if(fuel>=75){rainyFireClaims.delete(rainyFireKey(id));rainyFireLine(id,'다행이다… 아직 따뜻해.');return false;}
  rainyFireLine(id,fuel<=0?'불이 꺼졌어… 비에 젖으면 너무 추워. 다시 피워야 해!':fuel<45?'불이 꺼지면 안 돼!':'비가 계속 오네… 불이 약해지고 있어.');
  if(craftingV492Tasks[id]||characterAnimation.active(id)||v504Meditation.active&&v504Meditation.id===id)return false;
@@ -9046,9 +9029,9 @@ function rainyFireCare(id){
  }else if(fuel<=0&&stock>0){
   if(id==='hina'&&elapsed>=nextFireAttempt&&hinaCanPracticeFire()){setState('fireTravel','비 오는 날 · 기존 재점화 연습','shelter',null);started=true;}
   else if(id==='daeun'){refreshDaeunDailyPractice();if(daeun.dailyPractice.fire<DAEUN_DAILY_PRACTICE_LIMIT.fire){if(daeunNearCave()){daeun.action='autoFirePractice';daeun.actionAge=0;started=true;}else started=setDaeunDestination(daeun.sites.shelter,'home');}}
- }else if(clockParts().h>=7&&clockParts().h<18){
+ }else if((clockParts().h>=7&&clockParts().h<18)||rainNightColdBlocked(id)){
   const p=id==='hina'?hana.position:daeun.mesh.position,list=id==='hina'||sharedHomeActive?branchPiles:daeunResources.branches;
-  const item=list.filter(b=>b.available&&p.distanceTo(b.group.position)<18&&Math.hypot(b.group.position.x-(id==='hina'?campfire.position.x:daeunDisplayedFirePosition().x),b.group.position.z-(id==='hina'?campfire.position.z:daeunDisplayedFirePosition().z))<11.5&&!bearNearRoute(b.x,b.z)).sort((a,b)=>p.distanceToSquared(a.group.position)-p.distanceToSquared(b.group.position))[0];
+  const item=list.filter(b=>b.available&&p.distanceTo(b.group.position)<(darkHours()?7:18)&&Math.hypot(b.group.position.x-(id==='hina'?campfire.position.x:daeunDisplayedFirePosition().x),b.group.position.z-(id==='hina'?campfire.position.z:daeunDisplayedFirePosition().z))<11.5&&!bearNearRoute(b.x,b.z)).sort((a,b)=>p.distanceToSquared(a.group.position)-p.distanceToSquared(b.group.position))[0];
   if(item){const task={auto:true,rainCare:true,type:'branch',item,phase:'approach',age:0,duration:2.8};
    if(id==='hina'){hinaManualTask=task;target=null;navReset();state='recover';phaseAt=elapsed;}
    else{sharedDaeunResourceTask=task;daeun.path=[];daeun.destination=null;daeun.action='projectGather';daeun.actionAge=0;}
@@ -9284,6 +9267,7 @@ function refreshDaeunDailyPractice(){
 }
 function manualAction(type,point,index=-1){
  if(survivorIncapacitated(isManualHina()?'hina':'daeun'))return false;
+ if(type==='cookFish')return craftingV492Start('daeun','roastFish');
  if(type==='eatLeafFish')return consumeCookedMeal(isManualHina()?'hina':'daeun','leafFish');
  if(!isManualDaeun()||daeun.restLocked)return false;
  if(type!=='eat'&&type!=='eatFish')characterAnimation?.cancel('daeun');
@@ -10214,7 +10198,12 @@ function projectToScreen(point){const p=screenProjectionScratch.copy(point).proj
 // v4.94 unified material proficiency crafting: shared by both playable characters.
 const craftingV492={hina:{skills:{branches:0,palmFronds:0},categories:{living:0,storage:0},mat:false,bag:false},daeun:{skills:{branches:0,palmFronds:0},categories:{living:0,storage:0},mat:false,bag:false}};
 const craftingV492Tasks={hina:null,daeun:null};let craftingV492Tab='inventory',craftingV494Selected='mat',craftingV495Category='all',craftingV495ListSignature='';
-const craftingV494Recipes={mat:{name:'야자잎 잠자리',icon:PALM_FROND_ICON,materials:{palmFronds:6},requiredCategory:15,duration:12,description:'동굴 또는 모닥불 주변에 설치 · 내구도 100%'},bag:{name:'나뭇가지 백팩',icon:'🧶',materials:{branches:DAEUN_BAG_BRANCH_COST},requiredCategory:15,duration:8,exclusive:'daeun',description:'다은 고유 제작 · 기존 백팩 모델과 수납 기능 유지'},leafFish:{name:'야자잎에 익힌 물고기',icon:'🍃🐟',materials:{fish:1,palmFronds:1},requiredCategory:0,duration:8,repeatable:true,result:{kind:'leafFish',count:1},description:'켜진 모닥불 4m 이내 · 일반 구운 물고기와 같은 회복량'}};
+const craftingV494Recipes={roastFish:{name:'구운 물고기',icon:'🍖',materials:{fish:1},requiredCategory:0,duration:8,repeatable:true,result:{kind:'cookedFish',count:1},description:'켜진 모닥불 4m 이내 · 물고기 1마리 굽기'},mat:{name:'야자잎 잠자리',icon:PALM_FROND_ICON,materials:{palmFronds:6},requiredCategory:15,duration:12,description:'동굴 또는 모닥불 주변에 설치 · 내구도 100%'},bag:{name:'나뭇가지 백팩',icon:'🧶',materials:{branches:DAEUN_BAG_BRANCH_COST},requiredCategory:15,duration:8,exclusive:'daeun',description:'다은 고유 제작 · 기존 백팩 모델과 수납 기능 유지'},leafFish:{name:'야자잎에 익힌 물고기',icon:'🍃🐟',materials:{fish:1,palmFronds:1},requiredCategory:0,duration:8,repeatable:true,result:{kind:'leafFish',count:1},description:'켜진 모닥불 4m 이내 · 일반 구운 물고기와 같은 회복량'}};
+function mergeLivingCraftSkill(id){
+ const d=craftingV492[id],c=d.categories||(d.categories={});
+ if(Object.hasOwn(c,'storage')){c.living=Math.max(c.living||0,c.storage||0);delete c.storage;}
+ return c;
+}
 function craftingV492Actor(){return observedId==='daeun'?'daeun':'hina';} // UI always follows the selected/observed character
 function craftingV492State(id){return id==='hina'?stats:daeun.stats;}
 function craftingV492Mode(id){return id==='hina'?isManualHina():isManualDaeun();}
@@ -10225,7 +10214,7 @@ function nearLitCookingFire(id){
  const p=characters.get(id)?.mesh.position;if(!p)return false;
  return [[campfire.position,fireSuccess&&fireKnowledge>0],[daeunResources.fire.group.position,!sharedHomeActive&&daeun.inventory.fuel>0]].some(([f,lit])=>lit&&Math.hypot(p.x-f.x,p.z-f.z)<=4);
 }
-function craftingV492Check(id,kind){const d=craftingV492[id],recipe=craftingV494Recipes[kind];if(!recipe)return '알 수 없는 제작법';if(recipe.exclusive&&recipe.exclusive!==id)return '이 캐릭터의 제작법이 아니야';if(!recipe.repeatable&&((kind==='bag'&&id==='daeun'&&daeun.bag.crafted)||(kind!=='mat'&&d[kind])))return '이미 완성했어';if(recipe.result?survivorIncapacitated(id):!craftingV492Eligible(id))return '생존 상태를 먼저 회복해야 해';if(recipe.result&&!nearLitCookingFire(id))return '켜진 모닥불 가까이 가야 해';if(kind==='mat'&&!craftingV494NearCave(id)&&Math.hypot((id==='hina'?hana.position:daeun.mesh.position).x-campfire.position.x,(id==='hina'?hana.position:daeun.mesh.position).z-campfire.position.z)>10)return '야외에서는 모닥불 근처에 잠자리를 만들어야 해';if(kind==='mat'&&!v503BedSite(id))return '침대를 놓을 공간이 없어';for(const [material,n] of Object.entries(recipe.materials)){if(craftingV494Inventory(id,material)<n)return ({branches:'나뭇가지',palmFronds:'야자잎',fish:'물고기'}[material]||material)+' '+n+'개 필요';}return '';}
+function craftingV492Check(id,kind){mergeLivingCraftSkill(id);const d=craftingV492[id],recipe=craftingV494Recipes[kind];if(!recipe)return '알 수 없는 제작법';if(recipe.exclusive&&recipe.exclusive!==id)return '이 캐릭터의 제작법이 아니야';if(!recipe.repeatable&&((kind==='bag'&&id==='daeun'&&daeun.bag.crafted)||(kind!=='mat'&&d[kind])))return '이미 완성했어';if(recipe.result?survivorIncapacitated(id):!craftingV492Eligible(id))return '생존 상태를 먼저 회복해야 해';if(recipe.result&&!nearLitCookingFire(id))return '켜진 모닥불 가까이 가야 해';if(kind==='roastFish'&&id==='daeun'&&manualInventoryCount('cookedFish',id)>=daeunFishCap())return '구운 물고기를 담을 공간이 없어';if(kind==='mat'&&!craftingV494NearCave(id)&&Math.hypot((id==='hina'?hana.position:daeun.mesh.position).x-campfire.position.x,(id==='hina'?hana.position:daeun.mesh.position).z-campfire.position.z)>10)return '야외에서는 모닥불 근처에 잠자리를 만들어야 해';if(kind==='mat'&&!v503BedSite(id))return '침대를 놓을 공간이 없어';for(const [material,n] of Object.entries(recipe.materials)){if(craftingV494Inventory(id,material)<n)return ({branches:'나뭇가지',palmFronds:'야자잎',fish:'물고기'}[material]||material)+' '+n+'개 필요';}return '';}
 let v504ResultTimer=0;
 function v504CraftResult(message){
  let el=document.getElementById('v504CraftResult');
@@ -10249,7 +10238,7 @@ function craftingV492Finish(t){const {id,kind}=t,reason=craftingV492Check(id,kin
  const category=craftingV495RecipeCategories[kind];if(category){if(!d.categories)d.categories={living:0,storage:0};d.categories[category]=Math.min(100,(d.categories[category]||0)+(success?8:5));}
  const categoryGain=success?8:5;if(typeof gameTransactionFloat==='function')gameTransactionFloat(id,'skill',category||'living',categoryGain);
  if(success&&id===observedId)window.HinaInteractionSFX?.play('success');
- if(success){if(recipe.result){manualInventoryAdd(recipe.result.kind,recipe.result.count,id);inventoryPickupFloat(id,recipe.result.kind,recipe.result.count);}else if(kind!=='mat')d[kind]=true;if(kind==='mat')craftingV492Place(id);if(kind==='bag'&&id==='daeun'){daeun.bag.crafted=true;daeun.bag.progress=100;updateDaeunBagVisual();}}
+ if(success){if(kind==='roastFish'&&id==='daeun'&&!sharedHomeActive&&Math.hypot(daeun.mesh.position.x-daeunResources.fire.group.position.x,daeun.mesh.position.z-daeunResources.fire.group.position.z)<=4)daeun.inventory.fuel=Math.max(0,daeun.inventory.fuel-8);if(recipe.result){manualInventoryAdd(recipe.result.kind,recipe.result.count,id);inventoryPickupFloat(id,recipe.result.kind,recipe.result.count);}else if(kind!=='mat')d[kind]=true;if(kind==='mat')craftingV492Place(id);if(kind==='bag'&&id==='daeun'){daeun.bag.crafted=true;daeun.bag.progress=100;updateDaeunBagVisual();}}
  craftingV492Message(success?recipe.name+' 제작 성공!':'제작 실패 · 재료 소비, 관련 숙련도 +5',id,t.auto);refreshV435Inventory();craftingV492Render();v498RenderSkills();}
 const v503Beds=[];
 const v503BedClaims=new Map();
@@ -10482,7 +10471,7 @@ function craftingV492Tick(){
   const t=craftingV492Tasks[id];if(!t||snakeFearLocked(id))continue;
   const pos=id==='hina'?hana.position:daeun.mesh.position;
   const moved=Math.hypot(pos.x-t.startX,pos.z-t.startZ)>.22;
-  if(moved||(craftingV494Recipes[t.kind].result?survivorIncapacitated(id):!craftingV492Eligible(id))||(t.auto&&!craftingV492AutoSafe(id))||(!t.auto&&!craftingV492Mode(id))){
+  if(moved||(craftingV494Recipes[t.kind].result?survivorIncapacitated(id):!craftingV492Eligible(id))||(t.auto&&!craftingV494Recipes[t.kind].result&&!craftingV492AutoSafe(id))||(!t.auto&&!craftingV492Mode(id))){
    craftingV492Tasks[id]=null;
    craftingV492Message((id==='hina'?'히나':'다은')+' · '+(moved?'이동으로 제작 취소 · 재료 유지':'제작 중단 · 재료 유지'),id,t.auto);
    if(craftingV492Actor()===id)craftingV492Render();
@@ -10514,13 +10503,13 @@ function v498SkillRow(name,value){const n=Math.max(0,Math.min(100,Number(value)|
 let v4993SkillsSignature='';
 function v498RenderSkills(){
  if(v498Skills.style.display!=='block'){v4993SkillsSignature='';return;}
- const id=craftingV492Actor(),d=craftingV492[id],c=d.categories||{};
+ const id=craftingV492Actor(),d=craftingV492[id],c=mergeLivingCraftSkill(id);
  const animal=id==='hina'?{rabbit:rabbitPattern,fish:fishSkill,fire:fireSkill}:daeun.skills||{};
  const group=(label,cls,rows)=>'<section class="v499-group '+cls+'"><h3>'+label+'</h3>'+rows.join('')+'</section>';
- const signature=JSON.stringify([id,c.living,c.storage,animal.fire,animal.fish,animal.rabbit]);
+ const signature=JSON.stringify([id,c.living,c.cooking,animal.fire,animal.fish,animal.rabbit]);
  if(signature===v4993SkillsSignature)return;v4993SkillsSignature=signature;
  document.getElementById('v498SkillBody').innerHTML='<p class="v499-character">'+(id==='hina'?'히나':'다은')+' · 개인 숙련도</p>'+
- group('⚒ 제작','v499-craft',[v498SkillRow('생활',c.living),v498SkillRow('가방',c.storage)])+
+ group('⚒ 제작','v499-craft',[v498SkillRow('생활 · 가방 포함',c.living),v498SkillRow('요리',c.cooking)])+
  group('🔥 생존','v499-survival',[v498SkillRow('불 피우기',animal.fire)])+
  group('🐾 동물','v499-animal',[v498SkillRow('물고기',animal.fish),v498SkillRow('토끼',animal.rabbit)]);
 }
@@ -10537,8 +10526,8 @@ document.addEventListener('pointerdown',e=>{
   craftingV492Tab='inventory';craftingV492Render();
  }
 },true);
-const craftingV495Categories=[{id:'all',label:'전체'},{id:'living',label:'생활'},{id:'storage',label:'가방'},{id:'cooking',label:'요리'}];
-const craftingV495RecipeCategories={mat:'living',bag:'storage',leafFish:'cooking'};
+const craftingV495Categories=[{id:'all',label:'전체'},{id:'living',label:'생활'},{id:'cooking',label:'요리'}];
+const craftingV495RecipeCategories={mat:'living',bag:'living',leafFish:'cooking',roastFish:'cooking'};
 function craftingV495UpdateProgress(){
  const t=craftingV492Tasks[craftingV492Actor()],el=document.getElementById('v492Task');
  if(!el||craftingV492Tab!=='craft')return;
@@ -10554,7 +10543,7 @@ function craftingV495UpdateProgress(){
 function craftingV492Render(){
  const panel=document.getElementById('v492Craft');if(!panel)return;
  const on=craftingV492Tab==='craft';panel.style.display=on?'block':'none';document.getElementById('v493CraftToggle')?.classList.toggle('active',on);if(!on)return;
- const id=craftingV492Actor(),d=craftingV492[id];
+ const id=craftingV492Actor(),d=craftingV492[id];mergeLivingCraftSkill(id);if(craftingV495Category==='storage')craftingV495Category='living';
  document.getElementById('v4993CraftTitle').textContent=(id==='hina'?'히나':'다은')+' · 제작';
  const categoryHost=document.getElementById('v495Categories');
  // Build category controls once; never replace a button during a touch/click.
@@ -10562,8 +10551,8 @@ function craftingV492Render(){
  categoryHost.querySelectorAll('[data-category]').forEach(b=>{b.style.display='';const active=b.dataset.category===craftingV495Category;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));b.title=b.textContent;const old=b.querySelector('.v496-skillbar');if(old)old.remove();});
  // One full-width profession gauge per visible category; identical for all actors.
  const skillHost=document.getElementById('v497CategorySkills');const categoryValues=d.categories||{living:0,storage:0};
- const shown=craftingV495Category==='all'?['living','storage','cooking']:[craftingV495Category];
- const categoryLabels={living:'생활 숙련도',storage:'가방 숙련도',cooking:'요리 숙련도'};
+ const shown=craftingV495Category==='all'?['living','cooking']:[craftingV495Category];
+ const categoryLabels={living:'생활 숙련도 · 가방 포함',cooking:'요리 숙련도'};
  const categoryHTML=shown.map(cat=>{const value=Math.max(0,Math.min(100,Number(categoryValues[cat])||0));return '<div class="v497-skill-row"><div class="v497-skill-label"><span>'+categoryLabels[cat]+'</span><span>'+value+' / 100</span></div><div class="v497-track" role="progressbar" aria-label="'+categoryLabels[cat]+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+value+'"><div class="v497-fill" style="width:'+value+'%"></div></div></div>';}).join('');
  if(skillHost.innerHTML!==categoryHTML)skillHost.innerHTML=categoryHTML;
  const visible=Object.entries(craftingV494Recipes).filter(([key,r])=>(!r.exclusive||r.exclusive===id)&&(craftingV495Category==='all'||craftingV495RecipeCategories[key]===craftingV495Category));
@@ -14270,4 +14259,5 @@ html body button[data-status-effect]{width:44px!important;height:44px!important;
  html body #v5261MenuShell{top:calc(58px + env(safe-area-inset-top))!important;max-height:calc(100dvh - 68px - env(safe-area-inset-top))!important;}
 }
 </style>
+<style>#roastFishAction,#daeunCookFishButton{display:none!important;pointer-events:none!important;}</style>
 </body></html>
