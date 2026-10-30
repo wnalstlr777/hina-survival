@@ -11175,7 +11175,20 @@ const fishingTestFloat=new THREE.Group();
 const fishingTestWhite=new THREE.Mesh(new THREE.CylinderGeometry(.065,.085,.22,8),new THREE.MeshBasicMaterial({color:0xffffff}));
 const fishingTestRed=new THREE.Mesh(new THREE.CylinderGeometry(.045,.065,.16,8),new THREE.MeshBasicMaterial({color:0xf55243}));
 fishingTestRed.position.y=.19;fishingTestFloat.add(fishingTestWhite,fishingTestRed);fishingTestFloat.visible=false;scene.add(fishingTestFloat);
-const fishingTest={phase:'idle',id:null,pond:null,origin:new THREE.Vector3(),age:0,biteAt:0,result:''};
+const fishingTest={phase:'idle',id:null,pond:null,origin:new THREE.Vector3(),age:0,motion:null,result:''};
+function fishingTestMotion(kind){
+ const f=fishingTest;f.phase=kind;f.age=0;
+ if(kind==='quiet')f.motion={duration:2+Math.random()*(Math.random()<.3?18:7),phase:Math.random()*Math.PI*2};
+ else if(kind==='tease'){
+  const pulses=[];let duration=0;
+  for(let i=0,n=1+Math.floor(Math.random()*5);i<n;i++){
+   const length=.45+Math.random()*1.15;
+   pulses.push({start:duration,length,depth:.07+Math.random()*.17,lift:.025+Math.random()*.065});duration+=length;
+  }
+  f.motion={duration,pulses};
+ }else f.motion={dive:.18+Math.random()*.14,hold:.65+Math.random()*.4};
+}
+function fishingTestNextMotion(){const roll=Math.random();fishingTestMotion(roll<.35?'quiet':roll<.8?'tease':'strike');}
 function fishingTestNearby(){
  const ch=characters.get(observedId),p=ch?.mesh.position;if(!p||survivorIncapacitated(observedId)||v504ActorSleeping(observedId))return null;
  const ponds=[pondWater,daeunResources.pondMesh];return ponds.find(pond=>pond&&Math.hypot(p.x-pond.position.x,p.z-pond.position.z)<9)||null;
@@ -11188,12 +11201,12 @@ fishingTestButton.addEventListener('click',e=>{
  const f=fishingTest;if(f.phase==='result')return;
  if(f.phase==='idle'){
   const pond=fishingTestNearby();if(!pond)return;const p=characters.get(observedId).mesh.position;
-  f.id=observedId;f.pond=pond;f.origin.copy(p);f.phase='waiting';f.age=0;f.biteAt=3+Math.random()*4;
+  f.id=observedId;f.pond=pond;f.origin.copy(p);fishingTestMotion('quiet');
   const dx=p.x-pond.position.x,dz=p.z-pond.position.z,length=Math.hypot(dx,dz)||1;
   fishingTestFloat.position.set(pond.position.x+dx/length*1.8,pond.position.y+.12,pond.position.z+dz/length*1.8);fishingTestFloat.visible=true;
-  fishingTestButton.textContent='🎣 찌를 지켜보세요';
+  fishingTestButton.textContent='🎣 당기기';
  }else{
-  const onTime=f.age>=f.biteAt+.55&&f.age<=f.biteAt+1.4;
+  const onTime=f.phase==='strike'&&f.age>=f.motion.dive&&f.age<=f.motion.dive+f.motion.hold;
   fishingTestResult(!onTime?'💨 타이밍 실패!':Math.random()<.4?'💨 물고기가 도망갔어요!':'🐟 잡았다! (테스트)');
  }
 });
@@ -11206,11 +11219,26 @@ function updateFishingTest(dt){
  if(f.phase==='idle'){fishingTestButton.textContent='🎣 낚시';return;}
  if(paused)return;f.age+=dt;
  if(f.phase==='result'){if(f.age>=1.8)fishingTestReset();return;}
- const dive=Math.max(0,Math.min(1,(f.age-f.biteAt)/.55));
- fishingTestFloat.position.y=f.pond.position.y+.12+(.025*Math.sin(f.age*4.1)+.018*Math.sin(f.age*7.7))*(1-dive)-.36*dive;
- fishingTestFloat.rotation.z=Math.sin(f.age*3.3)*.08*(1-dive);
- fishingTestButton.textContent=dive>=1?'🎣 지금 당기기!':'🎣 찌를 지켜보세요';
- if(f.age>f.biteAt+1.4)fishingTestResult('💨 놓쳤어요!');
+ let offset=0,tilt=0;
+ if(f.phase==='quiet'){
+  offset=.008*Math.sin(f.age*1.7+f.motion.phase); // Long, almost motionless pauses.
+  if(f.age>=f.motion.duration)fishingTestNextMotion();
+ }else if(f.phase==='tease'){
+  const pulse=f.motion.pulses.find(p=>f.age<p.start+p.length);
+  if(pulse){
+   const u=(f.age-pulse.start)/pulse.length;
+   // A partial dip always resurfaces; even the deepest tease leaves the tip visible.
+   offset=-pulse.depth*Math.sin(Math.PI*u)**2+pulse.lift*Math.sin(Math.PI*2*u);
+   tilt=Math.sin(Math.PI*2*u)*.16;
+  }else fishingTestNextMotion();
+ }else if(f.phase==='strike'){
+  offset=-.48*Math.min(1,f.age/f.motion.dive);
+  if(f.age>f.motion.dive+f.motion.hold){fishingTestResult('💨 놓쳤어요!');return;}
+ }
+ fishingTestFloat.position.y=f.pond.position.y+.12+offset;
+ fishingTestFloat.rotation.z=tilt;
+ // Keep the same label: watch the float rather than a timed UI prompt.
+ fishingTestButton.textContent='🎣 당기기';
 }
 const codexCrafted=new Set();
 const codexCategories={equipment:'장비',cooking:'요리',living:'생활'};
