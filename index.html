@@ -11090,7 +11090,7 @@ function updateFirstNightGuide(){
  survivalGuide.setAttribute('aria-label',`${ch.name||id}의 시작 동굴 방향, ${Math.ceil(dist)}미터`);
 }
 function resetSurvivalPresentation(){
- wildHiveLastSting.clear();for(const hive of wildHives)hive.attack=null;
+ wildHiveLastSting.clear();for(const hive of wildHives)hive.attack=null;lastWildHiveUpdate=null;
  if(survivalFlower.mesh)survivalFlower.mesh.visible=false;
  survivalFlower.motion=null;survivalFlower.expiresAt=0;survivalFlower.patch=null;survivalFlower.nextCheck=0;survivalFlower.reply=null;survivalFlower.seen.clear();
  survivalMood.clear();survivalSocialUntil=0;survivalSocialTick=0;survivalLastElapsed=elapsed;extraSurvivorSpeaker=null;
@@ -11110,7 +11110,8 @@ const WILD_HIVE_ATTACK_RADIUS=5,WILD_HIVE_LEASH_RADIUS=8,WILD_HIVE_STING_COOLDOW
 const WILD_HIVE_WATCH_SECONDS=1.8,WILD_HIVE_DIVE_SECONDS=1.5,WILD_HIVE_RETURN_SECONDS=1.2,WILD_HIVE_MAX_STINGS=3;
 const wildHiveBeeTemplate=makeFlowerBee(),wildHiveDummy=new THREE.Object3D(),wildHiveMatrix=new THREE.Matrix4(),wildHiveBounds=new THREE.Box3(),wildHiveProjected=new THREE.Vector3();
 const wildHiveBeesPerNest=isMobile?5:8,WILD_HIVE_LIMIT=14;
-let nextWildHiveObservation=0;
+let nextWildHiveObservation=0,lastWildHiveUpdate=null,wildHiveClockPaused=false;
+document.addEventListener('visibilitychange',()=>{lastWildHiveUpdate=null;});
 function wildHivePool(key,geometry,material,capacity){
  const mesh=new THREE.InstancedMesh(geometry,material,capacity);mesh.name='WildHive_'+key;mesh.count=0;mesh.frustumCulled=false;mesh.castShadow=false;mesh.receiveShadow=false;mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);scene.add(mesh);wildHivePools.set(key,mesh);return mesh;
 }
@@ -11155,13 +11156,13 @@ function wildHiveSting(id,now){
  ch.stats.health=Math.max(0,health-3);ch.stats.will=Math.max(0,will-5);
  gameVitalFloat(id,'health',ch.stats.health-health);gameVitalFloat(id,'will',ch.stats.will-will);
  startSnakeFearReaction(id,true); // Same white blink, without the snake's jump or movement lock.
- threatWillLossSound(id,'bee',will,ch.stats.will);
+ if(id===observedId)window.HinaInteractionSFX?.play('beeHit',1,false,true);
  showSurvivalLine(id,'아야! 벌에 쏘였어! 벌통에서 떨어져야겠어.');
  log('🐝 '+(ch.name||id)+' 벌 쏘임 · 체력 −3 · 의지력 −5');
  return true;
 }
 function updateWildHiveThreats(hive,now,dt){
- const step=Math.min(.05,Math.max(0,dt)),seconds=now*.001;
+ const step=Math.max(0,dt),seconds=now*.001;
  const a=hive.attack||(hive.attack={phase:'idle',age:0,targetId:null,hits:0,beeIndex:0,blockedIds:new Set(),retreat:false,tip:new THREE.Vector3(),from:new THREE.Vector3(),control:new THREE.Vector3()});
  for(const id of a.blockedIds)if(!wildHiveTargetInRange(hive,id,WILD_HIVE_LEASH_RADIUS))a.blockedIds.delete(id);
  if(a.phase==='idle'){
@@ -11202,8 +11203,11 @@ function updateWildHiveThreats(hive,now,dt){
  }
  return a;
 }
-function updateWildHives(now,dt){
- if(!wildHives.length||paused||document.hidden)return;
+function updateWildHives(now){
+ // Attack windup/flight uses real time, not the simulation's 50ms frame cap.
+ const dt=lastWildHiveUpdate===null||wildHiveClockPaused?0:Math.max(0,(now-lastWildHiveUpdate)*.001);
+ lastWildHiveUpdate=now;wildHiveClockPaused=paused||document.hidden;
+ if(!wildHives.length||wildHiveClockPaused)return;
  const seconds=now*.001,daytime=clockParts().h>=6&&clockParts().h<19,listener=characters.get(observedId)?.mesh.position;
  let buzzing=Infinity;
  for(const mesh of wildHivePools.values())mesh.count=0;
@@ -12194,7 +12198,7 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  if(isMobile&&lastRenderAt&&t-lastRenderAt<1000/mobileTargetFPS)return;
  lastRenderAt=t;const frameCpuStart=performance.now();
  characterAnimation.beginFrame();
- let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);updateCameraFlowerPatches();updateDaeunFlowerBends(dt,t);updateFlowerBees(t);updateFlowerObservations(t);updateSurvivorSystems(dt);v517UpdateObjectives(dt);refreshCharacterUI(t);if(v498Skills.style.display==='block'&&t>=v5287NextSkills){v5287NextSkills=t+150;v498RenderSkills();}craftingV4993ApplyPoses();characterAnimation.endFrame(dt,t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina'&&!hinaSleepSpeechLock()&&survivorSpeech.companionOwns('hina'))$('bubble').textContent=meetingHinaLine;}if(!paused){updateWildHives(t,dt);updateFireEmbers(dt);updateTreeWind(t*.001);updateBerryPickingSway(t*.001);animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);v519AnimateSheep(t*.001);}if(followCamera){
+ let dt=prev===0?0:Math.max(0,Math.min(.05,(t-prev)/1000));prev=t;update(dt);updateCameraFlowerPatches();updateDaeunFlowerBends(dt,t);updateFlowerBees(t);updateFlowerObservations(t);updateSurvivorSystems(dt);v517UpdateObjectives(dt);refreshCharacterUI(t);if(v498Skills.style.display==='block'&&t>=v5287NextSkills){v5287NextSkills=t+150;v498RenderSkills();}craftingV4993ApplyPoses();characterAnimation.endFrame(dt,t);refreshHinaManualEmojis();if(meetingHinaLine&&performance.now()<meetingHinaLineUntil){$('thought').textContent='“'+meetingHinaLine+'”';if($('bubble')&&observedId==='hina'&&!hinaSleepSpeechLock()&&survivorSpeech.companionOwns('hina'))$('bubble').textContent=meetingHinaLine;}updateWildHives(t);if(!paused){updateFireEmbers(dt);updateTreeWind(t*.001);updateBerryPickingSway(t*.001);animateWildlife(t*.001,dt*speed);animateDeerFamily(t*.001,dt*speed);v519AnimateSheep(t*.001);}if(followCamera){
   updateFollowDeadZone(dt);
   if(followView==='back')v4998CameraOffset();
    followDesired.copy(followFocus).add(followOffset);
@@ -12285,19 +12289,19 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
 <script id="hina-interaction-sfx-v401">
 (()=>{
 // Use the same HTMLAudioElement playback path as the working cricket recording.
-const soundNames=['ui','berry','water','fish','wood','fire','cook','craft','eat','sleep','rest','animal','wash','success','inventory','step','bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder','threat','branchPickup','drink','washClean','chew'];
+const soundNames=['ui','berry','water','fish','wood','fire','cook','craft','eat','sleep','rest','animal','wash','success','inventory','step','bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder','threat','beeHit','branchPickup','drink','washClean','chew'];
 const ambience=new Set(['bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder']);
 const pools=new Map(),last=new Map(),counts={},attempts={},failures={};
 // Preserve assets and call sites, but deny all foot/sand feedback centrally.
 const soundPolicy={footsteps:false,inventoryRustle:false,fireAmbience:false};
 const swooshSounds=new Set(['step','inventory','water','wood','craft','rustle','wash']);
-const soundFiles={eat:'eat-start.wav',fish:'fish-splash.wav',branchPickup:'branch-pickup.wav',drink:'drink-gulp.wav',washClean:'fish-splash.wav',chew:'fish-chew.wav'};
+const soundFiles={beeHit:'threat.wav',eat:'eat-start.wav',fish:'fish-splash.wav',branchPickup:'branch-pickup.wav',drink:'drink-gulp.wav',washClean:'fish-splash.wav',chew:'fish-chew.wav'};
 const actionVoices=new Map();
 const wildlifeSchedule={phase:null,nextAt:0,waiting:false};
 let unlocked=false,paused=false,position=null,walker='',distance=0,lastAction='',previewVoice=null;
 const previewButton=document.getElementById('interactionSoundPreview');
 function interactionLevel(){return document.hidden||paused?0:Math.max(0,Math.min(1,Number(document.getElementById('ambientVolume')?.value??65)/100));}
-function mix(kind){return ambience.has(kind)?.04:(kind==='ui'||kind==='step')?.035:.08;}
+function mix(kind){return kind==='beeHit'?.20:ambience.has(kind)?.04:(kind==='ui'||kind==='step')?.035:.08;}
 function resetPreview(message='🔊 효과음 확인'){
  if(!previewButton)return;previewButton.disabled=false;previewButton.textContent=message;previewVoice=null;
 }
@@ -12346,7 +12350,7 @@ function play(kind,level=1,force=false,critical=false){
  const active=[...pools.values()].flat().filter(s=>s.busy);
  if(active.length>=6){
   if(ambience.has(kind)||kind==='step')return false;
-  const quiet=active.find(s=>ambience.has(s.kind)||s.kind==='step')||(kind==='fish'?active.find(s=>!s.audio.loop&&s.kind!=='threat'):null);
+  const quiet=active.find(s=>ambience.has(s.kind)||s.kind==='step')||(kind==='beeHit'?active.find(s=>s.kind!=='beeHit'):kind==='fish'?active.find(s=>!s.audio.loop&&s.kind!=='threat'):null);
   if(quiet){quiet.audio.pause();quiet.busy=false;}else return false;
  }
  last.set(kind,now);attempts[kind]=(attempts[kind]||0)+1;

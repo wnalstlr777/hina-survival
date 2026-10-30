@@ -10,7 +10,7 @@ BASE = runpy.run_path(str(ROOT / 'tools/check_stabilization.py'))
 FIXTURE = r'''
 window.__hiveCheck={
  setup(){
-  paused=false;wildHiveLastSting.clear();this.now=1000;this.events=[];
+  paused=false;wildHiveLastSting.clear();this.now=1000;this.events=[];lastWildHiveUpdate=this.now;wildHiveClockPaused=false;
   for(const r of snakeFearReactions.values()){restoreSnakeFearOverlay(r);for(const p of r.parts)for(const m of Array.isArray(p.white)?p.white:[p.white])m.dispose();}snakeFearReactions.clear();
   const p=wildHives[0].position;
   for(const ch of characters.values())if(ch.mesh)ch.mesh.position.set(p.x+100,0,p.z+100);
@@ -19,8 +19,8 @@ window.__hiveCheck={
   for(const hive of wildHives)hive.attack=null;
   camera.position.set(p.x+1000,p.y+1000,p.z+1000);
  },
- step(n=1){for(let i=0;i<n;i++){
-  this.now+=50;for(const r of snakeFearReactions.values())restoreSnakeFearOverlay(r);updateSnakeFearOverlay(.05);
+ step(n=1,interval=50){for(let i=0;i<n;i++){
+  this.now+=interval;for(const r of snakeFearReactions.values())restoreSnakeFearOverlay(r);updateSnakeFearOverlay(.05);
   const before=stats.health;updateWildHives(this.now,.05);
   if(stats.health<before)this.events.push({now:this.now,bee:wildHives[0].attack.beeIndex,blink:snakeFearReactions.has('hina'),locked:snakeFearLocked('hina')});
  }return this.stats();},
@@ -32,6 +32,7 @@ window.__hiveCheck={
  low(){stats.health=2;stats.will=3;},
  blink(){const r=snakeFearReactions.get("hina");restoreSnakeFearOverlay(r);updateSnakeFearOverlay(.001);return {white:r.parts.every(p=>p.mesh.material===p.white),jump:r.jump,locked:snakeFearLocked("hina")};},
  sting(id,now){return wildHiveSting(id,now);},
+ soundActor(id){observedId=id;characters.get(id).stats.will=0;characters.get(id).stats.health=100;wildHiveLastSting.clear();HinaInteractionSFX.setPaused(true);HinaInteractionSFX.setPaused(false);},
  snake(){const started=startSnakeFearReaction("hina");return {started,locked:snakeFearLocked("hina"),blinkOnly:snakeFearReactions.get("hina").blinkOnly};},
  nest(){const p=wildHives[0].position;camera.position.copy(p).add(new THREE.Vector3(0,1,8));camera.lookAt(p);camera.updateMatrixWorld(true);updateWildHives(this.now,.05);const matrix=new THREE.Matrix4();wildHivePools.get('nest').getMatrixAt(0,matrix);return new THREE.Vector3().setFromMatrixScale(matrix).toArray();},
  meditation(id){__stable.setup(id,false);observedId=id;const started=v504MeditationStart(id);refreshHinaManualEmojis();if(id==='daeun')refreshManualActionUI();return {started,hina: getComputedStyle(hinaManualMarkers.fire).display,daeun:getComputedStyle(fireEmojiMarker).display};},
@@ -53,6 +54,9 @@ def run():
    page.route('http://127.0.0.1:8000/',lambda route:route.fulfill(status=200,content_type='text/html',body=BODY))
    page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded',timeout=90000)
    page.wait_for_function('!!window.__hiveCheck',timeout=90000)
+   page.evaluate('__hiveCheck.setup()')
+   slow=page.evaluate('__hiveCheck.step(25,200)')
+   assert slow==[[97,95],[100,100]], ('5 FPS should still deliver the first sting within 5 seconds',slow,page.evaluate('__hiveCheck.state()'))
    page.evaluate('__hiveCheck.setup()')
    assert page.evaluate('__hiveCheck.step(30)')==[[100,100],[100,100]]
    assert page.evaluate('__hiveCheck.state().phase')=='watch'
@@ -100,6 +104,25 @@ def run():
    scale=page.evaluate('__hiveCheck.nest()')
    assert all(abs(a-b)<1e-5 for a,b in zip(scale,[1.35,1.65,1.35])),scale
    print('PASS escape cancels sting, retreat/re-entry, pause, independent cooldowns, stat floors, reset and hive scale',mobile,flush=True)
+   # Real HTMLAudio playback: every hit plays even at zero will, after another threat sound,
+   # and while six other voices are occupying the mixer.
+   page.evaluate('__hiveCheck.setup()')
+   page.locator('#mobileMenu' if mobile else '#v521PcMenu').click()
+   for actor in ['hina','daeun']:
+    page.evaluate('(id)=>__hiveCheck.soundActor(id)',actor)
+    for hit in range(3):
+     before=page.evaluate('HinaInteractionSFX.audioStatus().started.beeHit||0')
+     page.evaluate("HinaInteractionSFX.play('threat',1,false,true)")
+     result=page.evaluate('([id,now])=>__hiveCheck.sting(id,now)',[actor,100000+hit*4000])
+     assert result
+     page.wait_for_function('(n)=>(HinaInteractionSFX.audioStatus().started.beeHit||0)>n',arg=before,timeout=10000,polling=50)
+     assert not page.evaluate('HinaInteractionSFX.audioStatus().errors.beeHit')
+    before=page.evaluate('HinaInteractionSFX.audioStatus().started.beeHit||0')
+    result=page.evaluate("""(id)=>{HinaInteractionSFX.setPaused(true);HinaInteractionSFX.setPaused(false);for(const sound of ['fire','eat','sleep','rest','success','animal'])HinaInteractionSFX.play(sound,1,true);return __hiveCheck.sting(id,116000);}""",actor)
+    assert result
+    page.wait_for_function('(n)=>(HinaInteractionSFX.audioStatus().started.beeHit||0)>n',arg=before,timeout=10000,polling=50)
+   print('PASS first attack within 5s at 5 FPS and actual hit sound on every sting for both survivors',mobile,flush=True)
+   page.locator('#mobileMenu' if mobile else '#v521PcMenu').click()
    for actor in ['hina','daeun']:
     result=page.evaluate('(id)=>__hiveCheck.meditation(id)',actor)
     assert result=={'started':True,'hina':'none','daeun':'none'},result
