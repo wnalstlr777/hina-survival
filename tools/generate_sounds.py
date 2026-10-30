@@ -62,6 +62,9 @@ recipes = {
     'frog': [(0, .17, 260, 210), (.22, .19, 220, 190)],
     'cricket': [(i * .11, .06, 3900, 4050) for i in range(4)],
     'rustle': [], 'bee': [], 'fireAmbient': [], 'thunder': [],
+    'eat-start': [(0, .10, 360, 250), (.15, .10, 310, 220)],
+    'threat': [(0, .13, 430, 340), (.17, .22, 300, 240)],
+    'fish-clean': [(.04, .18, 550, 250)],
 }
 for name, notes in recipes.items():
     duration = {'bee': .8, 'fireAmbient': 1.2, 'thunder': 2.4}.get(name, max([s + d for s, d, *_ in notes] + [.45]) + .04)

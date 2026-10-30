@@ -2417,7 +2417,7 @@ function updateSnakes(step){
   // Snake proximity penalties apply to both characters, even during manual control.
  // Standing close to a snake is frightening continuously; backing away stops it.
   if(d<5.0){
-   if(!snake.hinaFearInside){snake.hinaFearInside=true;const before=stats.will;stats.will=Math.max(0,stats.will-30);gameVitalFloat('hina','will',stats.will-before);log('🐍 히나 뱀 5m 진입 · 의지력 감소');}
+   if(!snake.hinaFearInside){snake.hinaFearInside=true;const before=stats.will;stats.will=Math.max(0,stats.will-30);threatWillLossSound('hina','snake',before,stats.will);gameVitalFloat('hina','will',stats.will-before);log('🐍 히나 뱀 5m 진입 · 의지력 감소');}
 
    if(elapsed-snake.lastScare>18){snake.lastScare=elapsed;if(elapsed-lastSnakeWarning>16){say('뱀이 너무 가까워! 얼른 떨어지자!');lastSnakeWarning=elapsed;}}
   }
@@ -2427,7 +2427,7 @@ function updateSnakes(step){
 }
 // Fish schools periodically surface for observation (2-4 in-game hours between visits).
 // Visibility and skill gains share the same real, timed encounter.
-const FISH_VISIT_MIN=2,FISH_VISIT_SPAN=2;
+const FISH_VISIT_MIN=2,FISH_VISIT_SPAN=2,FISH_VISIT_FREQUENCY=1.5;
 // Both ponds use Hina's longer encounter duration and the same shared visit cycle.
 let fishVisitEnd=-1,fishNextVisit=0,fishVisitId=0;
 function fishVisitActive(){return elapsed<fishVisitEnd;}
@@ -2436,7 +2436,8 @@ function updateFishVisit(){
  if(elapsed>=fishNextVisit){
   fishVisitId++;
   fishVisitEnd=elapsed+hour*(1.2+Math.random()*.675);
-  fishNextVisit=fishVisitEnd+hour*(FISH_VISIT_MIN+Math.random()*FISH_VISIT_SPAN);
+  const oldCycle=(fishVisitEnd-elapsed)+hour*(FISH_VISIT_MIN+Math.random()*FISH_VISIT_SPAN);
+  fishNextVisit=elapsed+oldCycle/FISH_VISIT_FREQUENCY;
  }
  const visible=fishVisitActive();
  for(const f of fishes)f.g.visible=visible;
@@ -2812,7 +2813,7 @@ function updateCharacterPose(){
  const night=t.h>=19||t.h<6;
  const atShelter=Math.hypot(hana.position.x-sites.shelter.x,hana.position.z-sites.shelter.z)<2.5;
  const meetingWalking=meetingFollowUntil>performance.now()&&isManualDaeun()&&!isManualHina();
- const sleep=!meetingWalking&&!outdoorSleepBlocked('hina')&&(isManualHina()?state==='sleep':((((state==='rest'||state==='night')&&atShelter&&!target)||state==='outdoorSleep')&&(day>1||darkHours())));
+ const sleep=!(v504Meditation.active&&v504Meditation.id==='hina')&&!meetingWalking&&!outdoorSleepBlocked('hina')&&(isManualHina()?state==='sleep':((((state==='rest'||state==='night')&&atShelter&&!target)||state==='outdoorSleep')&&(day>1||darkHours())));
  // In the cave, a stationary survivor should not stand motionless through the night.
  const caveQuiet=atShelter&&!target&&darkHours()&&['fireTry','recover','wake','idle','caveScout'].includes(state);
  if(state==='branchFeed'&&!sleep){
@@ -3197,10 +3198,10 @@ v510MeditationStatus.title='명상 중 · 누르면 종료';
 v510MeditationStatus.textContent='🧘';
 Object.assign(v510MeditationStatus.style,{position:'fixed',right:'16px',top:'145px',width:'46px',height:'46px',zIndex:'80',display:'none',borderRadius:'50%',border:'4px solid #9ce9c0',background:'#468b70',color:'#fff',fontSize:'25px',boxShadow:'0 0 15px 4px rgba(156,233,192,.65)',cursor:'pointer',touchAction:'manipulation'});
 document.body.appendChild(v510MeditationStatus);
-v510MeditationStatus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(v504Meditation.active)v504MeditationStop();});
+v510MeditationStatus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(v504Meditation.active||v504AutomaticMeditation(observedId))v504MeditationStop();});
 function v510SyncMeditationUI(){
- const active=!!v504Meditation.active;
- v510MeditationStatus.title=active?(v504Meditation.completed?'명상 완료 · 누르면 일어나기':'명상 중 · 누르면 종료'):'명상';
+ const automatic=v504AutomaticMeditation(observedId),active=!!v504Meditation.active||automatic;
+ v510MeditationStatus.title=automatic?'마음 추스르는 중 · 기존 자동 회복':active?(v504Meditation.completed?'명상 완료 · 누르면 일어나기':'명상 중 · 누르면 종료'):'명상';
  v510MeditationStatus.style.display=active?'flex':'none';
  v510MeditationStatus.style.alignItems='center';v510MeditationStatus.style.justifyContent='center';
  v508MeditateIcon.classList.toggle('v510-meditating',active);
@@ -3219,8 +3220,8 @@ let v509FireMenuDismissUntil=0;
 function v509HideMeditation(){v508MeditateIcon.style.display='none';v508MeditateLine.style.display='none';}
 function v508UpdateMeditateIcon(){
  if(v504Meditation.active){v509HideMeditation();return;}
- const id=observedId==='daeun'?'daeun':'hina',p=v504ActorPosition(id),f=v507FirePos(id);
- const eligible=v504Meditation.active||(v507FireLit(id)&&!v503IsSleeping(id)&&Math.hypot(p.x-f.x,p.z-f.z)<7);
+ const id=observedId,p=v504ActorPosition(id),f=v507FirePos(id);
+ const eligible=p&&f&&v504MeditationEligible(id);
  if(!eligible){v509HideMeditation();return;}
  const projected=f.clone().add(new THREE.Vector3(0,1.8,0)).project(camera);
  if(projected.z>1||projected.z< -1){v509HideMeditation();return;}
@@ -3508,6 +3509,7 @@ function scareRabbit(r,from){
  r.heading=a;r.phase+=.5;
 }
 function rabbitCaptureHold(r,owner){
+ if(owner===observedId)window.HinaInteractionSFX?.play('animal');
  r.pet=true;r.caught=true;r.g.visible=true;r.hopActive=false;
  r.heldBy=owner;r.heldUntil=elapsed+3;
 }
@@ -5649,6 +5651,11 @@ function update(dt){
  refreshPalmFronds();
  updateNatureEncounters();
  // Manual Hina suspends autonomous navigation, while the rest of the world continues.
+ if(v504Meditation.active&&v504Meditation.id==='hina'){
+  updateCharacterPose();updateTorch();
+  stats.thirst=Math.max(0,stats.thirst-step*thirstRate);stats.hunger=Math.max(0,stats.hunger-step*hungerRate);
+  recoverHinaDuringRest(step,state);moraleUpdate(step);tickHinaCampfireFuel(step);updateHinaWorldUIAndLighting(step,dt);return;
+ }
  if(isManualHina()){
   const forward=manualMovementScratch.forward;camera.getWorldDirection(forward);forward.y=0;forward.normalize();
   const right=manualMovementScratch.right.set(-forward.z,0,forward.x);
@@ -7445,7 +7452,7 @@ function updateDaeunSnakes(step){
   snake.phase+=step*.7;updateSnakeRoaming(snake,step);
   if(d<5&&!snake.noticed){snake.noticed=true;daeunSay('🐍 뱀이야! 가까이 가지 말자.');}
   if(d<5){
-   if(!snake.daeunFearInside){snake.daeunFearInside=true;const before=daeun.stats.will;daeun.stats.will=Math.max(0,daeun.stats.will-30);gameVitalFloat('daeun','will',daeun.stats.will-before);daeunSay('뱀이 바로 앞에 있어! 도망가야 해!');}
+   if(!snake.daeunFearInside){snake.daeunFearInside=true;const before=daeun.stats.will;daeun.stats.will=Math.max(0,daeun.stats.will-30);threatWillLossSound('daeun','snake',before,daeun.stats.will);gameVitalFloat('daeun','will',daeun.stats.will-before);daeunSay('뱀이 바로 앞에 있어! 도망가야 해!');}
    if(elapsed-snake.lastScare>18){snake.lastScare=elapsed;daeunSay('뱀이 너무 가까워! 무서워…');}
   }
   if(d>=5)snake.daeunFearInside=false;
@@ -7640,7 +7647,7 @@ function updateMiddleBear(step){
   // Fear doubles at near-contact, but the bear never physically overlaps a character.
   const proximity=Math.hypot(tracked.mesh.position.x-middleBear.position.x,tracked.mesh.position.z-middleBear.position.z);
   const fearRate=proximity<=bearTerritory.contactRange?.60:.30;
-  const before=tracked.stats.will;tracked.stats.will=Math.max(0,tracked.stats.will-step*fearRate);continuousFearFloat(tracked.id,'bear',tracked.stats.will-before,elapsed);
+  const before=tracked.stats.will;tracked.stats.will=Math.max(0,tracked.stats.will-step*fearRate);threatWillLossSound(tracked.id,'bear',before,tracked.stats.will);continuousFearFloat(tracked.id,'bear',tracked.stats.will-before,elapsed);
   if(elapsed-bearState.lastWarning>22){
    bearState.lastWarning=elapsed;
    if(tracked.id==='daeun')daeunSay('🐻 곰이 따라오고 있어! 이곳을 벗어나야 해!');
@@ -8365,6 +8372,7 @@ function updateDaeunFuelFeed(){
 function updateDaeun(step,realDt){
  updateDaeunFuelFeed();
  updateDaeunSnakes(step);
+ if(v504Meditation.active&&v504Meditation.id==='daeun')daeun.timers.nextThink=Math.max(daeun.timers.nextThink||0,elapsed+1);
  const d=daeun,s=d.stats,inv=d.inventory;let moving=!!(isManualDaeun()&&sharedDaeunResourceTask?.phase==='approach'&&sharedDaeunResourceTask.walking);
  if(sharedHomeActive&&d.destination&&Math.hypot(d.destination.x-caveX,d.destination.z-caveZ)>100){
   d.path=[];d.destination=null;d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed;
@@ -8696,7 +8704,7 @@ function updateDaeun(step,realDt){
  if(craftingAction)d.lastCraftActiveAt=elapsed;
  const justCrafted=elapsed-(d.lastCraftActiveAt??-1e9)<8;
  const sharedActing=isManualDaeun()&&sharedDaeunResourceTask?.phase==='perform';
- const seat=!sleep&&!craftingAction&&!justCrafted&&!sharedActing&&(resting||caveQuiet);
+ const seat=!sleep&&((v504Meditation.active&&v504Meditation.id==='daeun')||(!craftingAction&&!justCrafted&&!sharedActing&&(resting||caveQuiet)));
  const acting=(d.manualTask&&d.manualTask.phase==='perform')||sharedActing;
  const activeManualType=sharedActing?sharedDaeunResourceTask.type:d.manualTask?.type;
  // Daeun faces the lit campfire while seated nearby; no interference with walking or tasks.
@@ -8807,7 +8815,7 @@ function gameTransactionFloat(character,kind,key,amount){
  if(!Number.isFinite(amount)||Math.abs(amount)<.001||character!==observedId)return;
  if(kind==='item'&&amount<0)return;
  if(amount>0){
-  const sound=kind==='food'?'eat':kind==='vital'&&key==='thirst'&&amount>1?'water':kind==='item'?({berries:'berry',branches:'wood',palmFronds:'berry',fish:'fish',cookedFish:'cook',fuel:'fire'}[key]):null;
+  const sound=kind==='food'?(key==='berries'?null:'eat'):kind==='vital'&&key==='thirst'&&amount>1?'water':kind==='item'?({berries:'berry',branches:'wood',palmFronds:'berry',fish:'fish',cookedFish:'cook',fuel:'fire'}[key]):null;
   if(sound)window.HinaInteractionSFX?.play(sound);
  }
  const node=document.createElement('div');node.className='skillGainFloat';
@@ -8835,6 +8843,11 @@ function showFoodConsumption(character,item,oldHunger,newHunger){
 }
 // Continuous threats: show the real accumulated change at a readable cadence.
 const threatFloatAccumulator=new Map();
+const threatWillSoundSources=new Set(['snake','bear']); // Add future creature source IDs here.
+function threatWillLossSound(character,source,before,after){
+ if(character!==observedId||!threatWillSoundSources.has(source)||!Number.isFinite(before)||!Number.isFinite(after)||after>=before)return false;
+ return window.HinaInteractionSFX?.play('threat')||false;
+}
 function continuousFearFloat(character,source,amount,now){
  if(amount>=0)return;
  const id=character+':'+source,entry=threatFloatAccumulator.get(id)||{amount:0,last:now};
@@ -9072,6 +9085,7 @@ function manualAction(type,point,index=-1){
   else{if(inv.berries<1){daeunSay('먹을 열매가 없어.');return false;}return characterAnimation.eat('daeun',{gain:12});}
   characterAnimation.fish('daeun');return true; // Fish timing/reward remains unchanged; reuse the arm gesture.
  }
+ if(v504Meditation.active&&v504Meditation.id==='daeun')v504MeditationStop();
  cancelManualTask();daeun.path=[];daeun.destination=null;
  if(type==='berry'){
   const tree=daeunResources.berries[index];
@@ -9335,6 +9349,7 @@ const hinaManualMarkers={
 Object.values(hinaManualMarkers).flat().forEach(marker=>{marker._hinaOwned=true;});
 function hideHinaManualMarkers(){Object.values(hinaManualMarkers).flat().forEach(m=>{m.style.display='none';m.onclick=null;m.classList.remove('interacting');clearCleanProgressRing(m);});}
 function hinaManualInteract(type,item){
+ if(v504Meditation.active&&v504Meditation.id==='hina')v504MeditationStop();
  if(!isManualHina())return;
  if(type!=='eat')characterAnimation?.cancel('hina');
  if(type==='eat'&&characterAnimation?.active('hina'))return;
@@ -9408,7 +9423,8 @@ function updateHinaManualTask(step){
  }else if(task.type==='rabbit'){
   if(!o||o.caught)return;
   // Observe the clicked rabbit at its original location; do not chase its live position.
-  o.caught=true;o.g.visible=false;o.hopActive=false;o.respawnDaeunAt=elapsed+DAY_SECONDS*(.45+Math.random()*.35);rabbitObservations++;rabbitPattern=Math.min(100,rabbitPattern+10);say('🐰 토끼를 관찰했어! 토끼는 숲으로 달아났어.');
+  if(observedId==='hina')window.HinaInteractionSFX?.play('animal');
+   o.caught=true;o.g.visible=false;o.hopActive=false;o.respawnDaeunAt=elapsed+DAY_SECONDS*(.45+Math.random()*.35);rabbitObservations++;rabbitPattern=Math.min(100,rabbitPattern+10);say('🐰 토끼를 관찰했어! 토끼는 숲으로 달아났어.');
  }else if(task.type==='fire'){
   if(fireSuccess){if(fireDryStock<2)return;fireDryStock-=2;fireKnowledge=Math.min(100,fireKnowledge+40);}
   else{if(fireDryStock<1||!hinaCanPracticeFire())return;fireDryStock--;attemptFire();}
@@ -10066,18 +10082,39 @@ const v504MeditationButton=document.createElement('button');
 v504MeditationButton.id='v504MeditationButton';
 v504MeditationButton.textContent='🧘 명상하기';
 v504MeditationButton.type='button';
-/* v5.0.6: use the shared circular interaction marker instead */
-function v504ActorPosition(id){return id==='hina'?hana.position:daeun.mesh.position;}
+document.body.appendChild(v504MeditationButton); // Restore the existing accessible fallback entry.
+function v504ActorPosition(id){return characters.get(id)?.mesh.position;}
+function v504ActorSleeping(id){return id==='hina'||id==='daeun'?v503IsSleeping(id):!!characters.get(id)?.sleeping;}
+function v504MeditationEligible(id){
+ const p=v504ActorPosition(id),fire=v507FirePos(id);
+ if(!p||!fire||!v507FireLit(id)||Math.hypot(p.x-fire.x,p.z-fire.z)>7||v504ActorSleeping(id))return false;
+ // These were the existing Daeun manual-rest restrictions, not new tuning.
+ if(id==='daeun'&&(daeun.restLocked||(daeun.inventory.fish>0&&!daeun.bag?.crafted)||!safeRestPoint(p)))return false;
+ return characters.get(id)?.canMeditate?.()!==false;
+}
+function v504AutomaticMeditation(id){
+ if(v504Meditation.active)return false;
+ return id==='hina'?!hinaManual&&state==='mentalRest':id==='daeun'?daeun.auto&&daeun.action==='rest'&&!daeun.path.length&&daeun.stats.will<45:!!characters.get(id)?.meditating;
+}
 function v504MeditationStop(){
- if(!v504Meditation.active)return;
+ if(!v504Meditation.active){
+  // Existing AI recovery is only observed here; it keeps its original rewards/timers.
+  if(v504AutomaticMeditation(observedId)){
+   if(observedId==='hina'){state='recover';target=null;}
+   else if(observedId==='daeun'){daeun.action='idle';daeun.timers.nextThink=elapsed;}
+  }
+  v510SyncMeditationUI();return;
+ }
  const medId=v504Meditation.id;
  v504Meditation.active=false;
  // End only the resting task created by meditation; do not cancel unrelated actions.
  if(medId==='daeun'&&v504Meditation.ownsRest&&daeun.manualTask?.type==='rest'){
   cancelManualTask();daeun.manualTask=null;daeun.path=[];daeun.destination=null;
-  daeun.action='manual';daeun.actionAge=0;
+  daeun.action=daeun.auto?'idle':'manual';daeun.actionAge=0;daeun.timers.nextThink=elapsed;
  }
+ if(medId==='hina'&&v504Meditation.ownsRest&&state===v504Meditation.previousActorState){state=hinaManual?'explore':'recover';target=null;sleepingPose=false;}
  v504Meditation.ownsRest=false;
+ if(medId!=='hina'&&medId!=='daeun')characters.get(medId)?.endMeditation?.();
  const previous=v504Meditation.previous;
  if(previous){
   followCamera=previous.followCamera;followView=previous.followView;
@@ -10088,47 +10125,44 @@ function v504MeditationStop(){
  v510SyncMeditationUI();
 }
 // Shared fire helpers: use the active campfire for each playable character.
-function v507FirePos(id){return id==='daeun'?daeunDisplayedFirePosition():campfire.position;}
-function v507FireLit(id){return id==='daeun'?daeunFireIsLit():!!fireSuccess;}
+function v507FirePos(id){return id==='daeun'?daeunDisplayedFirePosition():id==='hina'?campfire.position:characters.get(id)?.campfire?.position;}
+function v507FireLit(id){return id==='daeun'?daeunFireIsLit():id==='hina'?!!fireSuccess:!!characters.get(id)?.campfire?.lit;}
 function v507UpdateFireMenu(){} // Retained for compatibility; fire icon keeps its original action.
-function v504MeditationStart(){
- const id=observedId==='daeun'?'daeun':'hina',p=v504ActorPosition(id);
- if(v504Meditation.active){v504MeditationStop();return;}
- if(!v507FireLit(id)||Math.hypot(p.x-v507FirePos(id).x,p.z-v507FirePos(id).z)>7)return;
- if(v503IsSleeping(id))return;
- v504Meditation.previous=null; // Meditation does not take over the camera.
- v504Meditation.id=id;v504Meditation.active=true;v504Meditation.start=elapsed;
- v504Meditation.rewarded=false;v504Meditation.seat=p.clone();
- v504Meditation.ownsRest=false;
- v504Meditation.completed=false;
- if(id==='daeun'){
-  // Reuse Daeun's existing seated-rest pose and state machine, rather than
-  // merely changing the camera while the actor remains standing.
-  if(!isManualDaeun()||!manualAction('rest',daeun.mesh.position)){
-   v504Meditation.active=false;v504Meditation.previous=null;return;
-  }
-  v504Meditation.ownsRest=true;
-  daeun.path=[];daeun.destination=null;
-  daeun.mesh.rotation.y=Math.atan2(v507FirePos(id).x-p.x,v507FirePos(id).z-p.z);
- }
- v509FireMenuDismissUntil=performance.now()+1200;
- v509HideMeditation();hideRoastFishShortcut();
+function v504MeditationStart(requestedId=observedId){
+ const id=typeof requestedId==='string'?requestedId:observedId,p=v504ActorPosition(id);
+ if(v504Meditation.active){v504MeditationStop();return false;}
+ if(!v504MeditationEligible(id))return false;
+ const ch=characters.get(id);if(!ch)return false;
+ if(characterAnimation?.byId[id])characterAnimation.cancel(id);
+ v504Meditation.previous=null;
+ Object.assign(v504Meditation,{id,active:true,start:elapsed,rewarded:false,seat:p.clone(),ownsRest:true,completed:false,automatic:id==='hina'?!hinaManual:!!ch.auto,previousActorState:id==='hina'?state:ch.action});
+ if(id==='hina'){target=null;navReset();hinaManualTask=null;hinaCookingTask=null;}
+ else if(id==='daeun'){
+  cancelManualTask();sharedDaeunResourceTask=null;daeun.autoTask=null;
+  daeun.manualTask={type:'rest',phase:'perform',age:0};daeun.action='manualRest';daeun.actionAge=0;daeun.path=[];daeun.destination=null;
+ }else{ch.beginMeditation?.();}
+ ch.mesh.rotation.y=Math.atan2(v507FirePos(id).x-p.x,v507FirePos(id).z-p.z);
+ v509FireMenuDismissUntil=performance.now()+1200;v509HideMeditation();hideRoastFishShortcut();
  roastFishButton.classList.remove('v515-child-hover');v508MeditateIcon.classList.remove('v515-child-hover');
- v504MeditationButton.textContent='명상 끝내기';
- v510SyncMeditationUI();
+ v504MeditationButton.textContent='🧘 명상 끝내기';v510SyncMeditationUI();return true;
 }
+
 v504MeditationButton.addEventListener('click',v504MeditationStart);
 function v504MeditationTick(dt){
- const id=observedId==='daeun'?'daeun':'hina',p=v504ActorPosition(id);
- const canStart=v507FireLit(id)&&Math.hypot(p.x-v507FirePos(id).x,p.z-v507FirePos(id).z)<7&&!v503IsSleeping(id);
- /* Marker visibility is managed alongside the fire interaction marker. */
+ const id=observedId,p=v504ActorPosition(id);
+ const canStart=v504MeditationEligible(id);
+ v504MeditationButton.style.display=canStart||v504Meditation.active?'block':'none';
+ v504MeditationButton.textContent=v504Meditation.active?'🧘 명상 끝내기':'🧘 명상하기';
  v510SyncMeditationUI();
  if(!v504Meditation.active)return;
  const med=v504Meditation;
+ const automaticNow=id==='hina'?!hinaManual:!!characters.get(id)?.auto;
+ if(automaticNow!==med.automatic){v504MeditationStop();return;}
+ if(characterAnimation?.byId[id]&&(characterAnimation.busy(id)||characterAnimation.active(id))){v504MeditationStop();return;}
  if(med.id==='daeun'&&med.ownsRest&&daeun.action!=='manualRest'){
   v504MeditationStop();return;
  }
- if(id!==med.id||!v507FireLit(id)||v503IsSleeping(id)||
+ if(id!==med.id||!v507FireLit(id)||v504ActorSleeping(id)||
     Math.hypot(p.x-med.seat.x,p.z-med.seat.z)>.7){v504MeditationStop();return;}
  // Leave camera position, orbit target and collision entirely to the normal game camera.
  // The stationary world-space interaction markers remain closed during meditation.
@@ -10137,8 +10171,9 @@ function v504MeditationTick(dt){
  if(elapsed-med.start>=med.duration&&!med.rewarded){
   med.rewarded=true;
   if(id==='hina')changeWill(6,'모닥불 명상');
-  else daeun.stats.will=Math.min(100,daeun.stats.will+6);
+  else {const values=characters.get(id).stats;values.will=Math.min(100,values.will+6);}
   med.completed=true;
+  if(med.automatic){v504MeditationStop();return;}
   // Stay seated until the player cancels via movement or the right-side status button.
  }
 }
@@ -10686,7 +10721,7 @@ function survivorUrgent(id){
  return /dead|exhaust|flee|retreat|escape/i.test(action);
 }
 function survivorCanSpeakSoftly(id){
- const ch=survivorData(id);if(!ch||survivorUrgent(id))return false;
+ const ch=survivorData(id);if(!ch||survivorUrgent(id)||(v504Meditation.active&&v504Meditation.id===id))return false;
  if(id==='hina'?hinaSleepSpeechLock():id==='daeun'?daeunSleepSpeechLock():ch.sleeping)return false;
  if(characterAnimation?.byId[id]&&(characterAnimation.active(id)||characterAnimation.busy(id)))return false;
  if(survivorSpeech.current(id)||[...characters.keys()].some(key=>{const speech=survivorSpeech.current(key);return speech&&speech.rank<=3;}))return false;
@@ -10723,7 +10758,7 @@ function updateSurvivalMoods(now){
  }
 }
 function flowerSurvivalSafe(){
- return !survivorUrgent('hina')&&stats.energy>=45&&stats.hunger>=45&&stats.thirst>=45&&stats.will>=35&&!characterAnimation.busy('hina')&&!characterAnimation.active('hina')&&!hinaSleepSpeechLock();
+ return !(v504Meditation.active&&v504Meditation.id==='hina')&&!survivorUrgent('hina')&&stats.energy>=45&&stats.hunger>=45&&stats.thirst>=45&&stats.will>=35&&!characterAnimation.busy('hina')&&!characterAnimation.active('hina')&&!hinaSleepSpeechLock();
 }
 function beginHinaFlower(patch,now){
  if(clockParts().day<2||hinaManual||survivalFlower.mesh?.visible||survivalFlower.motion||!flowerSurvivalSafe())return false;
@@ -10836,11 +10871,13 @@ class CharacterAnimation {
   if(this.busy(id)){
    manualInventorySay('지금 하던 일을 마치고 할게.',id);return false;
   }
+  if(v504Meditation.active&&v504Meditation.id===id)v504MeditationStop();
   if(id==='hina'){target=null;navReset();}else{daeun.path=[];daeun.destination=null;}
   r.fishUntil=0;r.release=0;
   r.meal={time:0,last:performance.now(),source,available,take:options.take||null,gain:options.gain??12,
    energy:options.energy!==false,remaining:Math.max(1,Math.floor(options.count||1)),done:options.done||null,
    each:options.each||null,cancel:options.cancel||null,manual:this.manual(id),x:r.root.position.x,z:r.root.position.z};
+  if(id===observedId)window.HinaInteractionSFX?.play('eat');
   return true;
  }
  cancel(id){const r=this.byId[id],m=r.meal;if(!m)return;r.release=this.amount(m.time);r.releaseAge=0;r.meal=null;if(m.cancel)m.cancel();}
@@ -11750,11 +11787,13 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
 <script id="hina-interaction-sfx-v401">
 (()=>{
 // Use the same HTMLAudioElement playback path as the working cricket recording.
-const soundNames=['ui','berry','water','fish','wood','fire','cook','craft','eat','sleep','rest','animal','wash','success','inventory','step','bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder'];
+const soundNames=['ui','berry','water','fish','wood','fire','cook','craft','eat','sleep','rest','animal','wash','success','inventory','step','bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder','threat'];
 const ambience=new Set(['bird','owl','frog','cricket','rustle','bee','fireAmbient','thunder']);
 const pools=new Map(),last=new Map(),counts={},attempts={},failures={};
 // Preserve assets and call sites, but deny all foot/sand feedback centrally.
-const soundPolicy={footsteps:false,inventoryRustle:false};
+const soundPolicy={footsteps:false,inventoryRustle:false,fireAmbience:false};
+const swooshSounds=new Set(['step','inventory','water','wood','craft','rustle','wash']);
+const soundFiles={eat:'eat-start.wav',fish:'fish-clean.wav'};
 const wildlifeSchedule={phase:null,nextAt:0,waiting:false};
 let unlocked=false,paused=false,position=null,walker='',distance=0,lastAction='',previewVoice=null;
 const previewButton=document.getElementById('interactionSoundPreview');
@@ -11764,7 +11803,7 @@ function resetPreview(message='🔊 효과음 확인'){
  if(!previewButton)return;previewButton.disabled=false;previewButton.textContent=message;previewVoice=null;
 }
 function voice(kind){
- const audio=new Audio(new URL('sounds/'+kind+'.wav',document.baseURI).href);
+ const audio=new Audio(new URL('sounds/'+(soundFiles[kind]||kind+'.wav'),document.baseURI).href);
  audio.preload='auto';audio.playsInline=true;
  const slot={audio,kind,busy:false,level:1};
  audio.addEventListener('playing',()=>{
@@ -11777,7 +11816,7 @@ function voice(kind){
  });
  return slot;
 }
-for(const kind of soundNames)if(kind!=='step'&&kind!=='inventory')pools.set(kind,[voice(kind)]);
+for(const kind of soundNames)if(!swooshSounds.has(kind)&&kind!=='fireAmbient')pools.set(kind,[voice(kind)]);
 const primer=new Audio(new URL('sounds/unlock.wav',document.baseURI).href);primer.preload='auto';primer.volume=0;
 function unlock(){
  if(unlocked)return;
@@ -11795,10 +11834,10 @@ function syncVolume(){
  for(const pool of pools.values())for(const slot of pool)slot.audio.volume=Math.min(1,volume*mix(slot.kind)*slot.level);
 }
 function play(kind,level=1,force=false){
- if((/^(step|footstep|sand|walk|run)$/.test(kind)&&!soundPolicy.footsteps)||(kind==='inventory'&&!soundPolicy.inventoryRustle))return false;
+ if(swooshSounds.has(kind)||/^(footstep|sand|walk|run)$/.test(kind)||(kind==='fireAmbient'&&!soundPolicy.fireAmbience))return false;
  if(!unlocked||interactionLevel()<=0||!Number.isFinite(level)||level<=0)return false;
  const pool=pools.get(kind);if(!pool)return false;
- const now=performance.now(),limit=kind==='step'?380:kind==='ui'?90:(kind==='bird'||kind==='owl')?15000:ambience.has(kind)?650:350;
+ const now=performance.now(),limit=kind==='threat'?2500:kind==='step'?380:kind==='ui'?90:(kind==='bird'||kind==='owl')?15000:ambience.has(kind)?650:350;
  if(!force&&now-(last.get(kind)??-Infinity)<limit)return false;
  let slot=pool.find(slot=>!slot.busy);
  if(!slot&&pool.length<2){slot=voice(kind);pool.push(slot);}
@@ -11822,24 +11861,51 @@ function play(kind,level=1,force=false){
  });
  return true;
 }
-function classify(el){
- const raw=[el.id,el.getAttribute('title'),el.getAttribute('aria-label'),el.textContent?.slice(0,80)].join(' ').toLowerCase();
- if(/soundtoggle|환경음|음량|볼륨/.test(raw))return null;
- if(/먹기|먹어|eat|식사/.test(raw))return 'eat';
- if(/굽기|구운|cook/.test(raw))return 'cook';
- if(/씻기|wash/.test(raw))return 'wash';
- if(/낚시|fish|물고기/.test(raw))return 'fish';
- if(/마시|drink|water|물 뜨|물 긷/.test(raw))return 'water';
- if(/열매|berry|채집/.test(raw))return 'berry';
- if(/장작|firewood|fuel|나뭇가지/.test(raw))return 'wood';
- if(/모닥불|불 피우|fire|torch|횃불|점화/.test(raw))return 'fire';
- if(/craft|제작/.test(raw))return 'craft';
- if(/가방|바구니|인벤토리|소지품|itemtoggle/.test(raw))return 'inventory';
- if(/sleep|수면|잠자|잠들/.test(raw))return 'sleep';
- if(/rest|휴식|쉬기/.test(raw))return 'rest';
- if(/토끼|사슴|rabbit|deer|관찰/.test(raw))return 'animal';
- return 'ui';
+// Observe actual panel transitions once, including outside-tap/Escape/programmatic closes.
+// No sound is attached to a craft/inventory button's text or translated label.
+function installUISoundObserver(){
+ const ids=['v521Menu','v5261MenuShell','v522Settings','v522MenuSkills','v522MenuExplore','v523MenuDetail','v492Craft','v498Skills','daeunActionButtons','daeunItemPanel','profileViewer','daeunProfileViewer','memoryViewer','v521MapBackdrop','v523DetailBackdrop','v504CraftResult','v465DropDialog'];
+ const targets=ids.map(id=>document.getElementById(id)).filter(Boolean);
+ const visible=node=>{const style=getComputedStyle(node);return !node.hidden&&style.display!=='none'&&style.visibility!=='hidden'&&node.getClientRects().length>0;};
+ function snapshot(){
+  const open=targets.filter(visible).map(node=>node.id);
+  const shell=document.getElementById('v5261MenuShell');
+  if(shell&&visible(shell)){const active=shell.querySelector('.v5261-pane[data-active="1"]');if(active)open.push('pane:'+active.id);}
+  for(const tab of document.querySelectorAll('#v495Categories button.selected[data-category],#v494Recipes button.selected[data-recipe]'))if(visible(tab))open.push('tab:'+(tab.dataset.category||tab.dataset.recipe));
+  return open.join('|');
+ }
+ let previous=snapshot(),pending=false;
+ const observer=new MutationObserver(()=>{
+  if(pending)return;pending=true;queueMicrotask(()=>{pending=false;const current=snapshot();if(current===previous)return;previous=current;playUITransition();});
+ });
+ for(const target of targets)observer.observe(target,{attributes:true,attributeFilter:['class','style','hidden','open','data-open','aria-hidden']});
+ for(const pane of document.querySelectorAll('.v5261-pane'))observer.observe(pane,{attributes:true,attributeFilter:['data-active']});
+ for(const tabs of document.querySelectorAll('#v495Categories,#v494Recipes'))observer.observe(tabs,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
+ observer.observe(document.body,{attributes:true,attributeFilter:['class']});
+ // Detail viewers may be created lazily on the first open.
+ const known=new Set(targets);
+ const additions=new MutationObserver(records=>{
+  let added=false;
+  for(const record of records)for(const node of record.addedNodes){
+   if(node.nodeType!==1)continue;
+   const candidates=[node,...node.querySelectorAll(ids.map(id=>'#'+id).join(','))];
+   for(const candidate of candidates)if(ids.includes(candidate.id)&&!known.has(candidate)){
+    known.add(candidate);targets.push(candidate);observer.observe(candidate,{attributes:true,attributeFilter:['class','style','hidden','open','data-open','aria-hidden']});added=true;
+   }
+  }
+  if(added){const current=snapshot();if(current!==previous){previous=current;playUITransition();}}
+ });
+ additions.observe(document.body,{childList:true});
 }
+let uiGestureSerial=0,uiGestureAt=-Infinity,lastUISoundGesture=-1;
+for(const event of ['pointerdown','keydown'])window.addEventListener(event,()=>{uiGestureSerial++;uiGestureAt=performance.now();},{capture:true,passive:true});
+window.addEventListener('click',()=>{if(performance.now()-uiGestureAt>600){uiGestureSerial++;uiGestureAt=performance.now();}},{capture:true,passive:true});
+function playUITransition(){
+ const sameGesture=performance.now()-uiGestureAt<600;
+ if(sameGesture&&lastUISoundGesture===uiGestureSerial)return false;
+ const played=play('ui');if(played&&sameGesture)lastUISoundGesture=uiGestureSerial;return played;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installUISoundObserver,{once:true});else installUISoundObserver();
 function event(text){
  // Only completed actions: plans, failed attempts and thoughts stay silent.
  if(/없|부족|필요|못|실패|중단|싶|보자|할까/.test(text))return false;
@@ -11847,7 +11913,6 @@ function event(text){
  if(/완성|제작 성공|발견했|해금/.test(text))kind='success';
  else if(/씻.*완료|세안.*완료/.test(text))kind='wash';
  else if(/마셨|물을 마심/.test(text))kind='water';
- else if(/먹었|먹음|식사 완료/.test(text))kind='eat';
  else if(/물고기.*잡|낚시 성공/.test(text))kind='fish';
  else if(/채집|열매.*모았/.test(text))kind='berry';
  else if(/장작.*추가|가지.*주웠|가지.*수집/.test(text))kind='wood';
@@ -11874,8 +11939,6 @@ window.addEventListener('keydown',unlock,{capture:true});
 window.addEventListener('click',unlock,{capture:true});
 document.getElementById('ambientVolume')?.addEventListener('input',syncVolume);
 document.addEventListener('visibilitychange',syncVolume);
-document.addEventListener('pointerdown',e=>{if(e.target.closest('#mobileMenu'))play('ui');},true);
-document.addEventListener('click',e=>{const el=e.target.closest('button,.daeunResourceEmoji,[role="button"]');if(!el||el.id==='interactionSoundPreview'||el.disabled||el.getAttribute('aria-disabled')==='true')return;const kind=classify(el);if(kind)play(kind);},true);
 previewButton?.addEventListener('click',e=>{
  e.stopPropagation();unlock();
  if(interactionLevel()<=0){resetPreview('볼륨을 올린 뒤 확인');return;}
@@ -11894,10 +11957,10 @@ function scheduleWildlife(isNight,now=performance.now()){
  if(now<wildlifeSchedule.nextAt||['bird','owl'].some(kind=>pools.get(kind).some(slot=>slot.busy)))return;
  if(play(phase)){wildlifeSchedule.waiting=true;}else wildlifeSchedule.nextAt=now+1000;
 }
-window.HinaInteractionSFX={play,event,movement,wildlife:scheduleWildlife,
+window.HinaInteractionSFX={play,event,movement,ui:playUITransition,wildlife:scheduleWildlife,
  setPaused(value){if(paused!==!!value){paused=!!value;syncVolume();}},
  diagnose:()=>({...counts}),
- audioStatus:()=>({backend:'html-audio-wav',policy:{...soundPolicy},wildlife:{...wildlifeSchedule},unlocked,volume:interactionLevel(),playing:[...pools.values()].flat().filter(s=>s.busy&&!s.audio.paused).map(s=>s.kind),attempts:{...attempts},started:{...counts},errors:{...failures}})
+ audioStatus:()=>({backend:'html-audio-wav',policy:{...soundPolicy,disabled:[...swooshSounds,'fireAmbient']},wildlife:{...wildlifeSchedule},unlocked,volume:interactionLevel(),playing:[...pools.values()].flat().filter(s=>s.busy&&!s.audio.paused).map(s=>s.kind),attempts:{...attempts},started:{...counts},errors:{...failures}})
 };
 })();
 </script>
@@ -13843,5 +13906,14 @@ html body #characterBar button:is(#observeHina,#observeDaeun) .character-orbit-l
 }
 @keyframes survivorBorderOrbit{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
 
+</style>
+<style id="exclusiveCharacterSelection">
+body.cinematic-mode #v504MeditationButton,body.cinematic-mode #v510MeditationStatus,
+body.v5261-menu-active #v504MeditationButton,body.hina-menu-foreground #v504MeditationButton,
+body:has(#v521MapBackdrop.open) #v504MeditationButton,
+body:has(#profileViewer.open,#daeunProfileViewer.open,#v523DetailBackdrop.open) #v504MeditationButton{visibility:hidden!important;}
+
+html body #characterBar button:is(#observeHina,#observeDaeun)[data-selected="false"][data-auto][data-locked]{background:#354c47!important;border-color:#718a80!important;box-shadow:none!important;outline:none!important;}
+html body #characterBar button:is(#observeHina,#observeDaeun)[data-selected="true"][data-auto][data-locked]{background:#468B70!important;color:white!important;box-shadow:inset 0 0 8px #a6ffe01f,0 0 7px #78f0cb38!important;}
 </style>
 </body></html>

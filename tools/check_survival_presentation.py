@@ -76,10 +76,10 @@ def run():
             page.locator('#mobileMenu' if mobile else '#v521PcMenu').click()
             page.evaluate('window.__briefTime=100000;Object.defineProperty(performance,"now",{configurable:true,value:()=>window.__briefTime});')
             # Every entry point, even force-play, must reject sand/footstep feedback.
-            assert page.evaluate("['step','footstep','sand','walk','run','inventory'].every(kind=>!HinaInteractionSFX.play(kind,1,true))")
+            assert page.evaluate("['step','footstep','sand','walk','run','inventory','water','wood','craft','rustle','wash','fireAmbient'].every(kind=>!HinaInteractionSFX.play(kind,1,true))")
             page.evaluate("for(const id of ['hina','daeun'])for(let n=0;n<30;n++)HinaInteractionSFX.movement(id,{x:n,z:0},'explore')")
             assert not page.evaluate('HinaInteractionSFX.audioStatus().attempts.step')
-            for sound in ['water', 'fire', 'craft', 'eat', 'sleep', 'ui']:
+            for sound in ['fire', 'eat', 'sleep', 'ui', 'berry', 'animal']:
                 played=page.evaluate('(kind)=>{__brief.advance(1000);return HinaInteractionSFX.play(kind);}', sound)
                 assert played, (sound,page.evaluate('HinaInteractionSFX.audioStatus()'))
                 try:
@@ -131,7 +131,8 @@ def run():
                 page.evaluate('(id)=>__brief.ring(id,true)', actor)
                 ring = page.locator(selector + ' .character-orbit')
                 assert ring.is_visible()
-                assert page.locator(selector).evaluate('(e)=>getComputedStyle(e).backgroundColor') == 'rgb(70, 139, 112)'
+                expected_fill='rgb(70, 139, 112)' if page.locator(selector).get_attribute('data-selected')=='true' else 'rgb(53, 76, 71)'
+                assert page.locator(selector).evaluate('(e)=>getComputedStyle(e).backgroundColor') == expected_fill
                 style = page.locator(selector + ' rect').evaluate('(e)=>({width:getComputedStyle(e).strokeWidth,color:getComputedStyle(e).stroke,duration:getComputedStyle(e).animationDuration})')
                 assert style == {'width': '5px', 'color': 'rgb(156, 233, 192)', 'duration': '3s'}, style
                 button_box = page.locator(selector).bounding_box(); ring_box = ring.bounding_box()
