@@ -2794,7 +2794,7 @@ let hinaFireHintAt=0;
 const hinaFireHints=['불을 피울 수 있다면 밤이 덜 무서울 텐데.','나뭇가지를 모아서 불을 피워 봐야겠어.','모닥불이 있으면 동굴에서 좀 더 안심할 수 있겠지?'];
 function updateHinaManualActionPose(){
  const task=hinaManualTask||(hinaCookingTask?{type:'cookFish',phase:'perform'}:null);
- if(!isManualHina()||!task||task.phase!=='perform')return;
+ if(!task||(!isManualHina()&&!task.auto)||task.phase!=='perform')return;
  // Match Daeun's fire / berry / fish / rabbit hand-flutter and drinking / branch reach.
  const kind=task.type;
  const flutter=['fire','berry','fish','rabbit','cookFish'].includes(kind);
@@ -5021,6 +5021,7 @@ function chooseNextDayAction(){
   }
   return; // Keep sleepTravel until the cave is actually reached.
  }
+ if(craftingV492AutoProject('hina'))return;
  // Independent, limited-frequency life skills; critical needs above always win.
  const safeForProjects=stats.energy>46&&stats.hunger>48&&stats.thirst>43&&stats.will>32;
  if(safeForProjects&&current.day>=4&&current.h>=8&&current.h<17){
@@ -5656,7 +5657,8 @@ function update(dt){
   stats.thirst=Math.max(0,stats.thirst-step*thirstRate);stats.hunger=Math.max(0,stats.hunger-step*hungerRate);
   recoverHinaDuringRest(step,state);moraleUpdate(step);tickHinaCampfireFuel(step);updateHinaWorldUIAndLighting(step,dt);return;
  }
- if(isManualHina()){
+ if(hinaManualTask?.auto&&!craftingV492AutoSafe('hina'))hinaManualTask=null;
+ if(isManualHina()||hinaManualTask?.auto||craftingV492Tasks.hina?.auto){
   const forward=manualMovementScratch.forward;camera.getWorldDirection(forward);forward.y=0;forward.normalize();
   const right=manualMovementScratch.right.set(-forward.z,0,forward.x);
   const movement=manualMovementScratch.movement.set(0,0,0);
@@ -5666,7 +5668,7 @@ function update(dt){
   if(playerKeys.has('KeyA'))movement.sub(right);
   if(Math.hypot(joystick.x,joystick.y)>.12)movement.addScaledVector(forward,-joystick.y).addScaledVector(right,joystick.x);
   let moved=false;
-  if(hinaManualTask?.phase==='approach'){movement.set(0,0,0);}
+  if(!isManualHina()||hinaManualTask?.phase==='approach'){movement.set(0,0,0);}
   if(movement.lengthSq()>.01){
    if(state==='rest'||state==='resting'||state==='sleep'){
     state='recover';goal='플레이어 직접 이동';sleepingPose=false;
@@ -5682,6 +5684,7 @@ function update(dt){
   updateHinaManualTask(step);
   updateHinaCookingTask(step);
   const hinaTaskWalking=!!(hinaManualTask?.phase==='approach'&&hinaManualTask.walking);
+  if(!isManualHina())stats.energy=Math.max(5,stats.energy-step*(.018+(hinaTaskWalking?.16:0)));
   updateExploration(); // Reveal Hina-region tiles even when the AI update returns early.
   // Same 16.8Hz alternating-leg gait used by Daeun, with Hina's torch/held-item pose preserved.
   walkPose(step,moved||hinaTaskWalking);
@@ -8211,6 +8214,7 @@ class DaeunAIController{
    const practiceBranch=(sharedHomeActive?branchPiles:daeunResources.branches).filter(b=>b.available).sort((a,b)=>{const score=t=>t.group.position.distanceTo(pos)+Math.max(0,100-(elapsed-(daeunResourceVisited.get(t)||-9999)))*.5;return score(a)-score(b);})[0];
    if(practiceBranch){d.branchId=(sharedHomeActive?branchPiles:daeunResources.branches).indexOf(practiceBranch);setDaeunDestination(practiceBranch.group.position,'branch');return;}
   }
+  if(craftingV492AutoProject('daeun'))return;
   // Observe wildlife during safe daylight gaps. Practice consumes no animal and
   // shares the manual daily limits; food, water, rest and fire have already won priority.
   if(clockParts().day>=3&&clockParts().h>=8&&clockParts().h<18&&s.energy>=48&&s.thirst>=58&&s.hunger>=58){
@@ -8373,7 +8377,8 @@ function updateDaeun(step,realDt){
  updateDaeunFuelFeed();
  updateDaeunSnakes(step);
  if(v504Meditation.active&&v504Meditation.id==='daeun')daeun.timers.nextThink=Math.max(daeun.timers.nextThink||0,elapsed+1);
- const d=daeun,s=d.stats,inv=d.inventory;let moving=!!(isManualDaeun()&&sharedDaeunResourceTask?.phase==='approach'&&sharedDaeunResourceTask.walking);
+ const d=daeun,s=d.stats,inv=d.inventory;let moving=!!(sharedDaeunResourceTask?.phase==='approach'&&sharedDaeunResourceTask.walking);
+ if(d.auto&&['projectGather','projectCraft'].includes(d.action)&&!sharedDaeunResourceTask&&!craftingV492Tasks.daeun){d.action='idle';d.timers.nextThink=elapsed;}
  if(sharedHomeActive&&d.destination&&Math.hypot(d.destination.x-caveX,d.destination.z-caveZ)>100){
   d.path=[];d.destination=null;d.action='idle';d.actionAge=0;d.timers.nextThink=elapsed;
  }
@@ -8703,7 +8708,7 @@ function updateDaeun(step,realDt){
  // when the cave's automatic night-rest pose would otherwise make her sit down.
  if(craftingAction)d.lastCraftActiveAt=elapsed;
  const justCrafted=elapsed-(d.lastCraftActiveAt??-1e9)<8;
- const sharedActing=isManualDaeun()&&sharedDaeunResourceTask?.phase==='perform';
+ const sharedActing=sharedDaeunResourceTask?.phase==='perform';
  const seat=!sleep&&((v504Meditation.active&&v504Meditation.id==='daeun')||(!craftingAction&&!justCrafted&&!sharedActing&&(resting||caveQuiet)));
  const acting=(d.manualTask&&d.manualTask.phase==='perform')||sharedActing;
  const activeManualType=sharedActing?sharedDaeunResourceTask.type:d.manualTask?.type;
@@ -9290,7 +9295,8 @@ function updateSharedCampfireBonus(){
 }
 function updateSharedDaeunResourceTask(step){
  const t=sharedDaeunResourceTask;
- if(!t||!isManualDaeun())return;
+ if(!t||(!isManualDaeun()&&!t.auto))return;
+ if(t.auto&&!craftingV492AutoSafe('daeun')){sharedDaeunResourceTask=null;return;}
  if(t.phase==='approach'){approachResourceTask(t,daeun.mesh,step,'다은');if(t.invalid)sharedDaeunResourceTask=null;return;}
  t.age+=step;if(t.age<t.duration)return;
  sharedDaeunResourceTask=null;
@@ -9387,7 +9393,7 @@ function updateHinaCookingTask(step){
  log('🔥🐟 모닥불에서 물고기 1마리 굽기 완료 · 구운 생선 획득');
 }
 function updateHinaManualTask(step){
- if(!isManualHina()||!hinaManualTask)return;
+ if(!hinaManualTask||(!isManualHina()&&!hinaManualTask.auto))return;
  const task=hinaManualTask;
  if(task.phase==='approach'){approachResourceTask(task,hana,step,'히나');if(task.invalid)hinaManualTask=null;return;}
  task.age+=step;
@@ -9989,7 +9995,7 @@ function projectToScreen(point){const p=screenProjectionScratch.copy(point).proj
 
 // v4.94 unified material proficiency crafting: shared by both playable characters.
 const craftingV492={hina:{skills:{branches:0,palmFronds:0},categories:{living:0,storage:0},mat:false,bag:false},daeun:{skills:{branches:0,palmFronds:0},categories:{living:0,storage:0},mat:false,bag:false}};
-const craftingV492Tasks={hina:null,daeun:null};let craftingV492Tab='inventory',craftingV492LastAuto=-1,craftingV494Selected='mat',craftingV495Category='all',craftingV495ListSignature='';
+const craftingV492Tasks={hina:null,daeun:null};let craftingV492Tab='inventory',craftingV494Selected='mat',craftingV495Category='all',craftingV495ListSignature='';
 const craftingV494Recipes={mat:{name:'야자잎 잠자리',icon:PALM_FROND_ICON,materials:{palmFronds:6},requiredCategory:15,duration:12,description:'동굴 또는 모닥불 주변에 설치 · 내구도 100%'},bag:{name:'나뭇가지 백팩',icon:'🧶',materials:{branches:DAEUN_BAG_BRANCH_COST},requiredCategory:15,duration:8,exclusive:'daeun',description:'다은 고유 제작 · 기존 백팩 모델과 수납 기능 유지'}};
 function craftingV492Actor(){return observedId==='daeun'?'daeun':'hina';} // UI always follows the selected/observed character
 function craftingV492State(id){return id==='hina'?stats:daeun.stats;}
@@ -10198,12 +10204,48 @@ function craftingV4993ApplyPoses(){
  }
 }
 
+// Discretionary projects run after survival priorities, never from a background timer.
+function craftingV492AutoSafe(id){
+ const st=craftingV492State(id),h=clockParts().h,pos=id==='hina'?hana.position:daeun.mesh.position;
+ return clockParts().day>=2&&h>=8&&h<17&&st.energy>46&&st.hunger>58&&st.thirst>58&&st.will>45&&!bearNearRoute(pos.x,pos.z)&&!(id==='hina'?hinaManual:!daeun.auto);
+}
+function craftingV492AutoProject(id){
+ if(!craftingV492AutoSafe(id)||craftingV492Tasks[id]||characterAnimation.active(id)||v504Meditation.active&&v504Meditation.id===id)return false;
+ if(id==='hina'?(hinaManualTask||hinaCookingTask):(daeun.manualTask||sharedDaeunResourceTask||daeun.fuelFeed))return false;
+ const d=craftingV492[id],pos=id==='hina'?hana.position:daeun.mesh.position;
+ // Daeun keeps her storage specialty; a missing mat must not block an affordable bag.
+ const kinds=(id==='daeun'?['bag','mat']:['mat']).filter(k=>k==='bag'?!daeun.bag.crafted:!d.mat);
+ const attemptReady=performance.now()>=(d.nextAutoAttemptAt||0);
+ if(attemptReady)d.nextAutoAttemptAt=performance.now()+9000;
+ const stocked=kinds.find(k=>Object.entries(craftingV494Recipes[k].materials).every(([m,n])=>craftingV494Inventory(id,m)>=n));
+ if(attemptReady&&stocked==='mat'&&!craftingV494NearCave(id)&&Math.hypot(pos.x-campfire.position.x,pos.z-campfire.position.z)>10&&Math.random()<(id==='daeun'?.25:.18)*1.4){
+  if(id==='hina'){setState('wander','잠자리 제작 · 동굴로 이동','shelter',null);return true;}
+  return setDaeunDestination(daeun.sites.shelter,'home');
+ }
+ const ready=kinds.find(k=>!craftingV492Check(id,k));
+ if(ready&&attemptReady&&Math.random()<(id==='daeun'?.25:.18)*1.4){
+  if(!craftingV492Start(id,ready,true))return false;
+  if(id==='hina'){target=null;navReset();state='recover';phaseAt=elapsed;}
+  else{daeun.path=[];daeun.destination=null;daeun.action='projectCraft';daeun.actionAge=0;}
+  return true;
+ }
+ const goal=kinds.find(k=>Object.entries(craftingV494Recipes[k].materials).some(([m,n])=>craftingV494Inventory(id,m)<n));
+ if(!goal||Math.random()>=.24*1.25*1.3)return false;
+ const material=Object.entries(craftingV494Recipes[goal].materials).find(([m,n])=>craftingV494Inventory(id,m)<n)?.[0];
+ const sites=material==='palmFronds'?palmFrondSites:id==='hina'||sharedHomeActive?branchPiles:daeunResources.branches;
+ const item=sites.filter(x=>x.available&&x.group.visible&&pos.distanceTo(x.group.position)<24&&!bearNearRoute(x.group.position.x,x.group.position.z)).sort((a,b)=>pos.distanceToSquared(a.group.position)-pos.distanceToSquared(b.group.position))[0];
+ if(!item)return false;
+ const task={auto:true,type:material==='palmFronds'?'frond':'branch',item,phase:'approach',age:0,duration:2.8};
+ if(id==='hina'){hinaManualTask=task;target=null;navReset();state='recover';phaseAt=elapsed;}
+ else{sharedDaeunResourceTask=task;daeun.path=[];daeun.destination=null;daeun.action='projectGather';daeun.actionAge=0;}
+ return true;
+}
 function craftingV492Tick(){
  for(const id of ['hina','daeun']){
   const t=craftingV492Tasks[id];if(!t)continue;
   const pos=id==='hina'?hana.position:daeun.mesh.position;
   const moved=Math.hypot(pos.x-t.startX,pos.z-t.startZ)>.22;
-  if(moved||!craftingV492Eligible(id)||(!t.auto&&!craftingV492Mode(id))){
+  if(moved||!craftingV492Eligible(id)||(t.auto&&!craftingV492AutoSafe(id))||(!t.auto&&!craftingV492Mode(id))){
    craftingV492Tasks[id]=null;
    craftingV492Message((id==='hina'?'히나':'다은')+' · '+(moved?'이동으로 제작 취소 · 재료 유지':'제작 중단 · 재료 유지'));
    if(craftingV492Actor()===id)craftingV492Render();
@@ -10213,15 +10255,7 @@ function craftingV492Tick(){
    if(craftingV492Tab==='craft'&&craftingV492Actor()===id)craftingV495UpdateProgress();
   }
  }
- // AI work belongs only to its own actor, never blocks the other actor's task.
- const sec=Math.floor(performance.now()/1000);
- if(sec!==craftingV492LastAuto&&sec%9===0){
-  craftingV492LastAuto=sec;
-  if(!craftingV492Tasks.daeun&&daeun.auto&&craftingV492Eligible('daeun')){
-   const kind=!craftingV492.daeun.mat?'mat':!craftingV492.daeun.bag?'bag':null;
-   if(kind&&(kind==='bag'||craftingV494NearCave('daeun'))&&Math.random()<.25)craftingV492Start('daeun',kind,true);
-  }
- }
+
 }
 const v494Style=document.createElement('style');v494Style.textContent=`#v492Craft{display:none;min-width:230px;color:#e7f6e9;font-size:12px;line-height:1.6;position:fixed;right:12px;top:20%;z-index:1201;width:min(340px,calc(100vw - 28px));max-height:65vh;overflow:auto;box-sizing:border-box;background:rgba(25,48,39,.97);border:1px solid #85b596;border-radius:14px;padding:18px 12px 12px;box-shadow:0 9px 28px #0009}#v492Craft button{background:#497c61;color:#fff;border:1px solid #8bc49e;border-radius:8px;padding:8px;cursor:pointer}#v492Craft button:disabled{opacity:.4}#v493CraftToggle{position:fixed;right:12px;top:48%;z-index:1200;background:#294b3d;border:1px solid #a3d0ae;border-radius:13px;color:#f4fff4;padding:12px;font-size:14px;font-weight:700;cursor:pointer}#v493CraftToggle.active{background:#548d68}#v493CraftClose{position:absolute;right:7px;top:5px;background:transparent!important;border:0!important;font-size:17px!important}#v494Recipes{display:flex;gap:8px;margin:12px 0}#v494Recipes button{flex:1;display:flex;align-items:center;justify-content:center;gap:4px}#v494Recipes button.selected{outline:2px solid #b9e8bb}#v494Recipes svg,#v494Ingredients svg{width:26px;height:26px;vertical-align:middle}#v494Ingredients{display:grid;gap:7px;margin:12px 0}#v494Ingredients .material{display:flex;align-items:center;justify-content:space-between;gap:8px}#v494Ingredients .material>span:first-child{display:flex;align-items:center;gap:6px}#v492Notice{color:#f4dcab;min-height:18px;margin-top:8px}#v492Task{color:#b9e8bb}#v495Categories{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 8px}#v495Categories button{min-height:46px;padding:7px 12px;touch-action:manipulation;display:flex;flex-direction:column;gap:5px;min-width:70px}.v496-skillbar{display:block;width:100%;height:6px;border-radius:6px;background:#203c30;overflow:hidden;pointer-events:none}.v496-skillbar>span{display:block;height:100%;background:#9ad9a8;pointer-events:none}#v495Categories button.selected{background:#87b99b!important;color:#102c1c!important;font-weight:800}#v494Recipes{display:flex!important;flex-direction:column;gap:5px!important;margin:8px 0 12px!important;max-height:145px;overflow-y:auto}#v494Recipes button{flex:none!important;justify-content:flex-start!important;text-align:left;min-height:44px;touch-action:manipulation}#v494Recipes button.selected{background:#6d9b7c!important;border-color:#d1ffdc!important}#v495Details{padding:10px;border:1px solid #658c72;border-radius:10px;background:#172e25}#v495Title{font-size:15px;font-weight:700;margin-bottom:6px}#v495Header{color:#d8e9d8;font-size:11px;margin:6px 0}#daeunItemPanel{transform:translateY(-90px)}@media(max-width:650px){#v493CraftToggle{right:8px;top:43%;font-size:12px}#v492Craft{right:8px;top:13%;max-height:70vh}#daeunItemPanel{transform:translateY(-75px)}}`;document.head.appendChild(v494Style);
 const v497Style=document.createElement('style');v497Style.textContent=`#v495Categories button .v496-skillbar{display:none!important}#v497CategorySkills{display:grid;gap:12px;margin:10px 0 14px}#v497CategorySkills .v497-skill-row{display:grid;gap:6px}#v497CategorySkills .v497-skill-label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700}#v497CategorySkills .v497-track{height:12px;background:#203c30;border-radius:10px;overflow:hidden;border:1px solid #527b62}#v497CategorySkills .v497-fill{height:100%;background:#65c38a;border-radius:10px;transition:width .2s}#v494Ingredients .v497-short{color:#ff7777;font-weight:800}#v494Ingredients .v497-enough{color:#85e2a2;font-weight:800}`;document.head.appendChild(v497Style);
@@ -10807,9 +10841,12 @@ function updateFirstNightGuide(){
  const dist=ch&&home?Math.hypot(home.x-ch.mesh.position.x,home.z-ch.mesh.position.z):0;
  const visible=clock.day===1&&(clock.h>=20||clock.h<6)&&dist>10;
  survivalGuide.hidden=!visible;
- if(survivalGuide.parentNode!==v517ObjectiveUI)v517ObjectiveUI.append(survivalGuide);
+ if(survivalGuide.parentNode!==document.body)document.body.append(survivalGuide);
  v517ObjectiveUI.classList.toggle('tutorial-pulse-active',visible||v517ObjectiveUI.classList.contains('tutorial-cave-hint')||v517ObjectiveUI.classList.contains('tutorial-night-warning'));
  if(!visible)return;
+ const anchor=projectToScreen(ch.mesh.position.clone().add(new THREE.Vector3(0,3.4,0)));
+ if(!anchor){survivalGuide.hidden=true;return;}
+ survivalGuide.style.left=anchor.x+'px';survivalGuide.style.top=anchor.y+'px';
  const dx=home.x-ch.mesh.position.x,dz=home.z-ch.mesh.position.z,e=camera.matrixWorld.elements;
  const right=dx*e[0]+dz*e[2],upLength=Math.hypot(e[4],e[6]);
  const up=upLength>.0001?(dx*e[4]+dz*e[6])/upLength:dx*e[8]+dz*e[10];
@@ -13885,9 +13922,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #v517ObjectiveUI.tutorial-cave-hint .v517Message{opacity:var(--tutorial-opacity)!important;animation:none!important;}
 html body #v517ObjectiveUI.tutorial-night-warning{background:var(--tutorial-warning)!important;color:white!important;}
 #v517ObjectiveUI.tutorial-night-warning .v517Message{color:white!important;opacity:1!important;animation:none!important;}
-#firstNightCaveGuide{position:absolute;top:calc(100% + 8px);left:50%;margin-left:-24px;width:48px;text-align:center;pointer-events:none;color:#ffe668;text-shadow:0 2px 4px #000;}
+#firstNightCaveGuide{position:fixed;transform:translate(-50%,-100%);z-index:43;width:48px;text-align:center;pointer-events:none;color:#55BFFF;opacity:.7;text-shadow:0 2px 4px #000;}
 #firstNightCaveGuide[hidden]{display:none!important}
-#firstNightCaveGuide .cave-guide-arrow{display:block;font-size:38px;font-weight:900;line-height:40px;opacity:var(--tutorial-opacity);transform-origin:center;}
+#firstNightCaveGuide .cave-guide-arrow{display:block;font-size:38px;font-weight:900;-webkit-text-stroke:2px #55BFFF;line-height:40px;transform-origin:center;}
 #firstNightCaveGuide .cave-guide-distance{display:block;font-size:11px;font-weight:700;}
 body.cinematic-mode #firstNightCaveGuide{display:none!important}
 .survival-extra-bubble[hidden]{display:none!important}
@@ -13898,8 +13935,9 @@ html body #characterBar button:is(#observeHina,#observeDaeun) .character-orbit{
  display:none!important;left:var(--orbit-left,-4.5px)!important;top:var(--orbit-top,-4.5px)!important;right:auto!important;bottom:auto!important;width:var(--orbit-width)!important;height:var(--orbit-height)!important;
  overflow:visible!important;transform:none!important;pointer-events:none!important;
 }
-html body #characterBar button:is(#observeHina,#observeDaeun)[data-auto="true"] .character-orbit{display:block!important;}
-html body #characterBar button:is(#observeHina,#observeDaeun)[data-auto="false"] .character-orbit{display:none!important;}
+html body #characterBar button:is(#observeHina,#observeDaeun)[data-auto="true"][data-selected="true"] .character-orbit{display:block!important;}
+html body #characterBar button:is(#observeHina,#observeDaeun):is([data-auto="false"],[data-selected="false"]) .character-orbit{display:none!important;}
+html body #characterBar button:is(#observeHina,#observeDaeun):is([data-auto="false"],[data-selected="false"]) .character-orbit-light{animation:none!important;}
 html body #characterBar button:is(#observeHina,#observeDaeun) .character-orbit-light{
  stroke:#9CE9C0!important;stroke-width:5px!important;vector-effect:non-scaling-stroke;stroke-dasharray:18 82!important;
  animation:survivorBorderOrbit 3s linear infinite!important;filter:none!important;
