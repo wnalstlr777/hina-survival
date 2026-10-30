@@ -290,7 +290,7 @@ body.cinematic-mode #v517ObjectiveUI,body.ui-hidden #v517ObjectiveUI,body.hide-u
 #skillPanel,#mindPanel,#memoryPanel{display:none!important}
 #ui{max-height:65vh;overflow-y:auto}
 #hideAllUI{position:fixed!important;left:12px!important;right:auto!important;top:245px!important;bottom:auto!important;transform:none!important}
-#v517ObjectiveUI{position:fixed!important;top:8px!important;left:50%!important;transform:translateX(-50%)!important;z-index:72!important}
+#v517ObjectiveUI{position:fixed!important;top:8px!important;left:calc(50% - 12px)!important;transform:translateX(-50%)!important;z-index:72!important}
 #controls{position:fixed!important;bottom:14px!important;left:50%!important;right:auto!important;top:auto!important;transform:translateX(-50%)!important;display:flex!important;gap:8px!important;align-items:center;justify-content:center;width:max-content!important;max-width:95vw!important}
 #extraControls{display:none!important}
 #v493CraftToggle,#v498Skills,#v498SkillToggle{font-size:13px!important;min-width:90px!important;min-height:40px!important;border-radius:12px!important}
@@ -300,7 +300,7 @@ body.cinematic-mode #v517ObjectiveUI,body.ui-hidden #v517ObjectiveUI,body.hide-u
 #v523Bottom{position:fixed!important;left:50%!important;transform:translateX(-50%)!important;bottom:18px!important;display:flex!important;gap:6px!important;z-index:90!important;white-space:nowrap!important}
 #v523Bottom button{height:42px!important;min-width:104px!important;padding:0 12px!important;background:#173b3b!important;color:#fff!important;border:1px solid #75b6a6!important;border-radius:10px!important;font-weight:700!important;cursor:pointer!important}
 #v521PcMenu{position:fixed!important;top:12px!important;right:12px!important;z-index:100!important}
-#v517ObjectiveUI{position:fixed!important;top:8px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;z-index:60!important}
+#v517ObjectiveUI{position:fixed!important;top:8px!important;left:calc(50% - 12px)!important;right:auto!important;transform:translateX(-50%)!important;z-index:60!important}
 #hideAllUI{position:fixed!important;left:12px!important;top:unset!important;bottom:85px!important;z-index:60!important}
 #controls{display:none!important}
 #skillPanel,#mindPanel,#memoryPanel{display:none!important}
@@ -9041,7 +9041,7 @@ function rainyFireCare(id){
  if(started)rainyFireClaims.set(rainyFireKey(id),{id,until:elapsed+60});return started;
 }
 const threatFloatAccumulator=new Map();
-const threatWillSoundSources=new Set(['snake','bear']); // Add future creature source IDs here.
+const threatWillSoundSources=new Set(['snake','bear','bee']); // Add future creature source IDs here.
 function threatWillLossSound(character,source,before,after){
  if(source==='snake'&&Number.isFinite(before)&&Number.isFinite(after)&&after<before)startSnakeFearReaction(character);
  if(character!==observedId||!threatWillSoundSources.has(source)||!Number.isFinite(before)||!Number.isFinite(after)||after>=before)return false;
@@ -9426,6 +9426,7 @@ const pondEmojiMarker=makeResourceMarker('💧','물 마시기');
 const bagEmojiMarker=makeResourceMarker('🧶','동굴에서 가방 제작 · 나뭇가지 2개');
 const storeEmojiMarker=makeResourceMarker('🌿','동굴에 나뭇가지 보관');storeEmojiMarker.style.display='none';
 function positionEmojiMarker(btn,point,click){
+ if((btn===fireEmojiMarker||btn===hinaManualMarkers.fire)&&(v504Meditation.active&&v504Meditation.id===observedId||v504AutomaticMeditation(observedId))){btn.style.display='none';btn.onclick=null;return;}
  const xy=projectToScreen(point);
  if(!xy){btn.style.display='none';btn.onclick=null;return;}
  btn._worldAnchor=point.clone();btn._screenOffsetX=0;btn._screenOffsetY=0;btn.style.display='flex';btn.style.left=xy.x+'px';btn.style.top=xy.y+'px';btn.onclick=click;
@@ -10375,6 +10376,7 @@ function v504MeditationStart(requestedId=observedId){
  ch.mesh.rotation.y=Math.atan2(v507FirePos(id).x-p.x,v507FirePos(id).z-p.z);
  v509FireMenuDismissUntil=performance.now()+1200;v509HideMeditation();hideRoastFishShortcut();
  roastFishButton.classList.remove('v515-child-hover');v508MeditateIcon.classList.remove('v515-child-hover');
+ fireEmojiMarker.style.display='none';hinaManualMarkers.fire.style.display='none';
  v504MeditationButton.textContent='🔥 불멍 끝내기';v510SyncMeditationUI();return true;
 }
 
@@ -11082,6 +11084,7 @@ function updateFirstNightGuide(){
  survivalGuide.setAttribute('aria-label',`${ch.name||id}의 시작 동굴 방향, ${Math.ceil(dist)}미터`);
 }
 function resetSurvivalPresentation(){
+ wildHiveLastSting.clear();
  if(survivalFlower.mesh)survivalFlower.mesh.visible=false;
  survivalFlower.motion=null;survivalFlower.expiresAt=0;survivalFlower.patch=null;survivalFlower.nextCheck=0;survivalFlower.reply=null;survivalFlower.seen.clear();
  survivalMood.clear();survivalSocialUntil=0;survivalSocialTick=0;survivalLastElapsed=elapsed;extraSurvivorSpeaker=null;
@@ -11096,7 +11099,8 @@ function updateSurvivalPresentation(now){
 }
 
 // Wild hives: shared meshes/instance pools, one central update, no honey interaction.
-const wildHives=[],wildHivePools=new Map(),wildHiveObservations=new Map();
+const wildHives=[],wildHivePools=new Map(),wildHiveObservations=new Map(),wildHiveLastSting=new Map();
+const WILD_HIVE_ATTACK_RADIUS=5,WILD_HIVE_STING_COOLDOWN=4000;
 const wildHiveBeeTemplate=makeFlowerBee(),wildHiveDummy=new THREE.Object3D(),wildHiveMatrix=new THREE.Matrix4(),wildHiveBounds=new THREE.Box3(),wildHiveProjected=new THREE.Vector3();
 const wildHiveBeesPerNest=isMobile?5:8,WILD_HIVE_LIMIT=14;
 let nextWildHiveObservation=0;
@@ -11128,30 +11132,48 @@ function initializeWildHives(){
  wildHivePool('entrance',new THREE.SphereGeometry(.085,7,5),beeBlack,WILD_HIVE_LIMIT);
  const parts=wildHiveBeeTemplate.children;for(const part of parts){const key=part.geometry.uuid+':'+part.material.uuid;if(!wildHivePools.has(key))wildHivePool(key,part.geometry,part.material,WILD_HIVE_LIMIT*wildHiveBeesPerNest*2);}
 }
+function updateWildHiveThreats(hive,now,dt){
+ const p=hive.position;let target=null,nearest=Infinity;
+ for(const [id,ch] of characters){
+  if(!ch.mesh||!ch.stats||ch.stats.health<=0)continue;
+  const d=Math.hypot(ch.mesh.position.x-p.x,ch.mesh.position.z-p.z);
+  if(d>=WILD_HIVE_ATTACK_RADIUS)continue;
+  if(d<nearest){nearest=d;target=ch.mesh.position;}
+  // One cooldown per character across every hive, independent of camera and game speed.
+  if(hive.scatter<.75||now-(wildHiveLastSting.get(id)??-Infinity)<WILD_HIVE_STING_COOLDOWN)continue;
+  wildHiveLastSting.set(id,now);
+  const health=ch.stats.health,will=ch.stats.will;
+  ch.stats.health=Math.max(0,health-3);ch.stats.will=Math.max(0,will-5);
+  gameVitalFloat(id,'health',ch.stats.health-health);gameVitalFloat(id,'will',ch.stats.will-will);
+  threatWillLossSound(id,'bee',will,ch.stats.will);
+  showSurvivalLine(id,'아야! 벌에 쏘였어! 벌통에서 떨어져야겠어.');
+  log('🐝 '+(ch.name||id)+' 벌 쏘임 · 체력 −3 · 의지력 −5');
+ }
+ hive.scared=!!target;
+ hive.scatter=THREE.MathUtils.damp(hive.scatter,target?1:0,target?5:2.4,Math.min(.05,Math.max(0,dt)));
+ return target;
+}
 function updateWildHives(now,dt){
- if(!wildHives.length||paused)return;
+ if(!wildHives.length||paused||document.hidden)return;
  const seconds=now*.001,daytime=clockParts().h>=6&&clockParts().h<19,listener=characters.get(observedId)?.mesh.position;
  let buzzing=Infinity;
  for(const mesh of wildHivePools.values())mesh.count=0;
  for(let i=3;i<5;i++)wildHiveBeeTemplate.children[i].rotation.x=Math.sin(seconds*70)*(i===3?1:-1)*.35;
  wildHiveBeeTemplate.updateMatrixWorld(true);
  for(const hive of wildHives){
-  const p=hive.position,dist=camera.position.distanceTo(p);if(listener)buzzing=Math.min(buzzing,Math.hypot(listener.x-p.x,listener.z-p.z));
+  const p=hive.position,attackTarget=updateWildHiveThreats(hive,now,dt),dist=camera.position.distanceTo(p);if(listener)buzzing=Math.min(buzzing,Math.hypot(listener.x-p.x,listener.z-p.z));
   wildHiveProjected.copy(p).project(camera);
   if(dist>(isMobile?58:80)||wildHiveProjected.z< -1||wildHiveProjected.z>1||Math.abs(wildHiveProjected.x)>1.25||Math.abs(wildHiveProjected.y)>1.3)continue;
   const nest=wildHivePools.get('nest'),entry=wildHivePools.get('entrance');
-  wildHiveDummy.position.copy(p);wildHiveDummy.rotation.set(0,0,-.06);wildHiveDummy.scale.set(.9,1.1,.9);wildHiveDummy.updateMatrix();nest.setMatrixAt(nest.count++,wildHiveDummy.matrix);
-  wildHiveDummy.position.set(p.x,p.y-.10,p.z+.285);wildHiveDummy.rotation.set(0,0,0);wildHiveDummy.scale.set(1,.8,.25);wildHiveDummy.updateMatrix();entry.setMatrixAt(entry.count++,wildHiveDummy.matrix);
-  if(!daytime)continue;
-  let nearest=null,nearestDistance=Infinity;for(const ch of characters.values()){if(!ch.mesh)continue;const d=Math.hypot(ch.mesh.position.x-p.x,ch.mesh.position.z-p.z);if(d<nearestDistance){nearestDistance=d;nearest=ch.mesh.position;}}
-  if(nearestDistance<5)hive.scared=true;else if(nearestDistance>7.5)hive.scared=false;
-  hive.scatter=THREE.MathUtils.damp(hive.scatter,hive.scared?1:0,hive.scared?5:2.4,Math.min(.05,Math.max(0,dt)));
-  const dx=p.x-(nearest?.x??p.x),dz=p.z-(nearest?.z??p.z),len=Math.max(.1,Math.hypot(dx,dz));
+  wildHiveDummy.position.copy(p);wildHiveDummy.rotation.set(0,0,-.06);wildHiveDummy.scale.set(1.35,1.65,1.35);wildHiveDummy.updateMatrix();nest.setMatrixAt(nest.count++,wildHiveDummy.matrix);
+  wildHiveDummy.position.set(p.x,p.y-.15,p.z+.4275);wildHiveDummy.rotation.set(0,0,0);wildHiveDummy.scale.set(1.5,1.2,.375);wildHiveDummy.updateMatrix();entry.setMatrixAt(entry.count++,wildHiveDummy.matrix);
+  if(!daytime&&!attackTarget&&hive.scatter<.01)continue;
   for(let i=0;i<wildHiveBeesPerNest;i++){
    const phase=hive.phase+i*2.399963,a=seconds*(.65+(i%3)*.08)+phase,cycle=(seconds*.12+i*.17+hive.id*.11)%1;
    let emergence=THREE.MathUtils.smoothstep(cycle,.04,.20)*(1-THREE.MathUtils.smoothstep(cycle,.84,1));if(hive.scared)emergence=1;
    const r=(.65+(i%4)*.16+.2*Math.sin(a*.77))*emergence;
-   wildHiveDummy.position.set(p.x+Math.cos(a)*r+dx/len*2.7*hive.scatter,p.y+.15+Math.sin(a*2.3)*.22+.75*hive.scatter,p.z+.32+Math.sin(a)*r+dz/len*2.7*hive.scatter);
+   const swarmX=THREE.MathUtils.lerp(p.x,attackTarget?.x??p.x,hive.scatter),swarmY=THREE.MathUtils.lerp(p.y+.15,(attackTarget?.y??p.y)+1.2,hive.scatter),swarmZ=THREE.MathUtils.lerp(p.z+.32,attackTarget?.z??p.z,hive.scatter);
+   wildHiveDummy.position.set(swarmX+Math.cos(a)*r,swarmY+Math.sin(a*2.3)*.22,swarmZ+Math.sin(a)*r);
    wildHiveDummy.rotation.set(0,-a,Math.sin(a*1.3)*.10);wildHiveDummy.scale.setScalar(emergence<.03?0:emergence);wildHiveDummy.updateMatrix();
    for(const part of wildHiveBeeTemplate.children){const pool=wildHivePools.get(part.geometry.uuid+':'+part.material.uuid);wildHiveMatrix.multiplyMatrices(wildHiveDummy.matrix,part.matrixWorld);pool.setMatrixAt(pool.count++,wildHiveMatrix);}
   }
@@ -11961,7 +11983,7 @@ document.body.appendChild(v517ObjectiveUI);
 const v517ObjectiveMessage=v517ObjectiveUI.querySelector('.v517Message');
 let v517LastObjective='';
 function v519PositionObjective(){
- v517ObjectiveUI.style.top='8px';v517ObjectiveUI.style.left='50%';v517ObjectiveUI.style.transform='translateX(-50%)';
+ v517ObjectiveUI.style.top='8px';v517ObjectiveUI.style.left='calc(50% - 12px)';v517ObjectiveUI.style.transform='translateX(-50%)';
 }
 v519PositionObjective();window.addEventListener('resize',v519PositionObjective,{passive:true});
 function v517UpdateObjectives(dt){
@@ -14295,7 +14317,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  }
  html body #mobileMenu::after{font-size:16px!important;line-height:1!important;}
  html body #v517ObjectiveUI{
-  left:130px!important;right:46px!important;top:calc(13px + env(safe-area-inset-top))!important;
+  left:118px!important;right:58px!important;top:calc(13px + env(safe-area-inset-top))!important;
   transform:none!important;
   width:auto!important;max-width:380px!important;
   padding:8px 12px!important;border-radius:10px!important;
