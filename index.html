@@ -2675,8 +2675,7 @@ function nightFearFactor(x,z,opts={}){
  if(inCaveWalkZone(x,z)||caveEntrancePortal(x,z))return 0;
  const intensity=nightFearIntensity();if(intensity<=0)return 0;
  let exposure=opts.exploring?1:opts.moving?.65:.28;
- if(opts.torch)exposure*=.5;
- if(opts.companion)exposure*=.5;
+ exposure*=1-strongestSurvivalEffect([{kind:'nightFearReduction',value:opts.torch?.5:0},{kind:'nightFearReduction',value:opts.companion?.5:0}],'nightFearReduction');
  if(opts.unknown)exposure*=1.2;
  return Math.min(4.5,nightFearAdaptation(clockParts().day)*intensity*exposure);
 }
@@ -2901,14 +2900,27 @@ const FULL_FIRE_LINES=['이제 그만 넣어도 되겠다.','불이 충분히 �
 function fullLine(lines){return lines[Math.floor(Math.random()*lines.length)];}
 // v3.82: proximity reassurance is a single non-stacking multiplier.
 // Only routine morale drain is reduced; direct snake/bear damage remains dangerous.
-function companionWillDrainMultiplier(character){
- const owner=character==='hina'?hana.position:daeun.mesh.position;
- const other=character==='hina'?daeun.mesh.position:hana.position;
- const together=dualReady&&Math.hypot(owner.x-other.x,owner.z-other.z)<=10;
- const torchLit=torchGroup.visible&&torchCarried&&torchLight.intensity>0;
- const torchNearby=torchLit&&Math.hypot(owner.x-hana.position.x,owner.z-hana.position.z)<=10;
- return (together||torchNearby)?.5:1;
+const survivalEffectProviders=new Map();
+function strongestSurvivalEffect(effects,kind){
+ return effects.reduce((best,e)=>e.kind===kind&&Number.isFinite(e.value)?Math.max(best,e.value):best,0);
 }
+function activeSurvivalEffects(character){
+ const owner=characters.get(character)?.mesh.position;if(!owner)return [];
+ const other=character==='hina'?daeun.mesh.position:hana.position,effects=[];
+ if(dualReady&&Math.hypot(owner.x-other.x,owner.z-other.z)<=10)effects.push({source:'friend',kind:'routineWillReduction',value:.5});
+ if(torchGroup.visible&&torchCarried&&torchLight.intensity>0&&Math.hypot(owner.x-hana.position.x,owner.z-hana.position.z)<=10)effects.push({source:'torch',kind:'routineWillReduction',value:.5});
+ // Hina's existing pet bonuses; do not invent a new Daeun pet bonus.
+ if(character==='hina'&&petRabbit)effects.push({source:'rabbit',kind:'routineWillReduction',value:.5},{source:'rabbit',kind:'lonelinessGrowthReduction',value:.5});
+ if(v504Meditation.active&&v504Meditation.id===character)effects.push({source:'fireGaze',kind:'fireGazeCompletionWill',value:6});
+ for(const [source,provider] of survivalEffectProviders)for(const effect of provider(character)||[])effects.push({...effect,source});
+ return effects;
+}
+function survivalEffectValue(character,kind){return strongestSurvivalEffect(activeSurvivalEffects(character),kind);}
+function routineWillDrainMultiplier(character){return 1-Math.min(1,survivalEffectValue(character,'routineWillReduction'));}
+function companionWillDrainMultiplier(character){
+ return 1-Math.min(1,strongestSurvivalEffect(activeSurvivalEffects(character).filter(e=>e.source==='friend'||e.source==='torch'),'routineWillReduction'));
+}
+
 function tickHinaCampfireFuel(step){
  if(fireSuccess){
   // Rain accelerates consumption and raises the risk of embers dying, even with fuel.
@@ -2946,7 +2958,7 @@ function moraleUpdate(step){
  let drain=0;
  if(exploring&&away>13)drain+=.018+(away>28?.02:0);
  if(exposed){
-  const fear=nightFearFactor(hana.position.x,hana.position.z,{exploring,moving:exploring,torch:torchCarried,companion:false});
+  const fear=nightFearFactor(hana.position.x,hana.position.z,{exploring,moving:exploring,torch:false,companion:false});
   // Subtract baseline so daytime movement cost is not duplicated.
   drain+=.042*fear*(nightFearIntensity()>.05?3:1);
  }
@@ -2954,7 +2966,7 @@ function moraleUpdate(step){
  if(stats.thirst<25)drain+=.025;
  if(stats.hunger<25)drain+=.025;
  // Isolation does not produce unlimited passive will drain.
- loneliness=Math.min(100,loneliness+step*(petRabbit?.003:.006));
+ loneliness=Math.min(100,loneliness+step*.006*(1-Math.min(1,survivalEffectValue('hina','lonelinessGrowthReduction'))));
  drain+=Math.min(.012,loneliness*.00015);
  // At high morale, ordinary daily responsibility still costs some mental energy.
  if(stats.will>82&&!resting)drain+=.026;
@@ -2984,7 +2996,7 @@ function moraleUpdate(step){
   stats.will=Math.min(100,stats.will+step*recovery*diminishing*needsPenalty);
   loneliness=Math.max(0,loneliness-step*.022);
  }else{
-  stats.will=Math.max(0,stats.will-step*drain*(1-mentalResilience())*(petRabbit?.5:1)*(darkHours()&&exposed?2:1)*companionWillDrainMultiplier('hina'));
+  stats.will=Math.max(0,stats.will-step*drain*(1-mentalResilience())*(darkHours()&&exposed?2:1)*routineWillDrainMultiplier('hina'));
  }
  if(elapsed>lastMoraleMessage+32&&stats.will<34&&state==='wander'){
   lastMoraleMessage=elapsed;
@@ -3220,8 +3232,7 @@ function fireGazeHelp(){
  if(v504AutomaticMeditation(id)&&id==='daeun')return ['불멍 · 자동 휴식','의지력 45 미만일 때의 기존 휴식입니다. 현재 체력 회복은 게임 시간 초당 +'+energy.toFixed(3)+'이며 최대 체력은 100입니다.',restDetail+' 직접 실행하는 불멍의 +6 보상은 겹쳐 지급하지 않습니다.'];
  return ['불멍 효과','켜진 모닥불 7m 안에서 게임 내 25분을 채우면 의지력 +6(최대 100)을 한 번 받습니다.'+(id==='daeun'?' 다은은 기존 앉기 체력 회복도 적용됩니다: 현재 게임 시간 초당 +'+energy.toFixed(3)+'(최대 100).'+restDetail:' 히나는 시작 전 상태의 기존 회복 규칙을 유지하며 별도의 체력 보너스는 없습니다.'),'불 꺼짐·0.7m 초과 이동·다른 행동·자동/수동 모드 변경·관찰 캐릭터 변경 시 취소됩니다. 다은은 안전하게 앉을 수 있고 탈진 잠금 및 가방 없이 생선을 든 상태가 아니어야 합니다.'];
 }
-v510MeditationStatus.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch'&&matchMedia('(min-width:701px) and (pointer:fine)').matches)statHelpShow(v510MeditationStatus,fireGazeHelp());});
-v510MeditationStatus.addEventListener('pointerleave',statHelpHide);
+
 function v510SyncMeditationUI(){
  const automatic=v504AutomaticMeditation(observedId),active=!!v504Meditation.active||automatic;
  v510MeditationStatus.removeAttribute('title');
@@ -3437,12 +3448,7 @@ function closeWillShieldTip(){
  willShieldHud.classList.remove('tip-open');
  willShieldHud.setAttribute('aria-expanded','false');
 }
-willShieldHud.addEventListener('click',e=>{
- e.stopPropagation();
- const opening=!willShieldHud.classList.contains('tip-open');
- closeWillShieldTip();
- if(opening){willShieldHud.classList.add('tip-open');willShieldHud.setAttribute('aria-expanded','true');}
-});
+
 document.addEventListener('pointerdown',e=>{
  if(!willShieldHud.contains(e.target))closeWillShieldTip();
 });
@@ -3468,12 +3474,12 @@ function updateWillShieldHud(){
  }
  willShieldHud.style.visibility=(mobile&&document.body.classList.contains('menu-open'))?'hidden':'visible';
  const causes=[together?'동료 10m 이내':null,torchNearby?'켜진 횃불 10m 이내':null].filter(Boolean);
- const detail='💗 의지력 감소 50% 완화<br>'+causes.join(' + ')+'<br>두 조건이 겹쳐도 50%만 적용<br>뱀·곰의 직접 공포 피해는 제외';
+ const detail='💗 의지력 감소 50% 완화<br>'+causes.join(' + ')+'<br>같은 종류는 가장 높은 효과 한 번만 적용<br>뱀·곰의 직접 공포 피해는 제외';
  const tip=document.getElementById('willShieldTip');
  if(tip.innerHTML!==detail)tip.innerHTML=detail;
 }
 function updatePetBenefitFeedback(){
- const active=observedId==='hina'?!!petRabbit?.g?.visible:observedId==='daeun'?!!daeunPetRabbit?.g?.visible:false;
+ const active=observedId==='hina'?!!petRabbit:observedId==='daeun'?!!daeunPetRabbit?.g?.visible:false;
  petRabbitHud.style.display=active?'flex':'none';
  if(active){
   const mobile=window.matchMedia('(max-width:700px)').matches;
@@ -6047,6 +6053,7 @@ function statHelpHide(){
 }
 function statHelpShow(el,customEntry=null){
  const entry=customEntry||STAT_HELP[el?.dataset?.statHelp];if(!entry)return;
+ statHelpPopup.style.maxWidth='';
  const character=el.id==='v510MeditationStatus'?(observedId==='daeun'?'다은':'히나'):el.closest('#daeunStats')?'다은':'히나';
  const description=entry[1].replaceAll('히나가',character+'가').replaceAll('히나는',character+'는');
  const detail=character==='다은'&&entry[0]==='의지력'?'의지력이 낮아지면 탐험을 줄이고 동굴에서 쉬면서 회복해요.':entry[2].replaceAll('히나는',character+'는');
@@ -6093,6 +6100,90 @@ for(const statArea of statAreas)statArea.addEventListener('keydown',e=>{
 });
 document.addEventListener('pointerdown',e=>{if(!e.target.closest('#stats')&&!e.target.closest('#daeunStats'))statHelpHide();});
 window.addEventListener('resize',statHelpHide);
+
+
+const statusEffectIcons=new Map();
+let statusEffectTooltip=null;
+function statusEffectOverlapNote(sources){
+ const effects=activeSurvivalEffects(observedId),kinds=new Set(effects.filter(e=>sources.includes(e.source)).map(e=>e.kind));
+ return [...kinds].some(kind=>effects.filter(e=>e.kind===kind).length>1)?' 같은 종류의 효과는 중복 적용하지 않으며, 가장 높은 수치 하나만 적용됩니다.':'';
+}
+function statusEffectHelp(icon){
+ const binding=statusEffectIcons.get(icon),entry=binding.help();
+ return [entry[0],entry[1],entry[2]+statusEffectOverlapNote(binding.sources)];
+}
+function hideStatusEffectTooltip(icon=null){
+ if(icon&&statusEffectTooltip?.icon!==icon)return;
+ if(statusEffectTooltip){statusEffectTooltip.icon.setAttribute('aria-expanded','false');statusEffectTooltip=null;statHelpHide();}
+}
+function showStatusEffectTooltip(icon,mobile=false){
+ const entry=statusEffectHelp(icon);statHelpShow(icon,entry);
+ if(statusEffectTooltip&&statusEffectTooltip.icon!==icon)statusEffectTooltip.icon.setAttribute('aria-expanded','false');
+ statusEffectTooltip={icon,mobile,signature:JSON.stringify(entry)};icon.setAttribute('aria-expanded','true');
+ if(mobile){
+  const rect=icon.getBoundingClientRect();
+  statHelpPopup.style.maxWidth=Math.min(320,innerWidth-24,Math.max(120,rect.left-24))+'px';
+  const tip=statHelpPopup.getBoundingClientRect();
+  const beside=rect.left-tip.width-12>=12;
+  statHelpPopup.style.left=Math.max(12,Math.min(innerWidth-tip.width-12,beside?rect.left-tip.width-12:rect.left+rect.width/2-tip.width/2))+'px';
+  statHelpPopup.style.top=Math.max(12,Math.min(innerHeight-tip.height-12,beside?rect.top+rect.height/2-tip.height/2:rect.top-tip.height-12))+'px';
+ }
+}
+function registerStatusEffectIcon(icon,{help,sources=[],order=100,tap=null}){
+ if(statusEffectIcons.has(icon))return;
+ const binding={help,sources,order,press:null,swallowUntil:0};statusEffectIcons.set(icon,binding);icon.dataset.statusEffect='true';icon.setAttribute('aria-expanded','false');icon.setAttribute('aria-describedby','statHelpPopup');
+ icon.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'&&matchMedia('(hover:hover) and (pointer:fine)').matches)showStatusEffectTooltip(icon);});
+ icon.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hideStatusEffectTooltip(icon);});
+ icon.addEventListener('focus',()=>{if(matchMedia('(hover:hover) and (pointer:fine)').matches)showStatusEffectTooltip(icon);});
+ icon.addEventListener('blur',()=>hideStatusEffectTooltip(icon));
+ icon.addEventListener('pointerdown',e=>{
+  if(e.pointerType!=='touch'&&e.pointerType!=='pen')return;
+  e.stopPropagation();binding.swallowUntil=0;
+  if(binding.press)clearTimeout(binding.press.timer);
+  const press={id:e.pointerId,x:e.clientX,y:e.clientY,shown:false,consumed:false,character:observedId};binding.press=press;
+  icon.setPointerCapture(e.pointerId);
+  press.timer=setTimeout(()=>{if(binding.press!==press||press.character!==observedId||document.hidden||getComputedStyle(icon).display==='none'||getComputedStyle(icon).visibility==='hidden')return;press.shown=press.consumed=true;showStatusEffectTooltip(icon,true);},550);
+ },true);
+ icon.addEventListener('pointermove',e=>{const press=binding.press;if(!press||e.pointerId!==press.id)return;if(Math.hypot(e.clientX-press.x,e.clientY-press.y)>12){clearTimeout(press.timer);press.consumed=true;hideStatusEffectTooltip(icon);}},true);
+ const finish=e=>{const press=binding.press;if(!press||e.pointerId!==press.id)return;clearTimeout(press.timer);binding.press=null;
+  if(press.consumed||e.type==='pointercancel'){binding.swallowUntil=performance.now()+800;e.preventDefault();e.stopPropagation();}
+  if(press.shown)hideStatusEffectTooltip(icon);
+  if(icon.hasPointerCapture(e.pointerId))icon.releasePointerCapture(e.pointerId);
+ };
+ for(const event of ['pointerup','pointercancel','lostpointercapture'])icon.addEventListener(event,finish,true);
+ icon.addEventListener('contextmenu',e=>{if(binding.press||matchMedia('(pointer:coarse)').matches)e.preventDefault();});
+ icon.addEventListener('click',e=>{
+  if(binding.press?.consumed||performance.now()<binding.swallowUntil){e.preventDefault();e.stopImmediatePropagation();return;}
+  if(tap==='toggle'){e.stopImmediatePropagation();const mobile=matchMedia('(pointer:coarse)').matches;if(mobile&&statusEffectTooltip?.icon===icon)hideStatusEffectTooltip(icon);else showStatusEffectTooltip(icon,mobile);}
+ },true);
+}
+function layoutStatusEffectIcons(){
+ const mobile=matchMedia('(max-width:700px), (pointer:coarse)').matches;
+ const icons=[...statusEffectIcons].filter(([icon])=>getComputedStyle(icon).display!=='none').sort((a,b)=>a[1].order-b[1].order).map(([icon])=>icon);
+ if(mobile){
+  // Keep the previous heart anchor (including the pet slot), then stack downward.
+  const heartVisible=icons.includes(willShieldHud),menu=document.getElementById('mobileMenu').getBoundingClientRect();
+  let top=heartVisible?parseFloat(willShieldHud.style.top):menu.bottom+9+(icons.includes(petRabbitHud)?46:0);
+  const right=heartVisible?willShieldHud.style.right:Math.max(9,innerWidth-menu.right)+'px';
+  for(const icon of icons.filter(el=>el!==petRabbitHud)){icon.style.top=Math.round(top)+'px';icon.style.right=right;top+=icon.getBoundingClientRect().height+9;icon.style.visibility=document.body.classList.contains('menu-open')?'hidden':'visible';}
+ }
+ for(const [icon,binding] of statusEffectIcons)if(binding.press&&!icons.includes(icon)){clearTimeout(binding.press.timer);binding.press.consumed=true;}
+ if(statusEffectTooltip){const icon=statusEffectTooltip.icon;
+  if(!icons.includes(icon)||getComputedStyle(icon).visibility==='hidden')hideStatusEffectTooltip(icon);
+  else if(JSON.stringify(statusEffectHelp(icon))!==statusEffectTooltip.signature)showStatusEffectTooltip(icon,statusEffectTooltip.mobile);
+ }
+}
+registerStatusEffectIcon(willShieldHud,{sources:['friend','torch'],order:10,tap:'toggle',help:()=>{
+ const effects=activeSurvivalEffects(observedId),causes=[effects.some(e=>e.source==='friend')?'친구 10m 이내':null,effects.some(e=>e.source==='torch')?'켜진 횃불 10m 이내':null].filter(Boolean);
+ return ['친구·횃불 안심 효과','평상시 의지력 감소 50% 완화. 적용 조건: '+causes.join(' 또는 ')+'.','뱀·곰의 직접 공포 피해에는 적용하지 않습니다. 조건이 하나 종료되어도 다른 조건이 남으면 유지됩니다.'];
+}});
+registerStatusEffectIcon(v510MeditationStatus,{sources:['fireGaze'],order:20,help:fireGazeHelp});
+registerStatusEffectIcon(petRabbitHud,{sources:['rabbit'],order:0,help:()=>observedId==='hina'?['토끼 동행','히나의 평상시 의지력 감소와 외로움 증가를 각각 50% 완화합니다. 토끼 동행 중 적용됩니다.','뱀·곰의 직접 공포 피해에는 적용하지 않습니다.']:['토끼 동행','다은이 토끼와 동행 중입니다.','현재 다은에게 별도의 의지력·외로움 수치 보너스는 구현되어 있지 않습니다.']});
+document.addEventListener('pointerdown',e=>{if(statusEffectTooltip&&!statusEffectTooltip.icon.contains(e.target))hideStatusEffectTooltip();},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hideStatusEffectTooltip();});
+function cancelStatusEffectPresses(){for(const binding of statusEffectIcons.values())if(binding.press){clearTimeout(binding.press.timer);binding.press=null;binding.swallowUntil=performance.now()+800;}hideStatusEffectTooltip();}
+window.addEventListener('blur',cancelStatusEffectPresses);window.addEventListener('resize',cancelStatusEffectPresses);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelStatusEffectPresses();});
 
 // Lightweight procedural ambience, unlocked only by a user click (browser autoplay policy).
 // Sound is enabled by default; browsers require an interaction to unlock playback.
@@ -8548,7 +8639,7 @@ function updateDaeun(step,realDt){
   const drain=sheltered?0:DAEUN_RULES.willBaseDrain+(moving?DAEUN_RULES.willMoveDrain:0)+(distanceFromHome>DAEUN_RULES.autoRadius*.75?DAEUN_RULES.willDistanceDrain:0)+DAEUN_RULES.willNightDrain*fear+(s.hunger<25||s.thirst<25?DAEUN_RULES.willLowNeedsDrain:0);
   // Night exploration costs three times as much will, including manual control.
   const nightExposureMultiplier=!sheltered&&nightFearIntensity()>.05?3:1;
-  s.will=Math.max(0,Math.min(100,s.will+step*((!moving&&!darkHours()&&distanceFromHome<DAEUN_RULES.autoRadius*.5&&s.hunger>=40&&s.thirst>=40)?.018:0)-step*drain*(darkHours()&&moving&&!sheltered?2:1)*nightExposureMultiplier*companionWillDrainMultiplier('daeun')));
+  s.will=Math.max(0,Math.min(100,s.will+step*((!moving&&!darkHours()&&distanceFromHome<DAEUN_RULES.autoRadius*.5&&s.hunger>=40&&s.thirst>=40)?.018:0)-step*drain*(darkHours()&&moving&&!sheltered?2:1)*nightExposureMultiplier*routineWillDrainMultiplier('daeun')));
  }
  // Eating while seated does not interrupt rest, its recovery or seated animation.
  if(d.seatedEating>0){
@@ -10271,8 +10362,9 @@ function v504MeditationTick(dt){
  hideRoastFishShortcut();
  if(elapsed-med.start>=med.duration&&!med.rewarded){
   med.rewarded=true;
-  if(id==='hina')changeWill(6,'모닥불 명상');
-  else {const values=characters.get(id).stats;values.will=Math.min(100,values.will+6);}
+  const reward=survivalEffectValue(id,'fireGazeCompletionWill');
+  if(id==='hina')changeWill(reward,'모닥불 명상');
+  else {const values=characters.get(id).stats;values.will=Math.min(100,values.will+reward);}
   med.completed=true;
   if(med.automatic){v504MeditationStop();return;}
   // Stay seated until the player cancels via movement or the right-side status button.
@@ -11884,7 +11976,7 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
  updateRoastFishButton();
  updateFishTransportPrototype();
  updatePetBenefitFeedback();
- updateWillShieldHud();
+ updateWillShieldHud();layoutStatusEffectIcons();
  renderBatching.update(t);
  const cpuStart=performance.now();renderer.render(scene,camera);updateSubtleBloom(t);
  const submitMs=performance.now()-cpuStart;
@@ -14071,5 +14163,10 @@ html body #characterBar button:is(#observeHina,#observeDaeun)[data-selected="tru
  html body #badge{top:88px!important;}
  html body #v521Menu{top:84px!important;}
 }
+</style>
+<style id="statusEffectHelpStyle">
+button[data-status-effect]{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+button[data-status-effect] .petTooltip{display:none!important;}
+#statHelpPopup{max-height:calc(100dvh - 24px);overflow-y:auto;box-sizing:border-box;}
 </style>
 </body></html>
