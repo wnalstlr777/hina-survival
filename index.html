@@ -247,10 +247,10 @@ body.cinematic-mode [data-hina-cinema-hide="1"]{display:none!important}
 <style id="v504Style">
 #v504CraftResult{position:fixed;z-index:2147483000;top:18%;left:50%;transform:translate(-50%,-15px) scale(.94);padding:12px 22px;background:rgba(19,42,34,.94);border:2px solid #c9e6b9;color:#fff7da;border-radius:22px;font-size:22px;font-weight:800;box-shadow:0 6px 30px #000a;opacity:0;pointer-events:none;transition:opacity .2s,transform .25s;text-align:center;max-width:85vw}
 #v504CraftResult.v504Show{opacity:1;transform:translate(-50%,0) scale(1)}
-#fishStoreButton{display:none!important;pointer-events:none!important}#v504MeditationButton{position:fixed;z-index:1250;left:50%;bottom:105px;transform:translateX(-50%);display:none;background:#324e4b;color:#fff;border:1px solid #a4c8ad;border-radius:18px;padding:10px 17px;font-weight:700;box-shadow:0 3px 14px #0008;cursor:pointer}
+#fishStoreButton{display:none!important;pointer-events:none!important}:is(#v504MeditationButton,#fishingTestButton){position:fixed;z-index:1250;left:50%;bottom:105px;transform:translateX(-50%);display:none;background:#324e4b;color:#fff;border:1px solid #a4c8ad;border-radius:18px;padding:10px 17px;font-weight:700;box-shadow:0 3px 14px #0008;cursor:pointer}
 @media (max-width:700px),(pointer:coarse){
  #v504CraftResult{font-size:19px;top:16%}
- #v504MeditationButton{bottom:100px;font-size:12px;padding:8px 12px}
+ :is(#v504MeditationButton,#fishingTestButton){bottom:100px;font-size:12px;padding:8px 12px}
  #v493CraftToggle{top:45%!important}
  #v498SkillsButton,#v498SkillsToggle{top:39%!important}
 }
@@ -11168,6 +11168,50 @@ function updateWildHives(now,dt){
  }
 }
 
+// Standalone fishing prototype: no inventory, proficiency, AI or survival rewards.
+const fishingTestButton=document.createElement('button');
+fishingTestButton.id='fishingTestButton';fishingTestButton.type='button';fishingTestButton.textContent='🎣 낚시';document.body.appendChild(fishingTestButton);
+const fishingTestFloat=new THREE.Group();
+const fishingTestWhite=new THREE.Mesh(new THREE.CylinderGeometry(.065,.085,.22,8),new THREE.MeshBasicMaterial({color:0xffffff}));
+const fishingTestRed=new THREE.Mesh(new THREE.CylinderGeometry(.045,.065,.16,8),new THREE.MeshBasicMaterial({color:0xf55243}));
+fishingTestRed.position.y=.19;fishingTestFloat.add(fishingTestWhite,fishingTestRed);fishingTestFloat.visible=false;scene.add(fishingTestFloat);
+const fishingTest={phase:'idle',id:null,pond:null,origin:new THREE.Vector3(),age:0,biteAt:0,result:''};
+function fishingTestNearby(){
+ const ch=characters.get(observedId),p=ch?.mesh.position;if(!p||survivorIncapacitated(observedId)||v504ActorSleeping(observedId))return null;
+ const ponds=[pondWater,daeunResources.pondMesh];return ponds.find(pond=>pond&&Math.hypot(p.x-pond.position.x,p.z-pond.position.z)<9)||null;
+}
+function fishingTestReset(){fishingTest.phase='idle';fishingTest.id=null;fishingTestFloat.visible=false;}
+function fishingTestResult(text){fishingTest.phase='result';fishingTest.age=0;fishingTest.result=text;fishingTestFloat.visible=false;fishingTestButton.textContent=text;}
+fishingTestButton.addEventListener('pointerdown',e=>e.stopPropagation());
+fishingTestButton.addEventListener('click',e=>{
+ e.stopPropagation();if(paused)return;
+ const f=fishingTest;if(f.phase==='result')return;
+ if(f.phase==='idle'){
+  const pond=fishingTestNearby();if(!pond)return;const p=characters.get(observedId).mesh.position;
+  f.id=observedId;f.pond=pond;f.origin.copy(p);f.phase='waiting';f.age=0;f.biteAt=3+Math.random()*4;
+  const dx=p.x-pond.position.x,dz=p.z-pond.position.z,length=Math.hypot(dx,dz)||1;
+  fishingTestFloat.position.set(pond.position.x+dx/length*1.8,pond.position.y+.12,pond.position.z+dz/length*1.8);fishingTestFloat.visible=true;
+  fishingTestButton.textContent='🎣 찌를 지켜보세요';
+ }else{
+  const onTime=f.age>=f.biteAt+.55&&f.age<=f.biteAt+1.4;
+  fishingTestResult(!onTime?'💨 타이밍 실패!':Math.random()<.4?'💨 물고기가 도망갔어요!':'🐟 잡았다! (테스트)');
+ }
+});
+function updateFishingTest(dt){
+ const f=fishingTest,near=fishingTestNearby();
+ if(f.phase!=='idle'&&(observedId!==f.id||!near||characters.get(f.id).mesh.position.distanceTo(f.origin)>2.5))fishingTestReset();
+ fishingTestButton.style.display=near&&!v504Meditation.active?'block':'none';
+ fishingTestButton.style.visibility=getComputedStyle(v504MeditationButton).visibility;
+ if(near&&!v504Meditation.active)v504MeditationButton.style.display='none';
+ if(f.phase==='idle'){fishingTestButton.textContent='🎣 낚시';return;}
+ if(paused)return;f.age+=dt;
+ if(f.phase==='result'){if(f.age>=1.8)fishingTestReset();return;}
+ const dive=Math.max(0,Math.min(1,(f.age-f.biteAt)/.55));
+ fishingTestFloat.position.y=f.pond.position.y+.12+(.025*Math.sin(f.age*4.1)+.018*Math.sin(f.age*7.7))*(1-dive)-.36*dive;
+ fishingTestFloat.rotation.z=Math.sin(f.age*3.3)*.08*(1-dive);
+ fishingTestButton.textContent=dive>=1?'🎣 지금 당기기!':'🎣 찌를 지켜보세요';
+ if(f.age>f.biteAt+1.4)fishingTestResult('💨 놓쳤어요!');
+}
 const codexCrafted=new Set();
 const codexCategories={equipment:'장비',cooking:'요리',living:'생활'};
 let codexCategory='equipment',codexSignature='';
@@ -12127,7 +12171,7 @@ function animate(t){requestAnimationFrame(animate);progressStore.tick(t);
   camera.lookAt(orbit.target);
  }else orbit.update();
  updateSurvivalPresentation(t);
- v504MeditationTick(dt);v508UpdateMeditateIcon();
+ v504MeditationTick(dt);updateFishingTest(dt);v508UpdateMeditateIcon();
  // Move the small sun shadow frustum with Hina; snap to texels to reduce shimmer.
  const shadowRadius=ultraLowPower?16:highQuality?48:28;
  const shadowMapSize=ultraLowPower?512:highQuality?(isMobile?1024:2048):(isMobile?768:1024);
@@ -14350,7 +14394,7 @@ html body #characterBar button:is(#observeHina,#observeDaeun) .character-orbit-l
 body.cinematic-mode #v504MeditationButton,body.cinematic-mode #v510MeditationStatus,
 body.v5261-menu-active #v504MeditationButton,body.hina-menu-foreground #v504MeditationButton,
 body:has(#v521MapBackdrop.open) #v504MeditationButton,
-body:has(#profileViewer.open,#daeunProfileViewer.open,#v523DetailBackdrop.open) #v504MeditationButton{visibility:hidden!important;}
+body:has(#profileViewer.open,#daeunProfileViewer.open,#v523DetailBackdrop.open) :is(#v504MeditationButton,#fishingTestButton){visibility:hidden!important;}
 
 html body #characterBar button:is(#observeHina,#observeDaeun)[data-selected="false"][data-auto][data-locked]{background:#354c47!important;border-color:#718a80!important;box-shadow:none!important;outline:none!important;}
 html body #characterBar button:is(#observeHina,#observeDaeun)[data-selected="true"][data-auto][data-locked]{background:#468B70!important;color:white!important;box-shadow:inset 0 0 8px #a6ffe01f,0 0 7px #78f0cb38!important;}
