@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>HINA SURVIVAL v5.2.88</title><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media (max-width:700px), (pointer:coarse){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media (max-width:700px), (pointer:coarse){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}}
+<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>HINA SURVIVAL v5.2.89</title><script src="hive-diagnostics.js?v=5.2.89"></script><style>body{margin:0;background:#0d171c;color:#eaf4f1;font:14px system-ui,sans-serif}#view{position:fixed;inset:0}#ui{position:fixed;left:18px;top:18px;width:310px;background:#101d24e8;border:1px solid #45616b;border-radius:15px;padding:17px;box-shadow:0 10px 30px #0007}h2{margin:0 0 5px;font-size:21px}.muted{color:#a5bdc3}.stat{display:flex;align-items:center;gap:9px;margin:9px 0}.stat label{width:52px}.bar{height:9px;background:#33424b;border-radius:8px;flex:1;overflow:hidden}.fill{height:100%;background:#68d3b1;width:50%}.val{width:35px;text-align:right}.thought{padding:12px;background:#243a42;border-radius:10px;margin:12px 0;min-height:45px}#log{max-height:145px;overflow:auto;font-size:12px;color:#b8c9cc;line-height:1.8}#controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#13242be8;padding:12px 17px;border-radius:14px;display:flex;gap:12px;align-items:center}button{background:#347f77;color:white;border:0;border-radius:8px;padding:9px 12px;cursor:pointer}button:hover{background:#469b8f}#badge{position:fixed;right:16px;top:16px;background:#13242bdb;padding:12px;border-radius:12px;text-align:right}@media (max-width:700px), (pointer:coarse){#ui{width:220px;padding:10px;top:8px;left:8px;font-size:12px}h2{font-size:16px}#badge{font-size:11px;right:8px;top:8px}#controls{bottom:8px;padding:8px;gap:5px}button{padding:7px}}#bubble{position:fixed;left:50%;top:50%;max-width:245px;min-width:110px;box-sizing:border-box;padding:11px 14px;background:#fffdf1;color:#25333a;border:2px solid #293d44;border-radius:17px;box-shadow:0 5px 18px #0005;text-align:center;font-weight:750;font-size:14px;line-height:1.5;pointer-events:none;z-index:4;opacity:0;transition:opacity .2s;transform:translate(-50%,-100%);white-space:normal}#bubble:after{content:"";position:absolute;bottom:-11px;left:calc(50% - 9px);width:16px;height:16px;background:#fffdf1;border-right:2px solid #293d44;border-bottom:2px solid #293d44;transform:rotate(45deg)}#bubble.show{opacity:1}#bubbleToggle[aria-pressed="false"]{background:#48545a}@media (max-width:700px), (pointer:coarse){#bubble{font-size:12px;max-width:170px;padding:8px 10px}#bubbleToggle{font-size:11px}}
 #dayNight{display:inline-block;margin-left:5px;padding:4px 8px;border-radius:20px;background:#f7c96b27;color:#ffe2a1;font-size:12px;font-weight:700;white-space:nowrap}#dayNight.night{background:#7d96d833;color:#cbd7ff}#mobileCategories{display:none}#mobileMenu{display:none}#extraControls{display:flex;gap:10px;align-items:center}
 @media (max-width:700px), (pointer:coarse){
  #mobileMenu{display:block;position:fixed;z-index:12;right:9px;top:9px;background:#163b45ed;font-size:14px;padding:10px 13px}
@@ -10951,7 +10951,7 @@ const renderBatching=(()=>{
 initializeOcclusionGroups(); // Include original unbatched trees near the bear.
 // Read-only capture for repeatable diagnostics. CPU submission is not GPU time.
 const renderSamples=[];let previousSampleTime=0,renderSampleCursor=0;
-window.hinaPerformance={version:'5.2.88',snapshot:()=>({render:{...renderer.info.render},memory:{...renderer.info.memory},batching:renderBatching.stats(),gpuTiming:'not measured',jsHeapBytes:performance.memory?.usedJSHeapSize??null}),samples:()=>{const ordered=renderSamples.length<600?renderSamples:[...renderSamples.slice(renderSampleCursor),...renderSamples.slice(0,renderSampleCursor)];return ordered.map(s=>({...s}));}};
+window.hinaPerformance={version:'5.2.89',snapshot:()=>({render:{...renderer.info.render},memory:{...renderer.info.memory},batching:renderBatching.stats(),gpuTiming:'not measured',jsHeapBytes:performance.memory?.usedJSHeapSize??null}),samples:()=>{const ordered=renderSamples.length<600?renderSamples:[...renderSamples.slice(renderSampleCursor),...renderSamples.slice(0,renderSampleCursor)];return ordered.map(s=>({...s}));}};
 
 // v5.2.7: four distal joints per survivor. Original shoulder/hip pivots stay intact.
 // Shared presentation only: never changes paths, destinations, resources or AI decisions.
@@ -11110,7 +11110,7 @@ const WILD_HIVE_ATTACK_RADIUS=7,WILD_HIVE_LEASH_RADIUS=8,WILD_HIVE_STING_COOLDOW
 const WILD_HIVE_WATCH_SECONDS=1.8,WILD_HIVE_DIVE_SECONDS=1.5,WILD_HIVE_RETURN_SECONDS=1.2,WILD_HIVE_MAX_STINGS=3,WILD_HIVE_REST_SECONDS=3;
 const wildHiveBeeTemplate=makeFlowerBee(),wildHiveDummy=new THREE.Object3D(),wildHiveMatrix=new THREE.Matrix4(),wildHiveBounds=new THREE.Box3(),wildHiveProjected=new THREE.Vector3();
 const wildHiveBeesPerNest=isMobile?5:8,WILD_HIVE_LIMIT=14;
-let nextWildHiveObservation=0,lastWildHiveUpdate=null,wildHiveClockPaused=false;
+let nextWildHiveObservation=0,lastWildHiveUpdate=null,wildHiveClockPaused=false,wildHiveUpdateCount=0;
 document.addEventListener('visibilitychange',()=>{lastWildHiveUpdate=null;});
 function wildHivePool(key,geometry,material,capacity){
  const mesh=new THREE.InstancedMesh(geometry,material,capacity);mesh.name='WildHive_'+key;mesh.count=0;mesh.frustumCulled=false;mesh.castShadow=false;mesh.receiveShadow=false;mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);scene.add(mesh);wildHivePools.set(key,mesh);return mesh;
@@ -11206,7 +11206,7 @@ function updateWildHiveThreats(hive,now,dt){
 function updateWildHives(now){
  // Attack windup/flight uses real time, not the simulation's 50ms frame cap.
  const dt=lastWildHiveUpdate===null||wildHiveClockPaused?0:Math.max(0,(now-lastWildHiveUpdate)*.001);
- lastWildHiveUpdate=now;wildHiveClockPaused=paused||document.hidden;
+ lastWildHiveUpdate=now;wildHiveUpdateCount++;wildHiveClockPaused=paused||document.hidden;
  if(!wildHives.length||wildHiveClockPaused)return;
  const seconds=now*.001,daytime=clockParts().h>=6&&clockParts().h<19,listener=characters.get(observedId)?.mesh.position;
  let buzzing=Infinity;
@@ -11248,6 +11248,39 @@ function updateWildHives(now){
   if(showSurvivalLine(id,lines[record.line%lines.length])){record.line++;record.inside=nearest.id;record.next=now+60000;if(!nearest.discoveredBy.has(id)){nearest.discoveredBy.add(id);log('🐝 '+(ch.name||id)+' 야생 벌통 발견 · 현재 채집 불가');}}
  }
 }
+
+
+// Read-only diagnostics: collect the running game's actual state without moving actors or advancing attacks.
+window.hinaHiveDiagnosticSnapshot=()=>{
+ const now=performance.now(),round=n=>Number.isFinite(n)?Math.round(n*100)/100:null;
+ const point=p=>p?[round(p.x),round(p.y),round(p.z)]:null;
+ const actor=characters.get(observedId),near=actor?.mesh?wildHives.map(h=>({h,d:Math.hypot(actor.mesh.position.x-h.position.x,actor.mesh.position.z-h.position.z)})).sort((a,b)=>a.d-b.d):[];
+ const describe=({h,d})=>{
+  const a=h.attack,target=characters.get(a?.targetId),last=wildHiveLastSting.get(a?.targetId??observedId);
+  const cooldownMs=Math.max(0,WILD_HIVE_STING_COOLDOWN-(now-(last??-Infinity)));
+  let reason='ready';
+  if(paused)reason='game_paused';else if(document.hidden)reason='page_hidden';
+  else if(!actor?.stats||actor.stats.health<=0)reason='selected_actor_unavailable';
+  else if(lastWildHiveUpdate===null)reason='hive_loop_not_started';
+  else if(now-lastWildHiveUpdate>2500)reason='hive_loop_stale';
+  else if(a?.targetId&&a.targetId!==observedId)reason='attacking_other_character';
+  else if(a?.phase==='rest')reason='rest_between_volleys';
+  else if(a?.phase==='watch')reason=cooldownMs>0?'sting_cooldown':'watching_before_dive';
+  else if(a?.phase==='dive')reason='diving';else if(a?.phase==='return')reason='returning_to_hive';
+  else if(d>WILD_HIVE_ATTACK_RADIUS)reason='outside_attack_radius';
+  else reason='inside_radius_but_idle';
+  return {id:h.id,distance:round(d),position:point(h.position),phase:a?.phase??'not_initialized',ageSeconds:round(a?.age??0),hits:a?.hits??0,beeIndex:a?.beeIndex??null,targetId:a?.targetId??null,targetPosition:point(target?.mesh?.position),cooldownMs:Math.round(cooldownMs),reason};
+ };
+ return {
+  version:'5.2.89',paused,hidden:document.hidden,selectedId:observedId,day:clockParts().day,speed,
+  actor:actor?{id:observedId,position:point(actor.mesh?.position),health:round(actor.stats?.health),will:round(actor.stats?.will),energy:round(actor.stats?.energy),dead:!!actor.dead,restLocked:!!actor.restLocked,visible:actor.mesh?.visible??null,automatic:observedId==='hina'?!hinaManual:!!actor.auto}:null,
+  thresholds:{attackRadius:WILD_HIVE_ATTACK_RADIUS,leashRadius:WILD_HIVE_LEASH_RADIUS,cooldownMs:WILD_HIVE_STING_COOLDOWN,watchSeconds:WILD_HIVE_WATCH_SECONDS,diveSeconds:WILD_HIVE_DIVE_SECONDS},
+  loop:{updates:wildHiveUpdateCount,lastUpdateAgoMs:lastWildHiveUpdate===null?null:Math.round(now-lastWildHiveUpdate),clockPaused:wildHiveClockPaused},
+  hiveCount:wildHives.length,nearest:near.slice(0,3).map(describe),
+  flowerInsects:actor?.mesh?flowerBeeFlights.filter(f=>f.active!==false).map(f=>({kind:f.kind,distance:round(Math.hypot(actor.mesh.position.x-f.bee.position.x,actor.mesh.position.z-f.bee.position.z))})).sort((a,b)=>a.distance-b.distance).slice(0,3):[],
+  audio:window.HinaInteractionSFX?.audioStatus?.()??null
+ };
+};
 
 const codexCrafted=new Set();
 const codexCategories={equipment:'장비',cooking:'요리',living:'생활'};
@@ -14198,7 +14231,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  settings.innerHTML='<strong>⚙️ 설정</strong><div id="v5264SettingsControls"></div>';
  shell.appendChild(settings);
  const settingsControls=settings.querySelector('#v5264SettingsControls');
- const settingsIds=['ambientVolumeControl','interactionSoundPreview','qualityToggle','perfToggle','collisionDebug','rainTest','devDay10'];
+ const settingsIds=['hiveDiagnosticButton','ambientVolumeControl','interactionSoundPreview','qualityToggle','perfToggle','collisionDebug','rainTest','devDay10'];
  function attachSettings(){
    if(!mobile())return;
    for(const id of settingsIds){
