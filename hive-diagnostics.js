@@ -1,7 +1,7 @@
 /* Read-only, local diagnostics. Nothing is uploaded automatically. */
 (()=>{
  'use strict';
- const VERSION='5.2.91',errors=[],samples=[],startedAt=performance.now();
+ const VERSION='5.2.92',errors=[],samples=[],startedAt=performance.now();
  let recording=false,timer=null,panel=null,summary=null,output=null,status=null,toggle=null;
  const bounded=(list,item,max)=>{list.push(item);if(list.length>max)list.shift();};
  const safePath=value=>{try{const u=new URL(value,location.href);return /https?:/.test(u.protocol)?(u.origin+u.pathname).slice(0,300):u.protocol;}catch{return String(value||'').slice(0,160);}};

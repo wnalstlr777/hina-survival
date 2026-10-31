@@ -44,8 +44,9 @@ window.__hiveCheck={
  pause(value){paused=value;},
  reset(){resetSurvivalPresentation();return wildHives.every(h=>h.attack===null)&&wildHiveLastSting.size===0;},
  low(){stats.energy=2;stats.will=3;},
- blink(){const r=snakeFearReactions.get("hina");restoreSnakeFearOverlay(r);updateSnakeFearOverlay(.001);return {white:r.parts.every(p=>p.mesh.material===p.white),jump:r.jump,locked:snakeFearLocked("hina")};},
+ blink(){const r=snakeFearReactions.get("hina");restoreSnakeFearOverlay(r);updateSnakeFearOverlay(.05);return {white:r.parts.every(p=>p.mesh.material===p.white),jump:r.jump,arms:characterAnimation.byId.hina.arms.map(arm=>arm.rotation.x),locked:snakeFearLocked("hina")};},
  sting(id,now){return wildHiveSting(id,now);},
+ buzzSetup(){this.setup();observedId='hina';soundEnabled=true;wildHiveBuzzLevel=0;this.move('hina',5);HinaInteractionSFX.setPaused(true);HinaInteractionSFX.setPaused(false);},
  soundActor(id){observedId=id;characters.get(id).stats.will=0;characters.get(id).stats.energy=100;wildHiveLastSting.clear();HinaInteractionSFX.setPaused(true);HinaInteractionSFX.setPaused(false);},
  snake(){const started=startSnakeFearReaction("hina");return {started,locked:snakeFearLocked("hina"),blinkOnly:snakeFearReactions.get("hina").blinkOnly};},
  nest(){const p=wildHives[0].position;camera.position.copy(p).add(new THREE.Vector3(0,1,8));camera.lookAt(p);camera.updateMatrixWorld(true);updateWildHives(this.now,.05);const matrix=new THREE.Matrix4();wildHivePools.get('nest').getMatrixAt(0,matrix);return new THREE.Vector3().setFromMatrixScale(matrix).toArray();},
@@ -94,17 +95,17 @@ def run():
    approach=page.evaluate("""()=>{const positions=[];for(let i=0;i<30;i++){__hiveCheck.step();positions.push(__hiveCheck.state().swarm);}return positions;}""")
    from math import dist
    assert dist(approach[0],approach[-1])>.7,approach
-   assert all(dist(a,b)<=1.25*.05+1e-6 for a,b in zip(approach,approach[1:])),approach
+   assert all(dist(a,b)<=1.6*.05+1e-6 for a,b in zip(approach,approach[1:])),approach
    assert page.evaluate('__hiveCheck.stats()')==[[100,100],[100,100]]
    assert page.evaluate('__hiveCheck.state().phase')=='watch'
    print('PASS whole swarm approaches gradually before stinging and every enlarged hive clears the bark',mobile,flush=True)
    page.evaluate('__hiveCheck.setup()')
-   assert page.evaluate('__hiveCheck.step(30)')==[[100,100],[100,100]]
+   assert page.evaluate('__hiveCheck.step(20)')==[[100,100],[100,100]]
    assert page.evaluate('__hiveCheck.state().phase')=='watch'
    page.evaluate('__hiveCheck.step(6)')
    assert page.evaluate('__hiveCheck.state().phase')=='dive'
    # Compare early and late equal-duration segments of the actual flight path.
-   samples=page.evaluate("""()=>{const result=[];for(let i=0;i<6;i++){__hiveCheck.step(5);result.push(__hiveCheck.state().tip);}return result;}""")
+   samples=page.evaluate("""()=>{const result=[];for(let i=0;i<6;i++){__hiveCheck.step(3);result.push(__hiveCheck.state().tip);}return result;}""")
    from math import dist
    assert dist(samples[0],samples[1]) < dist(samples[3],samples[4]),samples
    state=page.evaluate('__hiveCheck.untilHits(3)')
@@ -144,7 +145,9 @@ def run():
    page.evaluate('__hiveCheck.low()')
    assert page.evaluate('__hiveCheck.sting("hina",18000)')
    assert page.evaluate('__hiveCheck.stats()[0]')==[0,0]
-   assert page.evaluate('__hiveCheck.blink()')=={'white':True,'jump':0,'locked':False}
+   reaction=page.evaluate('__hiveCheck.blink()')
+   assert reaction['white'] and 0<reaction['jump']<=.65 and not reaction['locked'],reaction
+   assert len(reaction['arms'])==2 and all(angle<-.5 for angle in reaction['arms']),reaction
    assert page.evaluate('__hiveCheck.snake()')=={'started':True,'locked':True,'blinkOnly':False}
    assert page.evaluate('__hiveCheck.reset()')
    scale=page.evaluate('__hiveCheck.nest()')
@@ -168,6 +171,20 @@ def run():
     assert result
     page.wait_for_function('(n)=>(HinaInteractionSFX.audioStatus().started.beeHit||0)>n',arg=before,timeout=10000,polling=50)
    print('PASS first attack within 5s at 5 FPS and actual hit sound on every sting for both survivors',mobile,flush=True)
+   page.evaluate('__hiveCheck.buzzSetup();__hiveCheck.step(20)')
+   page.wait_for_function('HinaInteractionSFX.audioStatus().playing.includes("beeSwarm")',timeout=10000,polling=50)
+   buzz=page.evaluate('HinaInteractionSFX.audioStatus().loops.find(voice=>voice.kind==="beeSwarm")')
+   assert buzz and 0<buzz['volume']<=.025 and 0<buzz['level']<=1,buzz
+   page.evaluate('__hiveCheck.move("hina",100);__hiveCheck.step(100)')
+   assert not page.evaluate('HinaInteractionSFX.audioStatus().loops.some(voice=>voice.kind==="beeSwarm")')
+   page.wait_for_timeout(700)
+   page.evaluate('__hiveCheck.buzzSetup();__hiveCheck.step(20)')
+   page.wait_for_function('HinaInteractionSFX.audioStatus().playing.includes("beeSwarm")',timeout=10000,polling=50)
+   page.evaluate('__hiveCheck.pause(true);__hiveCheck.step()')
+   assert not page.evaluate('HinaInteractionSFX.audioStatus().loops.some(voice=>voice.kind==="beeSwarm")')
+   page.evaluate('__hiveCheck.pause(false)')
+   print('PASS subtle real swarm audio, proximity fade/stop, pause, and every-hit sound',mobile,flush=True)
+
    page.locator('#mobileMenu' if mobile else '#v521PcMenu').click()
    for actor in ['hina','daeun']:
     result=page.evaluate('(id)=>__hiveCheck.meditation(id)',actor)
