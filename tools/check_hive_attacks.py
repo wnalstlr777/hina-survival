@@ -13,7 +13,7 @@ window.__hiveCheck={
   this.actor=id;this.now=performance.now();this.events=[];paused=false;selectCharacter(id);if(id==='hina')hinaManual=true;else daeun.auto=false;
   wildHiveLastSting.clear();lastWildHiveUpdate=this.now;wildHiveClockPaused=false;
   const p=wildHives[0].position;
-  for(const [key,ch] of characters)if(key!==id)ch.mesh.position.set(p.x+100,0,p.z+100);
+  for(const [key,ch] of characters)if(key!==id)ch.mesh.position.set(p.x+1000,0,p.z+1000);
   characters.get(id).mesh.position.set(p.x+1.2,p.y-1,p.z);
   for(const hive of wildHives)hive.attack=null;
  },
@@ -23,7 +23,7 @@ window.__hiveCheck={
   paused=false;wildHiveLastSting.clear();this.now=1000;this.events=[];this.actor='hina';lastWildHiveUpdate=this.now;wildHiveClockPaused=false;
   for(const r of snakeFearReactions.values()){restoreSnakeFearOverlay(r);for(const p of r.parts)for(const m of Array.isArray(p.white)?p.white:[p.white])m.dispose();}snakeFearReactions.clear();
   const p=wildHives[0].position;
-  for(const ch of characters.values())if(ch.mesh)ch.mesh.position.set(p.x+100,0,p.z+100);
+  for(const ch of characters.values())if(ch.mesh)ch.mesh.position.set(p.x+1000,0,p.z+1000);
   for(const id of ['hina','daeun']){delete characters.get(id).stats.health;Object.assign(characters.get(id).stats,{energy:100,will:100});}
   characters.get('hina').mesh.position.set(p.x+3,p.y-1,p.z);
   for(const hive of wildHives)hive.attack=null;
@@ -36,9 +36,11 @@ window.__hiveCheck={
  }return this.stats();},
  screenshot(){this.setup();this.actor='daeun';observedId='daeun';daeun.auto=false;__brief.clock(10,9);this.move('hina',100);this.move('daeun',6.5);Object.assign(daeun.stats,{energy:47,hunger:57,thirst:57,will:70});},
  stats(){return ['hina','daeun'].map(id=>{const s=characters.get(id).stats;return [s.energy,s.will];});},
+ untilPhase(phase){for(let i=0;i<250&&wildHives[0].attack?.phase!==phase;i++)this.step();return this.state();},
+ placement(){const geometry=wildHivePools.get('nest').geometry;geometry.computeBoundingBox();return wildHives.map(h=>{const matrix=new THREE.Matrix4().compose(h.position,new THREE.Quaternion().setFromEuler(new THREE.Euler(0,0,-.06)),new THREE.Vector3(1.35,1.65,1.35)),bounds=geometry.boundingBox.clone().applyMatrix4(matrix);return bounds.min.x-h.trunkEdge;});},
  untilHits(count){for(let i=0;i<1000&&this.events.length<count;i++)this.step();return this.state();},
- state(){const a=wildHives[0].attack;return {phase:a?.phase,hits:a?.hits,bee:a?.beeIndex,tip:a?.tip.toArray(),events:this.events};},
- move(id,distance){const p=wildHives[0].position;characters.get(id).mesh.position.set(p.x+distance,p.y-1,p.z);},
+ state(){const a=wildHives[0].attack;return {phase:a?.phase,hits:a?.hits,bee:a?.beeIndex,tip:a?.tip.toArray(),swarm:a?.swarmCenter.toArray(),events:this.events};},
+ move(id,distance){const p=wildHives[0].position;characters.get(id).mesh.position.set(p.x+(distance>=50?distance*10:distance),p.y-1,p.z+(distance>=50?distance*10:0));},
  pause(value){paused=value;},
  reset(){resetSurvivalPresentation();return wildHives.every(h=>h.attack===null)&&wildHiveLastSting.size===0;},
  low(){stats.energy=2;stats.will=3;},
@@ -80,12 +82,22 @@ def run():
    assert captured[1]==[60.62,72.52],captured
    print('PASS native stat schema and supplied diagnostic case: energy 63.62 to 60.62; will 77.52 to 72.52',mobile,flush=True)
    page.evaluate('__hiveCheck.screenshot()')
-   screenshot=page.evaluate('__hiveCheck.step(25,200)')
+   screenshot=page.evaluate('__hiveCheck.step(45,200)')
    assert screenshot[1]==[44,65], ('Daeun on day 10 should be attacked inside the hive discovery radius',screenshot,page.evaluate('__hiveCheck.state()'))
    print('PASS screenshot scenario: day-10 manual Daeun, 6.5m from hive, health 47 to 44 and will 70 to 65',mobile,flush=True)
    page.evaluate('__hiveCheck.setup()')
    slow=page.evaluate('__hiveCheck.step(25,200)')
    assert slow==[[97,95],[100,100]], ('5 FPS should still deliver the first sting within 5 seconds',slow,page.evaluate('__hiveCheck.state()'))
+   gaps=page.evaluate('__hiveCheck.placement()')
+   assert gaps and min(gaps)>.1,gaps
+   page.evaluate('__hiveCheck.setup();__hiveCheck.move("hina",6.5);__hiveCheck.step()')
+   approach=page.evaluate("""()=>{const positions=[];for(let i=0;i<30;i++){__hiveCheck.step();positions.push(__hiveCheck.state().swarm);}return positions;}""")
+   from math import dist
+   assert dist(approach[0],approach[-1])>.7,approach
+   assert all(dist(a,b)<=1.25*.05+1e-6 for a,b in zip(approach,approach[1:])),approach
+   assert page.evaluate('__hiveCheck.stats()')==[[100,100],[100,100]]
+   assert page.evaluate('__hiveCheck.state().phase')=='watch'
+   print('PASS whole swarm approaches gradually before stinging and every enlarged hive clears the bark',mobile,flush=True)
    page.evaluate('__hiveCheck.setup()')
    assert page.evaluate('__hiveCheck.step(30)')==[[100,100],[100,100]]
    assert page.evaluate('__hiveCheck.state().phase')=='watch'
@@ -101,8 +113,8 @@ def run():
    assert [e['bee'] for e in state['events']]==[0,1,2],state
    assert all(e['blink'] and not e['locked'] for e in state['events']),state
    assert all(b['now']-a['now']>=4000 for a,b in zip(state['events'],state['events'][1:])),state
-   assert page.evaluate('__hiveCheck.step(25)')==[[91,85],[100,100]]
-   assert page.evaluate('__hiveCheck.state().phase')=='rest'
+   assert page.evaluate('__hiveCheck.untilPhase("rest").phase')=='rest'
+   assert page.evaluate('__hiveCheck.stats()')==[[91,85],[100,100]]
    assert page.evaluate('__hiveCheck.step(30)')==[[91,85],[100,100]]
    page.evaluate('__hiveCheck.untilHits(4)')
    assert page.evaluate('__hiveCheck.stats()')==[[88,80],[100,100]]

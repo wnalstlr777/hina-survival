@@ -47,7 +47,7 @@ def run():
    page.locator('#hiveDiagnosticCopy').click()
    assert page.locator('#hiveDiagnosticText').is_visible()
    data=json.loads(page.locator('#hiveDiagnosticText').input_value())
-   assert data['current']['diagnosticVersion']=='5.2.90'
+   assert data['current']['diagnosticVersion']=='5.2.91'
    assert data['current']['game']['selectedId']=='daeun'
    assert data['current']['game']['day']==10
    assert data['current']['game']['nearest'][0]['distance']==6.5
@@ -79,7 +79,7 @@ def run():
    context.close()
   # The diagnostic script runs before the game module and survives a fatal startup error.
   page=browser.new_page()
-  broken='''<!doctype html><html><head><script src="hive-diagnostics.js?v=5.2.90"></script><script>throw new Error("diagnostic startup failure fixture")</script></head><body></body></html>'''
+  broken='''<!doctype html><html><head><script src="hive-diagnostics.js?v=5.2.91"></script><script>throw new Error("diagnostic startup failure fixture")</script></head><body></body></html>'''
   page.route(re.compile(r'^http://127\.0\.0\.1:8000/\?'),lambda route:route.fulfill(status=200,content_type='text/html',body=broken))
   page.goto('http://127.0.0.1:8000/?hive-debug=1&private=do-not-copy',wait_until='load')
   assert page.locator('#hiveDiagnosticPanel').is_visible()
