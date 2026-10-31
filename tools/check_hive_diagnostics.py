@@ -15,6 +15,7 @@ window.__diagnosticsTest={
  state(){return JSON.stringify({paused,actor:observedId,position:characters.get(observedId).mesh.position.toArray(),stats:characters.get(observedId).stats,updates:wildHiveUpdateCount});},
  pause(value){paused=value;},
  phase(value,target='daeun'){wildHives[0].attack={phase:value,age:.25,hits:1,beeIndex:1,targetId:target};lastWildHiveUpdate=performance.now();},
+ invalidVitality(){daeun.stats.energy=NaN;lastWildHiveUpdate=performance.now();},
  escape(){__hiveCheck.move('daeun',20);lastWildHiveUpdate=performance.now();}
 };
 '''
@@ -46,11 +47,13 @@ def run():
    page.locator('#hiveDiagnosticCopy').click()
    assert page.locator('#hiveDiagnosticText').is_visible()
    data=json.loads(page.locator('#hiveDiagnosticText').input_value())
-   assert data['current']['diagnosticVersion']=='5.2.89'
+   assert data['current']['diagnosticVersion']=='5.2.90'
    assert data['current']['game']['selectedId']=='daeun'
    assert data['current']['game']['day']==10
    assert data['current']['game']['nearest'][0]['distance']==6.5
    assert data['current']['game']['actor']['health']==47
+   assert data['current']['game']['actor']['energy']==47
+   assert data['current']['game']['actor']['vitalityKey']=='energy'
    assert data['current']['gameSnapshotAvailable']
    assert '?' not in data['current']['page']
    page.evaluate('__diagnosticsTest.pause(true);__diagnosticsTest.fresh()')
@@ -70,11 +73,13 @@ def run():
    page.wait_for_timeout(1100)
    assert page.evaluate('HinaHiveDiagnostics.report().samples.length')==count
    assert not errors,errors
+   page.evaluate('__diagnosticsTest.invalidVitality()')
+   assert page.evaluate('HinaHiveDiagnostics.snapshot().game.nearest[0].reason')=='invalid_vitality_stat'
    print('PASS settings entry, read-only background recording, report details, stop, copy/fallback and download',mobile,flush=True)
    context.close()
   # The diagnostic script runs before the game module and survives a fatal startup error.
   page=browser.new_page()
-  broken='''<!doctype html><html><head><script src="hive-diagnostics.js?v=5.2.89"></script><script>throw new Error("diagnostic startup failure fixture")</script></head><body></body></html>'''
+  broken='''<!doctype html><html><head><script src="hive-diagnostics.js?v=5.2.90"></script><script>throw new Error("diagnostic startup failure fixture")</script></head><body></body></html>'''
   page.route(re.compile(r'^http://127\.0\.0\.1:8000/\?'),lambda route:route.fulfill(status=200,content_type='text/html',body=broken))
   page.goto('http://127.0.0.1:8000/?hive-debug=1&private=do-not-copy',wait_until='load')
   assert page.locator('#hiveDiagnosticPanel').is_visible()

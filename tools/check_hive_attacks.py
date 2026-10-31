@@ -9,32 +9,42 @@ ROOT = Path(__file__).resolve().parents[1]
 BASE = runpy.run_path(str(ROOT / 'tools/check_stabilization.py'))
 FIXTURE = r'''
 window.__hiveCheck={
+ nativeApproach(id){
+  this.actor=id;this.now=performance.now();this.events=[];paused=false;selectCharacter(id);if(id==='hina')hinaManual=true;else daeun.auto=false;
+  wildHiveLastSting.clear();lastWildHiveUpdate=this.now;wildHiveClockPaused=false;
+  const p=wildHives[0].position;
+  for(const [key,ch] of characters)if(key!==id)ch.mesh.position.set(p.x+100,0,p.z+100);
+  characters.get(id).mesh.position.set(p.x+1.2,p.y-1,p.z);
+  for(const hive of wildHives)hive.attack=null;
+ },
+ schema(){return ['hina','daeun'].map(id=>({id,hasHealth:Object.hasOwn(characters.get(id).stats,'health'),energy:characters.get(id).stats.energy,will:characters.get(id).stats.will}));},
+ diagnosticCase(){this.setup();this.actor='daeun';observedId='daeun';daeun.auto=false;__brief.clock(1,12);this.move('hina',100);this.move('daeun',1.2);Object.assign(daeun.stats,{energy:63.62,will:77.52});},
  setup(){
   paused=false;wildHiveLastSting.clear();this.now=1000;this.events=[];this.actor='hina';lastWildHiveUpdate=this.now;wildHiveClockPaused=false;
   for(const r of snakeFearReactions.values()){restoreSnakeFearOverlay(r);for(const p of r.parts)for(const m of Array.isArray(p.white)?p.white:[p.white])m.dispose();}snakeFearReactions.clear();
   const p=wildHives[0].position;
   for(const ch of characters.values())if(ch.mesh)ch.mesh.position.set(p.x+100,0,p.z+100);
-  for(const id of ['hina','daeun'])Object.assign(characters.get(id).stats,{health:100,will:100});
+  for(const id of ['hina','daeun']){delete characters.get(id).stats.health;Object.assign(characters.get(id).stats,{energy:100,will:100});}
   characters.get('hina').mesh.position.set(p.x+3,p.y-1,p.z);
   for(const hive of wildHives)hive.attack=null;
   camera.position.set(p.x+1000,p.y+1000,p.z+1000);
  },
  step(n=1,interval=50){for(let i=0;i<n;i++){
   this.now+=interval;for(const r of snakeFearReactions.values())restoreSnakeFearOverlay(r);updateSnakeFearOverlay(.05);
-  const before=characters.get(this.actor).stats.health;updateWildHives(this.now);
-  if(characters.get(this.actor).stats.health<before)this.events.push({now:this.now,bee:wildHives[0].attack.beeIndex,blink:snakeFearReactions.has('hina'),locked:snakeFearLocked('hina')});
+  const before=characters.get(this.actor).stats.energy;updateWildHives(this.now);
+  if(characters.get(this.actor).stats.energy<before)this.events.push({now:this.now,bee:wildHives[0].attack.beeIndex,blink:snakeFearReactions.has('hina'),locked:snakeFearLocked('hina')});
  }return this.stats();},
- screenshot(){this.setup();this.actor='daeun';observedId='daeun';daeun.auto=false;__brief.clock(10,9);this.move('hina',100);this.move('daeun',6.5);Object.assign(daeun.stats,{health:47,energy:57,hunger:57,thirst:57,will:70});},
- stats(){return ['hina','daeun'].map(id=>{const s=characters.get(id).stats;return [s.health,s.will];});},
+ screenshot(){this.setup();this.actor='daeun';observedId='daeun';daeun.auto=false;__brief.clock(10,9);this.move('hina',100);this.move('daeun',6.5);Object.assign(daeun.stats,{energy:47,hunger:57,thirst:57,will:70});},
+ stats(){return ['hina','daeun'].map(id=>{const s=characters.get(id).stats;return [s.energy,s.will];});},
  untilHits(count){for(let i=0;i<1000&&this.events.length<count;i++)this.step();return this.state();},
  state(){const a=wildHives[0].attack;return {phase:a?.phase,hits:a?.hits,bee:a?.beeIndex,tip:a?.tip.toArray(),events:this.events};},
  move(id,distance){const p=wildHives[0].position;characters.get(id).mesh.position.set(p.x+distance,p.y-1,p.z);},
  pause(value){paused=value;},
  reset(){resetSurvivalPresentation();return wildHives.every(h=>h.attack===null)&&wildHiveLastSting.size===0;},
- low(){stats.health=2;stats.will=3;},
+ low(){stats.energy=2;stats.will=3;},
  blink(){const r=snakeFearReactions.get("hina");restoreSnakeFearOverlay(r);updateSnakeFearOverlay(.001);return {white:r.parts.every(p=>p.mesh.material===p.white),jump:r.jump,locked:snakeFearLocked("hina")};},
  sting(id,now){return wildHiveSting(id,now);},
- soundActor(id){observedId=id;characters.get(id).stats.will=0;characters.get(id).stats.health=100;wildHiveLastSting.clear();HinaInteractionSFX.setPaused(true);HinaInteractionSFX.setPaused(false);},
+ soundActor(id){observedId=id;characters.get(id).stats.will=0;characters.get(id).stats.energy=100;wildHiveLastSting.clear();HinaInteractionSFX.setPaused(true);HinaInteractionSFX.setPaused(false);},
  snake(){const started=startSnakeFearReaction("hina");return {started,locked:snakeFearLocked("hina"),blinkOnly:snakeFearReactions.get("hina").blinkOnly};},
  nest(){const p=wildHives[0].position;camera.position.copy(p).add(new THREE.Vector3(0,1,8));camera.lookAt(p);camera.updateMatrixWorld(true);updateWildHives(this.now,.05);const matrix=new THREE.Matrix4();wildHivePools.get('nest').getMatrixAt(0,matrix);return new THREE.Vector3().setFromMatrixScale(matrix).toArray();},
  meditation(id){__stable.setup(id,false);observedId=id;const started=v504MeditationStart(id);refreshHinaManualEmojis();if(id==='daeun')refreshManualActionUI();return {started,hina: getComputedStyle(hinaManualMarkers.fire).display,daeun:getComputedStyle(fireEmojiMarker).display};},
@@ -56,6 +66,19 @@ def run():
    page.route('http://127.0.0.1:8000/',lambda route:route.fulfill(status=200,content_type='text/html',body=BODY))
    page.goto('http://127.0.0.1:8000/',wait_until='domcontentloaded',timeout=90000)
    page.wait_for_function('!!window.__hiveCheck',timeout=90000)
+   schema=page.evaluate('__hiveCheck.schema()')
+   assert all(not actor['hasHealth'] for actor in schema),schema
+   for actor in ['daeun','hina']:
+    page.evaluate('(id)=>__hiveCheck.nativeApproach(id)',actor)
+    before=page.evaluate('__hiveCheck.stats()')
+    after=page.evaluate('__hiveCheck.step(25,200)')
+    index=0 if actor=='hina' else 1
+    assert after[index]==[before[index][0]-3,before[index][1]-5],('Native game stats must be damaged without inventing a health field',actor,before,after)
+    assert all(not item['hasHealth'] for item in page.evaluate('__hiveCheck.schema()'))
+   page.evaluate('__hiveCheck.diagnosticCase()')
+   captured=page.evaluate('__hiveCheck.step(25,200)')
+   assert captured[1]==[60.62,72.52],captured
+   print('PASS native stat schema and supplied diagnostic case: energy 63.62 to 60.62; will 77.52 to 72.52',mobile,flush=True)
    page.evaluate('__hiveCheck.screenshot()')
    screenshot=page.evaluate('__hiveCheck.step(25,200)')
    assert screenshot[1]==[44,65], ('Daeun on day 10 should be attacked inside the hive discovery radius',screenshot,page.evaluate('__hiveCheck.state()'))

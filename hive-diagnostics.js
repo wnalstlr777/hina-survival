@@ -1,7 +1,7 @@
 /* Read-only, local diagnostics. Nothing is uploaded automatically. */
 (()=>{
  'use strict';
- const VERSION='5.2.89',errors=[],samples=[],startedAt=performance.now();
+ const VERSION='5.2.90',errors=[],samples=[],startedAt=performance.now();
  let recording=false,timer=null,panel=null,summary=null,output=null,status=null,toggle=null;
  const bounded=(list,item,max)=>{list.push(item);if(list.length>max)list.shift();};
  const safePath=value=>{try{const u=new URL(value,location.href);return /https?:/.test(u.protocol)?(u.origin+u.pathname).slice(0,300):u.protocol;}catch{return String(value||'').slice(0,160);}};
@@ -18,7 +18,7 @@
  }
  function report(){return {format:'HINA_HIVE_DIAGNOSTIC_V1',collectedAt:new Date().toISOString(),recording,current:snapshot(),errors:[...errors],samples:[...samples]};}
  const text=()=>JSON.stringify(report(),null,2);
- const reasons={ready:'공격 준비 가능',game_paused:'게임이 일시정지됨',page_hidden:'게임 탭이 숨겨짐',selected_actor_unavailable:'선택 캐릭터가 없거나 체력이 0',hive_loop_not_started:'벌 공격 업데이트가 시작되지 않음',hive_loop_stale:'벌 공격 업데이트가 지연되거나 멈춤',attacking_other_character:'다른 캐릭터를 공격 중',rest_between_volleys:'세 번 공격 후 휴식 중',sting_cooldown:'피해 간격 4초를 기다리는 중',watching_before_dive:'돌진 전 관찰 중',diving:'캐릭터를 향해 돌진 중',returning_to_hive:'벌통으로 복귀 중',outside_attack_radius:'공격 범위 밖',inside_radius_but_idle:'범위 안인데 공격 시작 안 됨'};
+ const reasons={ready:'공격 준비 가능',game_paused:'게임이 일시정지됨',page_hidden:'게임 탭이 숨겨짐',invalid_vitality_stat:'체력 데이터가 없거나 숫자가 아님',selected_actor_unavailable:'선택 캐릭터가 없거나 체력이 0',hive_loop_not_started:'벌 공격 업데이트가 시작되지 않음',hive_loop_stale:'벌 공격 업데이트가 지연되거나 멈춤',attacking_other_character:'다른 캐릭터를 공격 중',rest_between_volleys:'세 번 공격 후 휴식 중',sting_cooldown:'피해 간격 4초를 기다리는 중',watching_before_dive:'돌진 전 관찰 중',diving:'캐릭터를 향해 돌진 중',returning_to_hive:'벌통으로 복귀 중',outside_attack_radius:'공격 범위 밖',inside_radius_but_idle:'범위 안인데 공격 시작 안 됨'};
  function render(){
   if(!panel||panel.hidden)return;
   const current=snapshot(),g=current.game?.snapshotError?null:current.game,h=g?.nearest?.[0];
